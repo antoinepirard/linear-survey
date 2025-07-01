@@ -1,6 +1,6 @@
 # Folio
 
-Personal portfolio website built with Next.js and Radix UI.
+Personal portfolio website built with Next.js and Tailwind CSS.
 
 ## Getting Started
 
@@ -23,16 +23,15 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 ## Tech Stack
 
 - **Framework**: [Next.js](https://nextjs.org) with App Router
-- **UI Library**: [Radix UI](https://www.radix-ui.com/themes) for components and theming
+- **Styling**: [Tailwind CSS](https://tailwindcss.com) for utility-first styling
 - **Language**: TypeScript
-- **Styling**: Radix UI Themes (migrated from Tailwind CSS)
 
 ## Learn More
 
 To learn more about the technologies used:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
-- [Radix UI Themes](https://www.radix-ui.com/themes/docs) - comprehensive design system
+- [Tailwind CSS](https://tailwindcss.com/docs) - utility-first CSS framework
 - [TypeScript](https://www.typescriptlang.org/docs/) - typed JavaScript
 
 ## Deploy on Vercel
