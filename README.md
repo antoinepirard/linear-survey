@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Folio
+
+Personal portfolio website built with Next.js and Radix UI.
 
 ## Getting Started
 
@@ -18,16 +20,20 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org) with App Router
+- **UI Library**: [Radix UI](https://www.radix-ui.com/themes) for components and theming
+- **Language**: TypeScript
+- **Styling**: Radix UI Themes (migrated from Tailwind CSS)
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn more about the technologies used:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
+- [Radix UI Themes](https://www.radix-ui.com/themes/docs) - comprehensive design system
+- [TypeScript](https://www.typescriptlang.org/docs/) - typed JavaScript
 
 ## Deploy on Vercel
 
