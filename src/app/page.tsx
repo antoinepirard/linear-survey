@@ -1,3 +1,4 @@
+
 import { Flex, Text, Heading, Container, Box } from "@radix-ui/themes";
 
 export default function Home() {
@@ -53,15 +54,19 @@ export default function Home() {
             
             <Box>
               <Text size="2" weight="bold" color="gray">
-                Central App
+                Zenly
               </Text>
             </Box>
             
             <Box>
               <Text size="2" weight="bold" color="gray">
-                CAMBRIDGE
-                <br />
-                <Text size="1">Judge Business School</Text>
+                Snap Inc.
+              </Text>
+            </Box>
+            
+            <Box>
+              <Text size="2" weight="bold" color="gray">
+                Figma
               </Text>
             </Box>
           </Flex>
