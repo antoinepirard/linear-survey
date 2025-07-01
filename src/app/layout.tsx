@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Theme } from "@radix-ui/themes";
+import { Analytics } from "@vercel/analytics/react";
 import "@radix-ui/themes/styles.css";
 import "./globals.css";
 
@@ -37,6 +38,7 @@ export default function RootLayout({
           scaling="100%"
         >
           {children}
+          <Analytics />
         </Theme>
       </body>
     </html>
