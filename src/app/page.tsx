@@ -17,7 +17,7 @@ export default function Home() {
       try {
         const data = await getHighlights();
         console.log('Fetched highlights data:', data);
-        setHighlights(data);
+        setHighlights(data || []);
       } catch (error) {
         console.error('Failed to fetch highlights:', error);
         // Fallback to empty array if fetch fails
