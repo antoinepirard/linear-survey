@@ -38,10 +38,10 @@ export default function Home() {
           <div className="pt-9 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-base font-bold text-slate-900">
+                <h1 className="text-base font-semibold text-slate-900">
                   Antoine Pirard
                 </h1>
-                <p className="text-base font-regular text-slate-600">
+                <p className="text-base font-normal text-slate-600">
                   Product design leader
                 </p>
               </div>
@@ -55,9 +55,9 @@ export default function Home() {
               <motion.div
                 layoutId="photo"
                 onClick={() => setIsModalOpen(true)}
-                className="cursor-zoom-in"
+                className="cursor-zoom-in interactive-element"
                 whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.15 }}
                 style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
               >
                 <Image
@@ -65,7 +65,7 @@ export default function Home() {
                   alt="Antoine Pirard"
                   width={200}
                   height={250}
-                  className="rounded-2xl shadow-2xl transform rotate-2 hover:rotate-1 transition-transform duration-300 border-4 border-white object-cover"
+                  className="rounded-2xl shadow-2xl transform rotate-2 border-4 border-white object-cover interactive-element photo-hover transition-transform duration-150"
                   style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
                   priority
                 />
@@ -76,16 +76,16 @@ export default function Home() {
           {/* Main Content */}
           <div className="flex flex-col gap-6 max-w-2xl">
             <div className="animate-fade-in-up" style={{ animationDelay: '150ms' }}>
-              <p className="text-base font-medium leading-relaxed text-slate-950">
+              <p className="fluid-text-base font-medium leading-relaxed text-slate-950">
                 Product design leader scaling startups from nothing to millions in ARR.
               </p>
-              <p className="text-base leading-relaxed text-slate-700">
+              <p className="fluid-text-base leading-relaxed text-slate-700">
                 — I&apos;m building experiences and teams that allow businesses to scale to their full potential.
               </p>
             </div>
 
             <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-              <p className="text-base leading-relaxed text-slate-600">
+              <p className="fluid-text-base leading-relaxed text-slate-600">
                 Over the last 10 years, I&apos;ve helped early-stage startup founders create products from the ground up, 
                 led teams and developed successful product strategy. I thrive in strategic chaos clearing and crafting 
                 the detailed experiences that make a product feel complete.

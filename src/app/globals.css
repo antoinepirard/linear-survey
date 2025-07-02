@@ -1,12 +1,44 @@
 @import 'tailwindcss';
 
-/* Text selection styling */
+/* Typography optimizations for better legibility */
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Touch optimizations - hover states only apply on devices that can hover */
+@media (hover: hover) {
+  /* Photo hover rotation - only on hover-capable devices */
+  .photo-hover:hover {
+    transform: rotate(1deg) !important;
+  }
+  
+
+}
+
+/* Enhanced text selection styling */
 ::selection {
   background-color: #334155; /* slate-700 */
   color: white;
+  text-shadow: none; /* Remove text shadow on selection */
 }
 
-/* Subtle appearance transitions */
+/* Fluid typography for better responsive design */
+.fluid-text-lg {
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+}
+
+.fluid-text-base {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+/* Tabular numbers for consistent alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Optimized animations - under 200ms for immediate feel */
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -19,14 +51,48 @@
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 200ms ease-out forwards;
+  animation: fade-in-up 150ms ease-out forwards;
   opacity: 0;
+  will-change: opacity, transform;
 }
 
-/* Animated color blocks border */
+/* Performance optimization for animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Interactive elements optimizations */
+.interactive-element {
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+/* Focus states using box-shadow for better radius support */
+.interactive-element:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.1);
+  border-radius: inherit;
+}
+
+/* Button and link focus states */
+a:focus-visible,
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.1);
+  border-radius: 0.375rem;
+}
+
+/* Smooth scrolling for anchor navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Animated color blocks border - decorative element */
 .color-border {
   position: relative;
   overflow: hidden;
+  pointer-events: none; /* Prevent hijacking events */
 }
 
 .color-border::after {
