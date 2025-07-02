@@ -1,3 +1,52 @@
 @import 'tailwindcss';
 
-/* Remove custom global styles - let Tailwind handle everything */
+/* Subtle appearance transitions */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 200ms ease-out forwards;
+  opacity: 0;
+}
+
+/* Animated color blocks border */
+.color-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.color-border::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    #ef4444 0%,
+    #ef4444 20%,
+    #f97316 20%,
+    #f97316 40%,
+    #eab308 40%,
+    #eab308 60%,
+    #22c55e 60%,
+    #22c55e 80%,
+    #3b82f6 80%,
+    #3b82f6 100%
+  );
+  transform: translateX(-100%);
+  transition: transform 300ms ease-out;
+}
+
+.color-border:hover::after {
+  transform: translateX(0);
+}
