@@ -72,11 +72,11 @@ export default function Home() {
                 style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
               >
                 <Image
-                  src="/Assets/Images/antoine-olivia.jpg"
+                  src="/Assets/Images/IMG_0169 2.jpeg"
                   alt="Antoine Pirard"
                   width={200}
                   height={250}
-                  className="rounded-2xl shadow-2xl transform rotate-2 hover:rotate-1 transition-transform duration-300 border-4 border-white"
+                  className="rounded-2xl shadow-2xl transform rotate-2 hover:rotate-1 transition-transform duration-300 border-4 border-white object-cover"
                   style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
                   priority
                 />
