@@ -9,31 +9,31 @@ import LocationTime from '@/components/LocationTime';
 const highlightsData = [
   {
     title: 'Rasayel Reporting',
-    description: 'Lead Platform Team',
-    category: '2021 – Present',
+    description: 'Product Lead',
+    category: '2025',
     href: '#'
   },  {
     title: 'Rasayel Automations',
-    description: 'Product Research & Design',
-    category: '2021 – Present',
+    description: 'Senior Product Designer',
+    category: '2023 - 2024',
     href: '#'
   },
   {
     title: 'Rasayel Inbox',
-    description: 'Product strategy and development',
-    category: 'Product',
+    description: 'Senior Product Designer',
+    category: '2022 - 2025',
     href: '#'
   },
   {
     title: 'GoVocal',
-    description: 'Design tool and workflow optimization',
-    category: 'Product, Web',
+    description: 'Product Designer',
+    category: '2016 - 2021',
     href: '#'
   },
   {
-    title: 'Insights',
-    description: 'Data visualization and analytics platform',
-    category: 'Web',
+    title: 'CentralApp',
+    description: 'Product Designer',
+    category: '2015 - 2016',
     href: '#'
   }
 ];
