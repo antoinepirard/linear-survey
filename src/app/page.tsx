@@ -106,7 +106,7 @@ export default function Home() {
           <ListItem items={highlightsData} title="Highlights" animationDelay="300ms" />
 
           {/* Company Logos Section */}
-          <div className="mt-9 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
+          <div className="mt-9 animate-fade-in-up mb-30" style={{ animationDelay: '400ms' }}>
             <div className="flex gap-12 items-center flex-wrap">
               <div className="h-8 flex items-center">
                 <Image 
