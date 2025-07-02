@@ -1,45 +1,34 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import ListItem from '@/components/ListItem';
 import LocationTime from '@/components/LocationTime';
-
-const highlightsData = [
-  {
-    title: 'Rasayel Reporting',
-    description: 'Product Lead',
-    category: '2025',
-    href: '#'
-  },  {
-    title: 'Rasayel Automations',
-    description: 'Senior Product Designer',
-    category: '2023 - 2024',
-    href: '#'
-  },
-  {
-    title: 'Rasayel Inbox',
-    description: 'Senior Product Designer',
-    category: '2022 - 2025',
-    href: '#'
-  },
-  {
-    title: 'GoVocal',
-    description: 'Product Designer',
-    category: '2016 - 2021',
-    href: '#'
-  },
-  {
-    title: 'CentralApp',
-    description: 'Product Designer',
-    category: '2015 - 2016',
-    href: '#'
-  }
-];
+import { getHighlights, type Highlight } from '@/sanity/lib/fetch';
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [highlights, setHighlights] = useState<Highlight[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchHighlights() {
+      try {
+        const data = await getHighlights();
+        console.log('Fetched highlights data:', data);
+        setHighlights(data);
+      } catch (error) {
+        console.error('Failed to fetch highlights:', error);
+        // Fallback to empty array if fetch fails
+        setHighlights([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchHighlights();
+  }, []);
 
   return (
     <div className="bg-white min-h-screen relative">
@@ -105,7 +94,30 @@ export default function Home() {
           </div>
 
           {/* Highlights Section */}
-          <ListItem items={highlightsData} title="Highlights" animationDelay="300ms" />
+          {isLoading ? (
+            <div className="mt-9 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+              <div className="text-center py-8">
+                <div className="text-slate-500">Loading highlights...</div>
+              </div>
+            </div>
+          ) : (
+            <ListItem 
+              items={highlights.map(highlight => {
+                console.log('Raw highlight from Sanity:', highlight);
+                const mappedItem = {
+                  title: highlight.title,
+                  description: highlight.description,
+                  category: highlight.category,
+                  slug: typeof highlight.slug === 'string' ? highlight.slug : highlight.slug?.current,
+                  href: highlight.href
+                };
+                console.log('Mapped item:', mappedItem);
+                return mappedItem;
+              })}
+              title="Highlights" 
+              animationDelay="400ms" 
+            />
+          )}
 
           {/* Company Logos Section */}
           <div className="mt-9 animate-fade-in-up mb-30" style={{ animationDelay: '400ms' }}>
