@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+/* Text selection styling */
+::selection {
+  background-color: #334155; /* slate-700 */
+  color: white;
+}
+
 /* Subtle appearance transitions */
 @keyframes fade-in-up {
   from {

@@ -14,7 +14,7 @@ interface ListItemProps {
 export default function ListItem({ items, title = 'Highlights', animationDelay = '400ms' }: ListItemProps) {
   return (
     <div className="animate-fade-in-up" style={{ animationDelay }}>
-      <h2 className="text-sm font-medium text-slate-900 mb-6">{title}</h2>
+      <h2 className="text-base font-medium text-slate-900 mb-6">{title}</h2>
       <div className="space-y-2">
         {items.map((item, index) => (
           <div key={index} className="group">

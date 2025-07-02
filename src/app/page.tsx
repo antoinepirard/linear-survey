@@ -3,19 +3,24 @@ import ListItem from '@/components/ListItem';
 
 const highlightsData = [
   {
-    title: 'Linear',
-    description: 'Product design and strategy',
+    title: 'Rasayel Reporting',
+    description: 'Lead Platform Team',
+    category: '2021 – Present',
+    href: '#'
+  },  {
+    title: 'Rasayel Automations',
+    description: 'Product Research & Design',
     category: '2021 – Present',
     href: '#'
   },
   {
-    title: 'Triage responsibility',
+    title: 'Rasayel Inbox',
     description: 'Product strategy and development',
     category: 'Product',
     href: '#'
   },
   {
-    title: 'Figma Plugin',
+    title: 'GoVocal',
     description: 'Design tool and workflow optimization',
     category: 'Product, Web',
     href: '#'
@@ -63,8 +68,11 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Highlights Section */}
+          <ListItem items={highlightsData} title="Highlights" animationDelay="300ms" />
+
           {/* Company Logos Section */}
-          <div className="mt-9 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+          <div className="mt-9 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
             <div className="flex gap-12 items-center flex-wrap">
               <div className="h-8 flex items-center">
                 <Image 
@@ -100,9 +108,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-          {/* Highlights Section */}
-          <ListItem items={highlightsData} title="Highlights" animationDelay="400ms" />
         </div>
       </div>
     </div>
