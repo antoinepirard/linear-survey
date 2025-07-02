@@ -44,18 +44,18 @@ export default function LocationTime() {
     <div className="flex items-center gap-3 text-slate-500">
       <div className="flex items-center gap-1">
         <MapPinIcon className="h-4 w-4 text-slate-400" />
-        <span className="text-sm font-medium">Belgium</span>
+        <span className="text-sm font-regular">Belgium</span>
       </div>
       
       <div className="w-px h-4 bg-slate-200" />
       <div className="flex items-center gap-1 relative group cursor-help">
         <ClockIcon className="h-4 w-4 text-slate-400" />
-        <span className="text-sm font-medium">{currentTime}</span>
+        <span className="text-sm font-regular">{currentTime}</span>
         
         {/* Timezone tooltip */}
         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
           <span className="text-slate-300">{timezoneInfo.timezone}</span>
-          <span className="ml-1 font-semibold text-white">GMT{timezoneInfo.offset}</span>
+          <span className="ml-1 font-medium text-white">GMT{timezoneInfo.offset}</span>
           <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-slate-900"></div>
         </div>
       </div>

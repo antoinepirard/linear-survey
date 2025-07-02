@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import ListItem from '@/components/ListItem';
 import LocationTime from '@/components/LocationTime';
@@ -40,14 +40,6 @@ const highlightsData = [
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isHighResLoaded, setIsHighResLoaded] = useState(false);
-
-  // Preload the high-resolution image
-  useEffect(() => {
-    const img = new window.Image();
-    img.onload = () => setIsHighResLoaded(true);
-    img.src = '/Assets/Images/IMG_0169 2.jpeg';
-  }, []);
 
   return (
     <div className="bg-white min-h-screen relative">
@@ -74,7 +66,7 @@ export default function Home() {
               <motion.div
                 layoutId="photo"
                 onClick={() => setIsModalOpen(true)}
-                className="cursor-pointer"
+                className="cursor-zoom-in"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.2 }}
               >
@@ -161,29 +153,21 @@ export default function Home() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-zoom-out"
             onClick={() => setIsModalOpen(false)}
           >
             <motion.div
               layoutId="photo"
               className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
             >
-              {!isHighResLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                </div>
-              )}
               <Image
                 src="/Assets/Images/IMG_0169 2.jpeg"
                 alt="Antoine Pirard - High Resolution"
                 width={800}
                 height={1000}
-                className={`rounded-2xl object-contain max-w-full max-h-full transition-opacity duration-300 ${
-                  isHighResLoaded ? 'opacity-100' : 'opacity-0'
-                }`}
+                className="rounded-2xl object-contain max-w-full max-h-full cursor-zoom-out"
+                onClick={() => setIsModalOpen(false)}
                 priority
-                onLoad={() => setIsHighResLoaded(true)}
               />
               <button
                 onClick={() => setIsModalOpen(false)}
