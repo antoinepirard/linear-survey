@@ -69,6 +69,7 @@ export default function Home() {
                 className="cursor-zoom-in"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.2 }}
+                style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
               >
                 <Image
                   src="/Assets/Images/antoine-olivia.jpg"
@@ -76,6 +77,7 @@ export default function Home() {
                   width={200}
                   height={250}
                   className="rounded-2xl shadow-2xl transform rotate-2 hover:rotate-1 transition-transform duration-300 border-4 border-white"
+                  style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
                   priority
                 />
               </motion.div>
@@ -152,13 +154,14 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-zoom-out"
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-zoom-out"
             onClick={() => setIsModalOpen(false)}
           >
             <motion.div
               layoutId="photo"
               className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center"
+              style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
             >
               <Image
                 src="/Assets/Images/IMG_0169 2.jpeg"
@@ -166,18 +169,10 @@ export default function Home() {
                 width={800}
                 height={1000}
                 className="rounded-2xl object-contain max-w-full max-h-full cursor-zoom-out"
+                style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
                 onClick={() => setIsModalOpen(false)}
                 priority
               />
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors duration-200"
-                aria-label="Close modal"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
             </motion.div>
           </motion.div>
         )}
