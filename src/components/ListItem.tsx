@@ -63,7 +63,7 @@ export default function ListItem({ items, title = 'Highlights', animationDelay =
               ) : (
                 <Link 
                   href={linkHref}
-                  className="block py-4 px-2 -mx-2 border-b border-slate-100 interactive-element transition-colors duration-150 hover:border-slate-200 hover:bg-slate-50"
+                  className="block py-4 px-2 -mx-2 border-b border-slate-100 interactive-element transition-colors duration-150 hover:border-slate-200"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
