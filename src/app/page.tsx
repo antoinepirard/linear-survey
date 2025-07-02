@@ -1,5 +1,10 @@
+'use client';
+
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import ListItem from '@/components/ListItem';
+import LocationTime from '@/components/LocationTime';
 
 const highlightsData = [
   {
@@ -34,23 +39,60 @@ const highlightsData = [
 ];
 
 export default function Home() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHighResLoaded, setIsHighResLoaded] = useState(false);
+
+  // Preload the high-resolution image
+  useEffect(() => {
+    const img = new window.Image();
+    img.onload = () => setIsHighResLoaded(true);
+    img.src = '/Assets/Images/IMG_0169 2.jpeg';
+  }, []);
+
   return (
     <div className="bg-white min-h-screen relative">
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex flex-col gap-20 py-9">
           {/* Header */}
           <div className="pt-9 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
-            <h1 className="text-base font-bold text-slate-900">
-              Antoine Pirard
-            </h1>
-            <p className="text-base font-regular text-slate-600">
-              Product design leader
-            </p>
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-base font-bold text-slate-900">
+                  Antoine Pirard
+                </h1>
+                <p className="text-base font-regular text-slate-600">
+                  Product design leader
+                </p>
+              </div>
+              <LocationTime />
+            </div>
+          </div>
+
+          {/* Photo Section */}
+          <div className="flex justify-start animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+            <div className="relative">
+              <motion.div
+                layoutId="photo"
+                onClick={() => setIsModalOpen(true)}
+                className="cursor-pointer"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Image
+                  src="/Assets/Images/antoine-olivia.jpg"
+                  alt="Antoine Pirard"
+                  width={200}
+                  height={250}
+                  className="rounded-2xl shadow-2xl transform rotate-2 hover:rotate-1 transition-transform duration-300 border-4 border-white"
+                  priority
+                />
+              </motion.div>
+            </div>
           </div>
 
           {/* Main Content */}
           <div className="flex flex-col gap-6 max-w-2xl">
-            <div className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+            <div className="animate-fade-in-up" style={{ animationDelay: '150ms' }}>
               <p className="text-base font-medium leading-relaxed text-slate-950">
                 Product design leader scaling startups from nothing to millions in ARR.
               </p>
@@ -110,6 +152,52 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setIsModalOpen(false)}
+          >
+            <motion.div
+              layoutId="photo"
+              className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {!isHighResLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                </div>
+              )}
+              <Image
+                src="/Assets/Images/IMG_0169 2.jpeg"
+                alt="Antoine Pirard - High Resolution"
+                width={800}
+                height={1000}
+                className={`rounded-2xl object-contain max-w-full max-h-full transition-opacity duration-300 ${
+                  isHighResLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                priority
+                onLoad={() => setIsHighResLoaded(true)}
+              />
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors duration-200"
+                aria-label="Close modal"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
