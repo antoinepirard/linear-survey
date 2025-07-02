@@ -1,5 +1,4 @@
 import { defineField, defineType } from 'sanity'
-import type { Rule } from 'sanity'
 
 export const highlight = defineType({
   name: 'highlight',
@@ -10,7 +9,7 @@ export const highlight = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (rule: Rule) => rule.required(),
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'slug',
@@ -21,20 +20,20 @@ export const highlight = defineType({
         source: 'title',
         maxLength: 96,
       },
-      validation: (rule: Rule) => rule.required(),
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'string',
       description: 'Short description shown on the homepage',
-      validation: (rule: Rule) => rule.required(),
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'category',
       title: 'Category/Timeframe',
       type: 'string',
-      validation: (rule: Rule) => rule.required(),
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'featuredImage',
@@ -114,7 +113,7 @@ export const highlight = defineType({
       title: 'Display Order',
       type: 'number',
       description: 'Lower numbers appear first',
-      validation: (rule: Rule) => rule.required().min(0),
+      validation: (rule) => rule.required().min(0),
     }),
     defineField({
       name: 'isPublished',

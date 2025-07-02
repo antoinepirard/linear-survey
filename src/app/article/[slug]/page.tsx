@@ -55,7 +55,7 @@ export default function ArticlePage() {
         <div className="max-w-4xl mx-auto px-4 py-20">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-slate-900 mb-4">Article Not Found</h1>
-            <p className="text-slate-600 mb-8">The article you're looking for doesn't exist.</p>
+            <p className="text-slate-600 mb-8">The article you&apos;re looking for doesn&apos;t exist.</p>
             <Link 
               href="/" 
               className="inline-flex items-center text-blue-600 hover:text-blue-700 transition-colors"
@@ -71,7 +71,8 @@ export default function ArticlePage() {
   // Custom components for PortableText
   const portableTextComponents = {
     types: {
-      image: ({ value }: any) => (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      image: ({ value }: { value: any }) => (
         <div className="my-8">
           <Image
             src={urlFor(value).url()}
@@ -89,47 +90,47 @@ export default function ArticlePage() {
       ),
     },
     block: {
-      h1: ({ children }: any) => (
+      h1: ({ children }: { children: React.ReactNode }) => (
         <h1 className="text-3xl font-bold text-slate-900 mt-12 mb-6 first:mt-0">
           {children}
         </h1>
       ),
-      h2: ({ children }: any) => (
+      h2: ({ children }: { children: React.ReactNode }) => (
         <h2 className="text-2xl font-bold text-slate-900 mt-10 mb-4">
           {children}
         </h2>
       ),
-      h3: ({ children }: any) => (
+      h3: ({ children }: { children: React.ReactNode }) => (
         <h3 className="text-xl font-semibold text-slate-900 mt-8 mb-3">
           {children}
         </h3>
       ),
-      normal: ({ children }: any) => (
+      normal: ({ children }: { children: React.ReactNode }) => (
         <p className="text-slate-700 leading-relaxed mb-4">
           {children}
         </p>
       ),
-      blockquote: ({ children }: any) => (
+      blockquote: ({ children }: { children: React.ReactNode }) => (
         <blockquote className="border-l-4 border-blue-200 pl-6 my-6 italic text-slate-600">
           {children}
         </blockquote>
       ),
     },
     marks: {
-      strong: ({ children }: any) => (
+      strong: ({ children }: { children: React.ReactNode }) => (
         <strong className="font-semibold text-slate-900">{children}</strong>
       ),
-      em: ({ children }: any) => (
+      em: ({ children }: { children: React.ReactNode }) => (
         <em className="italic">{children}</em>
       ),
-      code: ({ children }: any) => (
+      code: ({ children }: { children: React.ReactNode }) => (
         <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-sm font-mono">
           {children}
         </code>
       ),
-      link: ({ children, value }: any) => (
+      link: ({ children, value }: { children: React.ReactNode; value?: { href: string } }) => (
         <a
-          href={value.href}
+          href={value?.href || '#'}
           className="text-blue-600 hover:text-blue-700 underline transition-colors"
           target="_blank"
           rel="noopener noreferrer"
@@ -187,7 +188,8 @@ export default function ArticlePage() {
           <div className="prose prose-slate max-w-none">
             <PortableText 
               value={article.content} 
-              components={portableTextComponents}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              components={portableTextComponents as any}
             />
           </div>
         )}
