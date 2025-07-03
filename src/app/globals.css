@@ -83,9 +83,16 @@ button:focus-visible {
   border-radius: 0.375rem;
 }
 
-/* Smooth scrolling for anchor navigation */
+/* Smooth scrolling for anchor navigation and prevent scroll restoration */
 html {
   scroll-behavior: smooth;
+  overflow-anchor: none; /* Prevent scroll anchoring */
+}
+
+/* Ensure page always loads at top */
+body {
+  scroll-behavior: auto;
+  overscroll-behavior: none;
 }
 
 /* Animated color blocks border - decorative element */
