@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { ArrowUpRightIcon } from '@heroicons/react/24/outline';
+import { motion } from 'motion/react';
 
 interface ListItemData {
   title: string;
@@ -35,7 +37,7 @@ export default function ListItem({ items, title = 'Highlights', animationDelay =
           });
           
           return (
-            <div key={index} className="group">
+            <motion.div key={index} className="group" whileHover="hover">
               {isExternal ? (
                 <a 
                   href={item.href} 
@@ -52,11 +54,27 @@ export default function ListItem({ items, title = 'Highlights', animationDelay =
                         {item.description}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs uppercase text-slate-500">
+                    <div className="flex items-center min-w-0">
+                      <motion.span 
+                        className="text-xs uppercase text-slate-500 whitespace-nowrap"
+                        animate={{ x: 0 }}
+                        variants={{
+                          hover: { x: -20 }
+                        }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                      >
                         {item.category}
-                      </span>
-                      <span className="text-xs text-slate-400" aria-label="External link">↗</span>
+                      </motion.span>
+                      <motion.div
+                        className="flex items-center"
+                        initial={{ x: 20, opacity: 0 }}
+                        variants={{
+                          hover: { x: 0, opacity: 1 }
+                        }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                      >
+                        <ArrowUpRightIcon className="w-3 h-3 text-slate-400 -ml-2" aria-label="External link" />
+                      </motion.div>
                     </div>
                   </div>
                 </a>
@@ -85,7 +103,7 @@ export default function ListItem({ items, title = 'Highlights', animationDelay =
                   </div>
                 </Link>
               )}
-            </div>
+            </motion.div>
           );
         })}
       </div>
