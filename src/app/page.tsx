@@ -1,34 +1,41 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import ListItem from '@/components/ListItem';
 import LocationTime from '@/components/LocationTime';
-import { getHighlights, type Highlight } from '@/sanity/lib/fetch';
+
+// Static highlights data
+const staticHighlights = [
+  {
+    title: "Linear Design System",
+    description: "Built comprehensive design system and component library",
+    category: "Design System",
+    href: "https://linear.app"
+  },
+  {
+    title: "Triage Responsibility",
+    description: "Led product strategy and user experience design",
+    category: "Product Strategy",
+    href: "https://example.com"
+  },
+  {
+    title: "Figma Plugin Development",
+    description: "Created tools to streamline design workflow",
+    category: "Development",
+    href: "https://figma.com"
+  },
+  {
+    title: "User Insights Platform",
+    description: "Designed analytics dashboard for user behavior",
+    category: "Analytics",
+    href: "https://example.com"
+  }
+];
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [highlights, setHighlights] = useState<Highlight[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchHighlights() {
-      try {
-        const data = await getHighlights();
-        console.log('Fetched highlights data:', data);
-        setHighlights(data || []);
-      } catch (error) {
-        console.error('Failed to fetch highlights:', error);
-        // Fallback to empty array if fetch fails
-        setHighlights([]);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchHighlights();
-  }, []);
 
   return (
     <div className="bg-white min-h-screen relative">
@@ -94,30 +101,11 @@ export default function Home() {
           </div>
 
           {/* Highlights Section */}
-          {isLoading ? (
-            <div className="mt-9 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-              <div className="text-center py-8">
-                <div className="text-slate-500">Loading highlights...</div>
-              </div>
-            </div>
-          ) : (
-            <ListItem 
-              items={highlights.map(highlight => {
-                console.log('Raw highlight from Sanity:', highlight);
-                const mappedItem = {
-                  title: highlight.title,
-                  description: highlight.description,
-                  category: highlight.category,
-                  slug: typeof highlight.slug === 'string' ? highlight.slug : highlight.slug?.current,
-                  href: highlight.href
-                };
-                console.log('Mapped item:', mappedItem);
-                return mappedItem;
-              })}
-              title="Highlights" 
-              animationDelay="400ms" 
-            />
-          )}
+          <ListItem 
+            items={staticHighlights}
+            title="Highlights" 
+            animationDelay="400ms" 
+          />
 
           {/* Company Logos Section */}
           <div className="mt-9 animate-fade-in-up mb-30" style={{ animationDelay: '400ms' }}>
