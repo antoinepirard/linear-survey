@@ -89,10 +89,22 @@ html {
   overflow-anchor: none; /* Prevent scroll anchoring */
 }
 
-/* Ensure page always loads at top */
+/* Ensure page always loads at top and prevent horizontal overflow */
 body {
   scroll-behavior: auto;
   overscroll-behavior: none;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Prevent horizontal overflow on all containers */
+* {
+  box-sizing: border-box;
+}
+
+/* Ensure images don't overflow their containers */
+img {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Animated color blocks border - decorative element */

@@ -39,11 +39,11 @@ export default function Home() {
 
   return (
     <div className="bg-white min-h-screen relative">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="flex flex-col gap-20 py-9">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 py-9">
           {/* Header */}
           <div className="pt-9 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
-            <div className="flex justify-between items-start">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
               <div>
                 <h1 className="text-base font-semibold text-slate-900">
                   Antoine Pirard
@@ -52,7 +52,9 @@ export default function Home() {
                   Product design leader
                 </p>
               </div>
-              <LocationTime />
+              <div className="flex-shrink-0">
+                <LocationTime />
+              </div>
             </div>
           </div>
 
@@ -72,7 +74,7 @@ export default function Home() {
                   alt="Antoine Pirard"
                   width={200}
                   height={250}
-                  className="rounded-2xl shadow-2xl transform rotate-2 border-4 border-white object-cover interactive-element photo-hover transition-transform duration-150"
+                  className="rounded-2xl shadow-2xl transform rotate-2 border-4 border-white object-cover interactive-element photo-hover transition-transform duration-150 max-w-[180px] sm:max-w-[200px]"
                   style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
                   priority
                 />
@@ -110,39 +112,43 @@ export default function Home() {
           </div>
 
           {/* Company Logos Section */}
-          <div className="max-w-4xl">
+          <div className="max-w-2xl">
             <div className="mt-9 animate-fade-in-up mb-30" style={{ animationDelay: '400ms' }}>
-              <div className="flex gap-12 items-center flex-wrap">
-              <div className="h-8 flex items-center">
+              <div className="flex gap-6 sm:gap-8 md:gap-12 items-center flex-wrap">
+              <div className="h-6 sm:h-8 flex items-center">
                 <Image 
                   src="/Assets/Logos/Rasayel Logo.svg" 
                   alt="Rasayel" 
-                  width={105}
-                  height={29}
+                  width={84}
+                  height={23}
+                  className="w-auto h-full max-w-[84px] sm:max-w-[105px]"
                 />
               </div>
-              <div className="h-8 flex items-center">
+              <div className="h-6 sm:h-8 flex items-center">
                 <Image 
                   src="/Assets/Logos/GoVocal Logo.svg" 
                   alt="GoVocal" 
-                  width={65}
-                  height={44}
+                  width={52}
+                  height={35}
+                  className="w-auto h-full max-w-[52px] sm:max-w-[65px]"
                 />
               </div>
-              <div className="h-6 flex items-center">
+              <div className="h-5 sm:h-6 flex items-center">
                 <Image 
                   src="/Assets/Logos/CambridgeJBS Logo.svg" 
                   alt="Cambridge Judge Business School" 
-                  width={120}
-                  height={24}
+                  width={96}
+                  height={19}
+                  className="w-auto h-full max-w-[96px] sm:max-w-[120px]"
                 />
               </div>
-              <div className="h-8 flex items-center">
+              <div className="h-6 sm:h-8 flex items-center">
                 <Image 
                   src="/Assets/Logos/CentralApp Logo.svg" 
                   alt="CentralApp" 
-                  width={129}
-                  height={24}
+                  width={103}
+                  height={19}
+                  className="w-auto h-full max-w-[103px] sm:max-w-[129px]"
                 />
                 </div>
               </div>
