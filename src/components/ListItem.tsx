@@ -26,7 +26,7 @@ export default function ListItem({ items, title = 'Highlights', animationDelay =
         {items.map((item, index) => {
           // Determine the link destination
           const linkHref = item.slug ? `/article/${item.slug}` : (item.href || "#");
-          const isExternal = item.href && !item.slug;
+          const isExternal = item.href && (item.href.startsWith('http://') || item.href.startsWith('https://'));
           
           console.log(`Item ${index}:`, {
             title: item.title,
@@ -92,12 +92,28 @@ export default function ListItem({ items, title = 'Highlights', animationDelay =
                         {item.description}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs uppercase text-slate-500">
+                    <div className="flex items-center min-w-0">
+                      <motion.span 
+                        className="text-xs uppercase text-slate-500 whitespace-nowrap"
+                        animate={{ x: 0 }}
+                        variants={{
+                          hover: { x: -16 }
+                        }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                      >
                         {item.category}
-                      </span>
-                      {item.slug && (
-                        <span className="text-xs text-slate-400" aria-label="Read article">→</span>
+                      </motion.span>
+                      {(item.slug || (item.href && !isExternal)) && (
+                        <motion.div
+                          className="flex items-center"
+                          initial={{ x: 16, opacity: 0 }}
+                          variants={{
+                            hover: { x: 0, opacity: 1 }
+                          }}
+                          transition={{ duration: 0.15, ease: "easeOut" }}
+                        >
+                          <span className="text-xs text-slate-400 -ml-2" aria-label="Read more">→</span>
+                        </motion.div>
                       )}
                     </div>
                   </div>

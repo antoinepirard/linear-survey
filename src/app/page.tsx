@@ -12,7 +12,7 @@ const staticHighlights = [
     title: "Linear Design System",
     description: "Built comprehensive design system and component library",
     category: "Design System",
-    href: "https://linear.app"
+    href: "/case-studies/linear-design-system"
   },
   {
     title: "Triage Responsibility",
@@ -113,44 +113,64 @@ export default function Home() {
 
           {/* Company Logos Section */}
           <div className="max-w-2xl">
-            <div className="mt-9 animate-fade-in-up mb-30" style={{ animationDelay: '400ms' }}>
+            <div className="mt-9 mb-30">
               <div className="flex gap-6 sm:gap-8 md:gap-12 items-center flex-wrap">
-              <div className="h-6 sm:h-8 flex items-center">
-                <Image 
-                  src="/Assets/Logos/Rasayel Logo.svg" 
-                  alt="Rasayel" 
-                  width={84}
-                  height={23}
-                  className="w-auto h-full max-w-[84px] sm:max-w-[105px]"
-                />
-              </div>
-              <div className="h-6 sm:h-8 flex items-center">
-                <Image 
-                  src="/Assets/Logos/GoVocal Logo.svg" 
-                  alt="GoVocal" 
-                  width={52}
-                  height={35}
-                  className="w-auto h-full max-w-[52px] sm:max-w-[65px]"
-                />
-              </div>
-              <div className="h-5 sm:h-6 flex items-center">
-                <Image 
-                  src="/Assets/Logos/CambridgeJBS Logo.svg" 
-                  alt="Cambridge Judge Business School" 
-                  width={96}
-                  height={19}
-                  className="w-auto h-full max-w-[96px] sm:max-w-[120px]"
-                />
-              </div>
-              <div className="h-6 sm:h-8 flex items-center">
-                <Image 
-                  src="/Assets/Logos/CentralApp Logo.svg" 
-                  alt="CentralApp" 
-                  width={103}
-                  height={19}
-                  className="w-auto h-full max-w-[103px] sm:max-w-[129px]"
-                />
-                </div>
+                <motion.div 
+                  className="h-6 sm:h-8 flex items-center"
+                  initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  transition={{ duration: 0.5, delay: 0.5, ease: 'easeOut' }}
+                >
+                  <Image 
+                    src="/Assets/Logos/Rasayel Logo.svg" 
+                    alt="Rasayel" 
+                    width={84}
+                    height={23}
+                    className="w-auto h-full max-w-[84px] sm:max-w-[105px]"
+                  />
+                </motion.div>
+                <motion.div 
+                  className="h-6 sm:h-8 flex items-center"
+                  initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  transition={{ duration: 0.5, delay: 0.55, ease: 'easeOut' }}
+                >
+                  <Image 
+                    src="/Assets/Logos/GoVocal Logo.svg" 
+                    alt="GoVocal" 
+                    width={52}
+                    height={35}
+                    className="w-auto h-full max-w-[52px] sm:max-w-[65px]"
+                  />
+                </motion.div>
+                <motion.div 
+                  className="h-5 sm:h-6 flex items-center"
+                  initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  transition={{ duration: 0.5, delay: 0.6, ease: 'easeOut' }}
+                >
+                  <Image 
+                    src="/Assets/Logos/CambridgeJBS Logo.svg" 
+                    alt="Cambridge Judge Business School" 
+                    width={96}
+                    height={19}
+                    className="w-auto h-full max-w-[96px] sm:max-w-[120px]"
+                  />
+                </motion.div>
+                <motion.div 
+                  className="h-6 sm:h-8 flex items-center"
+                  initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  transition={{ duration: 0.5, delay: 0.62, ease: 'easeOut' }}
+                >
+                  <Image 
+                    src="/Assets/Logos/CentralApp Logo.svg" 
+                    alt="CentralApp" 
+                    width={103}
+                    height={19}
+                    className="w-auto h-full max-w-[103px] sm:max-w-[129px]"
+                  />
+                </motion.div>
               </div>
             </div>
           </div>
