@@ -15,10 +15,10 @@ const staticHighlights = [
     href: "/case-studies/linear-design-system"
   },
   {
-    title: "Triage Responsibility",
-    description: "Led product strategy and user experience design",
+    title: "Rasayel - Big Picture",
+    description: "Strategic design leadership transforming customer support platform",
     category: "Product Strategy",
-    href: "https://example.com"
+    href: "/case-studies/rasayel-big-picture"
   },
   {
     title: "Figma Plugin Development",
@@ -27,10 +27,10 @@ const staticHighlights = [
     href: "https://figma.com"
   },
   {
-    title: "User Insights Platform",
-    description: "Designed analytics dashboard for user behavior",
-    category: "Analytics",
-    href: "https://example.com"
+    title: "CentralApp",
+    description: "First product design role (2015-2016). Mostly UI/UX design.",
+    category: "Product Design",
+    href: "https://www.centralapp.com/en"
   }
 ];
 
