@@ -69,7 +69,7 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
 
   return (
     <motion.div
-      className={`fixed left-6 top-1/2 -translate-y-1/2 z-40 ${className}`}
+      className={`fixed left-2 md:left-4 lg:left-6 top-1/2 -translate-y-1/2 z-40 hidden lg:block ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       initial={{ opacity: 0, x: -20 }}
