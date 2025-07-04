@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { motion } from 'motion/react';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
+import TableOfContents from '@/components/TableOfContents';
 
 export default function LinearDesignSystemCaseStudy() {
   return (
     <div className="min-h-screen bg-white">
+      <TableOfContents />
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back Navigation */}
         <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '0ms' }}>

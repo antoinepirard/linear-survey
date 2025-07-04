@@ -17,11 +17,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import TableOfContents from '@/components/TableOfContents';
 
 // Role evolution chart data
 const roleChartData = [
-  { period: "H2 2022", strategy: 10, problemDiscovery: 30, solutionDiscovery: 60, implementation: 0 },
-  { period: "H1 2023", strategy: 12, problemDiscovery: 35, solutionDiscovery: 50, implementation: 3 },
+  { period: "H2 2022", strategy: 10, problemDiscovery: 30, solutionDiscovery: 55, implementation: 5 },
+  { period: "H1 2023", strategy: 10, problemDiscovery: 35, solutionDiscovery: 50, implementation: 5 },
   { period: "H2 2023", strategy: 15, problemDiscovery: 40, solutionDiscovery: 38, implementation: 7 },
   { period: "H1 2024", strategy: 18, problemDiscovery: 45, solutionDiscovery: 25, implementation: 12 },
   { period: "H2 2024", strategy: 22, problemDiscovery: 40, solutionDiscovery: 23, implementation: 15 },
@@ -122,9 +123,10 @@ function RoleEvolutionChart() {
 export default function RasayelBigPictureCaseStudy() {
   return (
     <div className="min-h-screen bg-white">
+      <TableOfContents />
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back Navigation */}
-        <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
+        <div className="mt-40 mb-8 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
           <Link 
             href="/" 
             className="inline-flex items-center px-1.5 py-1 bg-white font-medium rounded-md text-slate-600 text-sm hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
@@ -139,15 +141,15 @@ export default function RasayelBigPictureCaseStudy() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.15, delay: 0.1 }}
-          className="mb-12"
+          className="mb-12 text-center"
         >
-          <h1 className="text-4xl font-bold text-slate-900 mt-40 mb-4">
+          <h1 className="text-4xl font-bold text-slate-900 mt-10 mb-4">
             Rasayel - Big Picture
           </h1>
           <p className="text-xl text-slate-600 mb-6">
             Transforming customer support through strategic design leadership and comprehensive platform evolution.
           </p>
-          <div className="flex items-center gap-6 text-sm text-slate-500">
+          <div className="flex items-center justify-center gap-6 text-sm text-slate-500">
             <span className="bg-slate-100 px-3 py-1 rounded-full">Product Strategy</span>
             <span>2022 - 2024</span>
             <a 
