@@ -126,12 +126,12 @@ export default function RasayelBigPictureCaseStudy() {
       <TableOfContents />
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back Navigation */}
-        <div className="mt-40 mb-8 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
+        <div className="mt-12 mb-36 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
           <Link 
             href="/" 
             className="inline-flex items-center px-1.5 py-1 bg-white font-mono uppercase font-medium rounded-md text-slate-600 text-xs hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
           >
-            <ChevronLeftIcon className="w-4 h-4 mr-1 " />
+            <ChevronLeftIcon className="w-4 h-4 mr-1" />
             Back to Portfolio
           </Link>
         </div>
@@ -143,24 +143,15 @@ export default function RasayelBigPictureCaseStudy() {
           transition={{ duration: 0.15, delay: 0.1 }}
           className="mb-12 text-center"
         >
-          <h1 className="text-5xl font-bold text-slate-900 mt-10 mb-4 tracking-tight">
+          <div className="flex items-center justify-center gap-6 text-sm text-slate-500">
+            <span className='font-mono'>2022 - 2025</span>
+            </div>
+          <h1 className="text-5xl font-bold text-slate-900 mt-6 mb-4 tracking-tight">
             Rasayel - Big Picture
           </h1>
-          <p className="text-lg text-slate-700 mb-6">
+          <p className="text-lg text-slate-700 mb-24">
             Transforming customer support through strategic design leadership and comprehensive platform evolution.
           </p>
-          <div className="flex items-center justify-center gap-6 text-sm text-slate-500">
-            <span className="bg-slate-100 px-3 py-1 rounded-full">Product Strategy</span>
-            <span>2022 - 2024</span>
-            <a 
-              href="https://rasayel.io" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 transition-colors duration-150"
-            >
-              View Live →
-            </a>
-          </div>
         </motion.header>
 
         {/* Content */}

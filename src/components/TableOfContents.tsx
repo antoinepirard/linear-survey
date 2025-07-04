@@ -103,11 +103,11 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
                 // Different line lengths based on heading level
                 const getLineWidth = (level: number) => {
                   switch (level) {
-                    case 1: return 'w-6'; // H1 - longest (24px)
-                    case 2: return 'w-4'; // H2 - medium (16px)
-                    case 3: return 'w-3'; // H3 - short (12px)
-                    case 4: return 'w-2'; // H4 - shorter (8px)
-                    default: return 'w-2'; // H5, H6 - shortest
+                    case 1: return 'w-6'; 
+                    case 2: return 'w-4'; 
+                    case 3: return 'w-3'; 
+                    case 4: return 'w-2'; 
+                    default: return 'w-2'; 
                   }
                 };
                 
@@ -143,16 +143,16 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -10, scale: 0.95 }}
               transition={{ duration: 0.15, ease: "easeOut" }}
-              className="absolute top-1/2 left-0 -translate-y-1/2 bg-white/95 backdrop-blur-sm border border-slate-200 rounded-lg shadow-lg p-3 w-64"
+              className="absolute top-1/2 left-0 -translate-y-1/2 bg-white/95 backdrop-blur-sm ring-1 ring-slate-300/30 rounded-md shadow-md p-3 w-64"
             >
             <nav className="space-y-0.5">
               {tocItems.map((item) => {
                 // Different font weights based on heading level
                 const getFontWeight = (level: number) => {
                   switch (level) {
-                    case 2: return 'text-slate-800'; // H2 - medium weight (main sections)
-                    case 3: return 'text-slate-600'; // H3 - normal weight (subsections)
-                    default: return 'text-slate-600'; // H4+ - normal weight
+                    case 2: return 'text-slate-800'; 
+                    case 3: return 'text-slate-600'; 
+                    default: return 'text-slate-600';
                   }
                 };
                 
@@ -160,7 +160,7 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
                   <motion.button
                     key={item.id}
                     onClick={() => scrollToSection(item.id)}
-                    className={`block w-full text-left px-2 py-1 rounded text-sm cursor-pointer hover:text-slate-900 hover:bg-slate-50 transition-all duration-150 ${getFontWeight(item.level)}`}
+                    className={`block w-full text-left px-2 py-1 rounded text-sm cursor-pointer hover:text-slate-950 hover:bg-slate-50 transition-all duration-150 ${getFontWeight(item.level)}`}
                     style={{
                       paddingLeft: `${8 + (item.level - 2) * 12}px`
                     }}
