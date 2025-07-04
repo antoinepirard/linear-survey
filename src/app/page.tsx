@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { MagnifyingGlassIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import ListItem from '@/components/ListItem';
 import LocationTime from '@/components/LocationTime';
 
@@ -36,9 +37,47 @@ const staticHighlights = [
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [isHoveringPhoto, setIsHoveringPhoto] = useState(false);
+  const [isHoveringModal, setIsHoveringModal] = useState(false);
 
   return (
     <div className="bg-white min-h-screen relative">
+      {/* Global Custom Cursor */}
+      <AnimatePresence>
+        {(isHoveringPhoto || isHoveringModal) && (
+          <motion.div
+            className="fixed pointer-events-none z-[60]"
+            initial={{ 
+              opacity: 0,
+              scale: 0.3,
+              x: cursorPosition.x - 12,
+              y: cursorPosition.y - 12
+            }}
+            animate={{ 
+              opacity: 1,
+              scale: 1,
+              x: cursorPosition.x - 12,
+              y: cursorPosition.y - 12
+            }}
+            exit={{ 
+              opacity: 0,
+              scale: 0.3,
+              x: cursorPosition.x - 12,
+              y: cursorPosition.y - 12
+            }}
+            transition={{ duration: 0.05, ease: 'easeOut' }}
+          >
+            <div className="bg-slate-900/70 ring-1 ring-white/20 backdrop-blur-sm rounded-full p-2 shadow-lg">
+              {isHoveringPhoto ? (
+                <MagnifyingGlassIcon className="w-5 h-5 text-white" />
+              ) : (
+                <XMarkIcon className="w-5 h-5 text-white" />
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 py-9">
           {/* Header */}
@@ -64,20 +103,30 @@ export default function Home() {
               <motion.div
                 layoutId="photo"
                 onClick={() => setIsModalOpen(true)}
-                className="cursor-zoom-in interactive-element"
+                className="cursor-none interactive-element"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.15 }}
                 style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
+                onMouseEnter={() => setIsHoveringPhoto(true)}
+                onMouseLeave={() => setIsHoveringPhoto(false)}
+                onMouseMove={(e) => {
+                  setCursorPosition({
+                    x: e.clientX,
+                    y: e.clientY
+                  });
+                }}
               >
                 <Image
                   src="/Assets/Images/IMG_0169 2.jpeg"
                   alt="Antoine Pirard"
                   width={200}
                   height={250}
-                  className="rounded-2xl shadow-2xl transform rotate-2 border-4 border-white object-cover interactive-element photo-hover transition-transform duration-150 max-w-[180px] sm:max-w-[200px]"
+                  className="rounded-2xl shadow-2xl border-4 border-white object-cover interactive-element rotate-2 photo-hover transition-transform duration-150 max-w-[180px] sm:max-w-[200px]"
                   style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
                   priority
                 />
+                
+
               </motion.div>
             </div>
           </div>
@@ -178,29 +227,43 @@ export default function Home() {
       </div>
 
       {/* Modal */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {isModalOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-zoom-out"
-            onClick={() => setIsModalOpen(false)}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-none"
+            onClick={() => {
+              setIsModalOpen(false);
+              setIsHoveringModal(false);
+            }}
+            onMouseEnter={() => setIsHoveringModal(true)}
+            onMouseLeave={() => setIsHoveringModal(false)}
+            onMouseMove={(e) => {
+              setCursorPosition({
+                x: e.clientX,
+                y: e.clientY
+              });
+            }}
           >
             <motion.div
               layoutId="photo"
               className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center"
-              style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
+              transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
             >
               <Image
                 src="/Assets/Images/IMG_0169 2.jpeg"
                 alt="Antoine Pirard - High Resolution"
                 width={800}
                 height={1000}
-                className="rounded-2xl object-contain max-w-full max-h-full cursor-zoom-out"
+                className="rounded-2xl object-contain max-w-full max-h-full cursor-none"
                 style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setIsHoveringModal(false);
+                }}
                 priority
               />
             </motion.div>
