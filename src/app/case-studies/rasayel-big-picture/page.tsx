@@ -139,7 +139,12 @@ export default function RasayelBigPictureCaseStudy() {
       <TableOfContents />
       
       {/* Copy URL Button - Top Right */}
-      <div className="fixed top-6 right-6 z-50">
+      <motion.div 
+        initial={{ opacity: 0, y: -15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.15, delay: 0.10 }}
+        className="fixed top-6 right-6 z-50"
+      >
         <Button
           onClick={copyUrl}
           variant="outline"
@@ -149,7 +154,7 @@ export default function RasayelBigPictureCaseStudy() {
           <LinkIcon className="w-4 h-4" />
           Copy URL
         </Button>
-      </div>
+      </motion.div>
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back Navigation */}
         <div className="mt-12 mb-36 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>

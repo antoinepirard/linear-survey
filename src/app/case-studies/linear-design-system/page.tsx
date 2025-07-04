@@ -23,7 +23,12 @@ export default function LinearDesignSystemCaseStudy() {
       <TableOfContents />
       
       {/* Copy URL Button - Top Right */}
-      <div className="fixed top-6 right-6 z-50">
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.15, delay: 0.3 }}
+        className="fixed top-6 right-6 z-50"
+      >
         <Button
           onClick={copyUrl}
           variant="outline"
@@ -33,7 +38,7 @@ export default function LinearDesignSystemCaseStudy() {
           <LinkIcon className="w-4 h-4 mr-2" />
           Copy URL
         </Button>
-      </div>
+      </motion.div>
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back Navigation */}
         <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
