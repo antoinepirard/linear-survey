@@ -174,7 +174,7 @@ export default function RasayelBigPictureCaseStudy() {
           <section>
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">Overview</h2>
             <div className="prose prose-slate max-w-none">
-              <p className="text-lg text-slate-600 leading-relaxed">
+              <p className="text-base text-slate-700 leading-relaxed">
                 As Head of Design at Rasayel, I led the strategic transformation of a customer support platform serving thousands of businesses across the Middle East. This comprehensive initiative involved reimagining the entire user experience, establishing design systems, and driving product strategy that resulted in significant business growth and user satisfaction improvements.
               </p>
             </div>
