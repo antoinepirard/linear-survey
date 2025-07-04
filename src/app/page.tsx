@@ -50,7 +50,7 @@ export default function Home() {
             className="fixed pointer-events-none z-[60]"
             initial={{ 
               opacity: 0,
-              scale: 0.3,
+              scale: 0.7,
               x: cursorPosition.x - 12,
               y: cursorPosition.y - 12
             }}
@@ -62,7 +62,7 @@ export default function Home() {
             }}
             exit={{ 
               opacity: 0,
-              scale: 0.3,
+              scale: 0.7,
               x: cursorPosition.x - 12,
               y: cursorPosition.y - 12
             }}
