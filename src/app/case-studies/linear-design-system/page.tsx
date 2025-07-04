@@ -2,13 +2,38 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ChevronLeftIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import TableOfContents from '@/components/TableOfContents';
 
 export default function LinearDesignSystemCaseStudy() {
+  const copyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success('URL copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+      toast.error('Failed to copy URL');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
       <TableOfContents />
+      
+      {/* Copy URL Button - Top Right */}
+      <div className="fixed top-6 right-6 z-50">
+        <Button
+          onClick={copyUrl}
+          variant="outline"
+          size="sm"
+          className="bg-white/80 backdrop-blur-sm border-slate-200 hover:bg-white hover:border-slate-300 transition-all duration-150"
+        >
+          <LinkIcon className="w-4 h-4 mr-2" />
+          Copy URL
+        </Button>
+      </div>
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back Navigation */}
         <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '0ms' }}>

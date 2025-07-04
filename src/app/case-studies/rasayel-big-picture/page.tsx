@@ -1,8 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'motion/react';
-import { ChevronLeftIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 import {
   Card,
@@ -121,9 +124,32 @@ function RoleEvolutionChart() {
 }
 
 export default function RasayelBigPictureCaseStudy() {
+  const copyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success('URL copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+      toast.error('Failed to copy URL');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
       <TableOfContents />
+      
+      {/* Copy URL Button - Top Right */}
+      <div className="fixed top-6 right-6 z-50">
+        <Button
+          onClick={copyUrl}
+          variant="outline"
+          size="sm"
+          className="bg-white/80 backdrop-blur-sm border-slate-200 hover:bg-white hover:border-slate-300 transition-all duration-150"
+        >
+          <LinkIcon className="w-4 h-4" />
+          Copy URL
+        </Button>
+      </div>
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back Navigation */}
         <div className="mt-12 mb-36 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
@@ -153,7 +179,34 @@ export default function RasayelBigPictureCaseStudy() {
             Transforming customer support through strategic design leadership and comprehensive platform evolution.
           </p>
         </motion.header>
+      </div>
 
+      {/* Hero Image - Outside main container */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.15, delay: 0.2 }}
+        className="mb-16 bg-slate-50 rounded-md overflow-hidden relative mx-auto"
+        style={{ 
+          height: '500px',
+          width: 'calc(896px * 1.15)', // 15% larger than max-w-4xl (896px)
+          maxWidth: '90vw' // Responsive fallback
+        }}
+      >
+        <Image
+          src="/case-studies/rasayel-big-picture/RS-tickets.jpg"
+          alt="Rasayel inbox tickets interface showing customer support workflow"
+          width={1200}
+          height={600}
+          className="absolute bottom-0 left-0"
+          style={{ 
+            transform: 'translate(-12%, 25%)'
+          }}
+          priority
+        />
+      </motion.div>
+
+      <div className="max-w-4xl mx-auto px-6">
         {/* Content */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
