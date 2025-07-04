@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MagnifyingGlassIcon, MagnifyingGlassPlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import ListItem from '@/components/ListItem';
 import LocationTime from '@/components/LocationTime';
 
