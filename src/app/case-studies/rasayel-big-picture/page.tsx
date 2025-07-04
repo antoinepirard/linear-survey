@@ -129,9 +129,9 @@ export default function RasayelBigPictureCaseStudy() {
         <div className="mt-40 mb-8 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
           <Link 
             href="/" 
-            className="inline-flex items-center px-1.5 py-1 bg-white font-medium rounded-md text-slate-600 text-sm hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
+            className="inline-flex items-center px-1.5 py-1 bg-white font-mono uppercase font-medium rounded-md text-slate-600 text-xs hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
           >
-            <ChevronLeftIcon className="w-4 h-4 mr-1" />
+            <ChevronLeftIcon className="w-4 h-4 mr-1 " />
             Back to Portfolio
           </Link>
         </div>
@@ -143,10 +143,10 @@ export default function RasayelBigPictureCaseStudy() {
           transition={{ duration: 0.15, delay: 0.1 }}
           className="mb-12 text-center"
         >
-          <h1 className="text-4xl font-bold text-slate-900 mt-10 mb-4">
+          <h1 className="text-5xl font-bold text-slate-900 mt-10 mb-4 tracking-tight">
             Rasayel - Big Picture
           </h1>
-          <p className="text-xl text-slate-600 mb-6">
+          <p className="text-lg text-slate-700 mb-6">
             Transforming customer support through strategic design leadership and comprehensive platform evolution.
           </p>
           <div className="flex items-center justify-center gap-6 text-sm text-slate-500">
@@ -350,7 +350,7 @@ export default function RasayelBigPictureCaseStudy() {
         >
           <Link 
             href="/" 
-            className="inline-flex items-center px-1.5 py-1 bg-white font-medium rounded-md text-slate-600 text-sm hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
+            className="inline-flex items-center px-1.5 py-1 bg-white font-mono font-medium rounded-md text-slate-600 text-sm hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
           >
             <ChevronLeftIcon className="w-4 h-4 mr-1" />
             Back to Portfolio

@@ -21,6 +21,7 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
     // Generate table of contents from headings
     const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
     const items: TocItem[] = [];
+    const usedIds = new Set<string>();
 
     headings.forEach((heading, index) => {
       const level = parseInt(heading.tagName.charAt(1));
@@ -32,12 +33,23 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
       // Create ID if it doesn't exist
       let id = heading.id;
       if (!id) {
-        id = title.toLowerCase()
+        const baseId = title.toLowerCase()
           .replace(/[^\w\s-]/g, '')
           .replace(/\s+/g, '-')
           .trim();
+        
+        // Make ID unique by adding suffix if duplicate
+        id = baseId;
+        let counter = 1;
+        while (usedIds.has(id)) {
+          id = `${baseId}-${counter}`;
+          counter++;
+        }
+        
         heading.id = id;
       }
+      
+      usedIds.add(id);
 
       items.push({
         id,
