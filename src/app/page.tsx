@@ -121,7 +121,7 @@ export default function Home() {
                   alt="Antoine Pirard"
                   width={200}
                   height={250}
-                  className="rounded-2xl shadow-2xl border-4 border-white object-cover interactive-element rotate-2 photo-hover transition-transform duration-150 max-w-[180px] sm:max-w-[200px]"
+                  className="rounded-2xl shadow-xl ring-1 ring-slate-200/70 border-5 border-white object-cover interactive-element rotate-2 photo-hover transition-transform duration-150 max-w-[180px] sm:max-w-[200px]"
                   style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
                   priority
                 />

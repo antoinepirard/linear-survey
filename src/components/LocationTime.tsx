@@ -10,6 +10,7 @@ export default function LocationTime() {
   const [isTimeLoading, setIsTimeLoading] = useState(true);
   const [isLocationLoading, setIsLocationLoading] = useState(true);
   const [locationPhase, setLocationPhase] = useState<'pin' | 'flag' | 'text'>('pin');
+  const [isHoveringLocation, setIsHoveringLocation] = useState(false);
 
   // Update time every minute
   useEffect(() => {
@@ -105,18 +106,23 @@ export default function LocationTime() {
           {locationPhase === 'text' && (
             <motion.span
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+              animate={{ 
+                opacity: 1, 
+                scale: isHoveringLocation ? 1.1 : 1 
+              }}
               exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.15 }}
               className="text-sm"
             >
-              🇧🇪
+              {isHoveringLocation ? '🇪🇺' : '🇧🇪'}
             </motion.span>
           )}
         </motion.div>
         <div className="w-14 text-sm font-regular">
           <motion.div
             transition={{ duration: 0.3 }}
+            onMouseEnter={() => setIsHoveringLocation(true)}
+            onMouseLeave={() => setIsHoveringLocation(false)}
           >
             {locationPhase === 'pin' && (
               <motion.span
@@ -142,7 +148,7 @@ export default function LocationTime() {
                 animate={{ opacity: isLocationLoading ? 0.4 : 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                Belgium
+                {isHoveringLocation ? 'Europe' : 'Belgium'}
               </motion.span>
             )}
           </motion.div>
