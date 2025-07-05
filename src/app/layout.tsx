@@ -24,6 +24,9 @@ const playfairDisplay = Playfair_Display({
 export const metadata: Metadata = {
   title: "Antoine Pirard - Product Designer",
   description: "Product designer scaling startups from nothing to millions in ARR",
+  icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default function RootLayout({
