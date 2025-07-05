@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
+
 import ListItem from '@/components/ListItem';
 import LocationTime from '@/components/LocationTime';
 
@@ -48,9 +48,6 @@ const quotes = [
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const [isHoveringPhoto, setIsHoveringPhoto] = useState(false);
-  const [isHoveringModal, setIsHoveringModal] = useState(false);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
 
   // Cycle through quotes every 4 seconds
@@ -88,41 +85,7 @@ export default function Home() {
 
   return (
     <div className="bg-white min-h-screen relative">
-      {/* Global Custom Cursor */}
-      <AnimatePresence>
-        {(isHoveringPhoto || isHoveringModal) && (
-          <motion.div
-            className="fixed pointer-events-none z-[60]"
-            initial={{ 
-              opacity: 0,
-              scale: 0.7,
-              x: cursorPosition.x - 12,
-              y: cursorPosition.y - 12
-            }}
-            animate={{ 
-              opacity: 1,
-              scale: 1,
-              x: cursorPosition.x - 12,
-              y: cursorPosition.y - 12
-            }}
-            exit={{ 
-              opacity: 0,
-              scale: 0.7,
-              x: cursorPosition.x - 12,
-              y: cursorPosition.y - 12
-            }}
-            transition={{ duration: 0.05, ease: 'easeOut' }}
-          >
-            <div className="bg-slate-900/70 ring-1 ring-white/20 backdrop-blur-sm rounded-full p-2 shadow-lg">
-              {isHoveringPhoto ? (
-                <MagnifyingGlassIcon className="w-5 h-5 text-white" />
-              ) : (
-                <XMarkIcon className="w-5 h-5 text-white" />
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 py-9">
           {/* Header */}
@@ -148,18 +111,10 @@ export default function Home() {
               <motion.div
                 layoutId="photo"
                 onClick={() => setIsModalOpen(true)}
-                className="cursor-none interactive-element"
+                className="cursor-zoom-in interactive-element"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.15 }}
                 style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
-                onMouseEnter={() => setIsHoveringPhoto(true)}
-                onMouseLeave={() => setIsHoveringPhoto(false)}
-                onMouseMove={(e) => {
-                  setCursorPosition({
-                    x: e.clientX,
-                    y: e.clientY
-                  });
-                }}
               >
                 <Image
                   src="/Assets/Images/IMG_0169 2.jpeg"
@@ -341,19 +296,8 @@ export default function Home() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-none"
-            onClick={() => {
-              setIsModalOpen(false);
-              setIsHoveringModal(false);
-            }}
-            onMouseEnter={() => setIsHoveringModal(true)}
-            onMouseLeave={() => setIsHoveringModal(false)}
-            onMouseMove={(e) => {
-              setCursorPosition({
-                x: e.clientX,
-                y: e.clientY
-              });
-            }}
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-zoom-out"
+            onClick={() => setIsModalOpen(false)}
           >
             <motion.div
               layoutId="photo"
@@ -365,12 +309,9 @@ export default function Home() {
                 alt="Antoine Pirard - High Resolution"
                 width={800}
                 height={1000}
-                className="rounded-2xl object-contain max-w-full max-h-full cursor-none"
+                className="rounded-2xl object-contain max-w-full max-h-full cursor-zoom-out"
                 style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setIsHoveringModal(false);
-                }}
+                onClick={() => setIsModalOpen(false)}
                 priority
               />
             </motion.div>
