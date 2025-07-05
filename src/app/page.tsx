@@ -180,7 +180,7 @@ export default function Home() {
           <div className="flex flex-col gap-6 max-w-2xl">
             <div className="animate-fade-in-up" style={{ animationDelay: '150ms' }}>
               <p className="fluid-text-base font-medium leading-relaxed text-slate-950">
-                Product design leader scaling startups from nothing to millions in ARR.
+                Product design scaling startups from nothing to millions in ARR.
               </p>
               <p className="fluid-text-base leading-relaxed text-slate-700">
                 — I&apos;m building experiences and teams that allow businesses to scale to their full potential.

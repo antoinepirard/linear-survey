@@ -21,8 +21,8 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Antoine Pirard - Design Leader",
-  description: "Design leader scaling startups from nothing to millions in ARR",
+  title: "Antoine Pirard - Product Designer",
+  description: "Product designer scaling startups from nothing to millions in ARR",
 };
 
 export default function RootLayout({

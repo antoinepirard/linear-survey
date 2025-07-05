@@ -148,11 +148,10 @@ export default function RasayelBigPictureCaseStudy() {
         <Button
           onClick={copyUrl}
           variant="outline"
-          size="sm"
+          size="icon"
           className="bg-white/80 backdrop-blur-sm border-slate-200 hover:bg-white hover:border-slate-300 transition-all duration-150"
         >
           <LinkIcon className="w-4 h-4" />
-          Copy URL
         </Button>
       </motion.div>
       <div className="max-w-4xl mx-auto px-6 py-12">
