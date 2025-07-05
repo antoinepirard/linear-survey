@@ -140,9 +140,9 @@ export default function RasayelBigPictureCaseStudy() {
       
       {/* Copy URL Button - Top Right */}
       <motion.div 
-        initial={{ opacity: 0, y: -15 }}
+        initial={{ opacity: 0, y: -5 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.15, delay: 0.10 }}
+        transition={{ duration: 0.15, delay: 0.05 }}
         className="fixed top-6 right-6 z-50"
       >
         <Button
