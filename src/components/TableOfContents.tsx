@@ -95,11 +95,15 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              exit={{ 
+                opacity: 0,
+                x: 20, // Slide lines to the right as they exit
+                transition: { duration: 0.15, ease: "easeOut" }
+              }}
               transition={{ duration: 0.15 }}
               className="absolute top-1/2 left-0 -translate-y-1/2 space-y-2"
             >
-              {tocItems.map((item) => {
+              {tocItems.map((item, index) => {
                 // Different line lengths based on heading level
                 const getLineWidth = (level: number) => {
                   switch (level) {
@@ -128,6 +132,15 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
                     onClick={() => scrollToSection(item.id)}
                     className={`block h-px ${getLineWidth(item.level)} rounded-sm ${getLineColor(item.level)} transition-colors duration-150`}
                     whileTap={{ scale: 0.95 }}
+                    // Individual line sliding animation on hover
+                    animate={{
+                      x: isHovered ? 20 : 0,
+                      transition: {
+                        duration: 0.15,
+                        delay: index * 0.02, // Staggered animation
+                        ease: "easeOut"
+                      }
+                    }}
                   />
                 );
               })}
@@ -139,10 +152,29 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
         <AnimatePresence>
           {isHovered && (
             <motion.div
-              initial={{ opacity: 0, x: -10, scale: 0.95 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: -10, scale: 0.95 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
+              initial={{ 
+                opacity: 0, 
+                x: -20, // Start further left to create morphing effect
+                scale: 0.9,
+                borderRadius: 0 // Start with no border radius like the lines
+              }}
+              animate={{ 
+                opacity: 1, 
+                x: 0, 
+                scale: 1,
+                borderRadius: 6 // Animate to rounded corners
+              }}
+              exit={{ 
+                opacity: 0, 
+                x: -20, 
+                scale: 0.9,
+                transition: { duration: 0.15, ease: "easeOut" }
+              }}
+              transition={{ 
+                duration: 0.2, 
+                delay: 0.05, // Slight delay to let lines slide first
+                ease: "easeOut" 
+              }}
               className="absolute top-1/2 left-0 -translate-y-1/2 bg-white/95 backdrop-blur-sm ring-1 ring-slate-300/30 rounded-md shadow-md p-3 w-64"
             >
             <nav className="space-y-0.5">
