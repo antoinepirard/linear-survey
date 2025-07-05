@@ -168,12 +168,7 @@ export default function RasayelBigPictureCaseStudy() {
         </div>
 
         {/* Header */}
-        <motion.header
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.15, delay: 0.1 }}
-          className="mb-12 text-center"
-        >
+        <header className="mb-12 text-center">
           <div className="flex items-center justify-center gap-6 text-sm text-slate-500">
             <span className='font-mono'>2022 - 2025</span>
             </div>
@@ -183,14 +178,11 @@ export default function RasayelBigPictureCaseStudy() {
           <p className="text-lg text-slate-700 mb-24">
             Transforming customer support through strategic design leadership and comprehensive platform evolution.
           </p>
-        </motion.header>
+        </header>
       </div>
 
       {/* Hero Image - Outside main container */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.15, delay: 0.2 }}
+      <div
         className="mb-16 bg-slate-50 rounded-md overflow-hidden relative mx-auto"
         style={{ 
           height: '500px',
@@ -209,22 +201,17 @@ export default function RasayelBigPictureCaseStudy() {
           }}
           priority
         />
-      </motion.div>
+      </div>
 
       <div className="max-w-4xl mx-auto px-6">
         {/* Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.15, delay: 0.2 }}
-          className="space-y-16"
-        >
+        <div className="space-y-16">
           {/* Overview */}
           <section>
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">Overview</h2>
             <div className="prose prose-slate max-w-none">
               <p className="text-base text-slate-700 leading-relaxed">
-                As Head of Design at Rasayel, I led the strategic transformation of a customer support platform serving thousands of businesses across the Middle East. This comprehensive initiative involved reimagining the entire user experience, establishing design systems, and driving product strategy that resulted in significant business growth and user satisfaction improvements.
+I started at Rasayel as a Senior Product Designer but ended up leading the platform team. Turns out when you&apos;re moving fast, going back and forth with engineers takes forever. So I just started coding the prototypes myself—way faster and the end result was better. Along the way I had to figure out the product roadmap, make strategic calls, and keep the engineering team aligned. We rebuilt the whole user experience and created proper design systems for a customer support platform used by thousands of businesses across the Middle East.
               </p>
             </div>
           </section>
@@ -388,13 +375,10 @@ export default function RasayelBigPictureCaseStudy() {
               </div>
             </div>
           </section>
-        </motion.div>
+        </div>
 
         {/* Bottom Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.15, delay: 0.3 }}
+        <div
           className="mt-16 pt-8 border-t border-slate-200"
         >
           <Link 
@@ -404,7 +388,7 @@ export default function RasayelBigPictureCaseStudy() {
             <ChevronLeftIcon className="w-4 h-4 mr-1" />
             Back to Portfolio
           </Link>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
