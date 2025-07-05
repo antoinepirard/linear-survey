@@ -75,10 +75,9 @@ export default function Home() {
 
     Antoine Pirard - System Thinker & Product Designer
 
-    🧠 Systems Thinking & Architecture
-    🎨 Product Crafting & Design Leadership
-    ⚡ Vibing Code While Learning Everything
-    📱 Cross-Platform Design Systems
+    🧠 Systems Thinker
+    🎨 Product Crafter
+    ⚡ Vibing Coding to Learn (Is vibe coding just coding?)
 
     Built with Next.js 15, Framer Motion & Tailwind CSS
     Version: 2025.1
