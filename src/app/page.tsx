@@ -355,6 +355,13 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Footer footnote */}
+      <div className="text-center mb-8">
+        <p className="text-xs text-slate-400 font-mono tracking-wide">
+          Vibe coded in Belgium, using React, Tailwind, Framer Motion and Next.js
+        </p>
+      </div>
     </div>
   );
 }
