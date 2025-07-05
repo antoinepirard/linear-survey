@@ -17,7 +17,6 @@ interface ListItemProps {
 }
 
 export default function ListItem({ items, title = 'Highlights', animationDelay = '400ms' }: ListItemProps) {
-  console.log('ListItem received items:', items);
   
   return (
     <div className="animate-fade-in-up" style={{ animationDelay }}>
@@ -28,13 +27,7 @@ export default function ListItem({ items, title = 'Highlights', animationDelay =
           const linkHref = item.slug ? `/article/${item.slug}` : (item.href || "#");
           const isExternal = item.href && (item.href.startsWith('http://') || item.href.startsWith('https://'));
           
-          console.log(`Item ${index}:`, {
-            title: item.title,
-            slug: item.slug,
-            href: item.href,
-            linkHref,
-            isExternal
-          });
+
           
           return (
             <motion.div key={index} className="group" whileHover="hover">

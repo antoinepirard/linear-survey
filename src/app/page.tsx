@@ -62,6 +62,34 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  // Log folio info once on load
+  useEffect(() => {
+    console.log(
+      `%c
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║    ███████╗ ██████╗ ██╗     ██╗ ██████╗                     ║
+║    ██╔════╝██╔═══██╗██║     ██║██╔═══██╗                    ║
+║    █████╗  ██║   ██║██║     ██║██║   ██║                    ║
+║    ██╔══╝  ██║   ██║██║     ██║██║   ██║                    ║
+║    ██║     ╚██████╔╝███████╗██║╚██████╔╝                    ║
+║    ╚═╝      ╚═════╝ ╚══════╝╚═╝ ╚═════╝                     ║
+║                                                              ║
+║    Antoine Pirard - Product Designer & Developer             ║
+║                                                              ║
+║    🎨 Design System Architecture                             ║
+║    🚀 Strategic Product Leadership                           ║
+║    💻 Full-Stack Development                                 ║
+║    📱 Cross-Platform Design                                  ║
+║                                                              ║
+║    Built with Next.js 15, Framer Motion & Tailwind CSS      ║
+║    Version: 2025.1 | Environment: ${process.env.NODE_ENV || 'development'}                    ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝\n`,
+      'color: #0f172a; font-family: monospace; font-weight: bold;'
+    );
+  }, []);
+
   return (
     <div className="bg-white min-h-screen relative">
       {/* Global Custom Cursor */}
