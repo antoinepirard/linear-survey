@@ -66,26 +66,23 @@ export default function Home() {
   useEffect(() => {
     console.log(
       `%c
-╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
-║    ███████╗ ██████╗ ██╗     ██╗ ██████╗                      ║
-║    ██╔════╝██╔═══██╗██║     ██║██╔═══██╗                     ║
-║    █████╗  ██║   ██║██║     ██║██║   ██║                     ║
-║    ██╔══╝  ██║   ██║██║     ██║██║   ██║                     ║
-║    ██║     ╚██████╔╝███████╗██║╚██████╔╝                     ║
-║    ╚═╝      ╚═════╝ ╚══════╝╚═╝ ╚═════╝                      ║
-║                                                              ║
-║    Antoine Pirard - System Thinker & Product Designer        ║
-║                                                              ║
-║    🧠 Systems Thinking & Architecture                        ║
-║    🎨 Product Crafting & Design Leadership                    ║
-║    ⚡ Vibing Code While Learning Everything                    ║
-║    📱 Cross-Platform Design Systems                           ║
-║                                                              ║
-║    Built with Next.js 15, Framer Motion & Tailwind CSS       ║
-║    Version: 2025.1                                            ║
-║                                                              ║
-╚══════════════════════════════════════════════════════════════╝\n`,
+    ███████╗ ██████╗ ██╗     ██╗ ██████╗
+    ██╔════╝██╔═══██╗██║     ██║██╔═══██╗
+    █████╗  ██║   ██║██║     ██║██║   ██║
+    ██╔══╝  ██║   ██║██║     ██║██║   ██║
+    ██║     ╚██████╔╝███████╗██║╚██████╔╝
+    ╚═╝      ╚═════╝ ╚══════╝╚═╝ ╚═════╝
+
+    Antoine Pirard - System Thinker & Product Designer
+
+    🧠 Systems Thinking & Architecture
+    🎨 Product Crafting & Design Leadership
+    ⚡ Vibing Code While Learning Everything
+    📱 Cross-Platform Design Systems
+
+    Built with Next.js 15, Framer Motion & Tailwind CSS
+    Version: 2025.1
+\n`,
       'color: #0f172a; font-family: monospace; font-weight: bold;'
     );
   }, []);
