@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import ListItem from '@/components/ListItem';
@@ -35,11 +35,32 @@ const staticHighlights = [
   }
 ];
 
+const quotes = [
+  {
+    text: '"Perfection is achieved not when there is nothing more to add, but when there is nothing more to take away."',
+    author: '— Antoine de Saint-Exupéry'
+  },
+  {
+    text: '"There is surely nothing quite so useless as doing with great efficiency what should not be done at all."',
+    author: '— Peter Drucker'
+  }
+];
+
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [isHoveringPhoto, setIsHoveringPhoto] = useState(false);
   const [isHoveringModal, setIsHoveringModal] = useState(false);
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+
+  // Cycle through quotes every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="bg-white min-h-screen relative">
@@ -88,7 +109,7 @@ export default function Home() {
                   Antoine Pirard
                 </h1>
                 <p className="text-base font-normal text-slate-600">
-                  Product design leader
+                  Product designer
                 </p>
               </div>
               <div className="flex-shrink-0">
@@ -162,7 +183,7 @@ export default function Home() {
 
           {/* Company Logos Section */}
           <div className="max-w-2xl">
-            <div className="mt-9 mb-30">
+            <div className="mt-9 mb-12">
               <div className="flex gap-6 sm:gap-8 md:gap-12 items-center flex-wrap">
                 <motion.div 
                   className="h-6 sm:h-8 flex items-center"
@@ -222,6 +243,42 @@ export default function Home() {
                 </motion.div>
               </div>
             </div>
+          </div>
+
+          {/* Separation Line */}
+          <motion.div 
+            className="max-w-4xl"
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
+          >
+            <div className="h-px bg-slate-200" />
+          </motion.div>
+
+          {/* Quotes Section */}
+          <div className="max-w-2xl mb-32">
+            <motion.div 
+              className="min-h-[120px] flex items-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.blockquote 
+                  key={currentQuoteIndex}
+                  className="font-serif italic text-slate-900 text-lg leading-relaxed w-full"
+                  initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
+                  transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+                >
+                  {quotes[currentQuoteIndex].text}
+                  <cite className="block mt-2 text-sm font-sans not-italic text-slate-600">
+                    {quotes[currentQuoteIndex].author}
+                  </cite>
+                </motion.blockquote>
+              </AnimatePresence>
+            </motion.div>
           </div>
         </div>
       </div>
