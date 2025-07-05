@@ -196,6 +196,31 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Connect Section */}
+          <div className="max-w-2xl">
+            <div className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+              <h2 className="text-lg font-medium text-slate-900 mb-3">Connect</h2>
+              <p className="text-slate-600">
+                Reach out to me at{' '}
+                <a 
+                  href="mailto:contact@antoinepirard.be" 
+                  className="text-slate-600 hover:text-slate-700 transition-colors duration-150 border-b border-slate-100 hover:border-slate-300 pb-0.5"
+                >
+                  contact@antoinepirard.be
+                </a>
+                {' '}or{' '}
+                <a 
+                  href="https://x.com/antoinepirard" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-600 hover:text-slate-700 transition-colors duration-150 border-b border-slate-100 hover:border-slate-300 pb-0.5"
+                >
+                  @antoinepirard
+                </a>
+              </p>
+            </div>
+          </div>
+
           {/* Highlights Section */}
           <div className="max-w-4xl">
             <ListItem 
