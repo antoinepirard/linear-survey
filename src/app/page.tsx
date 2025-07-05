@@ -275,6 +275,7 @@ export default function Home() {
             initial={{ opacity: 0, scaleX: 0 }}
             animate={{ opacity: 1, scaleX: 1 }}
             transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
+            style={{ transformOrigin: 'left' }}
           >
             <div className="h-px bg-slate-200" />
           </motion.div>

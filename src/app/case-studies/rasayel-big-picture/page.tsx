@@ -175,7 +175,7 @@ export default function RasayelBigPictureCaseStudy() {
             Rasayel - Big Picture
           </h1>
           <p className="text-lg text-slate-700 mb-24">
-            Transforming customer support through strategic design leadership and comprehensive platform evolution.
+            3 years of building Rasayel, a WhatsApp native platform for sales and customer support.
           </p>
         </header>
       </div>
