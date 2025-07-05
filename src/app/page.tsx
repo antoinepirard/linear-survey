@@ -285,7 +285,7 @@ export default function Home() {
           </div>
 
           {/* Footer footnote */}
-          <div className="text-center mb-8">
+          <div className="text-center">
             <p className="text-xs text-slate-500 font-mono tracking-wide">
               Vibe coded in Belgium, using React, Tailwind, Framer Motion and Next.js
             </p>
