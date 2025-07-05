@@ -9,6 +9,7 @@ export default function LocationTime() {
   const [timezoneInfo, setTimezoneInfo] = useState<{ timezone: string; offset: string }>({ timezone: '', offset: '' });
   const [isTimeLoading, setIsTimeLoading] = useState(true);
   const [isLocationLoading, setIsLocationLoading] = useState(true);
+  const [locationPhase, setLocationPhase] = useState<'pin' | 'flag' | 'text'>('pin');
 
   // Update time every minute
   useEffect(() => {
@@ -50,27 +51,101 @@ export default function LocationTime() {
     };
   }, []);
 
-  // Location loading simulation
+  // Location loading simulation with phases
   useEffect(() => {
-    const locationTimeout = setTimeout(() => {
-      setIsLocationLoading(false);
-    }, 600);
+    // Phase 1: Show pin for 300ms
+    const pinTimeout = setTimeout(() => {
+      setLocationPhase('flag');
+    }, 300);
 
-    return () => clearTimeout(locationTimeout);
+    // Phase 2: Show EU flag for 1000ms
+    const flagTimeout = setTimeout(() => {
+      setLocationPhase('text');
+    }, 1300);
+
+    // Phase 3: Show Belgium text
+    const textTimeout = setTimeout(() => {
+      setIsLocationLoading(false);
+    }, 1600);
+
+    return () => {
+      clearTimeout(pinTimeout);
+      clearTimeout(flagTimeout);
+      clearTimeout(textTimeout);
+    };
   }, []);
 
 
   return (
     <div className="flex items-center gap-3 text-slate-500">
       <div className="flex items-center gap-1">
-        <MapPinIcon className="h-4 w-4 text-slate-400" />
+        <motion.div
+          className="w-4 h-4 flex items-center justify-center"
+          transition={{ duration: 0.3 }}
+        >
+          {locationPhase === 'pin' && (
+            <motion.div
+              animate={{ opacity: 0.4 }}
+              transition={{ duration: 0.3 }}
+            >
+              <MapPinIcon className="h-4 w-4 text-slate-400" />
+            </motion.div>
+          )}
+          {locationPhase === 'flag' && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.3 }}
+              className="text-sm"
+            >
+              🇪🇺
+            </motion.span>
+          )}
+          {locationPhase === 'text' && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.3 }}
+              className="text-sm"
+            >
+              🇧🇪
+            </motion.span>
+          )}
+        </motion.div>
         <div className="w-14 text-sm font-regular">
-          <motion.span
-            animate={{ opacity: isLocationLoading ? 0.4 : 1 }}
+          <motion.div
             transition={{ duration: 0.3 }}
           >
-            Belgium
-          </motion.span>
+            {locationPhase === 'pin' && (
+              <motion.span
+                animate={{ opacity: 0.4 }}
+                transition={{ duration: 0.3 }}
+              >
+                Locating
+              </motion.span>
+            )}
+            {locationPhase === 'flag' && (
+              <motion.span
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.3 }}
+              >
+                Europe
+              </motion.span>
+            )}
+            {locationPhase === 'text' && (
+              <motion.span
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: isLocationLoading ? 0.4 : 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                Belgium
+              </motion.span>
+            )}
+          </motion.div>
         </div>
       </div>
       

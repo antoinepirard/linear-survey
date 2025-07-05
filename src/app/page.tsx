@@ -12,13 +12,13 @@ const staticHighlights = [
   {
     title: "Linear Design System",
     description: "Built comprehensive design system and component library",
-    category: "Design System",
+    category: "Work",
     href: "/case-studies/linear-design-system"
   },
   {
     title: "Rasayel - Big Picture",
     description: "Strategic design leadership transforming customer support platform",
-    category: "Product Strategy",
+    category: "Work",
     href: "/case-studies/rasayel-big-picture"
   },
   {
@@ -30,7 +30,7 @@ const staticHighlights = [
   {
     title: "CentralApp",
     description: "First product design role (2015-2016). Mostly UI/UX design.",
-    category: "Product Design",
+    category: "Work",
     href: "https://www.centralapp.com/en"
   }
 ];
