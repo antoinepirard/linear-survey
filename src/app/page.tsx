@@ -75,12 +75,12 @@ export default function Home() {
 ║    ██║     ╚██████╔╝███████╗██║╚██████╔╝                    ║
 ║    ╚═╝      ╚═════╝ ╚══════╝╚═╝ ╚═════╝                     ║
 ║                                                              ║
-║    Antoine Pirard - Product Designer & Developer             ║
+║    Antoine Pirard - System Thinker & Product Designer        ║
 ║                                                              ║
-║    🎨 Design System Architecture                             ║
-║    🚀 Strategic Product Leadership                           ║
-║    💻 Full-Stack Development                                 ║
-║    📱 Cross-Platform Design                                  ║
+║    🧠 Systems Thinking & Architecture                        ║
+║    🎨 Product Crafting & Design Leadership                   ║
+║    ⚡ Vibing Code While Learning Everything                   ║
+║    📱 Cross-Platform Design Systems                          ║
 ║                                                              ║
 ║    Built with Next.js 15, Framer Motion & Tailwind CSS      ║
 ║    Version: 2025.1 | Environment: ${process.env.NODE_ENV || 'development'}                    ║
