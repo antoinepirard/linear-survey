@@ -6,6 +6,7 @@ import { ChevronLeftIcon, LinkIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import TableOfContents from '@/components/TableOfContents';
+import FocusBanner from '@/components/FocusBanner';
 
 export default function LinearDesignSystemCaseStudy() {
   const copyUrl = async () => {
@@ -283,6 +284,9 @@ export default function LinearDesignSystemCaseStudy() {
           </Link>
         </motion.div>
       </div>
+      
+      {/* Focus Banner */}
+      <FocusBanner />
     </div>
   );
 }

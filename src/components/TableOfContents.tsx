@@ -141,6 +141,7 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
                     onClick={() => scrollToSection(item.id)}
                     className={`block h-px ${getLineWidth(item.level)} rounded-sm ${getLineColor(item.level)} transition-colors duration-150`}
                     whileTap={{ scale: 0.95 }}
+                    tabIndex={-1}
                     // Individual line sliding animation on hover
                     animate={{
                       x: isHovered ? 20 : 0,
@@ -206,6 +207,7 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
                       paddingLeft: `${8 + (item.level - 2) * 12}px`
                     }}
                     whileTap={{ scale: 0.98 }}
+                    tabIndex={-1}
                   >
                     <span className="block truncate">{item.title}</span>
                   </motion.button>
