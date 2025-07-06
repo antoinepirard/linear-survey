@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import { ChevronLeftIcon, LinkIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import FocusBanner from '@/components/FocusBanner';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 import {
   Card,
@@ -389,6 +390,9 @@ I started at Rasayel as a Senior Product Designer but ended up leading the platf
           </Link>
         </div>
       </div>
+      
+      {/* Focus Banner */}
+      <FocusBanner />
     </div>
   );
 }

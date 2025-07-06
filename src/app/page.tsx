@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 import ListItem from '@/components/ListItem';
 import LocationTime from '@/components/LocationTime';
+import FocusBanner from '@/components/FocusBanner';
 
 // Static highlights data
 const staticHighlights = [
@@ -324,6 +325,9 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Focus Banner */}
+      <FocusBanner />
     </div>
   );
 }
