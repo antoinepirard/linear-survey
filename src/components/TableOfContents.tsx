@@ -80,15 +80,24 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
   if (tocItems.length === 0) return null;
 
   return (
-    <motion.div
-      className={`fixed left-2 md:left-4 lg:left-6 top-1/2 -translate-y-1/2 z-40 hidden lg:block ${className}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3, delay: 0.5 }}
-    >
-      <div className="relative">
+    <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40 hidden lg:block">
+      {/* Large invisible hover area extending far to the left */}
+      <div 
+        className="absolute -left-20 top-1/2 -translate-y-1/2 w-32 h-96"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      />
+      
+      <motion.div
+        className={`relative ${className}`}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3, delay: 0.5 }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="pl-2 md:pl-4 lg:pl-6">
+          <div className="relative">
         {/* Minimal lines view */}
         <AnimatePresence>
           {!isHovered && (
@@ -206,7 +215,9 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
           </motion.div>
         )}
       </AnimatePresence>
-      </div>
-    </motion.div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
   );
 }
