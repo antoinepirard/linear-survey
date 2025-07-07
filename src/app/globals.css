@@ -10,6 +10,17 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* Prevent horizontal overflow on mobile */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Ensure all elements respect viewport boundaries */
+* {
+  box-sizing: border-box;
+}
+
 /* Touch optimizations - hover states only apply on devices that can hover */
 @media (hover: hover) {
   /* Photo hover rotation - only on hover-capable devices */

@@ -85,8 +85,8 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-white min-h-screen relative">
-      <main>
+    <div className="bg-white min-h-screen relative overflow-x-hidden">
+      <main className="overflow-x-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 py-9">
             {/* Header */}
@@ -108,7 +108,7 @@ export default function Home() {
 
             {/* Photo Section */}
             <div className="flex justify-start animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-              <div className="relative">
+              <div className="relative px-4 py-2">
                 <motion.div
                   layoutId="photo"
                   onClick={() => setIsModalOpen(true)}
@@ -122,7 +122,7 @@ export default function Home() {
                     alt="Antoine Pirard"
                     width={200}
                     height={250}
-                    className="rounded-2xl shadow-xl ring-1 ring-slate-200/70 border-5 border-white object-cover interactive-element rotate-2 photo-hover transition-transform duration-150 max-w-[180px] sm:max-w-[200px]"
+                    className="rounded-2xl shadow-xl ring-1 ring-slate-200/70 border-5 border-white object-cover interactive-element rotate-1 sm:rotate-2 photo-hover transition-transform duration-150 max-w-[180px] sm:max-w-[200px]"
                     style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
                     priority
                   />
@@ -187,7 +187,7 @@ export default function Home() {
             {/* Company Logos Section */}
             <div className="max-w-2xl">
             <div className="mt-9 mb-12">
-              <div className="flex gap-6 sm:gap-8 md:gap-12 items-center flex-wrap">
+              <div className="flex gap-4 sm:gap-6 md:gap-8 lg:gap-12 items-center flex-wrap">
                 <motion.div 
                   className="h-6 sm:h-8 flex items-center"
                   initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
