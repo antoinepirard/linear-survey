@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/chart';
 import TableOfContents from '@/components/TableOfContents';
 
+
 // Role evolution chart data
 const roleChartData = [
   { period: "H2 2022", strategy: 10, problemDiscovery: 30, solutionDiscovery: 55, implementation: 5 },
@@ -279,6 +280,25 @@ I started at Rasayel as a Senior Product Designer but ended up leading the platf
                 <p className="text-slate-600 text-sm leading-relaxed">
                   Established design standards that worked across web, mobile, and API integrations, ensuring consistent experience regardless of access point.
                 </p>
+              </div>
+            </div>
+            
+            {/* Solution Demo Video */}
+            <div className="mt-12">
+              <h3 className="text-xl font-semibold text-slate-900 mb-6">Solution in Action</h3>
+              <div className="bg-white border border-slate-200 rounded-lg p-6">
+                <p className="text-slate-600 text-sm mb-6 leading-relaxed">
+                  Watch how the redesigned interface streamlines support workflows and improves agent efficiency through intuitive design patterns and optimized user flows.
+                </p>
+                <video 
+                  className="w-full max-w-4xl mx-auto aspect-[4/3] rounded-lg"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                >
+                  <source src="/Assets/Videos/reporting-highquality.webm" type="video/webm" />
+                </video>
               </div>
             </div>
           </section>
