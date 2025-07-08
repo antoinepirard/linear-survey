@@ -5,60 +5,16 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
 import ListItem from '@/components/ListItem';
-import LocationTime from '@/components/LocationTime';
 import FocusBanner from '@/components/FocusBanner';
+import HeaderSection from '@/components/HeaderSection';
+import CompanyLogos from '@/components/CompanyLogos';
+import QuotesSection from '@/components/QuotesSection';
+import { AnimationWrapper } from '@/hooks/useAnimation';
+import { staticHighlights } from '@/data/staticData';
 
-// Static highlights data
-const staticHighlights = [
-  {
-    title: "Linear Design System",
-    description: "Built comprehensive design system and component library",
-    category: "Work",
-    href: "/case-studies/linear-design-system"
-  },
-  {
-    title: "Rasayel - Big Picture",
-    description: "Strategic design leadership transforming customer support platform",
-    category: "Work",
-    href: "/case-studies/rasayel-big-picture"
-  },
-  {
-    title: "Figma Plugin Development",
-    description: "Created tools to streamline design workflow",
-    category: "Development",
-    href: "https://figma.com"
-  },
-  {
-    title: "CentralApp",
-    description: "First product design role (2015-2016). Mostly UI/UX design.",
-    category: "Work",
-    href: "https://www.centralapp.com/en"
-  }
-];
-
-const quotes = [
-  {
-    text: '"Perfection is achieved not when there is nothing more to add, but when there is nothing more to take away."',
-    author: '— Antoine de Saint-Exupéry'
-  },
-  {
-    text: '"There is surely nothing quite so useless as doing with great efficiency what should not be done at all."',
-    author: '— Peter Drucker'
-  }
-];
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
-
-  // Cycle through quotes every 4 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Log folio info once on load
   useEffect(() => {
@@ -90,24 +46,10 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 py-9">
             {/* Header */}
-            <div className="pt-9 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-0">
-                <div>
-                  <h1 className="text-base font-bold text-slate-900">
-                    Antoine Pirard
-                  </h1>
-                  <p className="text-base font-normal text-slate-600">
-                    Product designer
-                  </p>
-                </div>
-              <div className="flex-shrink-0">
-                <LocationTime />
-              </div>
-            </div>
-            </div>
+            <HeaderSection />
 
             {/* Photo Section */}
-            <div className="flex justify-start animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+            <AnimationWrapper delay="100ms" className="flex justify-start">
               <div className="relative px-4 py-2">
                 <motion.div
                   layoutId="photo"
@@ -128,31 +70,31 @@ export default function Home() {
                   />
                 </motion.div>
               </div>
-            </div>
+            </AnimationWrapper>
 
             {/* Main Content */}
             <div className="flex flex-col gap-6 max-w-2xl">
-              <div className="animate-fade-in-up" style={{ animationDelay: '150ms' }}>
+              <AnimationWrapper delay="150ms">
               <p className="fluid-text-base font-medium leading-relaxed text-slate-950">
                 Product design scaling startups from nothing to millions in ARR.
               </p>
               <p className="fluid-text-base leading-relaxed text-slate-700">
                 — I&apos;m building experiences and teams that allow businesses to scale to their full potential.
               </p>
-              </div>
+              </AnimationWrapper>
 
-              <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+              <AnimationWrapper delay="200ms">
               <p className="fluid-text-base leading-relaxed text-slate-600">
                 Over the last 10 years, I&apos;ve helped early-stage startup founders create products from the ground up, 
                 led teams and developed successful product strategy. I thrive in strategic chaos clearing and crafting 
                 the detailed experiences that make a product feel complete.
               </p>
-              </div>
+              </AnimationWrapper>
             </div>
 
             {/* Connect Section */}
             <div className="max-w-2xl">
-              <div className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+              <AnimationWrapper delay="300ms">
               <h2 className="text-lg font-medium text-slate-900 mb-3">Connect</h2>
               <p className="text-slate-600">
                 Reach out to me at{' '}
@@ -172,7 +114,7 @@ export default function Home() {
                   @antoinepirard
                 </a>
               </p>
-              </div>
+              </AnimationWrapper>
             </div>
 
             {/* Highlights Section */}
@@ -185,68 +127,7 @@ export default function Home() {
             </div>
 
             {/* Company Logos Section */}
-            <div className="max-w-2xl">
-            <div className="mt-9 mb-12">
-              <div className="flex gap-4 sm:gap-6 md:gap-8 lg:gap-12 items-center flex-wrap">
-                <motion.div 
-                  className="h-6 sm:h-8 flex items-center"
-                  initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.5, delay: 0.5, ease: 'easeOut' }}
-                >
-                  <Image 
-                    src="/Assets/Logos/Rasayel Logo.svg" 
-                    alt="Rasayel" 
-                    width={84}
-                    height={23}
-                    className="w-auto h-full max-w-[84px] sm:max-w-[105px]"
-                  />
-                </motion.div>
-                <motion.div 
-                  className="h-6 sm:h-8 flex items-center"
-                  initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.5, delay: 0.55, ease: 'easeOut' }}
-                >
-                  <Image 
-                    src="/Assets/Logos/GoVocal Logo.svg" 
-                    alt="GoVocal" 
-                    width={52}
-                    height={35}
-                    className="w-auto h-full max-w-[52px] sm:max-w-[65px]"
-                  />
-                </motion.div>
-                <motion.div 
-                  className="h-5 sm:h-6 flex items-center"
-                  initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.5, delay: 0.6, ease: 'easeOut' }}
-                >
-                  <Image 
-                    src="/Assets/Logos/CambridgeJBS Logo.svg" 
-                    alt="Cambridge Judge Business School" 
-                    width={96}
-                    height={19}
-                    className="w-auto h-full max-w-[96px] sm:max-w-[120px]"
-                  />
-                </motion.div>
-                <motion.div 
-                  className="h-6 sm:h-8 flex items-center"
-                  initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.5, delay: 0.62, ease: 'easeOut' }}
-                >
-                  <Image 
-                    src="/Assets/Logos/CentralApp Logo.svg" 
-                    alt="CentralApp" 
-                    width={103}
-                    height={19}
-                    className="w-auto h-full max-w-[103px] sm:max-w-[129px]"
-                  />
-                </motion.div>
-              </div>
-            </div>
-          </div>
+            <CompanyLogos />
 
           {/* Separation Line */}
           <motion.div 
@@ -260,30 +141,7 @@ export default function Home() {
           </motion.div>
 
           {/* Quotes Section */}
-          <div className="max-w-2xl mb-22">
-            <motion.div 
-              className="min-h-[120px] flex items-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <AnimatePresence mode="wait">
-                <motion.blockquote 
-                  key={currentQuoteIndex}
-                  className="font-serif italic text-slate-900 text-lg leading-relaxed w-full"
-                  initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, y: -8, filter: 'blur(4px)' }}
-                  transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-                >
-                  {quotes[currentQuoteIndex].text}
-                  <cite className="block mt-2 text-sm font-sans not-italic text-slate-600">
-                    {quotes[currentQuoteIndex].author}
-                  </cite>
-                </motion.blockquote>
-              </AnimatePresence>
-            </motion.div>
-          </div>
+          <QuotesSection />
 
           {/* Footer footnote */}
           <div className="text-center">
