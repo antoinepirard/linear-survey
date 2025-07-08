@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -60,24 +59,23 @@ export default function Home() {
             <HeaderSection />
 
             {/* Photo Section */}
-            <AnimationWrapper delay="100ms" className="flex justify-start">
+            <AnimationWrapper delay="100ms" className="flex justify-start relative z-50">
               <div className="relative px-4 py-2">
                 <motion.div
-                  layoutId="photo"
+                  layoutId="photo-container"
                   onClick={() => setIsModalOpen(true)}
-                  className="cursor-zoom-in interactive-element"
-                  whileHover={{ scale: 1.02 }}
+                  className="cursor-zoom-in interactive-element ring-1 ring-slate-300/40 to-slate-300/90 border-5 border-white rounded-2xl shadow-xl"
+                  whileHover={{ scale: 1.02, rotate: 2 }}
                   transition={{ duration: 0.15 }}
                   style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
                 >
-                  <Image
+                  <motion.img
+                    layoutId="photo"
                     src="/Assets/Images/IMG_0169_2.webp"
                     alt="Antoine Pirard"
                     width={200}
                     height={250}
-                    className="rounded-2xl shadow-xl ring-1 ring-slate-300/40 to-slate-300/90 border-5 border-white object-cover interactive-element rotate-1 sm:rotate-2 photo-hover transition-transform duration-150 max-w-[180px] sm:max-w-[200px]"
-                    style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
-                    priority
+                    className="rounded-2xl object-cover max-w-[180px] sm:max-w-[200px]"
                   />
                 </motion.div>
               </div>
@@ -96,8 +94,8 @@ export default function Home() {
 
               <AnimationWrapper delay="200ms">
               <p className="fluid-text-base leading-relaxed text-slate-600">
-                Over the last 10 years, I&apos;ve helped early-stage startup founders create products from the ground up, 
-                led teams and developed successful product strategy. I thrive in strategic chaos clearing and crafting 
+                Over the last 10 years, I&apos;ve helped early-stage startup founders create products from the ground up,
+                led teams and developed successful product strategy. I thrive in strategic chaos clearing and crafting
                 the detailed experiences that make a product feel complete.
               </p>
               </AnimationWrapper>
@@ -109,15 +107,15 @@ export default function Home() {
               <h2 className="text-lg font-medium text-slate-900 mb-3">Connect</h2>
               <p className="text-slate-600">
                 Reach out to me at{' '}
-                <a 
-                  href="mailto:contact@antoinepirard.be" 
+                <a
+                  href="mailto:contact@antoinepirard.be"
                   className="text-slate-600 hover:text-slate-700 transition-colors duration-150 border-b border-slate-100 hover:border-slate-300 pb-0.5"
                 >
                   contact@antoinepirard.be
                 </a>
                 {' '}or{' '}
-                <a 
-                  href="https://x.com/antoinepirard" 
+                <a
+                  href="https://x.com/antoinepirard"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-slate-600 hover:text-slate-700 transition-colors duration-150 border-b border-slate-100 hover:border-slate-300 pb-0.5"
@@ -130,10 +128,10 @@ export default function Home() {
 
             {/* Highlights Section */}
             <div className="max-w-4xl">
-              <ListItem 
+              <ListItem
                 items={staticHighlights}
-                title="Highlights" 
-                animationDelay="400ms" 
+                title="Highlights"
+                animationDelay="400ms"
               />
             </div>
 
@@ -141,7 +139,7 @@ export default function Home() {
             <CompanyLogos />
 
           {/* Separation Line */}
-          <motion.div 
+          <motion.div
             className="max-w-4xl"
             initial={{ opacity: 0, scaleX: 0 }}
             animate={{ opacity: 1, scaleX: 1 }}
@@ -166,12 +164,12 @@ export default function Home() {
 
       {/* Modal */}
       <AnimatePresence mode="wait">
-        <PhotoModal 
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
+        <PhotoModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
         />
       </AnimatePresence>
-      
+
       {/* Focus Banner */}
       <FocusBanner />
     </div>
