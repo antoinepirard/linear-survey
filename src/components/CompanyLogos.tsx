@@ -22,7 +22,6 @@ export default function CompanyLogos() {
                 className="w-auto"
                 style={{ 
                   height: index === 2 ? '24px' : '32px',
-                  maxWidth: logo.maxWidth
                 }}
               />
             </MotionBlurWrapper>
