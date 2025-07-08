@@ -10,7 +10,7 @@ export default function CompanyLogos() {
           {companyLogos.map((logo, index) => (
             <MotionBlurWrapper
               key={logo.alt}
-              className={`${index === 2 ? 'h-5 sm:h-6' : 'h-6 sm:h-8'} flex items-center`}
+              className="flex items-center"
               delay={logo.delay}
               duration={0.5}
             >
@@ -19,7 +19,11 @@ export default function CompanyLogos() {
                 alt={logo.alt} 
                 width={logo.width}
                 height={logo.height}
-                className={`w-auto h-full max-w-[${logo.maxWidth}] sm:max-w-[${logo.maxWidthSm}]`}
+                className="w-auto"
+                style={{ 
+                  height: index === 2 ? '24px' : '32px',
+                  maxWidth: logo.maxWidth
+                }}
               />
             </MotionBlurWrapper>
           ))}

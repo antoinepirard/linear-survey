@@ -1,16 +1,27 @@
 'use client';
 
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
 import ListItem from '@/components/ListItem';
-import FocusBanner from '@/components/FocusBanner';
 import HeaderSection from '@/components/HeaderSection';
 import CompanyLogos from '@/components/CompanyLogos';
-import QuotesSection from '@/components/QuotesSection';
 import { AnimationWrapper } from '@/hooks/useAnimation';
 import { staticHighlights } from '@/data/staticData';
+
+const FocusBanner = dynamic(() => import('@/components/FocusBanner'), {
+  ssr: false
+});
+
+const QuotesSection = dynamic(() => import('@/components/QuotesSection'), {
+  loading: () => <div className="animate-pulse h-32 bg-slate-100 rounded-lg" />
+});
+
+const PhotoModal = dynamic(() => import('@/components/PhotoModal'), {
+  loading: () => null
+});
 
 
 export default function Home() {
@@ -60,7 +71,7 @@ export default function Home() {
                   style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
                 >
                   <Image
-                    src="/Assets/Images/IMG_0169 2.jpeg"
+                    src="/Assets/Images/IMG_0169_2.webp"
                     alt="Antoine Pirard"
                     width={200}
                     height={250}
@@ -155,33 +166,10 @@ export default function Home() {
 
       {/* Modal */}
       <AnimatePresence mode="wait">
-        {isModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-zoom-out"
-            onClick={() => setIsModalOpen(false)}
-          >
-            <motion.div
-              layoutId="photo"
-              className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center"
-              transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-            >
-              <Image
-                src="/Assets/Images/IMG_0169 2.jpeg"
-                alt="Antoine Pirard - High Resolution"
-                width={800}
-                height={1000}
-                className="rounded-2xl object-contain max-w-full max-h-full cursor-zoom-out"
-                style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
-                onClick={() => setIsModalOpen(false)}
-                priority
-              />
-            </motion.div>
-          </motion.div>
-        )}
+        <PhotoModal 
+          isOpen={isModalOpen} 
+          onClose={() => setIsModalOpen(false)} 
+        />
       </AnimatePresence>
       
       {/* Focus Banner */}

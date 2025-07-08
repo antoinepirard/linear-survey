@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { MapPinIcon, ClockIcon } from '@heroicons/react/24/solid';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 export default function LocationTime() {
   const [currentTime, setCurrentTime] = useState<string>('');
