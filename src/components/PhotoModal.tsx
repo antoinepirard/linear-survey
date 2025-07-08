@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { motion } from 'motion/react';
 
 interface PhotoModalProps {
@@ -13,28 +12,26 @@ export default function PhotoModal({ isOpen, onClose }: PhotoModalProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2, ease: 'easeInOut' }}
-      className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-zoom-out"
+      className="fixed inset-0 z-50 flex items-center justify-center cursor-zoom-out"
       onClick={onClose}
     >
       <motion.div
-        layoutId="photo"
-        className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center"
-        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2, ease: 'easeInOut' }}
+        className="bg-black/30 backdrop-blur-sm absolute inset-0 w-full h-full"
       >
-        <Image
-          src="/Assets/Images/IMG_0169_2.webp"
-          alt="Antoine Pirard - High Resolution"
-          width={800}
-          height={1000}
-          className="rounded-2xl object-contain max-w-full max-h-full cursor-zoom-out"
-          style={{ willChange: 'transform', backfaceVisibility: 'hidden' }}
-          onClick={onClose}
-          priority
-        />
+      </motion.div>
+
+      <motion.div layoutId="photo-container" className="relative max-h-[90vh] overflow-hidden rounded-2xl">
+        <motion.img
+          layoutId="photo"
+            src="/Assets/Images/IMG_0169_2.webp"
+            alt="Antoine Pirard - High Resolution"
+            className="object-contain cursor-zoom-out"
+            onClick={onClose}
+          />
       </motion.div>
     </motion.div>
   );

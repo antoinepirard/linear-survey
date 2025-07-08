@@ -21,15 +21,6 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Touch optimizations - hover states only apply on devices that can hover */
-@media (hover: hover) {
-  /* Photo hover rotation - only on hover-capable devices */
-  .photo-hover:hover {
-    transform: rotate(1deg) !important;
-  }
-
-}
-
 /* Enhanced text selection styling */
 ::selection {
   background-color: #334155; /* slate-700 */
