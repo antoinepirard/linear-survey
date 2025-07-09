@@ -1,52 +1,64 @@
 export interface Project {
   year: string;
   projectName: string;
+  image?: string;
 }
 
 export const projects: Project[] = [
   {
     year: "2025",
     projectName: "Contact Lists",
+    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",
     projectName: "Zoho: Allow to turn off activity logging",
+    image: "/Assets/Images/antoine-olivia.webp",
   },
   {
     year: "2025",
     projectName: "Performance Reporting - Rebuild",
+    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",
     projectName: "Schedule Campaigns",
+    image: "/Assets/Images/IMG_0169_2.webp",
   },
   {
     year: "2025",
     projectName: "Performance Reporting - Improvements",
+    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",
     projectName: "Reporting System Rebuild",
+    image: "/Assets/Images/antoine-olivia.webp",
   },
   {
     year: "2025",
     projectName: "Reporting v2 - New Reports UI",
+    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",
     projectName: "Rewaa Project",
+    image: "/Assets/Images/IMG_0169_2.webp",
   },
   {
     year: "2025",
     projectName: "Reporting v2 - New Queries",
+    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",
     projectName: "Reporting v2 - Fix Sessions",
+    image: "/Assets/Images/antoine-olivia.webp",
   },
   {
     year: "2025",
     projectName: "HubSpot On Mobile App",
+    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",
