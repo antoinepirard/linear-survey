@@ -132,7 +132,7 @@ export default function Home() {
             <div className="max-w-4xl">
               <ListItem
                 items={staticHighlights}
-                title="Highlights"
+                title="Work"
                 animationDelay="400ms"
               />
             </div>

@@ -13,14 +13,14 @@ interface ListItemData {
 interface ListItemProps {
   items: ListItemData[];
   title?: string;
-  animationDelay?: string;
+  animationDelay?: string;  
 }
 
 export default function ListItem({ items, title = 'Highlights', animationDelay = '400ms' }: ListItemProps) {
   
   return (
     <div className="animate-fade-in-up" style={{ animationDelay }}>
-      <h2 className="text-base font-medium text-slate-900 mb-6">{title}</h2>
+      <h2 className="text-lg font-medium text-slate-900 mb-6">{title}</h2>
       <div className="space-y-0">
         {items.map((item, index) => {
           // Determine the link destination
