@@ -113,10 +113,10 @@ export default function FixingOurReportsCaseStudy() {
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">Intro</h2>
             <div className="prose prose-slate max-w-none">
               <p className="text-base text-slate-700 leading-relaxed mb-4">
-                Rasayel is a WhatsApp first messaging platform used by sales and support teams to handle customer conversations. Before this project, Rasayel's reporting system was unreliable and often led to confusion: key metrics like first response time and resolution time were either inaccurate or impossible to trust. Support teams, who rely on these numbers to track performance and improve customer experience, found themselves second-guessing the data or building manual workarounds.
+                Rasayel is a WhatsApp first messaging platform used by sales and support teams to handle customer conversations. Before this project, Rasayel&apos;s reporting system was unreliable and often led to confusion: key metrics like first response time and resolution time were either inaccurate or impossible to trust. Support teams, who rely on these numbers to track performance and improve customer experience, found themselves second-guessing the data or building manual workarounds.
               </p>
               <p className="text-base text-slate-700 leading-relaxed">
-                This project was about rebuilding reporting from the ground up so that support teams could finally get reliable, actionable insights. We focused on the support use case because that's where the pain was most acute, but we made sure not to break things for sales teams. The goal was to deliver fast, visible improvements while setting things up for long-term scalability. We tackled deep technical issues (like how sessions are defined and measured) and UX gaps (like making metrics transparent and exportable) to restore trust and operational visibility.
+                This project was about rebuilding reporting from the ground up so that support teams could finally get reliable, actionable insights. We focused on the support use case because that&apos;s where the pain was most acute, but we made sure not to break things for sales teams. The goal was to deliver fast, visible improvements while setting things up for long-term scalability. We tackled deep technical issues (like how sessions are defined and measured) and UX gaps (like making metrics transparent and exportable) to restore trust and operational visibility.
               </p>
             </div>
           </section>
