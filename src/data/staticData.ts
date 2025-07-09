@@ -1,9 +1,9 @@
 export const staticHighlights = [
   {
-    title: "Linear Design System",
-    description: "Built comprehensive design system and component library",
+    title: "Fixing our Reports (Rasayel)",
+    description: "Rebuilt reporting system from ground up to deliver reliable, actionable insights",
     category: "Work",
-    href: "/case-studies/linear-design-system"
+    href: "/case-studies/fixing-our-reports"
   },
   {
     title: "Rasayel - Big Picture",
