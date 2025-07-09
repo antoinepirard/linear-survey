@@ -49,7 +49,7 @@ export default function ListItem({ items, title = 'Highlights', animationDelay =
                     </div>
                     <div className="flex items-center min-w-0">
                       <motion.span 
-                        className="text-xs uppercase text-slate-500 whitespace-nowrap"
+                        className="text-xs font-mono uppercase text-slate-500 whitespace-nowrap"
                         animate={{ x: 0 }}
                         variants={{
                           hover: { x: -20 }
@@ -87,7 +87,7 @@ export default function ListItem({ items, title = 'Highlights', animationDelay =
                     </div>
                     <div className="flex items-center min-w-0">
                       <motion.span 
-                        className="text-xs uppercase text-slate-500 whitespace-nowrap"
+                        className="text-xs font-mono uppercase text-slate-500 whitespace-nowrap"
                         animate={{ x: 0 }}
                         variants={{
                           hover: { x: -16 }

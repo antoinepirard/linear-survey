@@ -1,5 +1,11 @@
 export const staticHighlights = [
   {
+    title: "Rasayel - Chatbot Flow Builder",
+    description: "Visual flow builder empowering teams to create sophisticated chatbot workflows without code",
+    category: "PROJECT",
+    href: "/case-studies/chatbot-flow-builder"
+  },
+  {
     title: "Rasayel - Fixing our Reports",
     description: "Rebuilt reporting system from ground up to deliver reliable, actionable insights",
     category: "PROJECT",
