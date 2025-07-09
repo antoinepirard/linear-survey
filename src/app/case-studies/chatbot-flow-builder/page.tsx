@@ -135,15 +135,15 @@ export default function ChatbotFlowBuilderCaseStudy() {
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Limited flexibility:</strong> Existing templates were rigid and couldn't adapt to specific business needs or customer contexts.</span>
+                  <span><strong>Limited flexibility:</strong> Existing templates were rigid and couldn&apos;t adapt to specific business needs or customer contexts.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Poor testing experience:</strong> Teams couldn't easily test or preview their chatbot flows before deployment.</span>
+                  <span><strong>Poor testing experience:</strong> Teams couldn&apos;t easily test or preview their chatbot flows before deployment.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>No conditional logic:</strong> Bots couldn't make decisions based on customer responses or previous interactions.</span>
+                  <span><strong>No conditional logic:</strong> Bots couldn&apos;t make decisions based on customer responses or previous interactions.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
@@ -161,7 +161,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">Research and Discovery</h2>
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-8">
               <p className="text-slate-700 leading-relaxed mb-4">
-                We conducted extensive research with customer support teams and analyzed leading chatbot platforms like Dialogflow, Botpress, and Intercom's Resolution Bot. Key insights included:
+                We conducted extensive research with customer support teams and analyzed leading chatbot platforms like Dialogflow, Botpress, and Intercom&apos;s Resolution Bot. Key insights included:
               </p>
               <ul className="space-y-3 text-slate-700">
                 <li className="flex items-start">
