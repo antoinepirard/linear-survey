@@ -6,9 +6,11 @@ import { motion, AnimatePresence } from 'motion/react';
 
 import ListItem from '@/components/ListItem';
 import HeaderSection from '@/components/HeaderSection';
-import CompanyLogos from '@/components/CompanyLogos';
 import { AnimationWrapper } from '@/hooks/useAnimation';
 import { staticHighlights } from '@/data/staticData';
+
+// import CompanyLogos from '@/components/CompanyLogos';
+
 
 const FocusBanner = dynamic(() => import('@/components/FocusBanner'), {
   ssr: false
@@ -136,7 +138,7 @@ export default function Home() {
             </div>
 
             {/* Company Logos Section */}
-            <CompanyLogos />
+            {/* <CompanyLogos /> */}
 
           {/* Separation Line */}
           <motion.div
@@ -155,7 +157,7 @@ export default function Home() {
           {/* Footer footnote */}
           <div className="text-center">
             <p className="text-xs text-slate-500 font-mono tracking-wide">
-              Vibe coded in Belgium, using React, Tailwind, Framer Motion and Next.js
+              Coded in English with my buddy Claudy.
             </p>
           </div>
         </div>

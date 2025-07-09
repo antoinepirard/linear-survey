@@ -1,26 +1,26 @@
 export const staticHighlights = [
   {
-    title: "Fixing our Reports (Rasayel)",
+    title: "Rasayel - Fixing our Reports",
     description: "Rebuilt reporting system from ground up to deliver reliable, actionable insights",
-    category: "Work",
+    category: "PROJECT",
     href: "/case-studies/fixing-our-reports"
   },
   {
-    title: "Rasayel - Big Picture",
+    title: "Rasayel - An Overview",
     description: "Strategic design leadership transforming customer support platform",
-    category: "Work",
+    category: "PROJECT",
     href: "/case-studies/rasayel-big-picture"
   },
   {
-    title: "Figma Plugin Development",
-    description: "Created tools to streamline design workflow",
-    category: "Development",
-    href: "https://figma.com"
+    title: "GoVocal",
+    description: "Citizen participation platform",
+    category: "LINK",
+    href: "https://govocal.com"
   },
   {
     title: "CentralApp",
     description: "First product design role (2015-2016). Mostly UI/UX design.",
-    category: "Work",
+    category: "LINK",
     href: "https://www.centralapp.com/en"
   }
 ];
