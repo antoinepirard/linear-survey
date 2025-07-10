@@ -65,10 +65,10 @@ export default function ChatbotFlowBuilderCaseStudy() {
             <span className='font-mono'>2023 - 2024</span>
             </div>
           <h1 className="text-5xl font-bold text-slate-900 mt-6 mb-4 tracking-tight">
-            Chatbot Flow Builder
+            A Chatbot Builder for the WhatsApp Business API
           </h1>
           <p className="text-lg text-slate-700 mb-24">
-            Designed and built a visual flow builder to empower teams to create sophisticated chatbot workflows without code.
+            Led the design and iteration of a chatbot builder tool integrated with the WhatsApp Business API to enable automated interactions and scale conversations efficiently.
           </p>
         </header>
       </div>
@@ -98,188 +98,158 @@ export default function ChatbotFlowBuilderCaseStudy() {
       <div className="max-w-4xl mx-auto px-6">
         {/* Content */}
         <div className="space-y-16">
-          {/* My Role */}
+          {/* Background */}
           <section>
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">My Role</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Background: Why Build a Chatbot?</h2>
             <div className="prose prose-slate max-w-none">
               <p className="text-base text-slate-700 leading-relaxed">
-                As Product Designer and Frontend Developer, I led the end-to-end design and development of the chatbot flow builder. This involved extensive user research with customer support teams, creating detailed wireframes and prototypes, and implementing the entire frontend experience. I collaborated closely with backend engineers to define the data model and API requirements, while also conducting user testing sessions to validate design decisions throughout the development process.
+                Businesses using WhatsApp needed to scale conversations efficiently. Manual handling limited growth, so automation was essential. The goal: enable automated interactions to qualify leads, collect data, handle support FAQs, and execute workflows, freeing teams for high-value tasks.
               </p>
             </div>
           </section>
 
-          {/* Intro */}
+          {/* Problem Complexity */}
           <section>
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Intro</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Problem Complexity</h2>
             <div className="prose prose-slate max-w-none">
               <p className="text-base text-slate-700 leading-relaxed mb-4">
-                Before this project, creating chatbot workflows in Rasayel required technical knowledge and manual configuration. Support teams wanted to automate common interactions like greeting customers, routing inquiries, and collecting contact information, but they were limited by complex setup processes and inflexible templates.
+                Chatbots address diverse jobs-to-be-done (JTBD). Conversations vary by goal—lead qualification, data collection, basic support, or integrated workflows. This required a flexible yet intuitive builder.
               </p>
               <p className="text-base text-slate-700 leading-relaxed">
-                The chatbot flow builder transformed this experience by providing a visual, drag-and-drop interface that allows teams to design sophisticated conversational flows without writing code. Teams can now create conditional logic, integrate with external systems, and build multi-step workflows that feel natural and responsive to customers. The tool bridges the gap between powerful automation capabilities and user-friendly design, empowering support teams to create better customer experiences independently.
+                We prioritized support use cases initially (pre-pivot to sales-focused ICP) to focus efforts and validate the core functionality before expanding to broader use cases.
               </p>
             </div>
           </section>
 
-          {/* Why We Built It */}
+          {/* Research and Initial Scope */}
           <section>
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Why We Built It</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Research and Initial Scope</h2>
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-8">
               <p className="text-slate-700 leading-relaxed mb-4">
-                Customer feedback revealed significant pain points with the existing chatbot system:
+                We interviewed agencies using competitors (ManyChat, Chatbot.com, Bird.com) to analyze strengths and weaknesses. Key insights:
               </p>
               <ul className="space-y-3 text-slate-700">
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Technical barriers:</strong> Setting up automated responses required developer involvement and complex configuration files.</span>
+                  <span>Triggers to start flows.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Limited flexibility:</strong> Existing templates were rigid and couldn&apos;t adapt to specific business needs or customer contexts.</span>
+                  <span>Messages with interactive elements (e.g., buttons, links).</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Poor testing experience:</strong> Teams couldn&apos;t easily test or preview their chatbot flows before deployment.</span>
+                  <span>Workflow actions for automation.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>No conditional logic:</strong> Bots couldn&apos;t make decisions based on customer responses or previous interactions.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Maintenance overhead:</strong> Updating chatbot behaviors required technical support and often caused downtime.</span>
+                  <span>Visual representation for easy editing.</span>
                 </li>
               </ul>
               <p className="text-slate-700 leading-relaxed mt-4">
-                These limitations prevented teams from creating the automated, personalized customer experiences they wanted to deliver.
+                To differentiate, we leveraged synergies with our ICP and existing product strengths, avoiding direct feature parity.
               </p>
             </div>
           </section>
 
-          {/* Research and Discovery */}
+          {/* V1: Proof of Concept */}
           <section>
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Research and Discovery</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6">V1: Proof of Concept</h2>
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-8">
               <p className="text-slate-700 leading-relaxed mb-4">
-                We conducted extensive research with customer support teams and analyzed leading chatbot platforms like Dialogflow, Botpress, and Intercom&apos;s Resolution Bot. Key insights included:
+                Focused on basics to validate viability:
               </p>
               <ul className="space-y-3 text-slate-700">
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Visual design matters:</strong> Teams responded best to node-based, flowchart-style interfaces that mirror their mental models of conversation flow.</span>
+                  <span><strong>Triggers:</strong> Inbound only, with simple conditions.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Progressive complexity:</strong> Users wanted to start simple but have access to advanced features like API integrations and complex branching logic.</span>
+                  <span><strong>Messages:</strong> Limited to 24-hour interactive window; ignored expired conversations initially to avoid workflow complexity.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Real-time preview:</strong> The ability to test flows immediately was crucial for building confidence and catching errors early.</span>
+                  <span><strong>Workflow Actions:</strong> Basic tagging and status changes.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Context awareness:</strong> Successful chatbots needed access to customer history, profile data, and previous conversation context.</span>
+                  <span><strong>Visual Representation:</strong> Opinionated canvas with enforced alignment for readability (later proved limiting).</span>
                 </li>
               </ul>
+              <p className="text-slate-700 leading-relaxed mt-4">
+                This version tested core feasibility but lacked depth.
+              </p>
             </div>
           </section>
 
-          {/* What We Built */}
+          {/* Iterations: V2 and Beyond */}
           <section>
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">What We Built</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Iterations: V2 and Beyond</h2>
             <div className="space-y-8">
               <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">1. Visual Flow Designer</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">V2: Expanded Capabilities</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">
-                  A drag-and-drop interface with nodes for messages, questions, conditions, and actions. Teams can create complex conversation paths by connecting nodes visually, making the logic clear and easy to modify.
+                  Expanded nodes for broader use cases. Added HTTP request node to integrate external systems, prioritizing quantity over polish to validate market demand.
                 </p>
               </div>
               <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">2. Conditional Logic Engine</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">V3: Enhanced Usability</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">
-                  Built-in support for if/then logic, customer data lookup, and dynamic response generation. Bots can make decisions based on customer responses, profile information, and conversation history.
+                  Emphasized usability for complex flows. Rebuilt canvas with undo/redo, drag-and-drop, zoom, and performance optimizations to handle large bots smoothly.
                 </p>
               </div>
               <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">3. Real-time Testing Environment</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">V4: Polish and Intelligence</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">
-                  Integrated chat simulator that lets teams test their flows immediately. Users can step through conversations, see how conditions are evaluated, and debug issues before deployment.
-                </p>
-              </div>
-              <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">4. Template Library</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  Pre-built flows for common use cases like lead qualification, appointment booking, and FAQ handling. Teams can customize templates or build from scratch using reusable components.
-                </p>
-              </div>
-              <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">5. Integration Capabilities</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  API nodes for connecting to external systems, webhook support for real-time data updates, and custom variables for storing and retrieving customer information throughout the conversation.
-                </p>
-              </div>
-            </div>
-            
-            {/* Technical Implementation */}
-            <div className="mt-12">
-              <h3 className="text-xl font-semibold text-slate-900 mb-6">Technical Implementation</h3>
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  The flow builder uses a graph-based data structure to represent conversation flows, with each node containing execution logic and metadata. The frontend leverages React Flow for the visual interface, with custom node types and connection validation. The backend processes flows through a state machine that maintains conversation context and handles branching logic. We built a custom execution engine that can pause, resume, and branch conversations based on real-time conditions and customer inputs.
+                  Polished interactions (e.g., improved fallbacks), added analytics (e.g., CTR tracking), CRM integrations, and AI features: nodes for info collection, intent detection, and basic AI agents.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* Challenges */}
+          {/* Key Challenges */}
           <section>
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Challenges</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Key Challenges</h2>
             <div className="space-y-6">
               <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">1. Balancing simplicity and power</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Feature Prioritization</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">
-                  Creating an interface that was approachable for non-technical users while still supporting complex logic and integrations. We solved this through progressive disclosure and contextual help.
+                  Flexibility enabled many use cases, but after core features, research time often exceeded implementation. We bet on high-impact additions serving most customers.
                 </p>
               </div>
               <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">2. Performance with large flows</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Flexibility vs. Opinionated Design</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">
-                  Ensuring the visual editor remained responsive with hundreds of nodes and connections. We implemented virtualization and optimized rendering to handle complex flows smoothly.
-                </p>
-              </div>
-              <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">3. Real-time execution model</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  Building a robust execution engine that could handle interruptions, context switching, and error recovery while maintaining conversation state across multiple customer interactions.
+                  Balanced defaults (e.g., customizable fallbacks) with extensibility. This tension required constant iteration to maintain usability without overwhelming users.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* Impact */}
+          {/* Outcomes and Lessons */}
           <section>
-            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Impact</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Outcomes and Lessons</h2>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-8">
+              <p className="text-slate-700 leading-relaxed mb-4">
+                The builder evolved from POC to robust tool, enabling scalable WhatsApp automation. Key learnings:
+              </p>
               <ul className="space-y-3 text-slate-700">
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>90% reduction in time to deploy new chatbot workflows, from days to minutes.</span>
+                  <span><strong>Start narrow:</strong> Focus on core use cases before expanding to avoid feature bloat.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>Support teams now create and maintain their own automation without developer involvement.</span>
+                  <span><strong>Iterate based on user feedback:</strong> Real usage patterns often differ from initial assumptions.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>40% increase in customer satisfaction for automated interactions due to more natural, contextual conversations.</span>
+                  <span><strong>Balance opinionated defaults with flexibility:</strong> Provide good defaults while allowing customization.</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>Became a key differentiator in sales conversations, with prospects specifically requesting the flow builder functionality.</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span>Foundation for advanced features like AI-powered suggestions and automated A/B testing of conversation flows.</span>
+                  <span><strong>Align design with business needs:</strong> This approach drove adoption and business value.</span>
                 </li>
               </ul>
             </div>
