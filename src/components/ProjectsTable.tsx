@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Image from 'next/image';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { projects, Project } from '@/data/projects';
 
 interface ProjectsTableProps {
@@ -20,6 +20,24 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
 
   const closeModal = () => {
     setSelectedProject(null);
+  };
+
+  const navigateToProject = (direction: 'up' | 'down') => {
+    if (!selectedProject) return;
+    
+    const currentIndex = sortedProjects.findIndex(
+      project => project.projectName === selectedProject.projectName && 
+                project.year === selectedProject.year
+    );
+    
+    let nextIndex;
+    if (direction === 'up') {
+      nextIndex = currentIndex > 0 ? currentIndex - 1 : sortedProjects.length - 1;
+    } else {
+      nextIndex = currentIndex < sortedProjects.length - 1 ? currentIndex + 1 : 0;
+    }
+    
+    setSelectedProject(sortedProjects[nextIndex]);
   };
 
   // Handle keyboard navigation
@@ -97,6 +115,17 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
             className="fixed inset-0 bg-black/10 backdrop-blur-sm z-50 flex items-center justify-center p-"
             onClick={closeModal}
           >
+            {/* ESC hint tag */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+              className="absolute top-4 right-4 bg-slate-900 text-white text-xs px-2 py-1 rounded-md font-mono"
+            >
+              ESC to close
+            </motion.div>
+            
             <motion.div
               key={`modal-${selectedProject.projectName}-${selectedProject.year}`}
               layout
@@ -129,12 +158,23 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
                     {selectedProject.year}
                   </p>
                 </motion.div>
-                <button
-                  onClick={closeModal}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors duration-150"
-                >
-                  <XMarkIcon className="w-5 h-5 text-slate-500" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => navigateToProject('up')}
+                    className="bg-white border border-slate-200 shadow-xs p-1.5 rounded-md hover:border-slate-300 transition-colors duration-150 poi"
+                    title="Previous project (↑)"
+                  >
+                    <ChevronUpIcon className="w-4 h-4 text-slate-500" />
+                  </button>
+                  <button
+                    onClick={() => navigateToProject('down')}
+                    className="bg-white border border-slate-200 shadow-xs p-1.5 rounded-md hover:border-slate-300 transition-colors duration-150"
+                    title="Next project (↓)"
+                  >
+                    <ChevronDownIcon className="w-4 h-4 text-slate-500" />
+                  </button>
+
+                </div>
               </motion.div>
 
               {/* Content */}
