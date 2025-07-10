@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Image from 'next/image';
-import { XMarkIcon, ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { projects, Project } from '@/data/projects';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 interface ProjectsTableProps {
   onProjectHover?: (project: Project | null) => void;
@@ -161,14 +161,14 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => navigateToProject('up')}
-                    className="bg-white border border-slate-200 shadow-xs p-1.5 rounded-md hover:border-slate-300 transition-colors duration-150 poi"
+                    className="bg-white border border-slate-200 shadow-xs p-1.5 rounded-md hover:border-slate-300 transition-colors duration-150 cursor-pointer"
                     title="Previous project (↑)"
                   >
                     <ChevronUpIcon className="w-4 h-4 text-slate-500" />
                   </button>
                   <button
                     onClick={() => navigateToProject('down')}
-                    className="bg-white border border-slate-200 shadow-xs p-1.5 rounded-md hover:border-slate-300 transition-colors duration-150"
+                    className="bg-white border border-slate-200 shadow-xs p-1.5 rounded-md hover:border-slate-300 transition-colors duration-150 cursor-pointer"
                     title="Next project (↓)"
                   >
                     <ChevronDownIcon className="w-4 h-4 text-slate-500" />
