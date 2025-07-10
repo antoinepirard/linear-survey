@@ -4,6 +4,98 @@ import Image from 'next/image';
 import { projects, Project } from '@/data/projects';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
+interface OptimizedVideoProps {
+  src: string;
+  poster?: string;
+  className?: string;
+}
+
+function OptimizedVideo({ src, poster, className = '' }: OptimizedVideoProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null);
+
+  // Intersection Observer for lazy loading
+  useEffect(() => {
+    if (!videoRef) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
+    );
+
+    observer.observe(videoRef);
+
+    return () => observer.disconnect();
+  }, [videoRef]);
+
+  const handleLoadStart = () => {
+    setIsLoading(true);
+    setHasError(false);
+  };
+
+  const handleLoadedData = () => {
+    setIsLoading(false);
+  };
+
+  const handleError = () => {
+    setIsLoading(false);
+    setHasError(true);
+  };
+
+  // Use provided poster or create from video path
+  const posterPath = poster || src.replace('.webm', '.jpg');
+
+  return (
+    <div className={`relative ${className}`}>
+      <video
+        ref={setVideoRef}
+        src={shouldLoad ? src : undefined}
+        className="w-full rounded-lg"
+        autoPlay={shouldLoad}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        poster={posterPath}
+        onLoadStart={handleLoadStart}
+        onLoadedData={handleLoadedData}
+        onError={handleError}
+        style={{
+          opacity: isLoading ? 0.7 : 1,
+          transition: 'opacity 0.3s ease'
+        }}
+      />
+      
+      {isLoading && shouldLoad && (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-100 rounded-lg">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
+        </div>
+      )}
+      
+      {hasError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-100 rounded-lg">
+          <div className="text-center text-slate-500">
+            <svg className="mx-auto h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-sm">Video failed to load</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface ProjectsTableProps {
   onProjectHover?: (project: Project | null) => void;
 }
@@ -183,20 +275,28 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
                 className="p-7"
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
               >
-                {selectedProject.image && (
+                {(selectedProject.image || selectedProject.video) && (
                   <motion.div 
                     layout
                     className="mb-6"
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
                   >
-                    <Image
-                      src={selectedProject.image}
-                      alt={selectedProject.projectName}
-                      width={600}
-                      height={400}
-                      className="w-full h-64 object-cover rounded-lg"
-                      priority
-                    />
+                    {selectedProject.video ? (
+                      <OptimizedVideo
+                        src={selectedProject.video}
+                        poster={selectedProject.poster}
+                        className="w-full"
+                      />
+                    ) : (
+                      <Image
+                        src={selectedProject.image!}
+                        alt={selectedProject.projectName}
+                        width={600}
+                        height={400}
+                        className="w-full h-64 object-cover rounded-lg"
+                        priority
+                      />
+                    )}
                   </motion.div>
                 )}
                 
