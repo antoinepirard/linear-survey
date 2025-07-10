@@ -182,7 +182,7 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
               {isFirstOfYear && (
                 <h3 
                   id={`year-${project.year}`}
-                  className="text-lg font-semibold text-slate-900 mt-8 mb-4 first:mt-0"
+                  className="sr-only"
                 >
                   {project.year}
                 </h3>
