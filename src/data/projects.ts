@@ -412,12 +412,12 @@ export const projects: Project[] = [
   },
   {
     year: "2023",
-    projectName: "Bots — Proactive Triggers",
+    projectName: "Proactive Triggers",
     category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Bots — Fallback v1",
+    projectName: "Fallback v1",
     category: "Chatbot",
   },
   {
@@ -427,27 +427,27 @@ export const projects: Project[] = [
   },
   {
     year: "2023",
-    projectName: "Bots — Customer Input Capture",
+    projectName: "Customer Input Capture",
     category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Bots — HTTP Requests v2",
+    projectName: "HTTP Requests v2",
     category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Bots — Free Canvas v1",
+    projectName: "Free Canvas v1",
     category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Bots - Branching v1",
+    projectName: "Branching v1",
     category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Bots — HTTP actions v1",
+    projectName: "HTTP Actions v1",
     category: "Chatbot",
   },
   {
@@ -469,6 +469,46 @@ export const projects: Project[] = [
     year: "2023",
     projectName: "Design System v2",
     category: "UI/UX",
+  },
+  {
+    year: "2023",
+    projectName: "Intent Detection",
+    category: "Chatbot",
+  },
+  {
+    year: "2023",
+    projectName: "Template Messages",
+    category: "Chatbot",
+  },
+  {
+    year: "2023",
+    projectName: "Message Carousels",
+    category: "Chatbot",
+  },
+  {
+    year: "2023",
+    projectName: "Canvas Notes",
+    category: "Chatbot",
+  },
+  {
+    year: "2023",
+    projectName: "Note Mentions",
+    category: "Chatbot",
+  },
+  {
+    year: "2023",
+    projectName: "Sidebar Action Groups",
+    category: "Chatbot",
+  },
+  {
+    year: "2023",
+    projectName: "Node Navigation",
+    category: "Chatbot",
+  },
+  {
+    year: "2023",
+    projectName: "Command Bar Improvements",
+    category: "Chatbot",
   },
   {
     year: "2024",
