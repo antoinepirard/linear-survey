@@ -10,7 +10,7 @@ export const projects: Project[] = [
   {
     year: "2025",
     projectName: "Contact Lists",
-    category: "Feature",
+    category: "Contact Management",
     image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
     description: "Redesigned contact management system with improved filtering, bulk actions, and real-time synchronization across multiple platforms.",
   },
@@ -23,7 +23,7 @@ export const projects: Project[] = [
   },
   {
     year: "2025",
-    projectName: "Performance Reporting - Rebuild",
+    projectName: "Performance Reporting - v2",
     category: "Analytics",
     image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
     description: "Complete overhaul of the reporting system with real-time analytics, customizable dashboards, and improved data visualization.",
@@ -36,60 +36,9 @@ export const projects: Project[] = [
   },
   {
     year: "2025",
-    projectName: "Performance Reporting - Improvements",
-    category: "Analytics",
-    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
-  },
-  {
-    year: "2025",
-    projectName: "Reporting System Rebuild",
-    category: "Analytics",
-    image: "/Assets/Images/antoine-olivia.webp",
-  },
-  {
-    year: "2025",
-    projectName: "Reporting v2 - New Reports UI",
-    category: "UI/UX",
-    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
-  },
-  {
-    year: "2025",
-    projectName: "Rewaa Project",
-    category: "Integration",
-    image: "/Assets/Images/IMG_0169_2.webp",
-  },
-  {
-    year: "2025",
-    projectName: "Reporting v2 - New Queries",
-    category: "Analytics",
-    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
-  },
-  {
-    year: "2025",
-    projectName: "Reporting v2 - Fix Sessions",
-    category: "Bug Fix",
-    image: "/Assets/Images/antoine-olivia.webp",
-  },
-  {
-    year: "2025",
-    projectName: "HubSpot On Mobile App",
+    projectName: "HubSpot Properties On Mobile App",
     category: "Integration",
     image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
-  },
-  {
-    year: "2025",
-    projectName: "Reporting v2 - 24h Inactivity Session Reset",
-    category: "Feature",
-  },
-  {
-    year: "2025",
-    projectName: "Reporting v2 - Auto-Reassignment for Away Agents",
-    category: "Automation",
-  },
-  {
-    year: "2025",
-    projectName: "Coexistence",
-    category: "Architecture",
   },
   {
     year: "2025",
@@ -98,624 +47,552 @@ export const projects: Project[] = [
   },
   {
     year: "2025",
-    projectName: "Property syncing (pipedrive)",
+    projectName: "Property syncing (Pipedrive)",
     category: "Integration",
   },
   {
     year: "2025",
-    projectName: "Bots: Supporting New Properties",
-    category: "Automation",
+    projectName: "WhatsApp Carousels",
+    category: "WhatsApp Natives",
   },
   {
     year: "2025",
-    projectName: "Carousels templates",
-  },
-  {
-    year: "2025",
-    projectName: "HubSpot: Workflow bot nodes",
+    projectName: "HubSpot Bot nodes",
+    category: "Chatbot",
   },
   {
     year: "2025",
     projectName: "Mobile app v2",
+    category: "Mobile",
   },
   {
     year: "2025",
-    projectName: "WhatsApp flows",
+    projectName: "WhatsApp Flows",
+    category: "WhatsApp Natives"
   },
   {
     year: "2025",
     projectName: "Monitoring dashboard",
+    category: "Analytics",
   },
   {
     year: "2025",
-    projectName: "Agents activation: detect email domain when joining",
+    projectName: "Detect email domain when joining workspace",
+    category: "Onboarding & Activation"
   },
   {
     year: "2024",
     projectName: "Unassigned inbox: Switch between user or team unassigned",
+    category: "Inbox"
   },
   {
     year: "2024",
-    projectName: "Team Assignment (HS/Campaigns)",
+    projectName: "Team Assignment when starting outbound campaigns",
+    category: "Outbound"
   },
   {
     year: "2024",
     projectName: "Billing & paywalls",
+    category: "Onboarding & Activation"
   },
   {
     year: "2024",
     projectName: "Improve HS activity logging formatting",
+    category: "Integration"
   },
   {
     year: "2024",
     projectName: "Companies: Auto fill domain based on name",
+    category: "Rasayel Objects"
   },
   {
     year: "2024",
     projectName: "Emojis on WA inbound",
+    category: "WhatsApp Natives"
   },
   {
     year: "2024",
     projectName: "Rebuilding Exports",
+    category: "Import & Export"
   },
   {
     year: "2024",
-    projectName: "Quick templates",
+    projectName: "Quick Templates",
+    category: "Inbox"
   },
   {
     year: "2024",
     projectName: "Unread count for \"assigned to me\"",
+    category: "Inbox"
   },
   {
     year: "2024",
     projectName: "Filter template composer by all/mine",
+    category: "Inbox"
   },
   {
     year: "2024",
     projectName: "Company v1",
+    category: "Rasayel Objects"
   },
   {
     year: "2024",
     projectName: "WA Interactive CTA URL button",
+    category: "Inbox"
   },
   {
     year: "2024",
     projectName: "Calendly Integration Buttons",
+    category: "Integration"
   },
   {
     year: "2024",
     projectName: "More & Mixed Buttons",
+    category: "WhatsApp Natives"
   },
   {
     year: "2024",
     projectName: "Primary teams & assignment",
+    category: "Assignment"
   },
   {
     year: "2024",
-    projectName: "Onboarding",
+    projectName: "Onboarding Redesign",
+    category: "Onboarding & Activation"
   },
   {
     year: "2024",
     projectName: "Property syncing",
+    category: "Integration"
   },
   {
     year: "2024",
     projectName: "Signature to messages",
+    category: "Inbox"
   },
   {
     year: "2024",
     projectName: "Unanswered Inbox Filter",
+    category: "Inbox"
   },
   {
     year: "2024",
     projectName: "Fix \"Waiting longest\" sorting",
+    category: "Inbox"
   },
   {
     year: "2024",
     projectName: "Emojis reactions on notes",
-  },
-  {
-    year: "2024",
-    projectName: "Inbox v2",
+    category: "Inbox"
   },
   {
     year: "2024",
     projectName: "FE Property editing",
+    category: "Contact Management"
   },
   {
     year: "2024",
     projectName: "Sequences",
+    category: "Automations"
   },
   {
     year: "2024",
     projectName: "Follow ups (formerly Snooze)",
+    category: "UI/UX"
   },
   {
     year: "2024",
     projectName: "Activities v0.1 - Reminders & Mentions",
+    category: "Notifications"
   },
   {
     year: "2024",
     projectName: "App Redesign v2.1",
+    category: "UI/UX"
   },
   {
     year: "2024",
     projectName: "Salesforce v0.1",
+    category: "Integration"
   },
   {
     year: "2024",
     projectName: "[Workflow Bots] AI smart capture node",
+    category: "Chatbot",
   },
   {
     year: "2024",
-    projectName: "Filtering",
+    projectName: "Filtering Rebuild",
+    category: "UI/UX",
   },
   {
     year: "2024",
     projectName: "HubSpot: Ownership & Assignment",
-  },
-  {
-    year: "2024",
-    projectName: "Certify our HubSpot App",
-  },
-  {
-    year: "2024",
-    projectName: "Setup A Prompt Directory Tool",
+    category: "Integration",
   },
   {
     year: "2024",
     projectName: "Contacts Table Redesign",
+    category: "Contact Management",
   },
   {
     year: "2024",
-    projectName: "Chatbot Flow Builder",
-  },
-  {
-    year: "2024",
-    projectName: "WhatsApp Tech Provider Status",
-  },
-  {
-    year: "2024",
-    projectName: "[health] Reconnecting channels",
+    projectName: "Flexible Chatbot Flow Builder",
+    category: "Chatbot",
   },
   {
     year: "2024",
     projectName: "Versioning Bots",
+    category: "Chatbot",
   },
   {
     year: "2024",
     projectName: "Odoo Integration",
+    category: "Integration",
   },
   {
     year: "2024",
     projectName: "Zoho CRM",
+    category: "Integration",
   },
   {
     year: "2024",
-    projectName: "Data primitives",
-  },
-  {
-    year: "2024",
-    projectName: "REST APIs",
-  },
-  {
-    year: "2024",
-    projectName: "Chat Errors",
+    projectName: "In Chat Errors",
+    category: "UI/UX",
   },
   {
     year: "2024",
     projectName: "Stage change trigger sending message",
-  },
-  {
-    year: "2024",
-    projectName: "Personalised automated answers",
+    category: "Chatbot",
   },
   {
     year: "2024",
     projectName: "Chatbot Owner Assignment Node",
+    category: "Chatbot",
   },
   {
     year: "2024",
     projectName: "Chatbot Pipedrive Person/Lead/Deal identification node",
-  },
-  {
-    year: "2024",
-    projectName: "Close chats from closed/lost deals/leads",
+    category: "Chatbot",
   },
   {
     year: "2024",
     projectName: "Template Carousels",
+    category: "WhatsApp Natives",
   },
   {
     year: "2024",
-    projectName: "Pipedrive messaging",
+    projectName: "In-Pipedrive messaging",
+    category: "Integration",
   },
   {
     year: "2024",
     projectName: "Sales Notifications",
-  },
-  {
-    year: "2024",
-    projectName: "Sequences",
+    category: "Notifications",
   },
   {
     year: "2024",
     projectName: "Bot analytics",
+    category: "Analytics",
   },
   {
     year: "2024",
     projectName: "Inbox Composer Rework",
+    category: "Inbox",
   },
   {
     year: "2024",
-    projectName: "[Workflow Bots] Support AI",
+    projectName: "Support AI in Chatbots",
+    category: "Chatbot",
   },
   {
     year: "2024",
-    projectName: "[Integration] Pipedrive v0.2",
+    projectName: "Pipedrive v0.2",
+    category: "Integration",
   },
   {
     year: "2024",
-    projectName: "[Integration] Pipedrive v0.1",
+    projectName: "Pipedrive v0.1",
+    category: "Integration",
   },
   {
     year: "2024",
-    projectName: "Chatbot Improvements (10/2023)",
+    projectName: "Chatbot Improvements",
+    category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Templates Enhancements",
+    projectName: "Templates Creation Improvements",
+    category: "UI/UX",
   },
   {
     year: "2023",
-    projectName: "System variables for bots",
+    projectName: "System variables",
+    category: "Chatbot",
   },
   {
     year: "2023",
     projectName: "Filtering & Sorting",
+    category: "Inbox",
   },
   {
     year: "2023",
     projectName: "Dissociated/Grouped Nodes",
+    category: "Chatbot",
   },
   {
     year: "2023",
     projectName: "Chatbot Fallbacks",
+    category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Flows",
+    projectName: "WhatsApp Flows v0.1",
+    category: "WhatsApp Natives",
   },
   {
     year: "2023",
-    projectName: "DAs in Template Variables",
+    projectName: "Properties in Template Variables",
+    category: "Inbox",
   },
   {
     year: "2023",
-    projectName: "Views Improvements",
+    projectName: "Views Grouping/Reordering",
+    category: "Inbox",
   },
   {
     year: "2023",
-    projectName: "Conversation AI",
+    projectName: "Conversational AI",
+    category: "AI",
   },
   {
     year: "2023",
     projectName: "Pipedrive activity logging",
+    category: "Integration",
   },
   {
     year: "2023",
-    projectName: "Sending Proactive Messages",
+    projectName: "Sending Proactive Messages UX",
+    category: "Outbound",
   },
   {
     year: "2023",
-    projectName: "Contact Importing",
-  },
-  {
-    year: "2023",
-    projectName: "CRM Entities",
+    projectName: "Contact Importing (csv & hubspot)",
+    category: "Contact Management",
   },
   {
     year: "2023",
     projectName: "Team Conversation Visibility",
+    category: "Permissions",
   },
   {
     year: "2023",
-    projectName: "Filtering conversations by data attribute",
+    projectName: "Filtering conversations by properties",
+    category: "Inbox",
   },
   {
     year: "2023",
-    projectName: "Inbox counts",
+    projectName: "Templates v2",
+    category: "Inbox",
   },
   {
     year: "2023",
-    projectName: "Templates",
+    projectName: "Hubspot v1",
+    category: "Integration",
   },
   {
     year: "2023",
-    projectName: "let's get crazy",
+    projectName: "Assignment Methods (last busy, etc)",
+    category: "Assignment",
   },
   {
     year: "2023",
-    projectName: "Hubspot",
-  },
-  {
-    year: "2023",
-    projectName: "Assignment Methods",
-  },
-  {
-    year: "2023",
-    projectName: "Agents & teams presence",
+    projectName: "Agents & Teams presence",
+    category: "Team Management",
   },
   {
     year: "2023",
     projectName: "Bots — Proactive Triggers",
+    category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Bots — fallback",
+    projectName: "Bots — Fallback v1",
+    category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Help Center AI Assistant",
+    projectName: "Knowledge for AI Assistant",
+    category: "AI",
   },
   {
     year: "2023",
-    projectName: "Bots — Customer Input",
+    projectName: "Bots — Customer Input Capture",
+    category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Bots — Webhook",
+    projectName: "Bots — HTTP Requests v2",
+    category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Bots — Free Canvas",
+    projectName: "Bots — Free Canvas v1",
+    category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Bots - Branching",
+    projectName: "Bots - Branching v1",
+    category: "Chatbot",
   },
   {
     year: "2023",
-    projectName: "Bots — HTTP actions",
-  },
-  {
-    year: "2023",
-    projectName: "Tracking granular FE events batch2",
+    projectName: "Bots — HTTP actions v1",
+    category: "Chatbot",
   },
   {
     year: "2023",
     projectName: "Tags 2.0",
+    category: "Organization",
   },
   {
     year: "2023",
     projectName: "Teams Permissions",
+    category: "Permissions",
   },
   {
     year: "2023",
     projectName: "Partner Dashboard",
-  },
-  {
-    year: "2023",
-    projectName: "Tracking granular FE events",
+    category: "Analytics",
   },
   {
     year: "2023",
     projectName: "Design System v2",
+    category: "UI/UX",
   },
   {
-    year: "2022",
-    projectName: "AI — First Step",
-  },
-  {
-    year: "2022",
+    year: "2024",
     projectName: "Localisation",
+    category: "Internationalization",
   },
   {
     year: "2022",
     projectName: "Channel Health",
-  },
-  {
-    year: "2022",
-    projectName: "CRM",
-  },
-  {
-    year: "2022",
-    projectName: "WA Catalog",
-  },
-  {
-    year: "2022",
-    projectName: "FE Re-architecture",
-  },
-  {
-    year: "2022",
-    projectName: "AWS Migration",
+    category: "System Health",
   },
   {
     year: "2022",
     projectName: "Onboarding v2",
+    category: "Onboarding & Activation",
   },
   {
     year: "2022",
-    projectName: "User Importing",
+    projectName: "User Importing v0",
+    category: "User Management",
   },
   {
     year: "2022",
     projectName: "HubSpot Workflow Actions",
-  },
-  {
-    year: "2022",
-    projectName: "CSAT",
-  },
-  {
-    year: "2022",
-    projectName: "Contact Lists / Segments",
-  },
-  {
-    year: "2022",
-    projectName: "Hubspot Workflow",
+    category: "Integration",
   },
   {
     year: "2022",
     projectName: "Resolving conversations v2",
+    category: "Inbox",
   },
   {
     year: "2022",
-    projectName: "Permissions",
+    projectName: "Permissions v1",
+    category: "Permissions",
   },
   {
     year: "2022",
-    projectName: "Automated update messages",
-  },
-  {
-    year: "2022",
-    projectName: "Chatbot",
+    projectName: "Chatbot v0",
+    category: "Chatbot",
   },
   {
     year: "2022",
     projectName: "Better Search",
+    category: "Search",
   },
   {
     year: "2022",
     projectName: "Contact page filters",
+    category: "Contact Management",
   },
   {
     year: "2022",
     projectName: "Statuses 2.0",
+    category: "Status Management",
   },
   {
     year: "2022",
-    projectName: "Improved collaboration",
-  },
-  {
-    year: "2022",
-    projectName: "In-chat offering",
+    projectName: "Improved collaboration (notes)",
+    category: "Team Management",
   },
   {
     year: "2022",
     projectName: "Reporting",
+    category: "Analytics",
   },
   {
     year: "2022",
-    projectName: "Smart entry points",
+    projectName: "Widget",
+    category: "Onboarding & Activation",
   },
   {
-    year: "2022",
+    year: "2024",
     projectName: "WhatsApp Embedded Signup",
-  },
-  {
-    year: "2022",
-    projectName: "Stripe App",
-  },
-  {
-    year: "2022",
-    projectName: "UI/UX & Polishing",
-  },
-  {
-    year: "2022",
-    projectName: "Contact attrs storage",
-  },
-  {
-    year: "2022",
-    projectName: "[eCommerce] Medusa",
-  },
-  {
-    year: "2022",
-    projectName: "Infra improvements, audit & migration",
-  },
-  {
-    year: "2022",
-    projectName: "HubSpot caching",
+    category: "WhatsApp Natives",
   },
   {
     year: "2022",
     projectName: "Inbox Rules",
+    category: "Inbox",
   },
   {
     year: "2022",
     projectName: "Resolving conversations",
+    category: "Inbox",
   },
   {
     year: "2022",
     projectName: "Views",
+    category: "UI/UX",
   },
   {
     year: "2022",
     projectName: "Campaigns",
+    category: "Marketing",
   },
   {
     year: "2022",
     projectName: "Product Analytics",
-  },
-  {
-    year: "2022",
-    projectName: "Apple Business Messages",
+    category: "Analytics",
   },
   {
     year: "2022",
     projectName: "WhatsApp Cloud API",
+    category: "WhatsApp Natives",
   },
   {
     year: "2022",
     projectName: "Onboarding flow",
-  },
-  {
-    year: "2022",
-    projectName: "Staging environment",
-  },
-  {
-    year: "2022",
-    projectName: "[eCommerce] Shopify",
+    category: "Onboarding & Activation",
   },
   {
     year: "2022",
     projectName: "Email (IMAP/SMTP)",
-  },
-  {
-    year: "2022",
-    projectName: "Audit CI/CD pipeline",
-  },
-  {
-    year: "2022",
-    projectName: "Alpha version - Prototyping",
-  },
-  {
-    year: "2022",
-    projectName: "Text Formatting Specs",
+    category: "Messaging Channels",
   },
   {
     year: "2022",
     projectName: "Zapier integration",
-  },
-  {
-    year: "2022",
-    projectName: "Octopods API Rate Limiting",
-  },
-  {
-    year: "2022",
-    projectName: "Conversations & Messages Search",
-  },
-  {
-    year: "2022",
-    projectName: "Out of office messages",
-  },
-  {
-    year: "2022",
-    projectName: "Welcome messages",
-  },
-  {
-    year: "2022",
-    projectName: "Workflow improvements I",
+    category: "Integration",
   },
   {
     year: "2022",
     projectName: "Platform Redesign",
-  },
-  {
-    year: "2022",
-    projectName: "Inbox API & Webhooks",
-  },
-  {
-    year: "2022",
-    projectName: "Facebook & Instagram Public",
+    category: "UI/UX",
   },
 ];
