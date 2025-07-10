@@ -103,20 +103,15 @@ interface ProjectsTableProps {
 interface FastScrollBarProps {
   years: string[];
   onYearSelect: (year: string) => void;
-  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
-function FastScrollBar({ years, onYearSelect, containerRef }: FastScrollBarProps) {
+function FastScrollBar({ years, onYearSelect }: FastScrollBarProps) {
   const [isScrolling, setIsScrolling] = useState(false);
   const [activeYear, setActiveYear] = useState<string | null>(null);
   const scrollBarRef = useRef<HTMLDivElement>(null);
-  const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [longPressTimeout, setLongPressTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    setTouchStartY(touch.clientY);
-    
     // Start long press timer
     const timeout = setTimeout(() => {
       setIsScrolling(true);
@@ -156,7 +151,6 @@ function FastScrollBar({ years, onYearSelect, containerRef }: FastScrollBarProps
     
     setIsScrolling(false);
     setActiveYear(null);
-    setTouchStartY(null);
   };
 
   // Only show on mobile/touch devices
@@ -348,7 +342,6 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
       <FastScrollBar
         years={uniqueYears}
         onYearSelect={handleYearSelect}
-        containerRef={containerRef}
       />
 
       {/* Modal Preview */}
