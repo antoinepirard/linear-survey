@@ -528,7 +528,7 @@ export const projects: Project[] = [
   {
     year: "2022",
     projectName: "Improved collaboration (notes)",
-    category: "Team Management",
+    category: "Inbox",
   },
   {
     year: "2022",
