@@ -112,7 +112,7 @@ I started at Rasayel as a Senior Product Designer but ended up leading the platf
             </div>
           </section>
 
-          {/* Projects Table */}
+          {/* Projects Section */}
           <section>
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">Projects</h2>
             <ProjectsTable />
