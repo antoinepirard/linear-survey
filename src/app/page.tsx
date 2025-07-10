@@ -95,7 +95,7 @@ export default function Home() {
               </AnimationWrapper>
 
               <AnimationWrapper delay="200ms">
-              <p className="fluid-text-base leading-relaxed text-slate-600">
+              <p className="text-base leading-relaxed text-slate-600">
                 Over the last 10 years, I&apos;ve helped early-stage startup founders create products from the ground up,
                 led teams and developed successful product strategy. I thrive in strategic chaos clearing and crafting
                 the detailed experiences that make a product feel complete.
