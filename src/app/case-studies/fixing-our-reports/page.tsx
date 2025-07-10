@@ -13,7 +13,7 @@ const FocusBanner = dynamic(() => import('@/components/FocusBanner'), {
 });
 
 const TableOfContents = dynamic(() => import('@/components/TableOfContents'), {
-  loading: () => <div className="w-8 h-8 bg-slate-100 rounded animate-pulse" />
+  loading: () => <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40 hidden lg:block opacity-0" />
 });
 
 export default function FixingOurReportsCaseStudy() {
