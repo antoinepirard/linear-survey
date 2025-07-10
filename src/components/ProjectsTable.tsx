@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Image from 'next/image';
 import { projects, Project } from '@/data/projects';
@@ -100,14 +100,142 @@ interface ProjectsTableProps {
   onProjectHover?: (project: Project | null) => void;
 }
 
+interface FastScrollBarProps {
+  years: string[];
+  onYearSelect: (year: string) => void;
+}
+
+function FastScrollBar({ years, onYearSelect }: FastScrollBarProps) {
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [activeYear, setActiveYear] = useState<string | null>(null);
+  const scrollBarRef = useRef<HTMLDivElement>(null);
+  const [longPressTimeout, setLongPressTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // Start long press timer
+    const timeout = setTimeout(() => {
+      setIsScrolling(true);
+      handleTouchMove(e);
+    }, 500); // 500ms long press
+    
+    setLongPressTimeout(timeout);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (longPressTimeout) {
+      clearTimeout(longPressTimeout);
+      setLongPressTimeout(null);
+    }
+
+    if (!isScrolling || !scrollBarRef.current) return;
+
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = scrollBarRef.current.getBoundingClientRect();
+    const relativeY = touch.clientY - rect.top;
+    const percentage = Math.max(0, Math.min(1, relativeY / rect.height));
+    const yearIndex = Math.floor(percentage * years.length);
+    
+    if (yearIndex >= 0 && yearIndex < years.length) {
+      const year = years[yearIndex];
+      setActiveYear(year);
+      onYearSelect(year);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimeout) {
+      clearTimeout(longPressTimeout);
+      setLongPressTimeout(null);
+    }
+    
+    setIsScrolling(false);
+    setActiveYear(null);
+  };
+
+  // Only show on mobile/touch devices
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  if (!isMobile) return null;
+
+  return (
+    <>
+      {/* Fast scroll bar */}
+      <div
+        ref={scrollBarRef}
+        className="fixed right-2 top-1/2 transform -translate-y-1/2 w-8 h-64 bg-slate-200/50 rounded-full z-40 touch-none"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          opacity: isScrolling ? 1 : 0.3,
+          transition: 'opacity 0.2s ease',
+        }}
+      >
+        {/* Year indicators */}
+        {years.map((year, index) => (
+          <div
+            key={year}
+            className="absolute left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-slate-400"
+            style={{
+              top: `${(index / (years.length - 1)) * 100}%`,
+              backgroundColor: activeYear === year ? '#1e293b' : '#94a3b8',
+              transform: `translateX(-50%) ${activeYear === year ? 'scale(1.5)' : 'scale(1)'}`,
+              transition: 'all 0.2s ease',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Year display bubble */}
+      <AnimatePresence>
+        {isScrolling && activeYear && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed right-12 top-1/2 transform -translate-y-1/2 bg-slate-900 text-white px-3 py-2 rounded-lg font-mono text-lg font-semibold z-50 pointer-events-none shadow-lg"
+          >
+            {activeYear}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
 export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // Sort all projects by year (newest first)
   const sortedProjects = [...projects].sort((a, b) => parseInt(b.year) - parseInt(a.year));
+  
+  // Get unique years for fast scroll
+  const uniqueYears = Array.from(new Set(sortedProjects.map(p => p.year)));
 
   const handleProjectClick = (project: Project) => {
     setSelectedProject(project);
+  };
+
+  const handleYearSelect = (year: string) => {
+    const yearElement = document.getElementById(`year-${year}`);
+    if (yearElement && containerRef.current) {
+      yearElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
   };
 
   const closeModal = () => {
@@ -172,7 +300,7 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
 
   return (
     <>
-      <div className="space-y-1">
+      <div ref={containerRef} className="space-y-1">
         {sortedProjects.map((project, index) => {
           // Check if this is the first project of a new year
           const isFirstOfYear = index === 0 || sortedProjects[index - 1].year !== project.year;
@@ -209,6 +337,12 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
           );
         })}
       </div>
+
+      {/* Fast scroll component */}
+      <FastScrollBar
+        years={uniqueYears}
+        onYearSelect={handleYearSelect}
+      />
 
       {/* Modal Preview */}
       <AnimatePresence>
