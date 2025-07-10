@@ -322,13 +322,13 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
                 onClick={() => handleProjectClick(project)}
               >
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium text-slate-900">
+                  <div className="text-sm font-medium text-slate-900 truncate pr-4">
                     {project.projectName}
                     {project.category && (
                       <span className="text-slate-400 font-normal"> / {project.category}</span>
                     )}
                   </div>
-                  <div className="text-xs text-slate-500 font-mono">
+                  <div className="text-xs text-slate-500 font-mono flex-shrink-0">
                     {project.year}
                   </div>
                 </div>
