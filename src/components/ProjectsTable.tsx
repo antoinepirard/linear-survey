@@ -173,27 +173,41 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
   return (
     <>
       <div className="space-y-1">
-        {sortedProjects.map((project, index) => (
-          <div 
-            key={`${project.year}-${index}`}
-            className="py-3 px-1 border-b border-slate-100 transition-colors duration-200 hover:border-slate-200 cursor-pointer"
-            onMouseEnter={() => onProjectHover?.(project)}
-            onMouseLeave={() => onProjectHover?.(null)}
-            onClick={() => handleProjectClick(project)}
-          >
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-medium text-slate-900">
-                {project.projectName}
-                {project.category && (
-                  <span className="text-slate-400 font-normal"> / {project.category}</span>
-                )}
+        {sortedProjects.map((project, index) => {
+          // Check if this is the first project of a new year
+          const isFirstOfYear = index === 0 || sortedProjects[index - 1].year !== project.year;
+          
+          return (
+            <React.Fragment key={`${project.year}-${index}`}>
+              {isFirstOfYear && (
+                <h3 
+                  id={`year-${project.year}`}
+                  className="text-lg font-semibold text-slate-900 mt-8 mb-4 first:mt-0"
+                >
+                  {project.year}
+                </h3>
+              )}
+              <div 
+                className="py-3 px-1 border-b border-slate-100 transition-colors duration-200 hover:border-slate-200 cursor-pointer"
+                onMouseEnter={() => onProjectHover?.(project)}
+                onMouseLeave={() => onProjectHover?.(null)}
+                onClick={() => handleProjectClick(project)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-medium text-slate-900">
+                    {project.projectName}
+                    {project.category && (
+                      <span className="text-slate-400 font-normal"> / {project.category}</span>
+                    )}
+                  </div>
+                  <div className="text-xs text-slate-500 font-mono">
+                    {project.year}
+                  </div>
+                </div>
               </div>
-              <div className="text-xs text-slate-500 font-mono">
-                {project.year}
-              </div>
-            </div>
-          </div>
-        ))}
+            </React.Fragment>
+          );
+        })}
       </div>
 
       {/* Modal Preview */}
