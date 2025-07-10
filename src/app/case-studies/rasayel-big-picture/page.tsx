@@ -69,7 +69,7 @@ export default function RasayelBigPictureCaseStudy() {
             <span className='font-mono'>2022 - 2025</span>
             </div>
           <h1 className="text-5xl font-bold text-slate-900 mt-6 mb-4 tracking-tight">
-            Rasayel - Big Picture
+            3 years of building
           </h1>
           <p className="text-lg text-slate-700 mb-24">
             3 years of building Rasayel, a WhatsApp native platform for sales and customer support.

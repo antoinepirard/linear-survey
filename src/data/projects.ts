@@ -1,88 +1,110 @@
 export interface Project {
   year: string;
   projectName: string;
+  category?: string;
   image?: string;
+  description?: string;
 }
 
 export const projects: Project[] = [
   {
     year: "2025",
     projectName: "Contact Lists",
+    category: "Feature",
     image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
+    description: "Redesigned contact management system with improved filtering, bulk actions, and real-time synchronization across multiple platforms.",
   },
   {
     year: "2025",
     projectName: "Zoho: Allow to turn off activity logging",
+    category: "Integration",
     image: "/Assets/Images/antoine-olivia.webp",
+    description: "Added privacy controls allowing users to disable activity tracking while maintaining essential functionality and compliance requirements.",
   },
   {
     year: "2025",
     projectName: "Performance Reporting - Rebuild",
+    category: "Analytics",
     image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
+    description: "Complete overhaul of the reporting system with real-time analytics, customizable dashboards, and improved data visualization.",
   },
   {
     year: "2025",
     projectName: "Schedule Campaigns",
+    category: "Marketing",
     image: "/Assets/Images/IMG_0169_2.webp",
   },
   {
     year: "2025",
     projectName: "Performance Reporting - Improvements",
+    category: "Analytics",
     image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",
     projectName: "Reporting System Rebuild",
+    category: "Analytics",
     image: "/Assets/Images/antoine-olivia.webp",
   },
   {
     year: "2025",
     projectName: "Reporting v2 - New Reports UI",
+    category: "UI/UX",
     image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",
     projectName: "Rewaa Project",
+    category: "Integration",
     image: "/Assets/Images/IMG_0169_2.webp",
   },
   {
     year: "2025",
     projectName: "Reporting v2 - New Queries",
+    category: "Analytics",
     image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",
     projectName: "Reporting v2 - Fix Sessions",
+    category: "Bug Fix",
     image: "/Assets/Images/antoine-olivia.webp",
   },
   {
     year: "2025",
     projectName: "HubSpot On Mobile App",
+    category: "Integration",
     image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",
     projectName: "Reporting v2 - 24h Inactivity Session Reset",
+    category: "Feature",
   },
   {
     year: "2025",
     projectName: "Reporting v2 - Auto-Reassignment for Away Agents",
+    category: "Automation",
   },
   {
     year: "2025",
     projectName: "Coexistence",
+    category: "Architecture",
   },
   {
     year: "2025",
     projectName: "Import CSV as campaign audience",
+    category: "Marketing",
   },
   {
     year: "2025",
     projectName: "Property syncing (pipedrive)",
+    category: "Integration",
   },
   {
     year: "2025",
     projectName: "Bots: Supporting New Properties",
+    category: "Automation",
   },
   {
     year: "2025",

@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import Image from 'next/image';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import { projects, Project } from '@/data/projects';
 
 interface ProjectsTableProps {
@@ -6,28 +9,183 @@ interface ProjectsTableProps {
 }
 
 export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  
   // Sort all projects by year (newest first)
   const sortedProjects = [...projects].sort((a, b) => parseInt(b.year) - parseInt(a.year));
 
+  const handleProjectClick = (project: Project) => {
+    setSelectedProject(project);
+  };
+
+  const closeModal = () => {
+    setSelectedProject(null);
+  };
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!selectedProject) return;
+
+      if (event.key === 'Escape') {
+        closeModal();
+        return;
+      }
+
+      if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        
+        const currentIndex = sortedProjects.findIndex(
+          project => project.projectName === selectedProject.projectName && 
+                    project.year === selectedProject.year
+        );
+        
+        let nextIndex;
+        if (event.key === 'ArrowUp') {
+          nextIndex = currentIndex > 0 ? currentIndex - 1 : sortedProjects.length - 1;
+        } else {
+          nextIndex = currentIndex < sortedProjects.length - 1 ? currentIndex + 1 : 0;
+        }
+        
+        setSelectedProject(sortedProjects[nextIndex]);
+      }
+    };
+
+    if (selectedProject) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedProject, sortedProjects]);
+
   return (
-    <div className="space-y-1">
-      {sortedProjects.map((project, index) => (
-        <div 
-          key={`${project.year}-${index}`}
-          className="py-3 px-1 border-b border-slate-100 transition-colors duration-200 hover:border-slate-200 cursor-pointer"
-          onMouseEnter={() => onProjectHover?.(project)}
-          onMouseLeave={() => onProjectHover?.(null)}
-        >
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-medium text-slate-900">
-              {project.projectName}
-            </div>
-            <div className="text-xs text-slate-500 font-mono">
-              {project.year}
+    <>
+      <div className="space-y-1">
+        {sortedProjects.map((project, index) => (
+          <div 
+            key={`${project.year}-${index}`}
+            className="py-3 px-1 border-b border-slate-100 transition-colors duration-200 hover:border-slate-200 cursor-pointer"
+            onMouseEnter={() => onProjectHover?.(project)}
+            onMouseLeave={() => onProjectHover?.(null)}
+            onClick={() => handleProjectClick(project)}
+          >
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-medium text-slate-900">
+                {project.projectName}
+                {project.category && (
+                  <span className="text-slate-400 font-normal"> / {project.category}</span>
+                )}
+              </div>
+              <div className="text-xs text-slate-500 font-mono">
+                {project.year}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      {/* Modal Preview */}
+      <AnimatePresence>
+        {selectedProject && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/10 backdrop-blur-sm z-50 flex items-center justify-center p-"
+            onClick={closeModal}
+          >
+            <motion.div
+              key={`modal-${selectedProject.projectName}-${selectedProject.year}`}
+              layout
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ 
+                layout: { duration: 0.3, ease: 'easeInOut' },
+                opacity: { duration: 0.2, ease: 'easeOut' },
+                scale: { duration: 0.2, ease: 'easeOut' },
+                y: { duration: 0.2, ease: 'easeOut' }
+              }}
+              className="bg-white rounded-md shadow-xl max-w-4xl w-full max-h-[90vh] overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <motion.div 
+                layout
+                className="flex items-center justify-between p-7"
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+              >
+                <motion.div
+                  layout
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                >
+                  <h3 className="text-base font-medium text-slate-900">
+                    {selectedProject.projectName}
+                  </h3>
+                  <p className="text-sm text-slate-500 font-mono">
+                    {selectedProject.year}
+                  </p>
+                </motion.div>
+                <button
+                  onClick={closeModal}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors duration-150"
+                >
+                  <XMarkIcon className="w-5 h-5 text-slate-500" />
+                </button>
+              </motion.div>
+
+              {/* Content */}
+              <motion.div 
+                layout
+                className="p-7"
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+              >
+                {selectedProject.image && (
+                  <motion.div 
+                    layout
+                    className="mb-6"
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  >
+                    <Image
+                      src={selectedProject.image}
+                      alt={selectedProject.projectName}
+                      width={600}
+                      height={400}
+                      className="w-full h-64 object-cover rounded-lg"
+                      priority
+                    />
+                  </motion.div>
+                )}
+                
+                {selectedProject.description && (
+                  <motion.div 
+                    layout
+                    className="prose prose-slate max-w-none"
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  >
+                    <p className="text-slate-700 leading-relaxed">
+                      {selectedProject.description}
+                    </p>
+                  </motion.div>
+                )}
+                
+                {!selectedProject.description && (
+                  <motion.p 
+                    layout
+                    className="text-slate-500 italic"
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  >
+                    No description available for this project.
+                  </motion.p>
+                )}
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
