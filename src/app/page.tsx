@@ -87,18 +87,17 @@ export default function Home() {
             <div className="flex flex-col gap-6 max-w-2xl">
               <AnimationWrapper delay="150ms">
               <p className="text-base font-medium leading-relaxed text-slate-950">
-                Product design scaling startups from nothing to millions in ARR.
+                I help startups build products that customers want to use.
               </p>
               <p className="text-base leading-relaxed text-slate-700">
-                — I&apos;m building experiences and teams that allow businesses to scale to their full potential.
+                — I care about the business, the customers and the team I work with.
               </p>
               </AnimationWrapper>
 
               <AnimationWrapper delay="200ms">
               <p className="text-base leading-relaxed text-slate-600">
-                Over the last 10 years, I&apos;ve helped early-stage startup founders create products from the ground up,
-                led teams and developed successful product strategy. I thrive in strategic chaos clearing and crafting
-                the detailed experiences that make a product feel complete.
+                I&apos;ve spent the last decade working at startups and collaborating with brillant engineers to solve user problems through thoughtful experiences.
+                I shine in the chaos and figuring things out from first principles. I love figuring out the most valuable problems to solve and solving them exceptionally well.
               </p>
               </AnimationWrapper>
             </div>
