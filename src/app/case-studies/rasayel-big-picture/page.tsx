@@ -71,7 +71,7 @@ export default function RasayelBigPictureCaseStudy() {
           <h1 className="text-5xl font-bold text-slate-900 mt-6 mb-4 tracking-tight">
             3 years of building
           </h1>
-          <p className="text-lg text-slate-700 mb-24">
+          <p className="text-lg text-slate-700">
             3 years of building Rasayel, a WhatsApp native platform for sales and customer support.
           </p>
         </header>
@@ -79,9 +79,8 @@ export default function RasayelBigPictureCaseStudy() {
 
       {/* Hero Image - Outside main container */}
       <div
-        className="mb-16 bg-slate-50 rounded-md overflow-hidden relative mx-auto"
+        className="mb-12 bg-slate-50 rounded-md overflow-hidden relative mx-auto aspect-[16/9] sm:aspect-[2/1]"
         style={{ 
-          height: '500px',
           width: 'calc(896px * 1.15)', // 15% larger than max-w-4xl (896px)
           maxWidth: '90vw' // Responsive fallback
         }}
