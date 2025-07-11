@@ -61,4 +61,18 @@ export const feedImages: FeedImage[] = [
     type: 'video',
     duration: 45
   },
+  {
+    id: 8,
+    src: '/Assets/Images/feed/IMG_0092.jpeg',
+    name: 'Recent Moment',
+    date: '2025',
+    type: 'image'
+  },
+  {
+    id: 9,
+    src: '/Assets/Images/feed/e53a65b0-e1c9-41d5-b472-8591803ecd07.jpeg',
+    name: 'Latest Shot',
+    date: '2025',
+    type: 'image'
+  },
 ];
