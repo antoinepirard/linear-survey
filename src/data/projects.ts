@@ -2,9 +2,7 @@ export interface Project {
   year: string;
   projectName: string;
   category?: string;
-  image?: string;
-  video?: string;
-  poster?: string;
+  videoLink?: string;
   description?: string;
 }
 
@@ -13,43 +11,37 @@ export const projects: Project[] = [
     year: "2025",
     projectName: "Linear Integration",
     category: "Integration",
-    video: "/case-studies/rasayel-big-picture/linear-integration.webm",
-    poster: "/case-studies/rasayel-big-picture/linear-integration.jpg",
+    videoLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     description: "This integration allowed users to log issues from Rasayel. The issue is linked to a conversation, and once the issue is completed, a message appears in the chat, effectively letting the agent know a bug or request has been completed and they can now let the customers know. Linear wasn't a priority for us, but it allowed us to iterate fast and learn from our own team what to build. With more time, we would have improved the composer and made it so you can still see the conversation context, among many other things.",
   },
   {
     year: "2025",
     projectName: "Contact Lists",
     category: "Contact Management",
-    video: "/case-studies/rasayel-big-picture/contact-lists.webm",
-    poster: "/case-studies/rasayel-big-picture/contact-lists.jpg",
+    videoLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     description: "Redesigned contact management system with improved filtering, bulk actions, and real-time synchronization across multiple platforms.",
   },
   {
     year: "2025",
     projectName: "Zoho: Allow to turn off activity logging",
     category: "Integration",
-    image: "/Assets/Images/antoine-olivia.jpeg",
     description: "Added privacy controls allowing users to disable activity tracking while maintaining essential functionality and compliance requirements.",
   },
   {
     year: "2025",
     projectName: "Performance Reporting - v2",
     category: "Analytics",
-    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
     description: "Complete overhaul of the reporting system with real-time analytics, customizable dashboards, and improved data visualization.",
   },
   {
     year: "2025",
     projectName: "Schedule Campaigns",
     category: "Marketing",
-    image: "/Assets/Images/IMG_0169_2.jpeg",
   },
   {
     year: "2025",
     projectName: "HubSpot Properties On Mobile App",
     category: "Integration",
-    image: "/case-studies/rasayel-big-picture/RS-tickets.jpg",
   },
   {
     year: "2025",

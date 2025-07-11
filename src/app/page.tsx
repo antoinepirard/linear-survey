@@ -1,8 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useEffect } from 'react';
+import { motion } from 'motion/react';
 
 import ListItem from '@/components/ListItem';
 import HeaderSection from '@/components/HeaderSection';
@@ -20,13 +20,9 @@ const QuotesSection = dynamic(() => import('@/components/QuotesSection'), {
   loading: () => <div className="animate-pulse h-32 bg-slate-100 rounded-lg" />
 });
 
-const PhotoModal = dynamic(() => import('@/components/PhotoModal'), {
-  loading: () => null
-});
 
 
 export default function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Log folio info once on load
   useEffect(() => {
@@ -65,8 +61,7 @@ export default function Home() {
               <div className="relative px-4 py-2">
                 <motion.div
                   layoutId="photo-container"
-                  onClick={() => setIsModalOpen(true)}
-                  className="cursor-zoom-in interactive-element ring-1 ring-slate-300/40 to-slate-300/90 border-5 border-white rounded-2xl shadow-xl"
+                  className="ring-1 ring-slate-300/40 to-slate-300/90 border-5 border-white rounded-2xl shadow-xl"
                   whileHover={{ scale: 1.02, rotate: 2 }}
                   transition={{ duration: 0.15 }}
                   style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
@@ -163,13 +158,6 @@ export default function Home() {
       </div>
       </main>
 
-      {/* Modal */}
-      <AnimatePresence mode="wait">
-        <PhotoModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      </AnimatePresence>
 
       {/* Focus Banner */}
       <FocusBanner />
