@@ -1,16 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { PlayIcon } from '@heroicons/react/24/solid';
 import { AnimationWrapper } from '@/hooks/useAnimation';
 import { feedImages, FeedImage } from '@/data/feed';
 import { generateVideoThumbnail, formatDuration } from '@/utils/videoThumbnail';
 import HeaderSection from '@/components/HeaderSection';
-import PhotoModal from '@/components/PhotoModal';
 
 export default function Feed() {
-  const [selectedItem, setSelectedItem] = useState<FeedImage | null>(null);
   const [videoThumbnails, setVideoThumbnails] = useState<Record<number, string>>({});
 
   useEffect(() => {
@@ -35,11 +33,10 @@ export default function Feed() {
   }, []);
 
   const handleItemClick = (item: FeedImage) => {
-    setSelectedItem(item);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedItem(null);
+    if (item.type === 'video') {
+      // Open video in new tab - you can replace with actual video URLs
+      window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+    }
   };
 
   return (
@@ -58,7 +55,7 @@ export default function Feed() {
               <AnimationWrapper key={item.id} delay={`${100 + index * 50}ms`}>
                 <div className="break-inside-avoid mb-6">
                   <div 
-                    className="rounded-md overflow-hidden cursor-pointer relative group"
+                    className={`rounded-md overflow-hidden relative group ${item.type === 'video' ? 'cursor-pointer' : ''}`}
                     onClick={() => handleItemClick(item)}
                   >
                     {item.type === 'video' ? (
@@ -100,14 +97,6 @@ export default function Feed() {
             ))}
           </div>
 
-          {selectedItem && (
-            <PhotoModal 
-              isOpen={true}
-              onClose={handleCloseModal}
-              item={selectedItem}
-              allItems={feedImages}
-            />
-          )}
         </div>
       </div>
     </div>
