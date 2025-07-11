@@ -4,6 +4,8 @@ export interface FeedImage {
   name: string;
   date: string;
   type?: 'image' | 'gif' | 'video';
+  thumbnail?: string;
+  duration?: number;
 }
 
 export const feedImages: FeedImage[] = [
@@ -20,5 +22,13 @@ export const feedImages: FeedImage[] = [
     name: 'Microsfot Ads via Iconic Matter',
     date: '2016',
     type: 'gif'
+  },
+  {
+    id: 3,
+    src: '/Assets/Videos/reporting-highquality.webm',
+    name: 'Reporting Demo',
+    date: '2024',
+    type: 'video',
+    duration: 15
   },
 ];
