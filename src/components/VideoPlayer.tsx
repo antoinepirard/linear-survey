@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { PlayIcon, PauseIcon, SpeakerWaveIcon, SpeakerXMarkIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import { formatDuration } from '@/utils/videoThumbnail';
 
@@ -49,7 +49,7 @@ export default function VideoPlayer({ src, className = '', autoplay = false }: V
     };
   }, []);
 
-  const togglePlayPause = () => {
+  const togglePlayPause = useCallback(() => {
     if (!videoRef.current) return;
 
     if (isPlaying) {
@@ -57,7 +57,7 @@ export default function VideoPlayer({ src, className = '', autoplay = false }: V
     } else {
       videoRef.current.play();
     }
-  };
+  }, [isPlaying]);
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!videoRef.current) return;
@@ -70,7 +70,7 @@ export default function VideoPlayer({ src, className = '', autoplay = false }: V
     videoRef.current.currentTime = newTime;
   };
 
-  const toggleMute = () => {
+  const toggleMute = useCallback(() => {
     if (!videoRef.current) return;
 
     if (isMuted) {
@@ -80,7 +80,7 @@ export default function VideoPlayer({ src, className = '', autoplay = false }: V
       videoRef.current.volume = 0;
       setIsMuted(true);
     }
-  };
+  }, [isMuted, volume]);
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
@@ -141,9 +141,15 @@ export default function VideoPlayer({ src, className = '', autoplay = false }: V
       <video
         ref={videoRef}
         src={src}
-        className="w-full h-full object-contain"
+        className="max-w-full max-h-full object-contain"
         onClick={togglePlayPause}
         autoPlay={autoplay}
+        style={{ 
+          maxWidth: '100%', 
+          maxHeight: '80vh',
+          width: 'auto',
+          height: 'auto'
+        }}
       />
 
       {isLoading && (

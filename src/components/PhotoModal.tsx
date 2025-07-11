@@ -1,12 +1,12 @@
 'use client';
 
 import { motion, AnimatePresence } from 'motion/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { FeedImage } from '@/data/feed';
 import VideoPlayer from './VideoPlayer';
-import { generateVideoThumbnail } from '@/utils/videoThumbnail';
+
 
 interface PhotoModalProps {
   isOpen: boolean;
@@ -25,17 +25,17 @@ export default function PhotoModal({ isOpen, onClose, item, allItems }: PhotoMod
     }
   }, [item, allItems]);
 
-  const goToPrevious = () => {
+  const goToPrevious = useCallback(() => {
     if (!allItems) return;
     const newIndex = currentIndex > 0 ? currentIndex - 1 : allItems.length - 1;
     setCurrentIndex(newIndex);
-  };
+  }, [currentIndex, allItems]);
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     if (!allItems) return;
     const newIndex = currentIndex < allItems.length - 1 ? currentIndex + 1 : 0;
     setCurrentIndex(newIndex);
-  };
+  }, [currentIndex, allItems]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -54,7 +54,7 @@ export default function PhotoModal({ isOpen, onClose, item, allItems }: PhotoMod
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, onClose]);
+  }, [goToPrevious, goToNext, onClose]);
 
   if (!isOpen) return null;
 
@@ -62,7 +62,7 @@ export default function PhotoModal({ isOpen, onClose, item, allItems }: PhotoMod
   if (!item || !allItems) {
     return (
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center"
+        className="fixed inset-0 z-[10000] flex items-center justify-center"
         onClick={(e) => {
           if (e.target === e.currentTarget) onClose();
         }}
@@ -104,7 +104,7 @@ export default function PhotoModal({ isOpen, onClose, item, allItems }: PhotoMod
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-[10000] flex items-center justify-center"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -122,29 +122,28 @@ export default function PhotoModal({ isOpen, onClose, item, allItems }: PhotoMod
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-40 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
           >
             <ChevronLeftIcon className="w-6 h-6" />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-40 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
           >
             <ChevronRightIcon className="w-6 h-6" />
           </button>
         </>
       )}
 
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 z-10 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
-      >
-        <XMarkIcon className="w-6 h-6" />
-      </button>
-
       {/* Content */}
-      <div className="relative max-w-[90vw] max-h-[90vh] flex items-center justify-center">
+      <div className="relative w-full h-full max-w-[90vw] max-h-[80vh] flex items-center justify-center z-10" style={{ maxHeight: '80vh' }}>
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute -top-12 -right-4 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+        >
+          <XMarkIcon className="w-6 h-6" />
+        </button>
         <AnimatePresence mode="wait">
           <motion.div 
             key={currentItem.id}
@@ -155,10 +154,10 @@ export default function PhotoModal({ isOpen, onClose, item, allItems }: PhotoMod
             className="w-full h-full flex items-center justify-center"
           >
             {currentItem.type === 'video' ? (
-              <div className="w-full h-full max-w-4xl max-h-[80vh]">
+              <div className="w-full h-full flex items-center justify-center">
                 <VideoPlayer 
                   src={currentItem.src} 
-                  className="w-full h-full"
+                  className="max-w-full max-h-full"
                   autoplay={true}
                 />
               </div>
@@ -168,7 +167,7 @@ export default function PhotoModal({ isOpen, onClose, item, allItems }: PhotoMod
                 alt={currentItem.name}
                 width={1200}
                 height={800}
-                className="max-w-full max-h-[80vh] object-contain"
+                className="max-w-full max-h-full object-contain"
               />
             )}
           </motion.div>

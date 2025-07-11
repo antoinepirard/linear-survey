@@ -25,10 +25,40 @@ export const feedImages: FeedImage[] = [
   },
   {
     id: 3,
+    src: '/Assets/Images/feed/original-6957a16c963578f42d22a8d3d5c4b7a4.gif',
+    name: 'Animation Demo',
+    date: '2024',
+    type: 'gif'
+  },
+  {
+    id: 4,
+    src: '/Assets/Images/feed/original-7fda3aa4c9a615ba69234cba6d64e772.webp',
+    name: 'Design Mockup',
+    date: '2024',
+    type: 'image'
+  },
+  {
+    id: 5,
     src: '/Assets/Videos/reporting-highquality.webm',
     name: 'Reporting Demo',
     date: '2024',
     type: 'video',
     duration: 15
+  },
+  {
+    id: 6,
+    src: '/Assets/Images/feed/Export-1718616313659.mp4',
+    name: 'Product Export Demo',
+    date: '2024',
+    type: 'video',
+    duration: 30
+  },
+  {
+    id: 7,
+    src: '/Assets/Images/feed/Upcoming Features video 1.mp4',
+    name: 'Upcoming Features Preview',
+    date: '2025',
+    type: 'video',
+    duration: 45
   },
 ];
