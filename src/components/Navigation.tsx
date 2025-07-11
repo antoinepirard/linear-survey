@@ -12,6 +12,7 @@ export default function Navigation({ className, showDot = true }: NavigationProp
   const pathname = usePathname();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [dotPosition, setDotPosition] = useState({ left: 0, width: 0 });
+  const [isDotReady, setIsDotReady] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
 
   const items = [
@@ -31,10 +32,16 @@ export default function Navigation({ className, showDot = true }: NavigationProp
   };
 
   useEffect(() => {
-    const activeItem = navRef.current?.querySelector(`[href="${pathname}"]`) as HTMLElement;
-    if (activeItem) {
-      updateDotPosition(activeItem);
-    }
+    // Add a small delay to ensure DOM is fully rendered
+    const timer = setTimeout(() => {
+      const activeItem = navRef.current?.querySelector(`[href="${pathname}"]`) as HTMLElement;
+      if (activeItem) {
+        updateDotPosition(activeItem);
+        setIsDotReady(true);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   return (
@@ -65,17 +72,24 @@ export default function Navigation({ className, showDot = true }: NavigationProp
           </Link>
         ))}
         
-        {showDot && (
+        {showDot && isDotReady && (
           <motion.div
             className="absolute bottom-[-2px] h-1 w-1 bg-slate-300 rounded-full"
+            initial={{ 
+              opacity: 0,
+              left: dotPosition.left,
+              scale: 1
+            }}
             animate={{
               left: dotPosition.left,
-              scale: hoveredItem ? 1.2 : 1
+              scale: hoveredItem ? 1.2 : 1,
+              opacity: 1
             }}
             transition={{
               type: "spring",
               stiffness: 400,
-              damping: 30
+              damping: 30,
+              opacity: { duration: 0.2 }
             }}
           />
         )}
