@@ -10,6 +10,7 @@ import HeaderSection from '@/components/HeaderSection';
 
 export default function Feed() {
   const [videoThumbnails, setVideoThumbnails] = useState<Record<number, string>>({});
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const generateThumbnails = async () => {
@@ -39,6 +40,10 @@ export default function Feed() {
     }
   };
 
+  const handleImageLoad = (id: number) => {
+    setLoadedImages(prev => new Set(prev).add(id));
+  };
+
   return (
     <div className="bg-white min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
@@ -55,19 +60,25 @@ export default function Feed() {
               <AnimationWrapper key={item.id} delay={`${100 + index * 50}ms`}>
                 <div className="break-inside-avoid mb-6">
                   <div 
-                    className={`rounded-md overflow-hidden relative group ${item.type === 'video' ? 'cursor-pointer' : ''}`}
+                    className={`rounded-md overflow-hidden relative group ${item.type === 'video' ? 'cursor-pointer' : ''} bg-slate-100`}
                     onClick={() => handleItemClick(item)}
                   >
                     {item.type === 'video' ? (
                       <>
-                        <Image
-                          src={videoThumbnails[item.id] || '/Assets/Images/placeholder.jpg'}
-                          alt={item.name}
-                          width={600}
-                          height={600}
-                          className="w-full h-auto"
-                          priority={index < 3}
-                        />
+                        <div className={`transition-opacity duration-300 ${loadedImages.has(item.id) ? 'opacity-100' : 'opacity-0'}`}>
+                          <Image
+                            src={videoThumbnails[item.id] || '/Assets/Images/placeholder.jpg'}
+                            alt={item.name}
+                            width={600}
+                            height={600}
+                            className="w-full h-auto"
+                            priority={index < 3}
+                            onLoad={() => handleImageLoad(item.id)}
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            placeholder="blur"
+                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                          />
+                        </div>
                         <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
                           <div className="bg-white bg-opacity-90 rounded-full p-3">
                             <PlayIcon className="w-6 h-6 text-slate-800 ml-1" />
@@ -80,14 +91,20 @@ export default function Feed() {
                         )}
                       </>
                     ) : (
-                      <Image
-                        src={item.src}
-                        alt={item.name}
-                        width={600}
-                        height={600}
-                        className="w-full h-auto"
-                        priority={index < 3}
-                      />
+                      <div className={`transition-opacity duration-300 ${loadedImages.has(item.id) ? 'opacity-100' : 'opacity-0'}`}>
+                        <Image
+                          src={item.src}
+                          alt={item.name}
+                          width={600}
+                          height={600}
+                          className="w-full h-auto"
+                          priority={index < 3}
+                          onLoad={() => handleImageLoad(item.id)}
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          placeholder="blur"
+                          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                        />
+                      </div>
                     )}
                   </div>
                   <p className="text-slate-500 font-mono text-xs mt-3">{item.date}</p>
