@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { projects, Project } from '@/data/projects';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 
 
 interface ProjectsTableProps {
@@ -10,12 +11,30 @@ interface ProjectsTableProps {
 
 export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [mediaDimensions, setMediaDimensions] = useState<{ width: number; height: number } | null>(null);
   
   // Sort all projects by year (newest first)
   const sortedProjects = [...projects].sort((a, b) => parseInt(b.year) - parseInt(a.year));
 
   const handleProjectClick = (project: Project) => {
     setSelectedProject(project);
+    setMediaDimensions(null); // Reset dimensions when changing projects
+  };
+
+  const handleVideoLoad = (event: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = event.currentTarget;
+    setMediaDimensions({
+      width: video.videoWidth,
+      height: video.videoHeight
+    });
+  };
+
+  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = event.currentTarget;
+    setMediaDimensions({
+      width: img.naturalWidth,
+      height: img.naturalHeight
+    });
   };
 
   const closeModal = () => {
@@ -135,7 +154,7 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, delay: 0.1 }}
-              className="absolute top-4 right-4 bg-slate-900 text-white text-xs px-2 py-1 rounded-md font-mono"
+              className="absolute top-4 right-4 bg-white text-slate-900 text-xs px-2 py-1 rounded-md font-mono"
             >
               ESC to close
             </motion.div>
@@ -197,23 +216,43 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
                 className="p-7"
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
               >
-                {selectedProject.videoLink && (
+                {/* Media Preview Section */}
+                {(selectedProject.previewImage || selectedProject.previewVideo) && (
                   <motion.div 
                     layout
-                    className="mb-6"
+                    className="mb-6 bg-slate-50 rounded-lg overflow-hidden"
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    style={{
+                      aspectRatio: mediaDimensions ? `${mediaDimensions.width} / ${mediaDimensions.height}` : 'auto'
+                    }}
                   >
-                    <a
-                      href={selectedProject.videoLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
-                    >
-                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z"/>
-                      </svg>
-                      Watch Video
-                    </a>
+                    {selectedProject.previewVideo ? (
+                      <video 
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-full object-contain"
+                        poster={selectedProject.previewImage}
+                        onLoadedMetadata={handleVideoLoad}
+                      >
+                        <source src={selectedProject.previewVideo} type="video/mp4" />
+                        <source src={selectedProject.previewVideo} type="video/webm" />
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : selectedProject.previewImage ? (
+                      <div className="relative w-full" style={{
+                        aspectRatio: mediaDimensions ? `${mediaDimensions.width} / ${mediaDimensions.height}` : '16 / 9'
+                      }}>
+                        <Image 
+                          src={selectedProject.previewImage} 
+                          alt={`Preview of ${selectedProject.projectName}`}
+                          fill
+                          className="object-contain"
+                          onLoad={handleImageLoad}
+                        />
+                      </div>
+                    ) : null}
                   </motion.div>
                 )}
                 

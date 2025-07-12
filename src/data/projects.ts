@@ -2,8 +2,9 @@ export interface Project {
   year: string;
   projectName: string;
   category?: string;
-  videoLink?: string;
   description?: string;
+  previewImage?: string;
+  previewVideo?: string;
 }
 
 export const projects: Project[] = [
@@ -11,14 +12,15 @@ export const projects: Project[] = [
     year: "2025",
     projectName: "Linear Integration",
     category: "Integration",
-    videoLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    previewImage: "/projects/linear-integration-preview.jpg",
+    previewVideo: "/case-studies/rasayel-big-picture/linear-integration.webm",
     description: "This integration allowed users to log issues from Rasayel. The issue is linked to a conversation, and once the issue is completed, a message appears in the chat, effectively letting the agent know a bug or request has been completed and they can now let the customers know. Linear wasn't a priority for us, but it allowed us to iterate fast and learn from our own team what to build. With more time, we would have improved the composer and made it so you can still see the conversation context, among many other things.",
   },
   {
     year: "2025",
     projectName: "Contact Lists",
     category: "Contact Management",
-    videoLink: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    previewImage: "/projects/contact-lists-preview.jpg",
     description: "Redesigned contact management system with improved filtering, bulk actions, and real-time synchronization across multiple platforms.",
   },
   {
@@ -31,6 +33,7 @@ export const projects: Project[] = [
     year: "2025",
     projectName: "Performance Reporting - v2",
     category: "Analytics",
+    previewImage: "/projects/performance-reporting-preview.jpg",
     description: "Complete overhaul of the reporting system with real-time analytics, customizable dashboards, and improved data visualization.",
   },
   {

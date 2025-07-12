@@ -106,7 +106,7 @@ export default function RasayelBigPictureCaseStudy() {
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">Overview</h2>
             <div className="prose prose-slate max-w-none">
               <p className="text-base text-slate-700 leading-relaxed">
-I started at Rasayel as a Senior Product Designer but ended up leading the platform team. Turns out when you&apos;re moving fast, going back and forth with engineers takes forever. So I just started coding the prototypes myself—way faster and the end result was better. Along the way I had to figure out the product roadmap, make strategic calls, and keep the engineering team aligned. We rebuilt the whole user experience and created proper design systems for a customer support platform used by thousands of businesses across the Middle East.
+I joined Rasayel as a Senior Product Designer and gradually took on platform team leadership responsibilities. To accelerate development cycles, I began implementing prototypes directly rather than relying solely on design handoffs. This approach helped streamline the development process. My role expanded to include product roadmap planning, strategic decision-making, and team coordination. The team worked together to rebuild the user experience and establish design systems for a customer support platform serving businesses across the Middle East.
               </p>
             </div>
           </section>
