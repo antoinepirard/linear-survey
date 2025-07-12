@@ -100,10 +100,10 @@ export default function Home() {
             <div className="flex flex-col gap-6 max-w-2xl">
               <AnimationWrapper delay="150ms">
               <p className="text-base font-medium leading-relaxed text-slate-950">
-                I help startups build products that customers want to use.
+                I design softwares that customers want to use.
               </p>
               <p className="text-base leading-relaxed text-slate-700">
-                — I care about the business, the customers and the team I work with.
+                — I truly care about the business, the customers and the team I work with.
               </p>
               </AnimationWrapper>
 
