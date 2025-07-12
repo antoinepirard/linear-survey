@@ -11,7 +11,7 @@ export interface FeedImage {
 export const feedImages: FeedImage[] = [
   {
     id: 1,
-    src: '/Assets/Images/feed/original-1fc0c719fd42a9ad1b385195c43307e4.webp',
+    src: '/Assets/Images/feed/company-logos-navigation.jpg',
     name: 'Latest Capture',
     date: '2025',
     type: 'image'
@@ -79,6 +79,13 @@ export const feedImages: FeedImage[] = [
     id: 10,
     src: '/Assets/Images/feed/composer-button.png',
     name: 'Composer Button',
+    date: '2025',
+    type: 'image'
+  },
+  {
+    id: 11,
+    src: '/Assets/Images/feed/drawing-face.png',
+    name: 'Latest Capture',
     date: '2025',
     type: 'image'
   },

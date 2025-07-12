@@ -59,12 +59,12 @@ export default function Feed() {
       
       {/* Wider container for feed content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 feed-container">
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-8">
           {feedImages.map((item, index) => (
             <AnimationWrapper key={item.id} delay={`${100 + index * 50}ms`}>
               <div className="masonry-column break-inside-avoid mb-6">
                 <div 
-                  className={`feed-image-container rounded-md overflow-hidden relative group ${item.type === 'video' ? 'cursor-pointer' : ''} bg-slate-100`}
+                  className={`feed-image-container rounded overflow-hidden relative group ${item.type === 'video' ? 'cursor-pointer' : ''} bg-slate-100`}
                   onClick={() => handleItemClick(item)}
                   >
                     {item.type === 'video' ? (
