@@ -54,14 +54,18 @@ export default function Feed() {
             <h1 className="text-8xl sm:text-6xl font-light text-slate-900 mb-2 text-center">Feed</h1>
             <p className="font-regular text-slate-600 mb-12 text-center">A visual collection of moments and work</p>
           </AnimationWrapper>
-
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-            {feedImages.map((item, index) => (
-              <AnimationWrapper key={item.id} delay={`${100 + index * 50}ms`}>
-                <div className="break-inside-avoid mb-6">
-                  <div 
-                    className={`rounded-md overflow-hidden relative group ${item.type === 'video' ? 'cursor-pointer' : ''} bg-slate-100`}
-                    onClick={() => handleItemClick(item)}
+        </div>
+      </div>
+      
+      {/* Wider container for feed content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+          {feedImages.map((item, index) => (
+            <AnimationWrapper key={item.id} delay={`${100 + index * 50}ms`}>
+              <div className="break-inside-avoid mb-6">
+                <div 
+                  className={`rounded-md overflow-hidden relative group ${item.type === 'video' ? 'cursor-pointer' : ''} bg-slate-100`}
+                  onClick={() => handleItemClick(item)}
                   >
                     {item.type === 'video' ? (
                       <>
@@ -74,7 +78,7 @@ export default function Feed() {
                             className="w-full h-auto"
                             priority={index < 3}
                             onLoad={() => handleImageLoad(item.id)}
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            sizes="100vw"
                             placeholder="blur"
                             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
                           />
@@ -100,7 +104,7 @@ export default function Feed() {
                           className="w-full h-auto"
                           priority={index < 3}
                           onLoad={() => handleImageLoad(item.id)}
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          sizes="100vw"
                           placeholder="blur"
                           blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
                         />
@@ -112,8 +116,6 @@ export default function Feed() {
                 </div>
               </AnimationWrapper>
             ))}
-          </div>
-
         </div>
       </div>
     </div>

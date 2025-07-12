@@ -75,4 +75,11 @@ export const feedImages: FeedImage[] = [
     date: '2025',
     type: 'image'
   },
+  {
+    id: 10,
+    src: '/Assets/Images/feed/composer-button.png',
+    name: 'Composer Button',
+    date: '2025',
+    type: 'image'
+  },
 ];
