@@ -1,10 +1,34 @@
 import { AnimationWrapper } from '@/hooks/useAnimation';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { useEffect, useState, useCallback } from 'react';
 import Navigation from './Navigation';
 
 export default function HeaderSection() {
   const { scrollY } = useScroll();
+  const [isMobile, setIsMobile] = useState(false);
+
+  const checkMobile = useCallback(() => {
+    setIsMobile(window.innerWidth < 640);
+  }, []);
+
+  useEffect(() => {
+    // Initial check
+    checkMobile();
+    
+    // Throttled resize handler for better performance
+    let timeoutId: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkMobile, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timeoutId);
+    };
+  }, [checkMobile]);
 
   const headerY = useTransform(scrollY, [0, 100], [0, -20]);
   const headerOpacity = useTransform(scrollY, [0, 100], [1, 0]);
@@ -12,10 +36,10 @@ export default function HeaderSection() {
 
   return (
     <>
-      {/* Original header */}
+      {/* Original header - hidden on mobile */}
       <motion.div
         style={{ y: headerY, opacity: headerOpacity }}
-        className="relative z-10"
+        className="relative z-10 hidden sm:block"
       >
         <AnimationWrapper delay="0ms" className="pt-9">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0">
@@ -32,10 +56,10 @@ export default function HeaderSection() {
         </AnimationWrapper>
       </motion.div>
 
-      {/* Sticky navbar */}
+      {/* Sticky navbar - always visible on mobile, scroll-triggered on desktop */}
       <motion.div
-        style={{ opacity: stickyOpacity }}
         className="fixed top-0 left-0 right-0 z-[9999] bg-white border-b border-slate-100"
+        style={{ opacity: isMobile ? 1 : stickyOpacity }}
       >
         <div className="max-w-4xl mx-auto px-6 py-2">
           <div className="flex justify-between items-center">

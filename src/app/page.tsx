@@ -57,7 +57,7 @@ export default function Home() {
     <div className="bg-white min-h-screen relative overflow-x-hidden">
       <main className="overflow-x-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 py-9">
+          <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 pt-20 pb-9 sm:py-9">
             {/* Header */}
             <HeaderSection />
 

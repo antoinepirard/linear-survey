@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { AnimationWrapper } from '@/hooks/useAnimation';
 import { feedImages, FeedImage } from '@/data/feed';
 import { preloadImageDimensions, ImageDimensions } from '@/utils/imageDimensions';
@@ -21,11 +21,11 @@ export default function Feed() {
     initializeImages();
   }, []);
 
-  const handleImageLoad = (id: number) => {
+  const handleImageLoad = useCallback((id: number) => {
     setLoadedImages(prev => new Set(prev).add(id));
-  };
+  }, []);
 
-  const getImageDimensions = (item: FeedImage) => {
+  const getImageDimensions = useCallback((item: FeedImage) => {
     const dimensions = imageDimensions[item.src];
     
     if (dimensions) {
@@ -48,16 +48,16 @@ export default function Feed() {
       height: 600,
       aspectRatio: 1
     };
-  };
+  }, [imageDimensions]);
 
   return (
     <div className="bg-white min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 py-9">
+        <div className="flex flex-col gap-12 sm:gap-16 md:gap-20 pt-20 pb-9 sm:py-9">
           <HeaderSection />
           
           <AnimationWrapper delay="50ms">
-            <h1 className="text-8xl sm:text-6xl font-light text-slate-900 mb-2 text-center">Feed</h1>
+            <h1 className="text-6xl sm:text-4xl font-light text-slate-900 mb-2 text-center">Feed</h1>
             <p className="font-regular text-slate-600 mb-12 text-center">A visual collection of moments and work</p>
           </AnimationWrapper>
         </div>
