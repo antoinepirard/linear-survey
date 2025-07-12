@@ -25,21 +25,6 @@ export default function ProjectPreview({ project }: ProjectPreviewProps) {
               {project.category && (
                 <p className="text-sm text-slate-400 mt-1">{project.category}</p>
               )}
-              {project.videoLink && (
-                <div className="mt-3">
-                  <a
-                    href={project.videoLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-3 py-1.5 bg-slate-900 text-white text-sm rounded-md hover:bg-slate-800 transition-colors"
-                  >
-                    <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z"/>
-                    </svg>
-                    Watch Video
-                  </a>
-                </div>
-              )}
             </motion.div>
           ) : (
             <div className="text-center text-slate-400">
