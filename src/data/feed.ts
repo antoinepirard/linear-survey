@@ -3,9 +3,9 @@ export interface FeedImage {
   src: string;
   name: string;
   date: string;
-  type?: 'image' | 'gif' | 'video';
-  thumbnail?: string;
-  duration?: number;
+  type?: 'image' | 'gif';
+  width?: number;
+  height?: number;
 }
 
 export const feedImages: FeedImage[] = [
@@ -36,30 +36,6 @@ export const feedImages: FeedImage[] = [
     name: 'Design Mockup',
     date: '2024',
     type: 'image'
-  },
-  {
-    id: 5,
-    src: '/Assets/Videos/reporting-highquality.webm',
-    name: 'Reporting Demo',
-    date: '2024',
-    type: 'video',
-    duration: 15
-  },
-  {
-    id: 6,
-    src: '/Assets/Images/feed/Export-1718616313659.mp4',
-    name: 'Product Export Demo',
-    date: '2024',
-    type: 'video',
-    duration: 30
-  },
-  {
-    id: 7,
-    src: '/Assets/Images/feed/Upcoming Features video 1.mp4',
-    name: 'Upcoming Features Preview',
-    date: '2025',
-    type: 'video',
-    duration: 45
   },
   {
     id: 8,
