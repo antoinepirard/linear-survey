@@ -209,7 +209,7 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
                   <div 
                     className="mb-6 bg-slate-50 rounded-lg overflow-hidden"
                     style={{
-                      aspectRatio: `${mediaDimensions.width} / ${mediaDimensions.height}`
+                      aspectRatio: `${mediaDimensions?.width} / ${mediaDimensions?.height}`
                     }}
                   >
                     {selectedProject.previewVideo ? (
