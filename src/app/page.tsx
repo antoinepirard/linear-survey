@@ -63,11 +63,11 @@ export default function Home() {
 
             {/* Photo Section */}
             <AnimationWrapper delay="100ms" className="flex justify-start relative z-50">
-              <div className="relative px-4 py-2">
+              <div className="relative px-4 py-2 group">
                 <motion.div
                   layoutId="photo-container"
                   onClick={() => setIsModalOpen(true)}
-                  className="cursor-zoom-in interactive-element ring-1 ring-slate-300/40 to-slate-300/90 border-5 border-white rounded-2xl shadow-xl"
+                  className="cursor-zoom-in interactive-element ring-1 ring-slate-300/40 to-slate-300/90 border-5 border-white rounded-2xl shadow-xl relative overflow-hidden"
                   whileHover={{ scale: 1.02, rotate: 2 }}
                   transition={{ duration: 0.15 }}
                   style={{ willChange: 'transform', transformStyle: 'preserve-3d' }}
@@ -80,6 +80,18 @@ export default function Home() {
                     height={250}
                     className="rounded-2xl object-cover max-w-[180px] sm:max-w-[200px]"
                   />
+                  {/* Contextual overlay */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent rounded-2xl flex items-end p-4"
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="text-white">
+                      <p className="text-xs font-medium mb-1">📍 Tervuren, Belgium</p>
+                      <p className="text-xs text-white/80">Antoine & Olivia</p>
+                    </div>
+                  </motion.div>
                 </motion.div>
               </div>
             </AnimationWrapper>
@@ -98,7 +110,7 @@ export default function Home() {
               <AnimationWrapper delay="200ms">
               <p className="text-base leading-relaxed text-slate-600">
                 I&apos;ve spent the last decade working at startups and collaborating with brillant engineers to solve user problems through thoughtful experiences.
-                I shine in the chaos and figuring things out from first principles. I love figuring out the most valuable problems to solve and solving them exceptionally well.
+                I enjoy finding my way through the chaos to figure out the most valuable problems to solve, with care and from first principles. 
               </p>
               </AnimationWrapper>
             </div>
