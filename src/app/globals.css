@@ -111,6 +111,35 @@ img {
   height: auto;
 }
 
+/* Prevent layout shifts during image loading */
+.feed-container {
+  contain: layout style;
+}
+
+/* Optimize masonry layout for stable scrolling */
+.masonry-column {
+  break-inside: avoid;
+  transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/* Maintain layout stability during image loading */
+.feed-image-container {
+  min-height: 15rem; /* Responsive minimum using rem units */
+  position: relative;
+}
+
+@media (max-width: 640px) {
+  .feed-image-container {
+    min-height: 12rem; /* Smaller on mobile */
+  }
+}
+
+@media (min-width: 1024px) {
+  .feed-image-container {
+    min-height: 18rem; /* Larger on desktop */
+  }
+}
+
 /* Animated color blocks border - decorative element */
 .color-border {
   position: relative;
