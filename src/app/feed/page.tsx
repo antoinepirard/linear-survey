@@ -57,7 +57,7 @@ export default function Feed() {
           <HeaderSection />
           
           <AnimationWrapper delay="50ms">
-            <h1 className="text-6xl sm:text-4xl font-light text-slate-900 mb-2 text-center">Feed</h1>
+            <h1 className="text-4xl sm:text-6xl font-light text-slate-900 mb-2 text-center">Feed</h1>
             <p className="font-regular text-slate-600 mb-12 text-center">A visual collection of moments and work</p>
           </AnimationWrapper>
         </div>
