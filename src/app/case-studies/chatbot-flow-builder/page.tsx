@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion } from 'motion/react';
@@ -20,50 +20,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
   const [isSelected, setIsSelected] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [connectionPoints, setConnectionPoints] = useState({ start: { x: 0, y: 0 }, end: { x: 0, y: 0 } });
   
   const headerRef = useRef<HTMLElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
-  
-  // Calculate connection points based on actual element positions
-  const updateConnectionPoints = () => {
-    if (headerRef.current && imageRef.current) {
-      const headerRect = headerRef.current.getBoundingClientRect();
-      const imageRect = imageRef.current.getBoundingClientRect();
-      
-      setConnectionPoints({
-        start: {
-          x: headerRect.left + headerRect.width / 2,
-          y: headerRect.bottom
-        },
-        end: {
-          x: imageRect.left + imageRect.width / 2,
-          y: imageRect.top
-        }
-      });
-    }
-  };
-  
-  // Update connection points when position changes or on mount
-  useEffect(() => {
-    updateConnectionPoints();
-  }, [position]);
-  
-  useEffect(() => {
-    updateConnectionPoints();
-    window.addEventListener('resize', updateConnectionPoints);
-    return () => window.removeEventListener('resize', updateConnectionPoints);
-  }, []);
-
-  const copyUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      toast.success('URL copied to clipboard!');
-    } catch (err) {
-      console.error('Failed to copy URL:', err);
-      toast.error('Failed to copy URL');
-    }
-  };
 
   const handleDragStart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -77,8 +35,6 @@ export default function ChatbotFlowBuilderCaseStudy() {
         x: moveEvent.clientX - startX,
         y: moveEvent.clientY - startY
       });
-      // Update connection points during drag
-      requestAnimationFrame(updateConnectionPoints);
     };
 
     const handleMouseUp = () => {
@@ -90,6 +46,18 @@ export default function ChatbotFlowBuilderCaseStudy() {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
+  
+
+  const copyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success('URL copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+      toast.error('Failed to copy URL');
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-slate-50 relative" style={{
@@ -182,54 +150,9 @@ export default function ChatbotFlowBuilderCaseStudy() {
         </header>
       </div>
 
-      {/* Connection Line */}
-      <svg 
-        className="absolute inset-0 pointer-events-none z-10"
-        style={{ 
-          width: '100vw', 
-          height: '100vh',
-          left: 0,
-          top: 0
-        }}
-      >
-        <defs>
-          <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f97316" />
-            <stop offset="100%" stopColor="#3b82f6" />
-          </linearGradient>
-        </defs>
-        
-        {/* Main connection line */}
-        <line
-          x1={connectionPoints.start.x}
-          y1={connectionPoints.start.y}
-          x2={connectionPoints.end.x}
-          y2={connectionPoints.end.y}
-          stroke="#cbd5e1"
-          strokeWidth="1"
-          strokeDasharray="4,4"
-          className={isDragging ? 'transition-none' : 'transition-all duration-200'}
-        />
-        
-        {/* Static connection points */}
-        <circle
-          cx={connectionPoints.start.x}
-          cy={connectionPoints.start.y}
-          r="4"
-          fill="#cbd5e1"
-          className={isDragging ? 'transition-none' : 'transition-all duration-200'}
-        />
-        <circle
-          cx={connectionPoints.end.x}
-          cy={connectionPoints.end.y}
-          r="4"
-          fill="#cbd5e1"
-        />
-      </svg>
 
       {/* Hero Video - Outside main container */}
       <div
-        ref={imageRef}
         className="mb-16 mx-auto flex justify-center"
         style={{ 
           maxWidth: '90vw'
@@ -251,7 +174,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
 
       <div className="max-w-4xl mx-auto px-6">
         {/* Content */}
-        <div className="space-y-16">
+        <div className="bg-white rounded-md ring-1 ring-slate-300/20 shadow-xl p-8 space-y-16">
           {/* Background */}
           <section>
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">Background: Why Build a Chatbot?</h2>
