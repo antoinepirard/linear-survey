@@ -177,7 +177,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         {/* Content */}
         <div className="bg-white rounded-md ring-1 ring-slate-300/20 shadow-xl overflow-hidden">
           {/* Introduction */}
-          <section className="p-8 pb-0">
+          <section className="p-12 pb-8">
             <div className="mb-8">
               <h2 className="text-xl font-semibold text-slate-900 mb-4">Role and Context</h2>
               <p   className="text-slate-700 leading-relaxed">
@@ -194,14 +194,14 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </section>
 
           {/* Understanding the Problem */}
-          <section className="border-t border-slate-100 p-8">
-            <div className="grid md:grid-cols-3 gap-8">
+          <section className="border-t border-slate-100 p-12">
+            <div className="grid md:grid-cols-3 gap-16">
               <div className="md:col-span-1">
                 <h2 className="text-xl font-semibold text-slate-900 mb-4">Understanding the Problem</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
-                  <p className="text-slate-700 leading-relaxed mb-4">
+                  <p className="text-slate-700 text-base leading-relaxed mb-4">
                     Chatbots address diverse jobs-to-be-done (JTBD). Conversations vary by goal—lead qualification, data collection, basic support, or integrated workflows. This required a flexible yet intuitive builder.
                   </p>
                   <p className="text-slate-700 leading-relaxed">
@@ -209,10 +209,10 @@ export default function ChatbotFlowBuilderCaseStudy() {
                   </p>
                 </div>
                 
-                <div className="bg-slate-50 rounded-md p-4">
+                <div className="bg-slate-50 rounded-md p-4 hover:bg-slate-100 transition-colors duration-200 cursor-pointer">
                   <button 
                     onClick={() => setShowRequirements(!showRequirements)}
-                    className="flex items-center justify-between w-full text-left group cursor-crosshair"
+                    className="flex items-center justify-between w-full text-left group"
                   >
                     <h4  className="text-base font-medium text-slate-900">How we got there?</h4>
                     <motion.div
@@ -246,8 +246,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </section>
 
           {/* Building the Solution */}
-          <section className="border-t border-slate-100 p-8">
-            <div className="grid md:grid-cols-3 gap-8">
+          <section className="border-t border-slate-100 p-12">
+            <div className="grid md:grid-cols-3 gap-16">
               <div className="md:col-span-1">
                 <h2 className="text-xl font-semibold text-slate-900 mb-4">Building the Solution</h2>
               </div>
@@ -310,8 +310,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </section>
 
           {/* Key Challenges */}
-          <section className="border-t border-slate-100 p-8">
-            <div className="grid md:grid-cols-3 gap-8">
+          <section className="border-t border-slate-100 p-12">
+            <div className="grid md:grid-cols-3 gap-16">
               <div className="md:col-span-1">
                 <h2 className="text-xl font-semibold text-slate-900 mb-4">Key Challenges</h2>
               </div>
@@ -343,7 +343,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
 
           {/* Outcomes and Lessons */}
           <section className="border-t border-slate-100 p-8">
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-16">
               <div className="md:col-span-1">
                 <h2 className="text-xl font-semibold text-slate-900 mb-4">Outcomes and Lessons</h2>
               </div>
