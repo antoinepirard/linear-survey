@@ -47,11 +47,11 @@ export default function ChatbotFlowBuilderCaseStudy() {
           <section className="p-6 md:p-12 pt-6 md:pt-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
               <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Node Design</h2>
+                <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Node Design</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
-                  <p className="text-slate-700 leading-relaxed mb-6">
+                  <p className="text-slate-700 leading-relaxed mb-4 md:mb-6">
                     Node design was critical to the builder&apos;s success. Each node needed to be immediately recognizable, easy to configure, and scalable across different complexity levels while maintaining visual consistency.
                   </p>
                 </div>
@@ -101,11 +101,11 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-6 md:p-12 pt-6 md:pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Analytics</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Analytics</h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
-                <p className="text-slate-700 leading-relaxed mb-6">
+                <p className="text-slate-700 leading-relaxed mb-4 md:mb-6">
                   Analytics design focused on providing actionable insights while maintaining simplicity for non-technical users to understand chatbot performance.
                 </p>
               </div>
@@ -137,11 +137,11 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-6 md:p-12 pt-6 md:pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Canvas</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Canvas</h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
-                <p className="text-slate-700 leading-relaxed mb-6">
+                <p className="text-slate-700 leading-relaxed mb-4 md:mb-6">
                   Canvas design evolved from a restrictive layout to a flexible workspace that could handle complex flows while remaining intuitive for beginners.
                 </p>
               </div>
@@ -173,11 +173,11 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-6 md:p-12 pt-6 md:pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Fallbacks</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Fallbacks</h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
-                <p className="text-slate-700 leading-relaxed mb-6">
+                <p className="text-slate-700 leading-relaxed mb-4 md:mb-6">
                   Fallback system design ensured graceful handling of unexpected user inputs while maintaining conversation flow and providing escape routes.
                 </p>
               </div>
@@ -283,7 +283,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
           {/* Introduction */}
           <section className="p-6 md:p-12 pb-6 md:pb-8">
             <div className="mb-8">
-              <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Role and Context</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Role and Context</h2>
               <p   className="text-slate-700 leading-relaxed">
                 As a Product Designer, I was responsible for the design and iteration of a chatbot builder tool integrated with the WhatsApp Business API to enable automated interactions and scale conversations efficiently.
               </p>
@@ -301,11 +301,11 @@ export default function ChatbotFlowBuilderCaseStudy() {
           <section className="border-t border-slate-100 p-6 md:p-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
               <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Understanding the Problem</h2>
+                <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Understanding the Problem</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
-                  <p className="text-slate-700 text-base leading-relaxed mb-4">
+                  <p className="text-slate-700 text-base leading-relaxed mb-3 md:mb-4">
                     Chatbots address diverse jobs-to-be-done (JTBD). Conversations vary by goal—lead qualification, data collection, basic support, or integrated workflows. This required a flexible yet intuitive builder.
                   </p>
                   <p className="text-slate-700 leading-relaxed">
@@ -353,11 +353,11 @@ export default function ChatbotFlowBuilderCaseStudy() {
           <section className="border-t border-slate-100 p-6 md:p-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
               <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Building the Solution</h2>
+                <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Building the Solution</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
-                  <p className="text-slate-700 leading-relaxed mb-6">
+                  <p className="text-slate-700 leading-relaxed mb-4 md:mb-6">
                     We approached development iteratively, starting with a proof of concept and expanding capabilities based on user feedback and market validation.
                   </p>
                 </div>
@@ -437,11 +437,11 @@ export default function ChatbotFlowBuilderCaseStudy() {
           <section className="border-t border-slate-100 p-6 md:p-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
               <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Key Challenges</h2>
+                <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Key Challenges</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
-                  <p className="text-slate-700 leading-relaxed mb-6">
+                  <p className="text-slate-700 leading-relaxed mb-4 md:mb-6">
                     Building a flexible chatbot builder presented unique challenges that required careful balance between power and usability.
                   </p>
                 </div>
