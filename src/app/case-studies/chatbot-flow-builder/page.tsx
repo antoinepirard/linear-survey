@@ -47,6 +47,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
           <section className="p-12 pt-8">
             <div className="grid md:grid-cols-3 gap-16">
               <div className="md:col-span-1">
+                <h2 className="text-xl font-semibold text-slate-900 mb-4">Node Design</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
@@ -100,6 +101,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-12 pt-8">
           <div className="grid md:grid-cols-3 gap-16">
             <div className="md:col-span-1">
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">Analytics</h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
@@ -135,6 +137,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-12 pt-8">
           <div className="grid md:grid-cols-3 gap-16">
             <div className="md:col-span-1">
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">Canvas</h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
@@ -170,6 +173,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-12 pt-8">
           <div className="grid md:grid-cols-3 gap-16">
             <div className="md:col-span-1">
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">Fallbacks</h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>

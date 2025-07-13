@@ -36,10 +36,10 @@ export function Tabs({
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
+              className={`px-6 py-4 text-sm font-medium relative transition-colors duration-200 cursor-pointer ${
                 activeTab === tab.id
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                  ? 'text-slate-900 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-slate-900 after:translate-y-px'
+                  : 'text-slate-500 hover:text-slate-700 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-slate-300 after:opacity-0 hover:after:opacity-100 hover:after:translate-y-px after:transition-all after:duration-200'
               } ${tabClassName}`}
             >
               {tab.label}
