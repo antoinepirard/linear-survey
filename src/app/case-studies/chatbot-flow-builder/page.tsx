@@ -21,6 +21,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
   const [showRequirements, setShowRequirements] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [activeTab, setActiveTab] = useState('nodes');
   
   const headerRef = useRef<HTMLElement>(null);
 
@@ -341,6 +342,58 @@ export default function ChatbotFlowBuilderCaseStudy() {
             </div>
           </section>
 
+        </div>
+
+        {/* Deep Dive: Node Design */}
+        <div className="bg-white rounded-md ring-1 ring-slate-300/20 shadow-xl overflow-hidden mt-16">
+          {/* Node Design Section */}
+          <section className="p-12">
+            <div className="grid md:grid-cols-3 gap-16">
+              <div className="md:col-span-1">
+                <h2 className="text-xl font-semibold text-slate-900 mb-4">Deep Dive: Node Design</h2>
+              </div>
+              <div className="md:col-span-2 space-y-6">
+                <div>
+                  <p className="text-slate-700 leading-relaxed mb-6">
+                    Node design was critical to the builder's success. Each node needed to be immediately recognizable, easy to configure, and scalable across different complexity levels while maintaining visual consistency.
+                  </p>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="bg-white border border-slate-200 rounded-lg p-6">
+                    <h3 className="font-semibold text-slate-900 mb-2">Visual Hierarchy</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed mb-3">
+                      Established clear visual patterns for different node types through color coding, iconography, and size variations.
+                    </p>
+                    <ul className="space-y-2 text-slate-600 text-sm">
+                      <li className="flex items-start">
+                        <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span><strong>Color System:</strong> Blue for messages, green for conditions, orange for actions</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span><strong>Icon Language:</strong> Consistent iconography to indicate node function at a glance</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-white border border-slate-200 rounded-lg p-6">
+                    <h3 className="font-semibold text-slate-900 mb-2">Configuration Patterns</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      Developed progressive disclosure patterns where basic configurations were visible, with advanced options accessible through expandable sections.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-white border border-slate-200 rounded-lg p-6">
+                    <h3 className="font-semibold text-slate-900 mb-2">Connection Logic</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      Designed connection points and flow indicators to make logic paths clear, reducing cognitive load when building complex flows.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
 
         {/* Bottom Navigation */}
