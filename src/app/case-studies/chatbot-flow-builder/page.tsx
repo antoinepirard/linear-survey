@@ -212,9 +212,9 @@ export default function ChatbotFlowBuilderCaseStudy() {
                 <div className="bg-slate-50 rounded-md p-4 hover:bg-slate-100 transition-colors duration-200 cursor-pointer">
                   <button 
                     onClick={() => setShowRequirements(!showRequirements)}
-                    className="flex items-center justify-between w-full text-left group"
+                    className="flex items-center justify-between w-full text-left group cursor-pointer"
                   >
-                    <h4  className="text-base font-medium text-slate-900">How we got there?</h4>
+                    <h4  className="text-base font-medium text-slate-900 cursor-pointer">How we got there?</h4>
                     <motion.div
                       animate={{ rotate: showRequirements ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
