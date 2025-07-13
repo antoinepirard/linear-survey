@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { motion } from 'motion/react';
 import { ChevronLeftIcon, LinkIcon } from '@heroicons/react/24/outline';
@@ -21,6 +20,40 @@ export default function ChatbotFlowBuilderCaseStudy() {
   const [isSelected, setIsSelected] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [connectionPoints, setConnectionPoints] = useState({ start: { x: 0, y: 0 }, end: { x: 0, y: 0 } });
+  
+  const headerRef = useRef<HTMLElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+  
+  // Calculate connection points based on actual element positions
+  const updateConnectionPoints = () => {
+    if (headerRef.current && imageRef.current) {
+      const headerRect = headerRef.current.getBoundingClientRect();
+      const imageRect = imageRef.current.getBoundingClientRect();
+      
+      setConnectionPoints({
+        start: {
+          x: headerRect.left + headerRect.width / 2,
+          y: headerRect.bottom
+        },
+        end: {
+          x: imageRect.left + imageRect.width / 2,
+          y: imageRect.top
+        }
+      });
+    }
+  };
+  
+  // Update connection points when position changes or on mount
+  useEffect(() => {
+    updateConnectionPoints();
+  }, [position]);
+  
+  useEffect(() => {
+    updateConnectionPoints();
+    window.addEventListener('resize', updateConnectionPoints);
+    return () => window.removeEventListener('resize', updateConnectionPoints);
+  }, []);
 
   const copyUrl = async () => {
     try {
@@ -44,6 +77,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
         x: moveEvent.clientX - startX,
         y: moveEvent.clientY - startY
       });
+      // Update connection points during drag
+      requestAnimationFrame(updateConnectionPoints);
     };
 
     const handleMouseUp = () => {
@@ -93,6 +128,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
 
         {/* Header */}
         <header 
+          ref={headerRef}
           className={`mb-12 text-center group border border-dashed transition-all duration-200 p-6 -m-6 relative cursor-move select-none ${
             isSelected 
               ? 'border-orange-500' 
@@ -146,25 +182,70 @@ export default function ChatbotFlowBuilderCaseStudy() {
         </header>
       </div>
 
-      {/* Hero Image - Outside main container */}
-      <div
-        className="mb-16 bg-slate-50 rounded-md overflow-hidden relative mx-auto"
+      {/* Connection Line */}
+      <svg 
+        className="absolute inset-0 pointer-events-none z-10"
         style={{ 
-          height: '500px',
-          width: 'calc(896px * 1.15)', // 15% larger than max-w-4xl (896px)
-          maxWidth: '90vw' // Responsive fallback
+          width: '100vw', 
+          height: '100vh',
+          left: 0,
+          top: 0
         }}
       >
-        <Image
-          src="/case-studies/rasayel-big-picture/RS-tickets.jpg"
-          alt="Chatbot flow builder interface showing visual workflow design"
-          width={1200}
-          height={600}
-          className="absolute bottom-0 left-0"
-          style={{ 
-            transform: 'translate(-12%, 25%)'
+        <defs>
+          <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f97316" />
+            <stop offset="100%" stopColor="#3b82f6" />
+          </linearGradient>
+        </defs>
+        
+        {/* Main connection line */}
+        <line
+          x1={connectionPoints.start.x}
+          y1={connectionPoints.start.y}
+          x2={connectionPoints.end.x}
+          y2={connectionPoints.end.y}
+          stroke="#cbd5e1"
+          strokeWidth="1"
+          strokeDasharray="4,4"
+          className={isDragging ? 'transition-none' : 'transition-all duration-200'}
+        />
+        
+        {/* Static connection points */}
+        <circle
+          cx={connectionPoints.start.x}
+          cy={connectionPoints.start.y}
+          r="4"
+          fill="#cbd5e1"
+          className={isDragging ? 'transition-none' : 'transition-all duration-200'}
+        />
+        <circle
+          cx={connectionPoints.end.x}
+          cy={connectionPoints.end.y}
+          r="4"
+          fill="#cbd5e1"
+        />
+      </svg>
+
+      {/* Hero Video - Outside main container */}
+      <div
+        ref={imageRef}
+        className="mb-16 mx-auto flex justify-center"
+        style={{ 
+          maxWidth: '90vw'
+        }}
+      >
+        <video
+          src="/Assets/Videos/thebooot.webm"
+          controls
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="h-auto rounded-md bg-slate-50"
+          style={{
+            maxWidth: 'calc(996px * 1.15)' // 15% larger than max-w-4xl (896px)
           }}
-          priority
         />
       </div>
 
