@@ -312,17 +312,17 @@ export default function ChatbotFlowBuilderCaseStudy() {
                   </p>
                 </div>
                 
-                <div className="bg-slate-50 rounded-md p-4 hover:bg-slate-100 transition-colors duration-200 cursor-pointer">
+                <div className="bg-slate-50 rounded-md p-4 cursor-pointer">
                   <button 
                     onClick={() => setShowRequirements(!showRequirements)}
-                    className="flex items-center justify-between w-full text-left group cursor-pointer"
+                    className="flex items-center justify-between w-full text-left cursor-pointer"
                   >
                     <h4  className="text-base font-medium text-slate-900 cursor-pointer">How we got there?</h4>
                     <motion.div
                       animate={{ rotate: showRequirements ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <ChevronDownIcon className="w-4 h-4 text-slate-500 group-hover:text-slate-700" />
+                      <ChevronDownIcon className="w-4 h-4 text-slate-500" />
                     </motion.div>
                   </button>
                   
