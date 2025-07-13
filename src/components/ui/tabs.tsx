@@ -29,10 +29,12 @@ export function Tabs({
     <div className={className}>
       {/* Tab Navigation */}
       <div className="border-b border-slate-200">
-        <div className="flex">
+        <div className="flex" role="tablist">
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
                 activeTab === tab.id
@@ -47,7 +49,7 @@ export function Tabs({
       </div>
 
       {/* Tab Content */}
-      <div className={contentClassName}>
+      <div className={contentClassName} role="tabpanel" aria-labelledby={`tab-${activeTab}`}>
         {tabs.find(tab => tab.id === activeTab)?.content}
       </div>
     </div>

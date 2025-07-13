@@ -47,9 +47,6 @@ export default function ChatbotFlowBuilderCaseStudy() {
           <section className="p-12 pt-8">
             <div className="grid md:grid-cols-3 gap-16">
               <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-4">
-                  Deep Dive: Node Design
-                </h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
@@ -103,9 +100,6 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-12 pt-8">
           <div className="grid md:grid-cols-3 gap-16">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">
-                Deep Dive: Analytics
-              </h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
@@ -141,9 +135,6 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-12 pt-8">
           <div className="grid md:grid-cols-3 gap-16">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">
-                Deep Dive: Canvas
-              </h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
@@ -179,9 +170,6 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-12 pt-8">
           <div className="grid md:grid-cols-3 gap-16">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">
-                Deep Dive: Fallbacks
-              </h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
@@ -479,7 +467,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         </div>
 
         {/* Deep Dive Section Header */}
-        <div className="mt-26 mb-8 text-center">
+        <div className="mt-26 mb-8 text-center" id="deep-dive-section">
           <div className="inline-block group border border-dashed border-slate-300 hover:border-slate-400 transition-all duration-200 p-6 relative">
           {/* Corner squares - visual indicators only */}
           <div className="absolute -top-1 -left-1 w-2 h-2 bg-slate-300 group-hover:bg-slate-400 transition-colors duration-200 pointer-events-none"></div>
