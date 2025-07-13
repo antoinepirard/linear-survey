@@ -259,7 +259,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <div className="bg-white border border-slate-200 rounded-lg p-4">
                     <h3 className="font-semibold text-slate-900 mb-2">V1: Proof of Concept</h3>
                     <p className="text-slate-600 text-sm leading-relaxed mb-3">
                       Focused on basics to validate viability. Limited scope to test core feasibility.
@@ -284,21 +284,21 @@ export default function ChatbotFlowBuilderCaseStudy() {
                     </ul>
                   </div>
                   
-                  <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <div className="bg-white border border-slate-200 rounded-lg p-4">
                     <h3 className="font-semibold text-slate-900 mb-2">V2: Expanded Capabilities</h3>
                     <p className="text-slate-600 text-sm leading-relaxed">
                       Expanded nodes for broader use cases. Added HTTP request node to integrate external systems, prioritizing quantity over polish to validate market demand.
                     </p>
                   </div>
                   
-                  <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <div className="bg-white border border-slate-200 rounded-lg p-4">
                     <h3 className="font-semibold text-slate-900 mb-2">V3: Enhanced Usability</h3>
                     <p className="text-slate-600 text-sm leading-relaxed">
                       Emphasized usability for complex flows. Rebuilt canvas with undo/redo, drag-and-drop, zoom, and performance optimizations to handle large bots smoothly.
                     </p>
                   </div>
                   
-                  <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <div className="bg-white border border-slate-200 rounded-lg p-4">
                     <h3 className="font-semibold text-slate-900 mb-2">V4: Polish and Intelligence</h3>
                     <p className="text-slate-600 text-sm leading-relaxed">
                       Polished interactions, added analytics (CTR tracking), CRM integrations, and AI features: nodes for info collection, intent detection, and basic AI agents.
@@ -323,14 +323,14 @@ export default function ChatbotFlowBuilderCaseStudy() {
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
+                  <div className="bg-slate-50 rounded-md p-4">
                     <h3 className="font-semibold text-slate-900 mb-2">Feature Prioritization</h3>
                     <p className="text-slate-700 text-sm leading-relaxed">
                       Flexibility enabled many use cases, but after core features, research time often exceeded implementation. We bet on high-impact additions serving most customers.
                     </p>
                   </div>
                   
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
+                  <div className="bg-slate-50 rounded-md p-4">
                     <h3 className="font-semibold text-slate-900 mb-2">Flexibility vs. Opinionated Design</h3>
                     <p className="text-slate-700 text-sm leading-relaxed">
                       Balanced defaults (e.g., customizable fallbacks) with extensibility. This tension required constant iteration to maintain usability without overwhelming users.
@@ -341,43 +341,6 @@ export default function ChatbotFlowBuilderCaseStudy() {
             </div>
           </section>
 
-          {/* Outcomes and Lessons */}
-          <section className="border-t border-slate-100 p-8">
-            <div className="grid md:grid-cols-3 gap-16">
-              <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-4">Outcomes and Lessons</h2>
-              </div>
-              <div className="md:col-span-2 space-y-6">
-                <div>
-                  <p className="text-slate-700 leading-relaxed mb-6">
-                    The builder evolved from POC to robust tool, enabling scalable WhatsApp automation. This project taught us valuable lessons about iterative development and user-centered design.
-                  </p>
-                </div>
-                
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                  <h3 className="font-semibold text-slate-900 mb-3">Key Learnings</h3>
-                  <ul className="space-y-3 text-slate-700 text-sm">
-                    <li className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <span><strong>Start narrow:</strong> Focus on core use cases before expanding to avoid feature bloat</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <span><strong>Iterate based on user feedback:</strong> Real usage patterns often differ from initial assumptions</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <span><strong>Balance defaults with flexibility:</strong> Provide good defaults while allowing customization</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <span><strong>Align design with business needs:</strong> This approach drove adoption and business value</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </section>
         </div>
 
         {/* Bottom Navigation */}
