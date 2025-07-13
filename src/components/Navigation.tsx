@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
+import Link from 'next/link';
 
 interface NavigationProps {
   className?: string;
