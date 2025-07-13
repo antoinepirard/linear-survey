@@ -48,7 +48,7 @@ export function FancyHeader({
   return (
     <header 
       ref={headerRef}
-      className={`mb-12 text-center group border border-dashed transition-all duration-200 p-6 -m-6 relative cursor-move select-none ${
+      className={`mb-12 text-center group border border-dashed transition-all duration-200 p-12 -m-4 relative cursor-move select-none ${
         isSelected 
           ? 'border-orange-500' 
           : 'border-slate-300 hover:border-slate-400'
@@ -100,7 +100,7 @@ export function FancyHeader({
         {title}
       </h1>
       
-      <p className="text-lg text-slate-700 mb-12">
+      <p className="text-lg text-slate-700 mb-4">
         {description}
       </p>
     </header>
