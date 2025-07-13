@@ -29,7 +29,10 @@ export function Tabs({
     <div className={className}>
       {/* Tab Navigation */}
       <div className="border-b border-slate-200 overflow-hidden">
-        <div className="flex overflow-x-auto overflow-y-hidden scrollbar-hide" role="tablist">
+        <div 
+          className="flex overflow-x-auto overflow-y-hidden hide-scrollbar" 
+          role="tablist"
+        >
           {tabs.map((tab) => (
             <button
               key={tab.id}

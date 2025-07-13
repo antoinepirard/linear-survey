@@ -40,6 +40,16 @@ html, body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Hide scrollbar while keeping scroll functionality */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 /* Optimized animations - under 200ms for immediate feel */
 @keyframes fade-in-up {
   from {
