@@ -1,8 +1,6 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 /* Typography optimizations for better legibility */
 * {
   -webkit-font-smoothing: antialiased;
