@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'motion/react';
@@ -8,6 +8,7 @@ import { ChevronLeftIcon, LinkIcon, ChevronDownIcon } from '@heroicons/react/24/
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabItem } from '@/components/ui/tabs';
+import { FancyHeader } from '@/components/FancyHeader';
 import { toast } from 'sonner';
 
 const FocusBanner = dynamic(() => import('@/components/FocusBanner'), {
@@ -19,12 +20,7 @@ const TableOfContents = dynamic(() => import('@/components/TableOfContents'), {
 });
 
 export default function ChatbotFlowBuilderCaseStudy() {
-  const [isSelected, setIsSelected] = useState(false);
   const [showRequirements, setShowRequirements] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  
-  const headerRef = useRef<HTMLElement>(null);
 
   const tabData: TabItem[] = [
     {
@@ -216,30 +212,6 @@ export default function ChatbotFlowBuilderCaseStudy() {
     }
   ];
 
-  const handleDragStart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDragging(true);
-    
-    const startX = e.clientX - position.x;
-    const startY = e.clientY - position.y;
-    
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      setPosition({
-        x: moveEvent.clientX - startX,
-        y: moveEvent.clientY - startY
-      });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-  
 
   const copyUrl = async () => {
     try {
@@ -287,60 +259,11 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </Link>
         </div>
 
-        {/* Header */}
-        <header 
-          ref={headerRef}
-          className={`mb-12 text-center group border border-dashed transition-all duration-200 p-6 -m-6 relative cursor-move select-none ${
-            isSelected 
-              ? 'border-orange-500' 
-              : 'border-slate-300 hover:border-slate-400'
-          } ${isDragging ? 'transition-none' : ''}`}
-          onClick={() => setIsSelected(!isSelected)}
-          onMouseDown={handleDragStart}
-          style={{
-            transform: `translate(${position.x}px, ${position.y}px)`,
-            transformOrigin: 'center'
-          }}
-        >
-          {/* Corner squares - visual indicators only */}
-          <div 
-            className={`absolute -top-1 -left-1 w-2 h-2 transition-colors duration-200 pointer-events-none ${
-              isSelected 
-                ? 'bg-orange-500' 
-                : 'bg-slate-300 group-hover:bg-slate-400'
-            }`}
-          ></div>
-          <div 
-            className={`absolute -top-1 -right-1 w-2 h-2 transition-colors duration-200 pointer-events-none ${
-              isSelected 
-                ? 'bg-orange-500' 
-                : 'bg-slate-300 group-hover:bg-slate-400'
-            }`}
-          ></div>
-          <div 
-            className={`absolute -bottom-1 -left-1 w-2 h-2 transition-colors duration-200 pointer-events-none ${
-              isSelected 
-                ? 'bg-orange-500' 
-                : 'bg-slate-300 group-hover:bg-slate-400'
-            }`}
-          ></div>
-          <div 
-            className={`absolute -bottom-1 -right-1 w-2 h-2 transition-colors duration-200 pointer-events-none ${
-              isSelected 
-                ? 'bg-orange-500' 
-                : 'bg-slate-300 group-hover:bg-slate-400'
-            }`}
-          ></div>
-          <div className="flex items-center justify-center gap-6 text-sm text-slate-500">
-            <span className='font-mono'>2023 - 2024</span>
-            </div>
-          <h1 className="text-5xl font-bold text-slate-900 mt-6 mb-4 tracking-tight">
-            A Chatbot Builder for the WhatsApp Business API
-          </h1>
-          <p className="text-lg text-slate-700 mb-12">
-            Led the design and iteration of a chatbot builder tool integrated with the WhatsApp Business API to enable automated interactions and scale conversations efficiently.
-          </p>
-        </header>
+        <FancyHeader
+          dateRange="2023 - 2024"
+          title="A Chatbot Builder for the WhatsApp Business API"
+          description="Led the design and iteration of a chatbot builder tool integrated with the WhatsApp Business API to enable automated interactions and scale conversations efficiently."
+        />
       </div>
 
 
