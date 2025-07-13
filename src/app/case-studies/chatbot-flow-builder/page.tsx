@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeftIcon, LinkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabItem } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
 const FocusBanner = dynamic(() => import('@/components/FocusBanner'), {
@@ -22,9 +23,198 @@ export default function ChatbotFlowBuilderCaseStudy() {
   const [showRequirements, setShowRequirements] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const [activeTab, setActiveTab] = useState('nodes');
   
   const headerRef = useRef<HTMLElement>(null);
+
+  const tabData: TabItem[] = [
+    {
+      id: 'nodes',
+      label: 'Node Design',
+      content: (
+        <>
+          {/* Node Evolution Image */}
+          <div className="px-12 pt-8 pb-4">
+            <div className="relative">
+              <Image
+                src="/case-studies/chatbot/node-evolution.png"
+                alt="Interactive Message Node Evolution"
+                width={1200}
+                height={400}
+                className="w-full h-auto rounded-lg border border-slate-100"
+              />
+              <p className="text-xs text-slate-500 font-mono mt-2">
+                Evolution of the Interactive Message Node that can contain buttons
+              </p>
+            </div>
+          </div>
+
+          <section className="p-12 pt-8">
+            <div className="grid md:grid-cols-3 gap-16">
+              <div className="md:col-span-1">
+                <h2 className="text-xl font-semibold text-slate-900 mb-4">
+                  Deep Dive: Node Design
+                </h2>
+              </div>
+              <div className="md:col-span-2 space-y-6">
+                <div>
+                  <p className="text-slate-700 leading-relaxed mb-6">
+                    Node design was critical to the builder&apos;s success. Each node needed to be immediately recognizable, easy to configure, and scalable across different complexity levels while maintaining visual consistency.
+                  </p>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="bg-white border border-slate-200 rounded-lg p-6">
+                    <h3 className="font-semibold text-slate-900 mb-2">Visual Hierarchy</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed mb-3">
+                      Established clear visual patterns for different node types through color coding, iconography, and size variations.
+                    </p>
+                    <ul className="space-y-2 text-slate-600 text-sm">
+                      <li className="flex items-start">
+                        <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span><strong>Color System:</strong> Blue for messages, green for conditions, orange for actions</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span><strong>Icon Language:</strong> Consistent iconography to indicate node function at a glance</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-white border border-slate-100 rounded-lg p-6">
+                    <h3 className="font-semibold text-slate-900 mb-2">Configuration Patterns</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      Developed progressive disclosure patterns where basic configurations were visible, with advanced options accessible through expandable sections.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-white border border-slate-200 rounded-lg p-6">
+                    <h3 className="font-semibold text-slate-900 mb-2">Connection Logic</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      Designed connection points and flow indicators to make logic paths clear, reducing cognitive load when building complex flows.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
+      )
+    },
+    {
+      id: 'analytics',
+      label: 'Analytics',
+      content: (
+        <section className="p-12 pt-8">
+          <div className="grid md:grid-cols-3 gap-16">
+            <div className="md:col-span-1">
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">
+                Deep Dive: Analytics
+              </h2>
+            </div>
+            <div className="md:col-span-2 space-y-6">
+              <div>
+                <p className="text-slate-700 leading-relaxed mb-6">
+                  Analytics design focused on providing actionable insights while maintaining simplicity for non-technical users to understand chatbot performance.
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Key Metrics</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Identified and designed visualizations for conversion rates, drop-off points, and user engagement patterns.
+                  </p>
+                </div>
+                
+                <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Real-time Feedback</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Implemented live analytics to help users understand immediate impact of their chatbot changes.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )
+    },
+    {
+      id: 'canvas',
+      label: 'Canvas',
+      content: (
+        <section className="p-12 pt-8">
+          <div className="grid md:grid-cols-3 gap-16">
+            <div className="md:col-span-1">
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">
+                Deep Dive: Canvas
+              </h2>
+            </div>
+            <div className="md:col-span-2 space-y-6">
+              <div>
+                <p className="text-slate-700 leading-relaxed mb-6">
+                  Canvas design evolved from a restrictive layout to a flexible workspace that could handle complex flows while remaining intuitive for beginners.
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Performance Optimization</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Rebuilt canvas with virtualization and efficient rendering to handle large chatbot flows smoothly.
+                  </p>
+                </div>
+                
+                <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Navigation Features</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Added zoom, pan, minimap, and search functionality to help users navigate complex automation flows.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )
+    },
+    {
+      id: 'fallbacks',
+      label: 'Fallbacks',
+      content: (
+        <section className="p-12 pt-8">
+          <div className="grid md:grid-cols-3 gap-16">
+            <div className="md:col-span-1">
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">
+                Deep Dive: Fallbacks
+              </h2>
+            </div>
+            <div className="md:col-span-2 space-y-6">
+              <div>
+                <p className="text-slate-700 leading-relaxed mb-6">
+                  Fallback system design ensured graceful handling of unexpected user inputs while maintaining conversation flow and providing escape routes.
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Default Behaviors</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Designed intelligent defaults for common fallback scenarios while allowing customization for specific use cases.
+                  </p>
+                </div>
+                
+                <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Escalation Paths</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Created clear escalation mechanisms to human agents when chatbot responses were insufficient.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )
+    }
+  ];
 
   const handleDragStart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -381,180 +571,10 @@ export default function ChatbotFlowBuilderCaseStudy() {
 
         {/* Deep Dive: Features */}
         <div className="bg-white rounded-md ring-1 ring-slate-300/20 shadow-xl overflow-hidden">
-          {/* Tab Navigation */}
-          <div className="border-b border-slate-200">
-            <div className="flex">
-              {[
-                { id: 'nodes', label: 'Node Design' },
-                { id: 'analytics', label: 'Analytics' },
-                { id: 'canvas', label: 'Canvas' },
-                { id: 'fallbacks', label: 'Fallbacks' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ${
-                    activeTab === tab.id
-                      ? 'border-slate-900 text-slate-900'
-                      : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Node Evolution Image */}
-          <div className="px-12 pt-8 pb-4">
-            <div className="relative">
-              <Image
-                src="/case-studies/chatbot/node-evolution.png"
-                alt="Interactive Message Node Evolution"
-                width={1200}
-                height={400}
-                className="w-full h-auto rounded-lg border border-slate-100"
-              />
-              <p className="text-xs text-slate-500 font-mono mt-2">
-                Evolution of the Interactive Message Node that can contain buttons
-              </p>
-            </div>
-          </div>
-
-          {/* Tab Content */}
-          <section className="p-12 pt-8">
-            <div className="grid md:grid-cols-3 gap-16">
-              <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-4">
-                  Deep Dive: {activeTab === 'nodes' ? 'Node Design' : 
-                            activeTab === 'analytics' ? 'Analytics' :
-                            activeTab === 'canvas' ? 'Canvas' : 'Fallbacks'}
-                </h2>
-              </div>
-              <div className="md:col-span-2 space-y-6">
-                {activeTab === 'nodes' && (
-                  <>
-                    <div>
-                      <p className="text-slate-700 leading-relaxed mb-6">
-                        Node design was critical to the builder&apos;s success. Each node needed to be immediately recognizable, easy to configure, and scalable across different complexity levels while maintaining visual consistency.
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="bg-white border border-slate-200 rounded-lg p-6">
-                        <h3 className="font-semibold text-slate-900 mb-2">Visual Hierarchy</h3>
-                        <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                          Established clear visual patterns for different node types through color coding, iconography, and size variations.
-                        </p>
-                        <ul className="space-y-2 text-slate-600 text-sm">
-                          <li className="flex items-start">
-                            <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <span><strong>Color System:</strong> Blue for messages, green for conditions, orange for actions</span>
-                          </li>
-                          <li className="flex items-start">
-                            <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            <span><strong>Icon Language:</strong> Consistent iconography to indicate node function at a glance</span>
-                          </li>
-                        </ul>
-                      </div>
-                      
-                      <div className="bg-white border border-slate-100 rounded-lg p-6">
-                        <h3 className="font-semibold text-slate-900 mb-2">Configuration Patterns</h3>
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          Developed progressive disclosure patterns where basic configurations were visible, with advanced options accessible through expandable sections.
-                        </p>
-                      </div>
-                      
-                      <div className="bg-white border border-slate-200 rounded-lg p-6">
-                        <h3 className="font-semibold text-slate-900 mb-2">Connection Logic</h3>
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          Designed connection points and flow indicators to make logic paths clear, reducing cognitive load when building complex flows.
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {activeTab === 'analytics' && (
-                  <>
-                    <div>
-                      <p className="text-slate-700 leading-relaxed mb-6">
-                        Analytics design focused on providing actionable insights while maintaining simplicity for non-technical users to understand chatbot performance.
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="bg-white border border-slate-200 rounded-lg p-6">
-                        <h3 className="font-semibold text-slate-900 mb-2">Key Metrics</h3>
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          Identified and designed visualizations for conversion rates, drop-off points, and user engagement patterns.
-                        </p>
-                      </div>
-                      
-                      <div className="bg-white border border-slate-200 rounded-lg p-6">
-                        <h3 className="font-semibold text-slate-900 mb-2">Real-time Feedback</h3>
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          Implemented live analytics to help users understand immediate impact of their chatbot changes.
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {activeTab === 'canvas' && (
-                  <>
-                    <div>
-                      <p className="text-slate-700 leading-relaxed mb-6">
-                        Canvas design evolved from a restrictive layout to a flexible workspace that could handle complex flows while remaining intuitive for beginners.
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="bg-white border border-slate-200 rounded-lg p-6">
-                        <h3 className="font-semibold text-slate-900 mb-2">Performance Optimization</h3>
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          Rebuilt canvas with virtualization and efficient rendering to handle large chatbot flows smoothly.
-                        </p>
-                      </div>
-                      
-                      <div className="bg-white border border-slate-200 rounded-lg p-6">
-                        <h3 className="font-semibold text-slate-900 mb-2">Navigation Features</h3>
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          Added zoom, pan, minimap, and search functionality to help users navigate complex automation flows.
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {activeTab === 'fallbacks' && (
-                  <>
-                    <div>
-                      <p className="text-slate-700 leading-relaxed mb-6">
-                        Fallback system design ensured graceful handling of unexpected user inputs while maintaining conversation flow and providing escape routes.
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="bg-white border border-slate-200 rounded-lg p-6">
-                        <h3 className="font-semibold text-slate-900 mb-2">Default Behaviors</h3>
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          Designed intelligent defaults for common fallback scenarios while allowing customization for specific use cases.
-                        </p>
-                      </div>
-                      
-                      <div className="bg-white border border-slate-200 rounded-lg p-6">
-                        <h3 className="font-semibold text-slate-900 mb-2">Escalation Paths</h3>
-                        <p className="text-slate-600 text-sm leading-relaxed">
-                          Created clear escalation mechanisms to human agents when chatbot responses were insufficient.
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </section>
+          <Tabs 
+            tabs={tabData} 
+            defaultTab="nodes"
+          />
         </div>
 
         {/* Bottom Navigation */}
