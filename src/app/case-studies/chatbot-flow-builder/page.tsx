@@ -45,9 +45,9 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </div>
 
           <section className="p-6 md:p-12 pt-6 md:pt-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
               <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-4">Node Design</h2>
+                <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Node Design</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
@@ -101,7 +101,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-6 md:p-12 pt-6 md:pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">Analytics</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Analytics</h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
@@ -137,7 +137,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-6 md:p-12 pt-6 md:pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">Canvas</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Canvas</h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
@@ -173,7 +173,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <section className="p-6 md:p-12 pt-6 md:pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">Fallbacks</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Fallbacks</h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
@@ -283,7 +283,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
           {/* Introduction */}
           <section className="p-6 md:p-12 pb-6 md:pb-8">
             <div className="mb-8">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4">Role and Context</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Role and Context</h2>
               <p   className="text-slate-700 leading-relaxed">
                 As a Product Designer, I was responsible for the design and iteration of a chatbot builder tool integrated with the WhatsApp Business API to enable automated interactions and scale conversations efficiently.
               </p>
@@ -299,9 +299,9 @@ export default function ChatbotFlowBuilderCaseStudy() {
 
           {/* Understanding the Problem */}
           <section className="border-t border-slate-100 p-6 md:p-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
               <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-4">Understanding the Problem</h2>
+                <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Understanding the Problem</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
@@ -351,9 +351,9 @@ export default function ChatbotFlowBuilderCaseStudy() {
 
           {/* Building the Solution */}
           <section className="border-t border-slate-100 p-6 md:p-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
               <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-4">Building the Solution</h2>
+                <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Building the Solution</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
@@ -435,9 +435,9 @@ export default function ChatbotFlowBuilderCaseStudy() {
 
           {/* Key Challenges */}
           <section className="border-t border-slate-100 p-6 md:p-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
               <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-4">Key Challenges</h2>
+                <h2 className="text-xl font-semibold text-slate-900 mb-6 md:mb-4">Key Challenges</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
