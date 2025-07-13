@@ -29,7 +29,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
       content: (
         <>
           {/* Node Evolution Image */}
-          <div className="px-12 pt-8 pb-4">
+          <div className="px-6 md:px-12 pt-6 md:pt-8 pb-4">
             <div className="relative">
               <Image
                 src="/case-studies/chatbot/node-evolution.png"
@@ -44,8 +44,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
             </div>
           </div>
 
-          <section className="p-12 pt-8">
-            <div className="grid md:grid-cols-3 gap-16">
+          <section className="p-6 md:p-12 pt-6 md:pt-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
               <div className="md:col-span-1">
                 <h2 className="text-xl font-semibold text-slate-900 mb-4">Node Design</h2>
               </div>
@@ -98,8 +98,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
       id: 'analytics',
       label: 'Analytics',
       content: (
-        <section className="p-12 pt-8">
-          <div className="grid md:grid-cols-3 gap-16">
+        <section className="p-6 md:p-12 pt-6 md:pt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
             <div className="md:col-span-1">
               <h2 className="text-xl font-semibold text-slate-900 mb-4">Analytics</h2>
             </div>
@@ -134,8 +134,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
       id: 'canvas',
       label: 'Canvas',
       content: (
-        <section className="p-12 pt-8">
-          <div className="grid md:grid-cols-3 gap-16">
+        <section className="p-6 md:p-12 pt-6 md:pt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
             <div className="md:col-span-1">
               <h2 className="text-xl font-semibold text-slate-900 mb-4">Canvas</h2>
             </div>
@@ -170,8 +170,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
       id: 'fallbacks',
       label: 'Fallbacks',
       content: (
-        <section className="p-12 pt-8">
-          <div className="grid md:grid-cols-3 gap-16">
+        <section className="p-6 md:p-12 pt-6 md:pt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
             <div className="md:col-span-1">
               <h2 className="text-xl font-semibold text-slate-900 mb-4">Fallbacks</h2>
             </div>
@@ -228,20 +228,20 @@ export default function ChatbotFlowBuilderCaseStudy() {
         initial={{ opacity: 0, y: -5 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.15, delay: 0.05 }}
-        className="fixed top-6 right-6 z-50"
+        className="fixed top-4 right-4 md:top-6 md:right-6 z-50"
       >
         <Button
           onClick={copyUrl}
           variant="outline"
           size="icon"
-          className="bg-white/80 backdrop-blur-sm border-slate-200 hover:bg-white hover:border-slate-300 transition-all duration-150"
+          className="min-h-[44px] min-w-[44px] bg-white/80 backdrop-blur-sm border-slate-200 hover:bg-white hover:border-slate-300 transition-all duration-150"
         >
           <LinkIcon className="w-4 h-4" />
         </Button>
       </motion.div>
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Back Navigation */}
-        <div className="mt-12 mb-36 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
+        <div className="mt-6 md:mt-12 mb-16 md:mb-36 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
           <Link 
             href="/" 
             className="inline-flex items-center px-1.5 py-1 bg-slate-50 font-mono uppercase font-medium rounded-md text-slate-600 text-xs hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
@@ -273,10 +273,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
           muted
           loop
           playsInline
-          className="h-auto rounded-md bg-slate-50"
-          style={{
-            maxWidth: 'calc(996px * 1.15)' // 15% larger than max-w-4xl (896px)
-          }}
+          className="w-full h-auto rounded-md bg-slate-50 max-w-none md:max-w-[calc(996px*1.15)]"
         />
       </div>
 
@@ -284,7 +281,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         {/* Content */}
         <div className="bg-white rounded-md ring-1 ring-slate-300/20 shadow-xl overflow-hidden">
           {/* Introduction */}
-          <section className="p-12 pb-8">
+          <section className="p-6 md:p-12 pb-6 md:pb-8">
             <div className="mb-8">
               <h2 className="text-xl font-semibold text-slate-900 mb-4">Role and Context</h2>
               <p   className="text-slate-700 leading-relaxed">
@@ -301,8 +298,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </section>
 
           {/* Understanding the Problem */}
-          <section className="border-t border-slate-100 p-12">
-            <div className="grid md:grid-cols-3 gap-16">
+          <section className="border-t border-slate-100 p-6 md:p-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
               <div className="md:col-span-1">
                 <h2 className="text-xl font-semibold text-slate-900 mb-4">Understanding the Problem</h2>
               </div>
@@ -353,8 +350,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </section>
 
           {/* Building the Solution */}
-          <section className="border-t border-slate-100 p-12">
-            <div className="grid md:grid-cols-3 gap-16">
+          <section className="border-t border-slate-100 p-6 md:p-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
               <div className="md:col-span-1">
                 <h2 className="text-xl font-semibold text-slate-900 mb-4">Building the Solution</h2>
               </div>
@@ -437,8 +434,8 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </section>
 
           {/* Key Challenges */}
-          <section className="border-t border-slate-100 p-12">
-            <div className="grid md:grid-cols-3 gap-16">
+          <section className="border-t border-slate-100 p-6 md:p-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
               <div className="md:col-span-1">
                 <h2 className="text-xl font-semibold text-slate-900 mb-4">Key Challenges</h2>
               </div>
@@ -471,14 +468,14 @@ export default function ChatbotFlowBuilderCaseStudy() {
         </div>
 
         {/* Deep Dive Section Header */}
-        <div className="mt-26 mb-8 text-center" id="deep-dive-section">
-          <div className="inline-block group border border-dashed border-slate-300 hover:border-slate-400 transition-all duration-200 p-6 relative">
+        <div className="mt-16 md:mt-26 mb-6 md:mb-8 text-center" id="deep-dive-section">
+          <div className="inline-block group border border-dashed border-slate-300 hover:border-slate-400 transition-all duration-200 p-4 md:p-6 relative">
           {/* Corner squares - visual indicators only */}
           <div className="absolute -top-1 -left-1 w-2 h-2 bg-slate-300 group-hover:bg-slate-400 transition-colors duration-200 pointer-events-none"></div>
           <div className="absolute -top-1 -right-1 w-2 h-2 bg-slate-300 group-hover:bg-slate-400 transition-colors duration-200 pointer-events-none"></div>
           <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-slate-300 group-hover:bg-slate-400 transition-colors duration-200 pointer-events-none"></div>
           <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-slate-300 group-hover:bg-slate-400 transition-colors duration-200 pointer-events-none"></div>
-          <h2 className="text-6xl font-medium text-slate-900 tracking-tight">
+          <h2 className="text-4xl md:text-6xl font-medium text-slate-900 tracking-tight">
             Deep Dive
           </h2>
           </div>

@@ -29,14 +29,14 @@ export function Tabs({
     <div className={className}>
       {/* Tab Navigation */}
       <div className="border-b border-slate-200">
-        <div className="flex" role="tablist">
+        <div className="flex overflow-x-auto scrollbar-hide" role="tablist">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               role="tab"
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-4 text-sm font-medium relative transition-colors duration-200 cursor-pointer ${
+              className={`px-4 md:px-6 py-4 text-sm font-medium relative transition-colors duration-200 cursor-pointer whitespace-nowrap flex-shrink-0 min-h-[44px] ${
                 activeTab === tab.id
                   ? 'text-slate-900 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-slate-900 after:translate-y-px'
                   : 'text-slate-500 hover:text-slate-700 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-slate-300 after:opacity-0 hover:after:opacity-100 hover:after:translate-y-px after:transition-all after:duration-200'
