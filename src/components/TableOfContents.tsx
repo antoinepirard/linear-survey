@@ -18,7 +18,7 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    // Generate table of contents from headings
+    // Generate table of contents from headings and tab navigation
     const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
     const items: TocItem[] = [];
     const usedIds = new Set<string>();
@@ -29,6 +29,13 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
       
       // Skip the main title (first h1)
       if (level === 1 && index === 0) return;
+      
+      // Skip headings that are inside tab content only
+      const isInsideTabContent = heading.closest('[role="tabpanel"]');
+      if (isInsideTabContent) return;
+      
+      // Skip the specific "Deep Dive" heading since we create our own entry with tabs
+      if (title === 'Deep Dive' && heading.closest('#deep-dive-section')) return;
       
       // Create ID if it doesn't exist
       let id = heading.id;
@@ -58,12 +65,91 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
       });
     });
 
+    // Add tab navigation items for deep dive sections
+    const tabButtons = document.querySelectorAll('[role="tab"]');
+    if (tabButtons.length > 0) {
+      // Add "Deep Dive" as a parent section
+      const deepDiveId = 'deep-dive-section';
+      if (!usedIds.has(deepDiveId)) {
+        items.push({
+          id: deepDiveId,
+          title: 'Deep Dive',
+          level: 2
+        });
+        usedIds.add(deepDiveId);
+      }
+
+      // Add each tab as a subsection
+      tabButtons.forEach((tab) => {
+        const tabText = tab.textContent?.trim() || '';
+        if (tabText) {
+          const baseId = `tab-${tabText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')}`;
+          let tabId = baseId;
+          let counter = 1;
+          while (usedIds.has(tabId)) {
+            tabId = `${baseId}-${counter}`;
+            counter++;
+          }
+          
+          usedIds.add(tabId);
+          items.push({
+            id: tabId,
+            title: tabText,
+            level: 3
+          });
+        }
+      });
+    }
+
     setTocItems(items);
   }, []);
 
 
 
   const scrollToSection = (id: string) => {
+    // Handle tab navigation
+    if (id.startsWith('tab-')) {
+      const tabText = id.replace('tab-', '').replace(/-/g, ' ');
+      const tabButtons = document.querySelectorAll('[role="tab"]');
+      
+      for (const tab of tabButtons) {
+        if (tab.textContent?.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, ' ').trim() === tabText) {
+          (tab as HTMLElement).click();
+          
+          // Scroll to the tabs container
+          const tabsContainer = tab.closest('[role="tablist"]')?.parentElement;
+          if (tabsContainer) {
+            const offset = 80;
+            const elementPosition = tabsContainer.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+          return;
+        }
+      }
+    }
+
+    // Handle deep dive section
+    if (id === 'deep-dive-section') {
+      const deepDiveElement = document.getElementById('deep-dive-section');
+      if (deepDiveElement) {
+        const offset = 80;
+        const elementPosition = deepDiveElement.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+        return;
+      }
+    }
+
+    // Default heading navigation
     const element = document.getElementById(id);
     if (element) {
       const offset = 80; // Account for any fixed headers
