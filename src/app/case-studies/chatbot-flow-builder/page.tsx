@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -17,6 +18,10 @@ const TableOfContents = dynamic(() => import('@/components/TableOfContents'), {
 });
 
 export default function ChatbotFlowBuilderCaseStudy() {
+  const [isSelected, setIsSelected] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+
   const copyUrl = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -27,8 +32,35 @@ export default function ChatbotFlowBuilderCaseStudy() {
     }
   };
 
+  const handleDragStart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDragging(true);
+    
+    const startX = e.clientX - position.x;
+    const startY = e.clientY - position.y;
+    
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      setPosition({
+        x: moveEvent.clientX - startX,
+        y: moveEvent.clientY - startY
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
   return (
-    <div className="min-h-screen bg-white relative">
+    <div className="min-h-screen bg-slate-50 relative" style={{
+      backgroundImage: 'radial-gradient(circle, #e2e8f0 1px, transparent 1px)',
+      backgroundSize: '20px 20px'
+    }}>
       <TableOfContents />
       
       {/* Copy URL Button - Top Right */}
@@ -52,7 +84,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <div className="mt-12 mb-36 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
           <Link 
             href="/" 
-            className="inline-flex items-center px-1.5 py-1 bg-white font-mono uppercase font-medium rounded-md text-slate-600 text-xs hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
+            className="inline-flex items-center px-1.5 py-1 bg-slate-50 font-mono uppercase font-medium rounded-md text-slate-600 text-xs hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
           >
             <ChevronLeftIcon className="w-4 h-4 mr-1" />
             Back to Portfolio
@@ -60,14 +92,55 @@ export default function ChatbotFlowBuilderCaseStudy() {
         </div>
 
         {/* Header */}
-        <header className="mb-12 text-center">
+        <header 
+          className={`mb-12 text-center group border border-dashed transition-all duration-200 p-6 -m-6 relative cursor-move select-none ${
+            isSelected 
+              ? 'border-orange-500' 
+              : 'border-slate-300 hover:border-slate-400'
+          } ${isDragging ? 'transition-none' : ''}`}
+          onClick={() => setIsSelected(!isSelected)}
+          onMouseDown={handleDragStart}
+          style={{
+            transform: `translate(${position.x}px, ${position.y}px)`,
+            transformOrigin: 'center'
+          }}
+        >
+          {/* Corner squares - visual indicators only */}
+          <div 
+            className={`absolute -top-1 -left-1 w-2 h-2 transition-colors duration-200 pointer-events-none ${
+              isSelected 
+                ? 'bg-orange-500' 
+                : 'bg-slate-300 group-hover:bg-slate-400'
+            }`}
+          ></div>
+          <div 
+            className={`absolute -top-1 -right-1 w-2 h-2 transition-colors duration-200 pointer-events-none ${
+              isSelected 
+                ? 'bg-orange-500' 
+                : 'bg-slate-300 group-hover:bg-slate-400'
+            }`}
+          ></div>
+          <div 
+            className={`absolute -bottom-1 -left-1 w-2 h-2 transition-colors duration-200 pointer-events-none ${
+              isSelected 
+                ? 'bg-orange-500' 
+                : 'bg-slate-300 group-hover:bg-slate-400'
+            }`}
+          ></div>
+          <div 
+            className={`absolute -bottom-1 -right-1 w-2 h-2 transition-colors duration-200 pointer-events-none ${
+              isSelected 
+                ? 'bg-orange-500' 
+                : 'bg-slate-300 group-hover:bg-slate-400'
+            }`}
+          ></div>
           <div className="flex items-center justify-center gap-6 text-sm text-slate-500">
             <span className='font-mono'>2023 - 2024</span>
             </div>
           <h1 className="text-5xl font-bold text-slate-900 mt-6 mb-4 tracking-tight">
             A Chatbot Builder for the WhatsApp Business API
           </h1>
-          <p className="text-lg text-slate-700 mb-24">
+          <p className="text-lg text-slate-700 mb-12">
             Led the design and iteration of a chatbot builder tool integrated with the WhatsApp Business API to enable automated interactions and scale conversations efficiently.
           </p>
         </header>
