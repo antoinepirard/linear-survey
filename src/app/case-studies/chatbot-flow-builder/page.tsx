@@ -383,7 +383,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         </div>
 
         {/* Bottom Navigation */}
-        <div className="mt-26 pb-16 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
+        <div className="mt-26 pb-16 text-center">
           <Link 
             href="/" 
             className="inline-flex items-center px-1.5 py-1 bg-slate-50 font-mono uppercase font-medium rounded-md text-slate-600 text-xs hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
