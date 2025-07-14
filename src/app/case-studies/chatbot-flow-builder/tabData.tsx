@@ -136,7 +136,7 @@ const AnalyticsContent = () => {
             <div className="relative">
               <div className={`space-y-4 transition-all duration-300 ${!showAll ? 'max-h-80 overflow-hidden' : ''}`}>
                 <div className="bg-white border border-slate-100 rounded-lg p-6">
-                  <h3 className="font-semibold text-slate-900 mb-2">Defining Core Value and Priorities</h3>
+                  <h3 className="font-semibold text-slate-900 mb-2">Scope and Priorities</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
                     The biggest challenge was figuring out what actually mattered. We discovered two distinct use cases: measuring business outcomes (like meetings booked) and evaluating chatbot performance (conversion through flows, drop-off analysis). While bots are usually part of larger funnels, users considered them a good proxy for outcomes, leading us to prioritize flow performance metrics first.
                   </p>
