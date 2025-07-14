@@ -344,7 +344,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </section>
           
           {/* Credits Footer */}
-          <footer className="border-t border-slate-100 p-6 md:p-12 text-center">
+          <footer className="bg-slate-50 border-t border-slate-100 p-6 md:p-8 text-center">
           <p className="text-xs text-slate-900 mb-1">
               Thanks to my colleagues:
             </p>
