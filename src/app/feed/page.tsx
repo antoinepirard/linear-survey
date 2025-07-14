@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { AnimationWrapper } from '@/hooks/useAnimation';
 import { feedImages, FeedImage } from '@/data/feed';
 import { preloadMediaDimensions, ImageDimensions } from '@/utils/imageDimensions';
@@ -10,10 +10,16 @@ import HeaderSection from '@/components/HeaderSection';
 export default function Feed() {
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
   const [imageDimensions, setImageDimensions] = useState<Record<string, ImageDimensions>>({});
+  
+  const sortedFeedImages = [...feedImages].sort((a, b) => {
+    const yearA = parseInt(a.date);
+    const yearB = parseInt(b.date);
+    return yearB - yearA;
+  });
 
   useEffect(() => {
     const initializeImages = async () => {
-      const mediaItems = feedImages.map(item => ({
+      const mediaItems = sortedFeedImages.map(item => ({
         src: item.src,
         type: item.type || 'image'
       }));
@@ -61,6 +67,32 @@ export default function Feed() {
     };
   }, [imageDimensions]);
 
+  const masonryColumns = useMemo(() => {
+    const getColumnCount = () => {
+      if (typeof window !== 'undefined') {
+        if (window.innerWidth < 640) return 1;
+        if (window.innerWidth < 1024) return 2;
+        return 3;
+      }
+      return 3;
+    };
+
+    const columnCount = getColumnCount();
+    const columns: FeedImage[][] = Array(columnCount).fill(null).map(() => []);
+    const columnHeights = Array(columnCount).fill(0);
+
+    sortedFeedImages.forEach((item) => {
+      const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
+      columns[shortestColumnIndex].push(item);
+      
+      const itemDimensions = getImageDimensions(item);
+      const estimatedHeight = itemDimensions.height + 100; // Add margin/padding
+      columnHeights[shortestColumnIndex] += estimatedHeight;
+    });
+
+    return columns;
+  }, [sortedFeedImages, imageDimensions, getImageDimensions]);
+
   return (
     <div className="bg-white min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
@@ -76,47 +108,54 @@ export default function Feed() {
       
       {/* Wider container for feed content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 feed-container">
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-8">
-          {feedImages.map((item, index) => (
-            <AnimationWrapper key={item.id} delay={`${100 + index * 50}ms`}>
-              <div className="masonry-column break-inside-avoid mb-6">
-                <div className={`feed-image-container rounded overflow-hidden bg-slate-100 ${item.type === 'video' ? 'video-container' : ''}`}>
-                  <div className={`transition-opacity duration-300 ${loadedImages.has(item.id) || item.type === 'video' ? 'opacity-100' : 'opacity-0'}`}>
-                    {item.type === 'video' ? (
-                      <video
-                        src={item.src}
-                        className="w-full block"
-                        controls
-                        muted
-                        playsInline
-                        onLoadedMetadata={() => handleImageLoad(item.id)}
-                        onCanPlay={() => handleImageLoad(item.id)}
-                        preload="metadata"
-                        style={{
-                          aspectRatio: getImageDimensions(item).aspectRatio || 'auto',
-                          height: 'auto'
-                        }}
-                      />
-                    ) : (
-                      <Image
-                        src={item.src}
-                        alt={item.name}
-                        width={getImageDimensions(item).width}
-                        height={getImageDimensions(item).height}
-                        className="w-full h-auto"
-                        priority={index < 3}
-                        onLoad={() => handleImageLoad(item.id)}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        placeholder="blur"
-                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                      />
-                    )}
-                  </div>
-                </div>
-                <p className="text-slate-500 font-mono text-xs mt-3">{item.date}</p>
-                <h3 className="text-slate-700 font-medium text-sm mt-1">{item.name}</h3>
-              </div>
-            </AnimationWrapper>
+        <div className="flex gap-6 items-start">
+          {masonryColumns.map((column, columnIndex) => (
+            <div key={columnIndex} className="flex-1 space-y-6">
+              {column.map((item) => {
+                const globalIndex = sortedFeedImages.findIndex(feedItem => feedItem.id === item.id);
+                return (
+                  <AnimationWrapper key={item.id} delay={`${100 + globalIndex * 50}ms`}>
+                    <div className="masonry-column break-inside-avoid">
+                      <div className={`feed-image-container rounded overflow-hidden bg-slate-100 ${item.type === 'video' ? 'video-container' : ''}`}>
+                        <div className={`transition-opacity duration-300 ${loadedImages.has(item.id) || item.type === 'video' ? 'opacity-100' : 'opacity-0'}`}>
+                          {item.type === 'video' ? (
+                            <video
+                              src={item.src}
+                              className="w-full block"
+                              controls
+                              muted
+                              playsInline
+                              onLoadedMetadata={() => handleImageLoad(item.id)}
+                              onCanPlay={() => handleImageLoad(item.id)}
+                              preload="metadata"
+                              style={{
+                                aspectRatio: getImageDimensions(item).aspectRatio || 'auto',
+                                height: 'auto'
+                              }}
+                            />
+                          ) : (
+                            <Image
+                              src={item.src}
+                              alt={item.name}
+                              width={getImageDimensions(item).width}
+                              height={getImageDimensions(item).height}
+                              className="w-full h-auto"
+                              priority={globalIndex < 3}
+                              onLoad={() => handleImageLoad(item.id)}
+                              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                              placeholder="blur"
+                              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                            />
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-slate-500 font-mono text-xs mt-3">{item.date}</p>
+                      <h3 className="text-slate-700 font-medium text-sm mt-1">{item.name}</h3>
+                    </div>
+                  </AnimationWrapper>
+                );
+              })}
+            </div>
           ))}
         </div>
       </div>
