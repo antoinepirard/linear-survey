@@ -91,7 +91,7 @@ export default function Feed() {
     });
 
     return columns;
-  }, [sortedFeedImages, imageDimensions, getImageDimensions]);
+  }, [sortedFeedImages, getImageDimensions]);
 
   return (
     <div className="bg-white min-h-screen">
