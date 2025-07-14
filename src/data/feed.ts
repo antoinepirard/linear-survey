@@ -18,7 +18,7 @@ const rawFeedImages = [
     type: 'image' as const
   },
   {
-    src: '/Assets/Images/feed/composer-button.png',
+    src: '/Assets/Images/feed/button-in-composer.png',
     name: 'Composer Button',
     date: '2024',
     type: 'image' as const
