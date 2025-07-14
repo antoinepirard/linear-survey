@@ -31,39 +31,38 @@ export const tabData: TabItem[] = [
             <div className="md:col-span-2 space-y-6">
               <div>
                 <p className="text-slate-700 leading-relaxed mb-4 md:mb-6">
-                  Node design was critical to the builder&apos;s success. Each node needed to be immediately recognizable, easy to configure, and scalable across different complexity levels while maintaining visual consistency.
+                The node architecture formed the foundation of the chatbot builder, making its design paramount to the platform&apos;s success. This presented several inherent challenges that required careful consideration. First, we needed to identify the right nodes that addressed specific user needs at the appropriate level of granularity. Second, these nodes had to be intuitively designed - easy to use and satisfying to interact with, especially considering that workflows could contain dozens or even hundreds of nodes. The user experience of each individual node was crucial to the overall platform usability. Through iterative development, we continuously refined the node system based on user feedback and learnings to achieve the optimal balance of functionality and usability.
                 </p>
               </div>
               
+              <p className="text-slate-700 mb-4">Key tradeoffs and issues</p>
+              
               <div className="space-y-4">
-                <div className="bg-white border border-slate-200 rounded-lg p-6">
-                  <h3 className="font-semibold text-slate-900 mb-2">Visual Hierarchy</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                    Established clear visual patterns for different node types through color coding, iconography, and size variations.
+                <div className="bg-white border border-slate-100 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Actions on Nodes vs Separated</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Since flows were mostly conversational initially, we decided to have actions (like closing the conversation) on the message nodes. This ended up being confusing for some, but especially didn&apos;t make the life of our users easy as (1) they didn&apos;t know they had to do so and (2) their needs evolved to be sometimes more operational (e.g. close conversation after assigning).
                   </p>
-                  <ul className="space-y-2 text-slate-600 text-sm">
-                    <li className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <span><strong>Color System:</strong> Blue for messages, green for conditions, orange for actions</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                      <span><strong>Icon Language:</strong> Consistent iconography to indicate node function at a glance</span>
-                    </li>
-                  </ul>
                 </div>
                 
                 <div className="bg-white border border-slate-100 rounded-lg p-6">
-                  <h3 className="font-semibold text-slate-900 mb-2">Configuration Patterns</h3>
+                  <h3 className="font-semibold text-slate-900 mb-2">Fallbacks at the Node Level</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
-                    Developed progressive disclosure patterns where basic configurations were visible, with advanced options accessible through expandable sections.
+                    We quickly understood that fallbacks were the core of bots (essentially &quot;what if user does x&quot;). My initial intuition was that having fallback separated from nodes was better for the UX since they had 1 place to set them up, and I found that the ability to manage fallbacks differently dependent on the node or where you are in the flow was overkilled. This quickly proved itself to be wrong and as a consequence we placed contextual fallback on the nodes.
                   </p>
                 </div>
                 
-                <div className="bg-white border border-slate-200 rounded-lg p-6">
-                  <h3 className="font-semibold text-slate-900 mb-2">Connection Logic</h3>
+                <div className="bg-white border border-slate-100 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Lack of Design System</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
-                    Designed connection points and flow indicators to make logic paths clear, reducing cognitive load when building complex flows.
+                    We started with message nodes, but as we expanded use cases, created many nodes. Nodes started looking differently and nothing was consistent. As a consequence, we rethought the visual anatomy of a node. We did it over multiple internal iteration with our front end engineer.
+                  </p>
+                </div>
+                
+                <div className="bg-white border border-slate-100 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Editing Experience</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    This is something I still remain unsatisfied with, but we had to decide what, if anything could be edited from the canvas in opposition to be edited in the sidebar. We had different paths, opening a sidebar, a popover over the node in the canvas, or direct inline node editing on the canvas. Of course editing on the node itself came with the issue of zoom levels. Editing in the sidebar was making you lose some context. So we ended up going for a mix, some key infos/high frequency actions could be taken from the canvas on the node itself, but the rest had to be done in the sidebar or popover.
                   </p>
                 </div>
               </div>
