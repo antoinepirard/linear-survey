@@ -9,28 +9,11 @@ export interface FeedImage {
 }
 
 const rawFeedImages = [
+  // 2025 - Most recent
   {
     src: '/Assets/Images/feed/company-logos-navigation.jpg',
     name: 'Inbox - Conversation List',
     date: '2025',
-    type: 'image' as const
-  },
-  {
-    src: '/Assets/Images/feed/original-d9c7f965f78c57318d87b4c2afaa968d.gif',
-    name: 'Microsfot Ads via Iconic Matter',
-    date: '2016',
-    type: 'gif' as const
-  },
-  {
-    src: '/Assets/Images/feed/original-6957a16c963578f42d22a8d3d5c4b7a4.gif',
-    name: 'Customisable Citizen Participation Platform',
-    date: '2024',
-    type: 'gif' as const
-  },
-  {
-    src: '/Assets/Images/feed/original-7fda3aa4c9a615ba69234cba6d64e772.webp',
-    name: 'Experimenting with Illustration styles',
-    date: '2024',
     type: 'image' as const
   },
   {
@@ -74,6 +57,26 @@ const rawFeedImages = [
     name: 'AI Generated',
     date: '2025',
     type: 'image' as const
+  },
+  // 2024 - Older
+  {
+    src: '/Assets/Images/feed/original-6957a16c963578f42d22a8d3d5c4b7a4.gif',
+    name: 'Customisable Citizen Participation Platform',
+    date: '2024',
+    type: 'gif' as const
+  },
+  {
+    src: '/Assets/Images/feed/original-7fda3aa4c9a615ba69234cba6d64e772.webp',
+    name: 'Experimenting with Illustration styles',
+    date: '2024',
+    type: 'image' as const
+  },
+  // 2016 - Oldest
+  {
+    src: '/Assets/Images/feed/original-d9c7f965f78c57318d87b4c2afaa968d.gif',
+    name: 'Microsfot Ads via Iconic Matter',
+    date: '2016',
+    type: 'gif' as const
   },
 ];
 
