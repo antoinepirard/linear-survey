@@ -98,6 +98,100 @@ const NodeDesignContent = () => {
     );
   };
 
+const AnalyticsContent = () => {
+  const [showAll, setShowAll] = useState(false);
+  
+  return (
+    <>
+        {/* Analytics Image */}
+        <div className="px-6 md:px-12 pt-6 md:pt-8 pb-4">
+          <div className="relative">
+            <Image
+              src="/case-studies/chatbot/compnent-analytics (1).png"
+              alt="Key path analytics component"
+              width={1200}
+              height={400}
+              className="w-full h-auto rounded-lg border border-slate-100"
+            />
+            <p className="text-xs text-slate-500 font-mono mt-2">
+              Key path analytics component
+            </p>
+          </div>
+        </div>
+
+        <section className="p-6 md:p-12 pt-6 md:pt-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
+          <div className="md:col-span-1">
+            <h2 className="text-lg font-semibold text-slate-900 mb-3 md:mb-4">Analytics</h2>
+          </div>
+          <div className="md:col-span-2 space-y-6">
+            <div>
+              <p className="text-slate-700 leading-relaxed mb-4 md:mb-6">
+                The analytics goal was initially fuzzy, but from first principles, when you build a bot, you don&apos;t do it for the sake of it - you do it with an objective in mind (e.g., book more demos, answer questions). The ultimate goal was to measure effectiveness, but we quickly realized there were two key jobs: measuring the outcome and chatbot performance evaluation. Customers wanted to know if the conversation flow was efficient, requiring insights into conversion rates and drop-off points to iterate effectively. This dual purpose shaped our entire analytics approach.
+              </p>
+            </div>
+            
+            <p className="text-slate-700 mb-4">Key challenges and decisions</p>
+            
+            <div className="relative">
+              <div className={`space-y-4 transition-all duration-300 ${!showAll ? 'max-h-80 overflow-hidden' : ''}`}>
+                <div className="bg-white border border-slate-100 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Defining Core Value and Priorities</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    The biggest challenge was figuring out what actually mattered. We discovered two distinct use cases: measuring business outcomes (like meetings booked) and evaluating chatbot performance (conversion through flows, drop-off analysis). While bots are usually part of larger funnels, users considered them a good proxy for outcomes, leading us to prioritize flow performance metrics first.
+                  </p>
+                </div>
+                
+                <div className="bg-white border border-slate-100 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Relative vs Absolute Numbers</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Numbers could be relative to either the total amount of users who entered the flow or relative to the node before. Since flows can be very flexible and complex, we needed to be explicit about our choice. We decided to provide both perspectives but defaulted to showing relative to flow entry, as this gave users the clearest picture of overall conversion performance.
+                  </p>
+                </div>
+                
+                <div className="bg-white border border-slate-100 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Unique vs Total Users</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    Some users could go multiple times through the same flow, creating a divergence between unique and total users. This was particularly challenging for repeat interactions. As a default, we went for unique runs since it&apos;s more telling of user behavior patterns, but we still highlighted total runs to make differences apparent and give users the full picture.
+                  </p>
+                </div>
+                
+                <div className="bg-white border border-slate-100 rounded-lg p-6">
+                  <h3 className="font-semibold text-slate-900 mb-2">Flow Versioning and Data Persistence</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    When flows were edited, we had to decide whether to keep data and show change impact, or create version history. We chose version history to maintain data integrity, but this means small edits (like fixing typos) create new versions and clear previous data. While this maintains accuracy, it&apos;s not ideal for minor changes - there were more graceful ways to handle this that we decided to scope out.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Fade overlay when collapsed */}
+              {!showAll && (
+                <div className="absolute bottom-0 left-0 right-0 h-50 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+              )}
+              
+              {/* Expand/Collapse button */}
+              <div className="mt-4 flex justify-center relative z-10 bg-white pt-2">
+                <button 
+                  onClick={() => setShowAll(!showAll)}
+                  className="flex items-center rounded gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  <span>{showAll ? 'Show less' : 'Show more'}</span>
+                  <motion.div
+                    animate={{ rotate: showAll ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDownIcon className="w-4 h-4" />
+                  </motion.div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+};
+
 export const tabData: TabItem[] = [
   {
     id: 'nodes',
@@ -107,38 +201,7 @@ export const tabData: TabItem[] = [
   {
     id: 'analytics',
     label: 'Analytics',
-    content: (
-      <section className="p-6 md:p-12 pt-6 md:pt-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
-          <div className="md:col-span-1">
-            <h2 className="text-lg font-semibold text-slate-900 mb-3 md:mb-4">Analytics</h2>
-          </div>
-          <div className="md:col-span-2 space-y-6">
-            <div>
-              <p className="text-slate-700 leading-relaxed mb-4 md:mb-6">
-                Analytics design focused on providing actionable insights while maintaining simplicity for non-technical users to understand chatbot performance.
-              </p>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="font-semibold text-slate-900 mb-2">Key Metrics</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  Identified and designed visualizations for conversion rates, drop-off points, and user engagement patterns.
-                </p>
-              </div>
-              
-              <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="font-semibold text-slate-900 mb-2">Real-time Feedback</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  Implemented live analytics to help users understand immediate impact of their chatbot changes.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    )
+    content: <AnalyticsContent />
   },
   {
     id: 'canvas',
