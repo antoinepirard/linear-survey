@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeftIcon, LinkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, LinkIcon, ChevronDownIcon, ChevronRightIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Tabs } from '@/components/ui/tabs';
 import Image from 'next/image';
@@ -363,19 +363,34 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </footer>
         </div>
 
+        {/* Chat CTA Container */}
+        <div className="mt-16 bg-slate-950 rounded-md p-8 md:p-12 flex items-center justify-between">
+          <h3 className="text-3xl font-medium text-white">
+            Wanna learn more about it? 
+            <p className="text-white">Let&apos;s chat.</p>
+          </h3>
+          <a href="mailto:contact@antoinepirard.be">
+            <Button 
+              className="bg-white text-slate-950 hover:bg-slate-100 font-medium"
+            >
+              Send an email
+              <ChatBubbleBottomCenterIcon className="w-4 h-4 ml-1" />
+            </Button>
+          </a>
+        </div>
+
         {/* Bottom Navigation */}
-        <div
-          className="mt-16 pt-8 border-t border-slate-200"
-        >
+        <div className="mt-26 pb-16 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
           <Link 
             href="/" 
-            className="inline-flex items-center px-1.5 py-1 bg-white font-mono font-medium rounded-md text-slate-600 text-sm hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
+            className="inline-flex items-center px-1.5 py-1 bg-slate-50 font-mono uppercase font-medium rounded-md text-slate-600 text-xs hover:text-slate-900 hover:bg-slate-100 transition-all duration-150"
           >
             <ChevronLeftIcon className="w-4 h-4 mr-1" />
             Back to Portfolio
           </Link>
         </div>
       </div>
+      
       
       {/* Focus Banner */}
       <FocusBanner />
