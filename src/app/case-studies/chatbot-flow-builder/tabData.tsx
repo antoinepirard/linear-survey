@@ -1,12 +1,14 @@
 import Image from 'next/image';
 import { TabItem } from '@/components/ui/tabs';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
-export const tabData: TabItem[] = [
-  {
-    id: 'nodes',
-    label: 'Node Design',
-    content: (
-      <>
+const NodeDesignContent = () => {
+  const [showAll, setShowAll] = useState(false);
+  
+  return (
+    <>
         {/* Node Evolution Image */}
         <div className="px-6 md:px-12 pt-6 md:pt-8 pb-4">
           <div className="relative">
@@ -37,7 +39,8 @@ export const tabData: TabItem[] = [
               
               <p className="text-slate-700 mb-4">Key tradeoffs and issues</p>
               
-              <div className="space-y-4">
+              <div className="relative">
+                <div className={`space-y-4 transition-all duration-300 ${!showAll ? 'max-h-80 overflow-hidden' : ''}`}>
                 <div className="bg-white border border-slate-100 rounded-lg p-6">
                   <h3 className="font-semibold text-slate-900 mb-2">Actions on Nodes vs Separated</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
@@ -65,12 +68,41 @@ export const tabData: TabItem[] = [
                     This is something I still remain unsatisfied with, but we had to decide what, if anything could be edited from the canvas in opposition to be edited in the sidebar. We had different paths, opening a sidebar, a popover over the node in the canvas, or direct inline node editing on the canvas. Of course editing on the node itself came with the issue of zoom levels. Editing in the sidebar was making you lose some context. So we ended up going for a mix, some key infos/high frequency actions could be taken from the canvas on the node itself, but the rest had to be done in the sidebar or popover.
                   </p>
                 </div>
+                </div>
+                
+                {/* Fade overlay when collapsed */}
+                {!showAll && (
+                  <div className="absolute bottom-0 left-0 right-0 h-50 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                )}
+                
+                {/* Expand/Collapse button */}
+                <div className="mt-4 flex justify-center relative z-10 bg-white pt-2">
+                  <button 
+                    onClick={() => setShowAll(!showAll)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                  >
+                    <span>{showAll ? 'Show less' : 'Show more'}</span>
+                    <motion.div
+                      animate={{ rotate: showAll ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronDownIcon className="w-4 h-4" />
+                    </motion.div>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </section>
       </>
-    )
+    );
+  };
+
+export const tabData: TabItem[] = [
+  {
+    id: 'nodes',
+    label: 'Node Design',
+    content: <NodeDesignContent />
   },
   {
     id: 'analytics',
