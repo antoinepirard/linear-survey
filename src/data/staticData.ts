@@ -1,31 +1,31 @@
 export const staticHighlights = [
   {
-    title: "Rasayel - Chatbot Flow Builder",
-    description: "Visual flow builder empowering teams to create sophisticated chatbot workflows without code",
+    title: "Chatbot Flow Builder",
+    description: "Building and iterating over Rasayel's chatbot flow builder.",
     category: "PROJECT",
     href: "/case-studies/chatbot-flow-builder"
   },
   {
-    title: "Rasayel - Fixing our Reports",
-    description: "Rebuilt reporting system from ground up to deliver reliable, actionable insights",
+    title: "Fixing Rasayel's Reports",
+    description: "Making Rasayel's reports reliable and useful.",
     category: "PROJECT",
     href: "/case-studies/fixing-our-reports"
   },
   {
-    title: "Rasayel - An Overview",
-    description: "Strategic design leadership transforming customer support platform",
+    title: "3 years of building Rasayel",
+    description: "An overview of the projects I worked on at Rasayel.",
     category: "PROJECT",
     href: "/case-studies/rasayel-big-picture"
   },
   {
     title: "GoVocal",
-    description: "Citizen participation platform",
+    description: "Building a Citizen participation platform.",
     category: "LINK",
     href: "https://govocal.com"
   },
   {
     title: "CentralApp",
-    description: "First product design role (2015-2016). Mostly UI/UX design.",
+    description: "Easy to setup online presence for local businesses.",
     category: "LINK",
     href: "https://www.centralapp.com/en"
   }
