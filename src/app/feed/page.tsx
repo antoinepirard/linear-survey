@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useEffect, useState, useCallback } from 'react';
 import { AnimationWrapper } from '@/hooks/useAnimation';
 import { feedImages, FeedImage } from '@/data/feed';
-import { preloadImageDimensions, ImageDimensions } from '@/utils/imageDimensions';
+import { preloadMediaDimensions, ImageDimensions } from '@/utils/imageDimensions';
 import HeaderSection from '@/components/HeaderSection';
 
 export default function Feed() {
@@ -13,8 +13,11 @@ export default function Feed() {
 
   useEffect(() => {
     const initializeImages = async () => {
-      const imageSources = feedImages.map(item => item.src);
-      const dimensions = await preloadImageDimensions(imageSources);
+      const mediaItems = feedImages.map(item => ({
+        src: item.src,
+        type: item.type || 'image'
+      }));
+      const dimensions = await preloadMediaDimensions(mediaItems);
       setImageDimensions(dimensions);
     };
 
@@ -42,7 +45,15 @@ export default function Feed() {
       };
     }
     
-    // Default square dimensions for images
+    // Default dimensions - 16:9 for videos, square for images
+    if (item.type === 'video') {
+      return {
+        width: 600,
+        height: 338, // 16:9 aspect ratio
+        aspectRatio: 16/9
+      };
+    }
+    
     return {
       width: 600,
       height: 600,
@@ -69,20 +80,37 @@ export default function Feed() {
           {feedImages.map((item, index) => (
             <AnimationWrapper key={item.id} delay={`${100 + index * 50}ms`}>
               <div className="masonry-column break-inside-avoid mb-6">
-                <div className="feed-image-container rounded overflow-hidden bg-slate-100">
-                  <div className={`transition-opacity duration-300 ${loadedImages.has(item.id) ? 'opacity-100' : 'opacity-0'}`}>
-                    <Image
-                      src={item.src}
-                      alt={item.name}
-                      width={getImageDimensions(item).width}
-                      height={getImageDimensions(item).height}
-                      className="w-full h-auto"
-                      priority={index < 3}
-                      onLoad={() => handleImageLoad(item.id)}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      placeholder="blur"
-                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                    />
+                <div className={`feed-image-container rounded overflow-hidden bg-slate-100 ${item.type === 'video' ? 'video-container' : ''}`}>
+                  <div className={`transition-opacity duration-300 ${loadedImages.has(item.id) || item.type === 'video' ? 'opacity-100' : 'opacity-0'}`}>
+                    {item.type === 'video' ? (
+                      <video
+                        src={item.src}
+                        className="w-full block"
+                        controls
+                        muted
+                        playsInline
+                        onLoadedMetadata={() => handleImageLoad(item.id)}
+                        onCanPlay={() => handleImageLoad(item.id)}
+                        preload="metadata"
+                        style={{
+                          aspectRatio: getImageDimensions(item).aspectRatio || 'auto',
+                          height: 'auto'
+                        }}
+                      />
+                    ) : (
+                      <Image
+                        src={item.src}
+                        alt={item.name}
+                        width={getImageDimensions(item).width}
+                        height={getImageDimensions(item).height}
+                        className="w-full h-auto"
+                        priority={index < 3}
+                        onLoad={() => handleImageLoad(item.id)}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                      />
+                    )}
                   </div>
                 </div>
                 <p className="text-slate-500 font-mono text-xs mt-3">{item.date}</p>

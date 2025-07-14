@@ -3,7 +3,7 @@ export interface FeedImage {
   src: string;
   name: string;
   date: string;
-  type?: 'image' | 'gif';
+  type?: 'image' | 'gif' | 'video';
   width?: number;
   height?: number;
 }
@@ -77,6 +77,19 @@ const rawFeedImages = [
     name: 'Microsfot Ads via Iconic Matter',
     date: '2016',
     type: 'gif' as const
+  },
+  // 2014 - Oldest videos
+  {
+    src: '/Assets/Images/feed/Showreel_2014.webm',
+    name: 'Showreel 2014',
+    date: '2014',
+    type: 'video' as const
+  },
+  {
+    src: '/Assets/Images/feed/Optician_Interview.webm',
+    name: 'Optician Interview',
+    date: '2014',
+    type: 'video' as const
   },
 ];
 

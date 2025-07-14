@@ -148,6 +148,23 @@ img {
   }
 }
 
+/* Override min-height for video containers */
+.feed-image-container.video-container {
+  min-height: auto !important;
+}
+
+@media (max-width: 640px) {
+  .feed-image-container.video-container {
+    min-height: auto !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .feed-image-container.video-container {
+    min-height: auto !important;
+  }
+}
+
 /* Animated color blocks border - decorative element */
 .color-border {
   position: relative;
