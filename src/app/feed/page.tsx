@@ -28,7 +28,7 @@ export default function Feed() {
     };
 
     initializeImages();
-  }, []);
+  }, [sortedFeedImages]);
 
   const handleImageLoad = useCallback((id: number) => {
     setLoadedImages(prev => new Set(prev).add(id));
