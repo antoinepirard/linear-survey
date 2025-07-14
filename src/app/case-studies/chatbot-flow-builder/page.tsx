@@ -92,7 +92,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
           muted
           loop
           playsInline
-          className="w-full h-auto rounded-md bg-slate-50 max-w-none md:max-w-[calc(996px*1.15)]"
+          className="w-full h-auto rounded-sm bg-slate-50 max-w-none md:max-w-[calc(996px*1.15)]"
         />
       </div>
 
