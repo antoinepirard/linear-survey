@@ -255,12 +255,12 @@ export default function ChatbotFlowBuilderCaseStudy() {
           <section className="border-t border-slate-100 p-6 md:p-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
               <div className="md:col-span-1">
-                <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Key Challenges</h2>
+                <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Core Challenges</h2>
               </div>
               <div className="md:col-span-2 space-y-6">
                 <div>
                   <p className="text-slate-700 leading-relaxed mb-4 md:mb-6">
-                    Building a flexible chatbot builder presented unique challenges that required careful balance between power and usability.
+                    As the only product person on this project while juggling multiple initiatives, effective prioritization became critical to our success. Customer expectations were high from day one—they were migrating from more mature competitors with extensive action libraries and robust fallback systems. We had to learn quickly and build solid foundations while managing time constraints.
                   </p>
                 </div>
                 
@@ -268,14 +268,21 @@ export default function ChatbotFlowBuilderCaseStudy() {
                   <div className="bg-slate-50 rounded-md p-4">
                     <h3 className="font-semibold text-slate-900 mb-2">Feature Prioritization</h3>
                     <p className="text-slate-700 text-sm leading-relaxed">
-                      Flexibility enabled many use cases, but after core features, research time often exceeded implementation. We bet on high-impact additions serving most customers.
+                      Early prioritization was straightforward—we had nothing, so building the basics was clear. Complexity emerged when deciding on use case-specific features like smart capture nodes for sales qualification, while our ICP was broadly &quot;every business using WhatsApp.&quot; This friction sparked conversations that ultimately helped us refine our customer focus.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-slate-50 rounded-md p-4">
+                    <h3 className="font-semibold text-slate-900 mb-2">Simplicity vs Power</h3>
+                    <p className="text-slate-700 text-sm leading-relaxed">
+                      We constantly debated whether to keep things simple by blocking certain use cases (like restricting action nodes to only follow message nodes) or accept slightly more complexity to enable broader functionality. This balance shaped every design decision.
                     </p>
                   </div>
                   
                   <div className="bg-slate-50 rounded-md p-4">
                     <h3 className="font-semibold text-slate-900 mb-2">Flexibility vs. Opinionated Design</h3>
                     <p className="text-slate-700 text-sm leading-relaxed">
-                      Balanced defaults (e.g., customizable fallbacks) with extensibility. This tension required constant iteration to maintain usability without overwhelming users.
+                      Balanced defaults (e.g., customizable fallbacks) with extensibility. For example, we initially restricted node positioning to ensure readability, but learned that as flows became complex, users needed flexibility to organize their layouts. This tension required constant iteration to maintain usability without overwhelming users.
                     </p>
                   </div>
                 </div>
