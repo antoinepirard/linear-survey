@@ -143,7 +143,7 @@ const AnalyticsContent = () => {
                 </div>
                 
                 <div className="bg-white border border-slate-100 rounded-lg p-6">
-                  <h3 className="font-semibold text-slate-900 mb-2">Relative vs Absolute Numbers</h3>
+                  <h3 className="font-semibold text-slate-900 mb-2">Relativity</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
                     Numbers could be relative to either the total amount of users who entered the flow or relative to the node before. Since flows can be very flexible and complex, we needed to be explicit about our choice. We decided to provide both perspectives but defaulted to showing relative to flow entry, as this gave users the clearest picture of overall conversion performance.
                   </p>
