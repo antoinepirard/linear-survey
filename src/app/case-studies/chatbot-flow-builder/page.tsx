@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeftIcon, LinkIcon, ChevronDownIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, LinkIcon, ChevronDownIcon, ChatBubbleBottomCenterIcon, ArrowTrendingUpIcon, LightBulbIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Tabs } from '@/components/ui/tabs';
 import Image from 'next/image';
@@ -156,6 +156,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
                           <p className="text-slate-700 text-sm leading-relaxed">
                             At the time, we were doing weekly interviews with customers. Combined with competitor analysis (ManyChat, Chatbot.com, Bird.com) we identified quickly the core problems. To give us a better understanding of the complexity and depht (e.g. fallbacks, conditions, etc.) we also collaborated with some support automation builder agencies to give us pointers.
                           </p>
+                          <p className="text-slate-700 text-sm leading-relaxed">As the product was being built, most or our feedback came from getting close to customers via our Slack Connect channels and our support team. For each bigger feature, I jumped onto calls with key ICP customers to dig deeper into their use cases and test our solutions.</p>
                         </div>
                       </motion.div>
                     )}
@@ -329,12 +330,14 @@ export default function ChatbotFlowBuilderCaseStudy() {
           <section className="p-6 md:p-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
               <div>
+                <ArrowTrendingUpIcon className="w-6 h-6 text-slate-300 mb-3" />
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Growth</h3>
                 <p className="text-slate-700 leading-relaxed">
                   The chatbot builder became a core differentiator for Rasayel, allowing us to close deals with customers using other platforms like WATI, Respond.io etc. It fueled our growth from 0$ to 65k$ in MRR, adding to our key differentiator like the quality of our inbox, and the depht of our CRM integrations. While there are many things I would want to do next, I am proud of the product&apos;s impact on the business and customers, especially accounting for the very limited resources we had.
                 </p>
               </div>
               <div>
+                <LightBulbIcon className="w-6 h-6 text-slate-300 mb-3" />
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Learnings</h3>
                 <p className="text-slate-700 leading-relaxed">
                   One of my key learnings on this project is that being opinionated too early can limit the use cases of the product, prematurely limiting the product&apos;s potential and learning opportunities. My second regret is that I didn&apos;t collaborate with our CS team sufficiently to have a champion in the company to continually iterate on our own chatbot flows. Instead, I did take the lead myself in building them did put myself at risks of falling for my own biases. Lastly, I wish I had spent more time in the code myself tweaking small details of the UX for high frequency actions instead of relying on rigid handovers.

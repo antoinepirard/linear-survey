@@ -79,7 +79,7 @@ const NodeDesignContent = () => {
                 <div className="mt-4 flex justify-center relative z-10 bg-white pt-2">
                   <button 
                     onClick={() => setShowAll(!showAll)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                    className="flex items-center rounded gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
                   >
                     <span>{showAll ? 'Show less' : 'Show more'}</span>
                     <motion.div
