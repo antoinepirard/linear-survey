@@ -27,15 +27,15 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
       const level = parseInt(heading.tagName.charAt(1));
       const title = heading.textContent || '';
       
-      // Skip the main title (first h1)
+      // Skip the main title (first h1) - this is typically the page title
+      // But include other h1s like "Deep Dive" and "Outcome"
       if (level === 1 && index === 0) return;
       
       // Skip headings that are inside tab content only
       const isInsideTabContent = heading.closest('[role="tabpanel"]');
       if (isInsideTabContent) return;
       
-      // Skip the specific "Deep Dive" heading since we create our own entry with tabs
-      if (title === 'Deep Dive' && heading.closest('#deep-dive-section')) return;
+      // Don't skip Deep Dive heading anymore - let it appear in natural order
       
       // Create ID if it doesn't exist
       let id = heading.id;
@@ -65,40 +65,37 @@ export default function TableOfContents({ className = '' }: TableOfContentsProps
       });
     });
 
-    // Add tab navigation items for deep dive sections
+    // Add tab navigation items as subsections under Deep Dive
     const tabButtons = document.querySelectorAll('[role="tab"]');
     if (tabButtons.length > 0) {
-      // Add "Deep Dive" as a parent section
-      const deepDiveId = 'deep-dive-section';
-      if (!usedIds.has(deepDiveId)) {
-        items.push({
-          id: deepDiveId,
-          title: 'Deep Dive',
-          level: 2
-        });
-        usedIds.add(deepDiveId);
-      }
-
-      // Add each tab as a subsection
-      tabButtons.forEach((tab) => {
-        const tabText = tab.textContent?.trim() || '';
-        if (tabText) {
-          const baseId = `tab-${tabText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')}`;
-          let tabId = baseId;
-          let counter = 1;
-          while (usedIds.has(tabId)) {
-            tabId = `${baseId}-${counter}`;
-            counter++;
+      // Find the Deep Dive item in the natural order
+      const deepDiveIndex = items.findIndex(item => item.title === 'Deep Dive');
+      if (deepDiveIndex !== -1) {
+        // Insert tab items after Deep Dive
+        const tabItems: TocItem[] = [];
+        tabButtons.forEach((tab) => {
+          const tabText = tab.textContent?.trim() || '';
+          if (tabText) {
+            const baseId = `tab-${tabText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')}`;
+            let tabId = baseId;
+            let counter = 1;
+            while (usedIds.has(tabId)) {
+              tabId = `${baseId}-${counter}`;
+              counter++;
+            }
+            
+            usedIds.add(tabId);
+            tabItems.push({
+              id: tabId,
+              title: tabText,
+              level: 3 // Make tabs level 3 since Deep Dive is level 2
+            });
           }
-          
-          usedIds.add(tabId);
-          items.push({
-            id: tabId,
-            title: tabText,
-            level: 3
-          });
-        }
-      });
+        });
+        
+        // Insert tab items after Deep Dive
+        items.splice(deepDiveIndex + 1, 0, ...tabItems);
+      }
     }
 
     setTocItems(items);

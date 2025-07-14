@@ -134,7 +134,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
                   onClick={() => setShowRequirements(!showRequirements)}
                 >
                   <div className="flex items-center justify-between w-full">
-                    <h4 className="text-base font-medium text-slate-900">How we got there?</h4>
+                    <h3 className="text-base font-medium text-slate-900">How we got there?</h3>
                     <motion.div
                       animate={{ rotate: showRequirements ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
@@ -309,6 +309,58 @@ export default function ChatbotFlowBuilderCaseStudy() {
             tabs={tabData} 
             defaultTab="nodes"
           />
+        </div>
+
+        {/* Outcome Section */}
+        <div className="mt-16 md:mt-26 mb-6 md:mb-8 text-center">
+          <div className="inline-block group border border-dashed border-slate-300 hover:border-slate-400 transition-all duration-200 p-4 md:p-6 relative">
+            {/* Corner squares - visual indicators only */}
+            <div className="absolute -top-1 -left-1 w-2 h-2 bg-slate-300 group-hover:bg-slate-400 transition-colors duration-200 pointer-events-none"></div>
+            <div className="absolute -top-1 -right-1 w-2 h-2 bg-slate-300 group-hover:bg-slate-400 transition-colors duration-200 pointer-events-none"></div>
+            <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-slate-300 group-hover:bg-slate-400 transition-colors duration-200 pointer-events-none"></div>
+            <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-slate-300 group-hover:bg-slate-400 transition-colors duration-200 pointer-events-none"></div>
+            <h2 className="text-4xl md:text-6xl font-medium text-slate-900 tracking-tight">
+              Outcome
+            </h2>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-md ring-1 ring-slate-300/20 shadow-xl overflow-hidden">
+          <section className="p-6 md:p-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Growth</h3>
+                <p className="text-slate-700 leading-relaxed">
+                  The chatbot builder became a core differentiator for Rasayel, allowing us to close deals with customers using other platforms like WATI, Respond.io etc. It fueled our growth from 0$ to 65k$ in MRR, adding to our key differentiator like the quality of our inbox, and the depht of our CRM integrations. While there are many things I would want to do next, I am proud of the product&apos;s impact on the business and customers, especially accounting for the very limited resources we had.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Learnings</h3>
+                <p className="text-slate-700 leading-relaxed">
+                  One of my key learnings on this project is that being opinionated too early can limit the use cases of the product, prematurely limiting the product&apos;s potential and learning opportunities. My second regret is that I didn&apos;t collaborate with our CS team sufficiently to have a champion in the company to continually iterate on our own chatbot flows. Instead, I did take the lead myself in building them did put myself at risks of falling for my own biases. Lastly, I wish I had spent more time in the code myself tweaking small details of the UX for high frequency actions instead of relying on rigid handovers.
+                </p>
+              </div>
+            </div>
+          </section>
+          
+          {/* Credits Footer */}
+          <footer className="border-t border-slate-100 p-6 md:p-12 text-center">
+          <p className="text-xs text-slate-900 mb-1">
+              Thanks to my colleagues:
+            </p>
+            <p className="text-xs text-slate-600">
+              <a href="https://x.com/logaretm" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">
+                Abdelrahman Awad
+              </a>
+              , <a href="https://jonnyom.me/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">
+                Jonny O&apos;Mahonny
+              </a>
+              , <a href="https://www.linkedin.com/in/tarek-khalil-wa/" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">
+                Tarek Khalil
+              </a>
+              , Nasser Hesham, Youssef Walid, and the rest of our engineering team.
+            </p>
+          </footer>
         </div>
 
         {/* Bottom Navigation */}

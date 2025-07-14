@@ -28,7 +28,7 @@ const NodeDesignContent = () => {
         <section className="p-6 md:p-12 pt-6 md:pt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-16">
             <div className="md:col-span-1">
-              <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Node Design</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3 md:mb-4">Node Design</h2>
             </div>
             <div className="md:col-span-2 space-y-6">
               <div>
@@ -111,7 +111,7 @@ export const tabData: TabItem[] = [
       <section className="p-6 md:p-12 pt-6 md:pt-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
           <div className="md:col-span-1">
-            <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Analytics</h2>
+            <h2 className="text-lg font-semibold text-slate-900 mb-3 md:mb-4">Analytics</h2>
           </div>
           <div className="md:col-span-2 space-y-6">
             <div>
@@ -147,7 +147,7 @@ export const tabData: TabItem[] = [
       <section className="p-6 md:p-12 pt-6 md:pt-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
           <div className="md:col-span-1">
-            <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Canvas</h2>
+            <h2 className="text-lg font-semibold text-slate-900 mb-3 md:mb-4">Canvas</h2>
           </div>
           <div className="md:col-span-2 space-y-6">
             <div>
@@ -183,7 +183,7 @@ export const tabData: TabItem[] = [
       <section className="p-6 md:p-12 pt-6 md:pt-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
           <div className="md:col-span-1">
-            <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Fallbacks</h2>
+            <h2 className="text-lg font-semibold text-slate-900 mb-3 md:mb-4">Fallbacks</h2>
           </div>
           <div className="md:col-span-2 space-y-6">
             <div>
