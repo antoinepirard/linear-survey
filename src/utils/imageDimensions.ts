@@ -71,7 +71,8 @@ export const preloadMediaDimensions = async (media: Array<{src: string, type?: '
   await Promise.allSettled(
     media.map(async (item) => {
       try {
-        const dims = await getMediaDimensions(item.src, item.type);
+        // Treat all items as images since videos now use thumbnail images
+        const dims = await getImageDimensions(item.src);
         dimensions[item.src] = dims;
       } catch (error) {
         console.error(`Failed to get dimensions for ${item.src}:`, error);

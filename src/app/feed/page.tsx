@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { PlayIcon } from '@heroicons/react/24/solid';
 import { AnimationWrapper } from '@/hooks/useAnimation';
-import VideoPlayer from '@/components/VideoPlayer';
 import { feedImages, FeedImage } from '@/data/feed';
 import { preloadMediaDimensions, ImageDimensions } from '@/utils/imageDimensions';
 import HeaderSection from '@/components/HeaderSection';
@@ -52,12 +52,12 @@ export default function Feed() {
       };
     }
     
-    // Default dimensions - 16:9 for videos, square for images
+    // Default dimensions - adjust for video vs other items
     if (item.type === 'video') {
       return {
         width: 600,
-        height: 338, // 16:9 aspect ratio
-        aspectRatio: 16/9
+        height: 400, // 3:2 aspect ratio for videos
+        aspectRatio: 3/2
       };
     }
     
@@ -117,35 +117,34 @@ export default function Feed() {
                 return (
                   <AnimationWrapper key={item.id} delay={`${100 + globalIndex * 50}ms`}>
                     <div className="masonry-column break-inside-avoid">
-                      <div className={`feed-image-container rounded overflow-hidden bg-slate-100 ${item.type === 'video' ? 'video-container' : ''}`}>
-                        <div className={`transition-opacity duration-300 ${loadedImages.has(item.id) || item.type === 'video' ? 'opacity-100' : 'opacity-0'}`}>
-                          {item.type === 'video' ? (
-                            <div style={{
-                              aspectRatio: getImageDimensions(item).aspectRatio || 'auto',
-                              height: 'auto'
-                            }}>
-                              <VideoPlayer
-                                src={item.src}
-                                className="w-full block"
-                                enableLazyLoading={true}
-                                poster={item.poster}
-                              />
-                            </div>
-                          ) : (
-                            <Image
-                              src={item.src}
-                              alt={item.name}
-                              width={getImageDimensions(item).width}
-                              height={getImageDimensions(item).height}
-                              className="w-full h-auto"
-                              priority={globalIndex < 3}
-                              onLoad={() => handleImageLoad(item.id)}
-                              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                              placeholder="blur"
-                              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                            />
-                          )}
+                      <div className={`feed-image-container rounded overflow-hidden bg-slate-100 relative ${item.type === 'video' ? 'video-container' : ''}`}>
+                        <div className={`transition-opacity duration-300 ${loadedImages.has(item.id) ? 'opacity-100' : 'opacity-0'}`}>
+                          <Image
+                            src={item.src}
+                            alt={item.name}
+                            width={getImageDimensions(item).width}
+                            height={getImageDimensions(item).height}
+                            className="w-full h-auto"
+                            priority={globalIndex < 3}
+                            onLoad={() => handleImageLoad(item.id)}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            placeholder="blur"
+                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                          />
                         </div>
+                        
+                        {/* Video icon overlay */}
+                        {item.type === 'video' && (
+                          <a 
+                            href={item.videoUrl || item.src} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="absolute top-3 right-3 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 transition-colors"
+                            title="Watch video"
+                          >
+                            <PlayIcon className="w-4 h-4" />
+                          </a>
+                        )}
                       </div>
                       <p className="text-slate-500 font-mono text-xs mt-3">{item.date}</p>
                       <h3 className="text-slate-700 font-medium text-sm mt-1">{item.name}</h3>

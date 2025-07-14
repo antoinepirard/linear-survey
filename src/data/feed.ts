@@ -6,7 +6,7 @@ export interface FeedImage {
   type?: 'image' | 'gif' | 'video';
   width?: number;
   height?: number;
-  poster?: string;
+  videoUrl?: string;
 }
 
 const rawFeedImages = [
@@ -81,16 +81,18 @@ const rawFeedImages = [
   },
   // 2014 - Oldest videos
   {
-    src: '/Assets/Images/feed/Showreel_2014.webm',
+    src: '/Assets/Images/feed/thumbnail-video-showreel.png',
     name: 'Showreel 2014',
     date: '2014',
-    type: 'video' as const
+    type: 'video' as const,
+    videoUrl: '/Assets/Images/feed/Showreel_2014.webm'
   },
   {
-    src: '/Assets/Images/feed/Optician_Interview.webm',
+    src: '/Assets/Images/feed/thumbnail-video-optician.png',
     name: 'Optician Interview (French) for CentralApp',
     date: '2015',
-    type: 'video' as const
+    type: 'video' as const,
+    videoUrl: '/Assets/Images/feed/Optician_Interview.webm'
   },
 ];
 
