@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeftIcon, LinkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Tabs } from '@/components/ui/tabs';
+import Image from 'next/image';
 import { FancyHeader } from '@/components/FancyHeader';
 import { toast } from 'sonner';
 import { tabData } from './tabData';
@@ -187,27 +188,9 @@ export default function ChatbotFlowBuilderCaseStudy() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900 mb-2">V1: Proof of Concept</h3>
-                      <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                        Focused on basics to validate viability. Limited scope to test core feasibility.
+                      <p className="text-slate-600 text-sm leading-relaxed">
+                        We started with the basics to validate viability. The first version was intentionally limited in scope to test core feasibility. We focused on inbound triggers with simple conditions, worked within WhatsApp&apos;s 24-hour messaging window, and built basic tagging and status changes. The canvas used an opinionated layout that later proved limiting as flows grew more complex.
                       </p>
-                      <ul className="space-y-2 text-slate-600 text-sm">
-                        <li className="flex items-start">
-                          <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <span><strong>Triggers:</strong> Inbound only, simple conditions</span>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <span><strong>Messages:</strong> 24-hour window limitation</span>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <span><strong>Actions:</strong> Basic tagging and status changes</span>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                          <span><strong>Canvas:</strong> Opinionated layout (later proved limiting)</span>
-                        </li>
-                      </ul>
                     </div>
                   </div>
                   
@@ -247,6 +230,23 @@ export default function ChatbotFlowBuilderCaseStudy() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            
+            {/* Feedback Image - Full width */}
+            <div className="mt-24 px-6 md:px-12 -mb-6 md:-mb-12">
+              <p className="text-xs font-mono text-slate-500 mb-12 text-center">
+                Thanks to customers who challenged each iterations.
+              </p>
+              <div className="relative">
+                <Image
+                  src="/case-studies/chatbot/feedback-recieved (1).png"
+                  alt="Customer feedback received"
+                  width={1200}
+                  height={600}
+                  className="w-full h-auto"
+                />
+                <div className="absolute bottom-0 left-0 right-0 h-68 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
               </div>
             </div>
           </section>
