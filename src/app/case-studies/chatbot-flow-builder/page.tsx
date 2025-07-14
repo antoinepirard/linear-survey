@@ -73,7 +73,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <FancyHeader
           dateRange="2023 - 2024"
           title="A Chatbot Builder for the WhatsApp Business API"
-          description="Led the design and iteration of a chatbot builder tool integrated with the WhatsApp Business API to enable automated interactions and scale conversations efficiently."
+          description="Led the product design of Rasayel's chatbot builder, integrated and optimised for the WhatsApp Business API to enable automated interactions and scale conversations efficiently."
         />
       </div>
 
@@ -104,14 +104,11 @@ export default function ChatbotFlowBuilderCaseStudy() {
             <div className="mb-8">
               <h2 className="text-xl font-semibold text-slate-900 mb-3 md:mb-4">Role and Context</h2>
               <p   className="text-slate-700 leading-relaxed">
-                As a Product Designer, I was responsible for the design and iteration of a chatbot builder tool integrated with the WhatsApp Business API to enable automated interactions and scale conversations efficiently.
-              </p>
-              <p className="text-slate-700 leading-relaxed">
-                In this case study, I&apos;ll outline key product decisions, design challenges, and how we iterated from proof of concept to a robust automation tool.
+                As product designer, I was responsible for identifying problems, prioritiszing them with our CEO, and scoping the solutions in a manner that would deliver value incrementally so we could validate our assumptions. I iterated on our chatbot builder for the WhatsApp Business API over 2 years.
               </p>
 
               <p className="text-slate-700 leading-relaxed">
-                The project started as an experiment, to validate the identified demand of automating WhatsApp conversations with a chatbot builder tool. At the time, we didn&apos;t have a clear ICP (Initial Customer Profile). The chatbot ultimaely became a key USP (Unique Selling Proposition) for our platform and we iterated on it for 2.5 years.
+                The project started as an experiment, to validate the identified demand of automating WhatsApp conversations with a chatbot builder tool. The chatbot ultimaely became a core USP for our platform and we iterated on it for over 2 years.
               </p>
             </div>
           </section>
@@ -125,26 +122,26 @@ export default function ChatbotFlowBuilderCaseStudy() {
               <div className="md:col-span-2 space-y-6">
                 <div>
                   <p className="text-slate-700 text-base leading-relaxed mb-3 md:mb-4">
-                    Chatbots address diverse jobs-to-be-done (JTBD). Conversations vary by goal—lead qualification, data collection, basic support, or integrated workflows. This required a flexible yet intuitive builder.
+                    Understanding the problem was a challenge initially since chatbots address diverse jobs-to-be-done. Conversations vary from use case to use case (from qualification to basic support FAQ). This required us to find patterns of needs from our customers that we could map to a system.
                   </p>
                   <p className="text-slate-700 leading-relaxed">
                     We prioritized support use cases initially (pre-pivot to sales-focused ICP) to focus efforts and validate the core functionality before expanding to broader use cases.
                   </p>
                 </div>
                 
-                <div className="bg-slate-50 rounded-md p-4 cursor-pointer">
-                  <button 
-                    onClick={() => setShowRequirements(!showRequirements)}
-                    className="flex items-center justify-between w-full text-left cursor-pointer"
-                  >
-                    <h4  className="text-base font-medium text-slate-900 cursor-pointer">How we got there?</h4>
+                <div 
+                  className="bg-slate-50 rounded-md p-4 cursor-pointer"
+                  onClick={() => setShowRequirements(!showRequirements)}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <h4 className="text-base font-medium text-slate-900">How we got there?</h4>
                     <motion.div
                       animate={{ rotate: showRequirements ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
                     >
                       <ChevronDownIcon className="w-4 h-4 text-slate-500" />
                     </motion.div>
-                  </button>
+                  </div>
                   
                   <AnimatePresence>
                     {showRequirements && (
@@ -187,7 +184,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
                       <span className="text-sm font-medium text-white">1</span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900 mb-2">V1: Proof of Concept</h3>
+                      <h3 className="font-semibold text-slate-900 mb-2">Proof of Concept</h3>
                       <p className="text-slate-600 text-sm leading-relaxed">
                         We started with the basics to validate viability. The first version was intentionally limited in scope to test core feasibility. We focused on inbound triggers with simple conditions, worked within WhatsApp&apos;s 24-hour messaging window, and built basic tagging and status changes. The canvas used an opinionated layout that later proved limiting as flows grew more complex.
                       </p>
@@ -199,9 +196,9 @@ export default function ChatbotFlowBuilderCaseStudy() {
                       <span className="text-sm font-medium text-white">2</span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900 mb-2">V2: Expanded Capabilities</h3>
+                      <h3 className="font-semibold text-slate-900 mb-2">Use cases expansion</h3>
                       <p className="text-slate-600 text-sm leading-relaxed">
-                        Expanded nodes for broader use cases. Added HTTP request node to integrate external systems, prioritizing quantity over polish to validate market demand.
+                        We added more nodes to increase the number of use cases we could cover. Added HTTP request node to integrate external systems, prioritizing shipping new nodes over polish to validate market fit.
                       </p>
                     </div>
                   </div>
@@ -211,7 +208,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
                       <span className="text-sm font-medium text-white">3</span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900 mb-2">V3: Enhanced Usability</h3>
+                      <h3 className="font-semibold text-slate-900 mb-2">Enhanced Usability</h3>
                       <p className="text-slate-600 text-sm leading-relaxed">
                         Emphasized usability for complex flows. Rebuilt canvas with undo/redo, drag-and-drop, zoom, and performance optimizations to handle large bots smoothly.
                       </p>
@@ -223,7 +220,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
                       <span className="text-sm font-medium text-white">4</span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900 mb-2">V4: Polish and Intelligence</h3>
+                      <h3 className="font-semibold text-slate-900 mb-2">Polish and Intelligence</h3>
                       <p className="text-slate-600 text-sm leading-relaxed">
                         Polished interactions, added analytics (CTR tracking), CRM integrations, and AI features: nodes for info collection, intent detection, and basic AI agents.
                       </p>
