@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { AnimationWrapper } from '@/hooks/useAnimation';
+import VideoPlayer from '@/components/VideoPlayer';
 import { feedImages, FeedImage } from '@/data/feed';
 import { preloadMediaDimensions, ImageDimensions } from '@/utils/imageDimensions';
 import HeaderSection from '@/components/HeaderSection';
@@ -119,20 +120,17 @@ export default function Feed() {
                       <div className={`feed-image-container rounded overflow-hidden bg-slate-100 ${item.type === 'video' ? 'video-container' : ''}`}>
                         <div className={`transition-opacity duration-300 ${loadedImages.has(item.id) || item.type === 'video' ? 'opacity-100' : 'opacity-0'}`}>
                           {item.type === 'video' ? (
-                            <video
-                              src={item.src}
-                              className="w-full block"
-                              controls
-                              muted
-                              playsInline
-                              onLoadedMetadata={() => handleImageLoad(item.id)}
-                              onCanPlay={() => handleImageLoad(item.id)}
-                              preload="metadata"
-                              style={{
-                                aspectRatio: getImageDimensions(item).aspectRatio || 'auto',
-                                height: 'auto'
-                              }}
-                            />
+                            <div style={{
+                              aspectRatio: getImageDimensions(item).aspectRatio || 'auto',
+                              height: 'auto'
+                            }}>
+                              <VideoPlayer
+                                src={item.src}
+                                className="w-full block"
+                                enableLazyLoading={true}
+                                poster={item.poster}
+                              />
+                            </div>
                           ) : (
                             <Image
                               src={item.src}

@@ -6,6 +6,7 @@ export interface FeedImage {
   type?: 'image' | 'gif' | 'video';
   width?: number;
   height?: number;
+  poster?: string;
 }
 
 const rawFeedImages = [
