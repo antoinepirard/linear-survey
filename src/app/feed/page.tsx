@@ -5,12 +5,12 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { PlayIcon } from '@heroicons/react/24/solid';
 import { AnimationWrapper } from '@/hooks/useAnimation';
 import { feedImages, FeedImage } from '@/data/feed';
-import { preloadMediaDimensions, ImageDimensions } from '@/utils/imageDimensions';
+import { ImageDimensions } from '@/utils/imageDimensions';
 import HeaderSection from '@/components/HeaderSection';
 
 export default function Feed() {
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
-  const [imageDimensions, setImageDimensions] = useState<Record<string, ImageDimensions>>({});
+  const [imageDimensions] = useState<Record<string, ImageDimensions>>({});
   
   const sortedFeedImages = [...feedImages].sort((a, b) => {
     const yearA = parseInt(a.date);
