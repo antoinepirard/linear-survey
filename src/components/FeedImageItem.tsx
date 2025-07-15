@@ -19,9 +19,10 @@ export default function FeedImageItem({ item, priority = false }: FeedImageItemP
 
   // Get default dimensions from feed data or fallback
   const getDefaultDimensions = useCallback(() => {
-    // Base width should be appropriate for the column width
-    // 7xl max width (1280px) / 3 columns - gaps and padding ≈ 400px
-    const maxColumnWidth = 400;
+    // Calculate responsive column width
+    // Desktop: (1280px - 48px padding - 48px gaps) / 3 = ~395px
+    // But use conservative 350px to account for any additional spacing
+    const maxColumnWidth = 350;
     
     if (item.width && item.height) {
       const aspectRatio = item.width / item.height;
@@ -48,8 +49,8 @@ export default function FeedImageItem({ item, priority = false }: FeedImageItemP
 
   // Use precise dimensions if available, otherwise use defaults
   const displayDimensions = dimensions ? {
-    width: Math.min(400, dimensions.width),
-    height: Math.round(Math.min(400, dimensions.width) / (dimensions.width / dimensions.height)),
+    width: Math.min(350, dimensions.width),
+    height: Math.round(Math.min(350, dimensions.width) / (dimensions.width / dimensions.height)),
   } : getDefaultDimensions();
 
   const handleImageLoad = useCallback(() => {
@@ -57,17 +58,20 @@ export default function FeedImageItem({ item, priority = false }: FeedImageItemP
   }, []);
 
   return (
-    <div ref={ref} className="masonry-column break-inside-avoid">
-      <div className={`feed-image-container rounded overflow-hidden bg-slate-100 relative max-w-full ${
-        item.type === 'video' ? 'video-container' : ''
-      }`}>
+    <div ref={ref} className="masonry-column break-inside-avoid max-w-full">
+      <div 
+        className={`feed-image-container rounded overflow-hidden bg-slate-100 relative max-w-full ${
+          item.type === 'video' ? 'video-container' : ''
+        }`}
+        style={{ maxWidth: '100%', width: '100%' }}
+      >
         {/* Skeleton placeholder */}
         {!isLoaded && (
           <div 
-            className="bg-slate-200 animate-pulse relative overflow-hidden"
+            className="bg-slate-200 animate-pulse relative overflow-hidden w-full"
             style={{
-              width: displayDimensions.width,
-              height: displayDimensions.height,
+              aspectRatio: `${displayDimensions.width} / ${displayDimensions.height}`,
+              maxWidth: '100%',
             }}
           >
             {/* Shimmer effect */}
@@ -91,8 +95,8 @@ export default function FeedImageItem({ item, priority = false }: FeedImageItemP
             alt={item.name}
             width={displayDimensions.width}
             height={displayDimensions.height}
-            className="w-full h-auto max-w-full"
-            style={{ maxWidth: '100%' }}
+            className="w-full h-auto"
+            style={{ maxWidth: '100%', height: 'auto' }}
             priority={priority}
             onLoad={handleImageLoad}
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"

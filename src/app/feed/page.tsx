@@ -17,8 +17,8 @@ export default function Feed() {
 
 
   const getDefaultDimensions = useCallback((item: FeedImage) => {
-    // Base width should match the column width
-    const maxColumnWidth = 400;
+    // Base width should match the column width  
+    const maxColumnWidth = 350;
     
     // Use feed data dimensions if available
     if (item.width && item.height) {
