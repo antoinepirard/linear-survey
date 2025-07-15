@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeftIcon, LinkIcon, ChevronDownIcon, ChatBubbleBottomCenterIcon, ArrowTrendingUpIcon, LightBulbIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, LinkIcon, ChevronDownIcon, ArrowTrendingUpIcon, LightBulbIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Tabs } from '@/components/ui/tabs';
 import Image from 'next/image';
