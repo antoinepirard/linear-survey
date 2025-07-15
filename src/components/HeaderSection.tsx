@@ -2,11 +2,15 @@ import { AnimationWrapper } from '@/hooks/useAnimation';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { useEffect, useState, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
+import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import Navigation from './Navigation';
 
 export default function HeaderSection() {
   const { scrollY } = useScroll();
   const [isMobile, setIsMobile] = useState(false);
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
 
   const checkMobile = useCallback(() => {
     setIsMobile(window.innerWidth < 640);
@@ -44,12 +48,41 @@ export default function HeaderSection() {
         <AnimationWrapper delay="0ms" className="pt-9">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0">
             <div>
-              <h1 className="text-base font-semibold text-slate-900">
-                Antoine Pirard
-              </h1>
-              <p className="text-base font-normal text-slate-600">
-                Product designer
-              </p>
+              {isHomePage ? (
+                <div className="inline-block -mx-2 -my-1 px-2 py-1">
+                  <div className="relative h-10 flex flex-col justify-center">
+                    <div>
+                      <h1 className="text-base font-semibold text-slate-900 leading-tight">
+                        Antoine Pirard
+                      </h1>
+                      <p className="text-base font-normal text-slate-600 leading-tight">
+                        Product designer
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link href="/" className="inline-block group -mx-2 -my-1 px-2 py-1 rounded-md hover:bg-slate-50 transition-all duration-200 cursor-pointer">
+                  <div className="relative h-10 overflow-hidden flex flex-col justify-center">
+                    <div className="group-hover:-translate-y-3 group-hover:opacity-0 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]">
+                      <h1 className="text-base font-semibold text-slate-900 leading-tight">
+                        Antoine Pirard
+                      </h1>
+                      <p className="text-base font-normal text-slate-600 leading-tight">
+                        Product designer
+                      </p>
+                    </div>
+                    <div className="absolute inset-y-0 left-2 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center">
+                      <div className="flex items-center">
+                        <ChevronLeftIcon className="w-3 h-3 text-slate-900 mr-1" />
+                        <p className="text-sm font-medium text-slate-900">
+                          Back to home
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              )}
             </div>
             <Navigation className="flex-shrink-0" />
           </div>
