@@ -62,26 +62,53 @@ export default function HeaderSection() {
                   </div>
                 </div>
               ) : (
-                <Link href="/" className="inline-block group -mx-2 -my-1 px-2 py-1 rounded-md hover:bg-slate-50 transition-all duration-200 cursor-pointer">
-                  <div className="relative h-10 overflow-hidden flex flex-col justify-center">
-                    <div className="group-hover:-translate-y-3 group-hover:opacity-0 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]">
-                      <h1 className="text-base font-semibold text-slate-900 leading-tight">
-                        Antoine Pirard
-                      </h1>
-                      <p className="text-base font-normal text-slate-600 leading-tight">
-                        Product designer
-                      </p>
-                    </div>
-                    <div className="absolute inset-y-0 left-2 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center">
-                      <div className="flex items-center">
-                        <ChevronLeftIcon className="w-3 h-3 text-slate-900 mr-1" />
-                        <p className="text-sm font-medium text-slate-900">
-                          Back to home
+                <motion.div
+                  className="inline-block -mx-2 -my-1 px-2 py-1 rounded-md cursor-pointer"
+                  initial="rest"
+                  whileHover="hover"
+                  animate="rest"
+                >
+                  <Link href="/">
+                    <motion.div 
+                      className="relative h-10 overflow-hidden flex flex-col justify-center rounded-md"
+                      variants={{
+                        rest: { backgroundColor: 'rgb(248 250 252 / 0)' },
+                        hover: { backgroundColor: 'rgb(248 250 252 / 1)' }
+                      }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <motion.div
+                        variants={{
+                          rest: { y: 0, opacity: 1 },
+                          hover: { y: -12, opacity: 0 }
+                        }}
+                        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                      >
+                        <h1 className="text-base font-semibold text-slate-900 leading-tight">
+                          Antoine Pirard
+                        </h1>
+                        <p className="text-base font-normal text-slate-600 leading-tight">
+                          Product designer
                         </p>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+                      </motion.div>
+                      <motion.div 
+                        className="absolute inset-y-0 left-2 flex items-center"
+                        variants={{
+                          rest: { y: 12, opacity: 0 },
+                          hover: { y: 0, opacity: 1 }
+                        }}
+                        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                      >
+                        <div className="flex items-center">
+                          <ChevronLeftIcon className="w-3 h-3 text-slate-900 mr-1" />
+                          <p className="text-sm font-medium text-slate-900">
+                            Back to home
+                          </p>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  </Link>
+                </motion.div>
               )}
             </div>
             <Navigation className="flex-shrink-0" />
