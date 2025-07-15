@@ -19,16 +19,18 @@ export default function Feed() {
   });
 
   useEffect(() => {
-    const initializeImages = async () => {
-      const mediaItems = sortedFeedImages.map(item => ({
-        src: item.src,
-        type: item.type || 'image'
-      }));
-      const dimensions = await preloadMediaDimensions(mediaItems);
-      setImageDimensions(dimensions);
-    };
+    // Temporarily disabled to fix navigation performance issue
+    // TODO: Implement lazy loading solution
+    // const initializeImages = async () => {
+    //   const mediaItems = sortedFeedImages.map(item => ({
+    //     src: item.src,
+    //     type: item.type || 'image'
+    //   }));
+    //   const dimensions = await preloadMediaDimensions(mediaItems);
+    //   setImageDimensions(dimensions);
+    // };
 
-    initializeImages();
+    // initializeImages();
   }, [sortedFeedImages]);
 
   const handleImageLoad = useCallback((id: number) => {
