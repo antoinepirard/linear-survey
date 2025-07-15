@@ -366,22 +366,6 @@ export default function ChatbotFlowBuilderCaseStudy() {
           </footer>
         </div>
 
-        {/* Chat CTA Container */}
-        <div className="mt-16 bg-slate-950 rounded-md p-8 md:p-12 flex items-center justify-between">
-          <h3 className="text-3xl font-medium text-white">
-            Wanna learn more about it? 
-            <p className="text-white">Let&apos;s chat.</p>
-          </h3>
-          <a href="mailto:contact@antoinepirard.be">
-            <Button 
-              className="bg-white text-slate-950 hover:bg-slate-100 font-medium"
-            >
-              Send an email
-              <ChatBubbleBottomCenterIcon className="w-4 h-4 ml-1" />
-            </Button>
-          </a>
-        </div>
-
         {/* Bottom Navigation */}
         <div className="mt-26 pb-16 text-center">
           <Link 
