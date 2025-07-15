@@ -1,16 +1,12 @@
 'use client';
 
-import Image from 'next/image';
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { PlayIcon } from '@heroicons/react/24/solid';
+import { useCallback, useMemo } from 'react';
 import { AnimationWrapper } from '@/hooks/useAnimation';
 import { feedImages, FeedImage } from '@/data/feed';
-import { ImageDimensions } from '@/utils/imageDimensions';
 import HeaderSection from '@/components/HeaderSection';
+import FeedImageItem from '@/components/FeedImageItem';
 
 export default function Feed() {
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
-  const [imageDimensions] = useState<Record<string, ImageDimensions>>({});
   
   const sortedFeedImages = [...feedImages].sort((a, b) => {
     const yearA = parseInt(a.date);
@@ -18,33 +14,16 @@ export default function Feed() {
     return yearB - yearA;
   });
 
-  useEffect(() => {
-    // Temporarily disabled to fix navigation performance issue
-    // TODO: Implement lazy loading solution
-    // const initializeImages = async () => {
-    //   const mediaItems = sortedFeedImages.map(item => ({
-    //     src: item.src,
-    //     type: item.type || 'image'
-    //   }));
-    //   const dimensions = await preloadMediaDimensions(mediaItems);
-    //   setImageDimensions(dimensions);
-    // };
 
-    // initializeImages();
-  }, [sortedFeedImages]);
 
-  const handleImageLoad = useCallback((id: number) => {
-    setLoadedImages(prev => new Set(prev).add(id));
-  }, []);
-
-  const getImageDimensions = useCallback((item: FeedImage) => {
-    const dimensions = imageDimensions[item.src];
+  const getDefaultDimensions = useCallback((item: FeedImage) => {
+    // Base width should match the column width
+    const maxColumnWidth = 400;
     
-    if (dimensions) {
-      // Calculate display width to maintain aspect ratio
-      // Base width of 600px for large images, adjust based on aspect ratio
-      const aspectRatio = dimensions.width / dimensions.height;
-      const displayWidth = Math.min(600, dimensions.width);
+    // Use feed data dimensions if available
+    if (item.width && item.height) {
+      const aspectRatio = item.width / item.height;
+      const displayWidth = Math.min(maxColumnWidth, item.width);
       const displayHeight = Math.round(displayWidth / aspectRatio);
       
       return {
@@ -54,21 +33,22 @@ export default function Feed() {
       };
     }
     
-    // Default dimensions - adjust for video vs other items
+    // Default dimensions based on media type
     if (item.type === 'video') {
       return {
-        width: 600,
-        height: 400, // 3:2 aspect ratio for videos
+        width: maxColumnWidth,
+        height: Math.round(maxColumnWidth * 0.67), // 3:2 aspect ratio for videos
         aspectRatio: 3/2
       };
     }
     
+    // Default square aspect ratio for images
     return {
-      width: 600,
-      height: 600,
+      width: maxColumnWidth,
+      height: maxColumnWidth,
       aspectRatio: 1
     };
-  }, [imageDimensions]);
+  }, []);
 
   const masonryColumns = useMemo(() => {
     const getColumnCount = () => {
@@ -88,13 +68,13 @@ export default function Feed() {
       const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
       columns[shortestColumnIndex].push(item);
       
-      const itemDimensions = getImageDimensions(item);
+      const itemDimensions = getDefaultDimensions(item);
       const estimatedHeight = itemDimensions.height + 100; // Add margin/padding
       columnHeights[shortestColumnIndex] += estimatedHeight;
     });
 
     return columns;
-  }, [sortedFeedImages, getImageDimensions]);
+  }, [sortedFeedImages, getDefaultDimensions]);
 
   return (
     <div className="bg-white min-h-screen">
@@ -118,39 +98,10 @@ export default function Feed() {
                 const globalIndex = sortedFeedImages.findIndex(feedItem => feedItem.id === item.id);
                 return (
                   <AnimationWrapper key={item.id} delay={`${100 + globalIndex * 50}ms`}>
-                    <div className="masonry-column break-inside-avoid">
-                      <div className={`feed-image-container rounded overflow-hidden bg-slate-100 relative ${item.type === 'video' ? 'video-container' : ''}`}>
-                        <div className={`transition-opacity duration-300 ${loadedImages.has(item.id) ? 'opacity-100' : 'opacity-0'}`}>
-                          <Image
-                            src={item.src}
-                            alt={item.name}
-                            width={getImageDimensions(item).width}
-                            height={getImageDimensions(item).height}
-                            className="w-full h-auto"
-                            priority={globalIndex < 3}
-                            onLoad={() => handleImageLoad(item.id)}
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                            placeholder="blur"
-                            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                          />
-                        </div>
-                        
-                        {/* Video icon overlay */}
-                        {item.type === 'video' && (
-                          <a 
-                            href={item.videoUrl || item.src} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="absolute top-3 right-3 bg-black/70 hover:bg-black/90 text-white rounded-full p-2 transition-colors"
-                            title="Watch video"
-                          >
-                            <PlayIcon className="w-4 h-4" />
-                          </a>
-                        )}
-                      </div>
-                      <p className="text-slate-500 font-mono text-xs mt-3">{item.date}</p>
-                      <h3 className="text-slate-700 font-medium text-sm mt-1">{item.name}</h3>
-                    </div>
+                    <FeedImageItem
+                      item={item}
+                      priority={globalIndex < 3}
+                    />
                   </AnimationWrapper>
                 );
               })}
