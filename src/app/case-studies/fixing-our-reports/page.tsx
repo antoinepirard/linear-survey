@@ -7,6 +7,7 @@ import { motion } from 'motion/react';
 import { ChevronLeftIcon, LinkIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import AnimatedGrid from '@/components/AnimatedGrid';
 
 const FocusBanner = dynamic(() => import('@/components/FocusBanner'), {
   ssr: false
@@ -29,6 +30,13 @@ export default function FixingOurReportsCaseStudy() {
 
   return (
     <div className="min-h-screen bg-white relative">
+      <AnimatedGrid 
+        gridSize={60}
+        strokeWidth={0.5}
+        color="#f1f5f9"
+        animationDuration={1.2}
+        delayBetweenLines={0.02}
+      />
       <TableOfContents />
       
       {/* Copy URL Button - Top Right */}
@@ -47,7 +55,7 @@ export default function FixingOurReportsCaseStudy() {
           <LinkIcon className="w-4 h-4" />
         </Button>
       </motion.div>
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-6 py-12 relative z-10">
         {/* Back Navigation */}
         <div className="mt-12 mb-36 animate-fade-in-up text-center" style={{ animationDelay: '0ms' }}>
           <Link 
@@ -95,7 +103,7 @@ export default function FixingOurReportsCaseStudy() {
         />
       </div>
 
-      <div className="max-w-4xl mx-auto px-6">
+      <div className="max-w-4xl mx-auto px-6 relative z-10">
         {/* Content */}
         <div className="space-y-16">
           {/* My Role */}
