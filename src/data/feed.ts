@@ -12,6 +12,18 @@ export interface FeedImage {
 const rawFeedImages = [
   // 2025 - Most recent
   {
+    src: '/Assets/Images/feed/back-to-home.gif',
+    name: 'Back to Home Button Animation',
+    date: '2025',
+    type: 'gif' as const
+  },
+  {
+    src: '/Assets/Images/feed/table-of-content.gif',
+    name: 'Table of Content Interface',
+    date: '2025',
+    type: 'gif' as const
+  },
+  {
     src: '/Assets/Images/feed/company-logos-navigation.jpg',
     name: 'Inbox - Conversation List',
     date: '2024',

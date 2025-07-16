@@ -142,21 +142,11 @@ img {
 
 /* Maintain layout stability during image loading */
 .feed-image-container {
-  min-height: 15rem; /* Responsive minimum using rem units */
+  min-height: auto;
   position: relative;
 }
 
-@media (max-width: 640px) {
-  .feed-image-container {
-    min-height: 12rem; /* Smaller on mobile */
-  }
-}
 
-@media (min-width: 1024px) {
-  .feed-image-container {
-    min-height: 18rem; /* Larger on desktop */
-  }
-}
 
 /* Override min-height for video containers */
 .feed-image-container.video-container {
