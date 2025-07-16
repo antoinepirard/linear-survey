@@ -2,6 +2,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
+import { useFeedPrefetch } from '@/hooks/useFeedPrefetch';
 
 interface NavigationProps {
   className?: string;
@@ -14,6 +15,12 @@ export default function Navigation({ className, showDot = true }: NavigationProp
   const [dotPosition, setDotPosition] = useState({ left: 0, width: 0 });
   const [isDotReady, setIsDotReady] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
+  
+  // Initialize prefetching hook for feed images
+  const { handleMouseEnter: handleFeedPrefetch, handleMouseLeave: handleFeedPrefetchCancel } = useFeedPrefetch({
+    hoverDelay: 200,
+    imageCount: 6
+  });
 
   const items = [
     { href: '/', label: 'Work' },
@@ -59,12 +66,22 @@ export default function Navigation({ className, showDot = true }: NavigationProp
             onMouseEnter={(e) => {
               setHoveredItem(item.href);
               updateDotPosition(e.currentTarget);
+              
+              // Trigger feed image prefetching when hovering over Feed link
+              if (item.href === '/feed') {
+                handleFeedPrefetch();
+              }
             }}
             onMouseLeave={() => {
               setHoveredItem(null);
               const activeItem = navRef.current?.querySelector(`[href="${pathname}"]`) as HTMLElement;
               if (activeItem) {
                 updateDotPosition(activeItem);
+              }
+              
+              // Cancel feed prefetching when leaving Feed link
+              if (item.href === '/feed') {
+                handleFeedPrefetchCancel();
               }
             }}
           >
