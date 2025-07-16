@@ -9,7 +9,8 @@ export const staticHighlights = [
     title: "Fixing Rasayel's Reports",
     description: "Making Rasayel's reports reliable and useful.",
     category: "PROJECT",
-    href: "/case-studies/fixing-our-reports"
+    href: "/case-studies/fixing-our-reports",
+    comingSoon: true
   },
   {
     title: "3 years of building Rasayel",

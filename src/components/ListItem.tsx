@@ -8,6 +8,7 @@ interface ListItemData {
   category: string;
   slug?: string;
   href?: string;
+  comingSoon?: boolean;
 }
 
 interface ListItemProps {
@@ -31,7 +32,25 @@ export default function ListItem({ items, title = 'Highlights', animationDelay =
           
           return (
             <motion.div key={index} className="group" whileHover="hover">
-              {isExternal ? (
+              {item.comingSoon ? (
+                <div className="block py-4 px-2 -mx-2 border-b border-slate-100 cursor-default">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="text-sm font-medium text-slate-500">
+                        {item.title}
+                      </h3>
+                      <p className="text-sm text-slate-400">
+                        {item.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center min-w-0">
+                      <span className="text-xs font-mono uppercase text-slate-400 whitespace-nowrap">
+                        COMING SOON
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : isExternal ? (
                 <a 
                   href={item.href} 
                   target="_blank"
