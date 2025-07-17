@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { motion } from 'motion/react';
+import { useState, useEffect } from 'react';
 
 interface MovingGridBackgroundProps {
   images: string[];
@@ -10,6 +11,32 @@ interface MovingGridBackgroundProps {
 }
 
 export default function MovingGridBackground({ images, className, style }: MovingGridBackgroundProps) {
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false);
+
+  // Preload images
+  useEffect(() => {
+    const preloadImages = async () => {
+      const loadPromises = images.map((src) => {
+        return new Promise<string>((resolve, reject) => {
+          const img = new window.Image();
+          img.onload = () => resolve(src);
+          img.onerror = reject;
+          img.src = src;
+        });
+      });
+
+      try {
+        await Promise.all(loadPromises);
+        setAllImagesLoaded(true);
+      } catch (error) {
+        console.error('Error preloading images:', error);
+        // Still show images even if some fail to preload
+        setAllImagesLoaded(true);
+      }
+    };
+
+    preloadImages();
+  }, [images]);
   // Create organized patterns for smoother animation - 4 columns
   const gridImages1 = [...images, ...images, ...images];
   const gridImages2 = [...images.slice(3), ...images.slice(0, 3), ...images.slice(3), ...images.slice(0, 3)];
@@ -21,18 +48,28 @@ export default function MovingGridBackground({ images, className, style }: Movin
       className={`bg-slate-50 rounded-md overflow-hidden relative mx-auto aspect-[16/9] sm:aspect-[2/1] ${className || ''}`}
       style={style}
     >
+      {/* Loading state */}
+      {!allImagesLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-50">
+          <div className="flex items-center space-x-2 text-slate-500">
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-slate-300 border-t-slate-600"></div>
+            <span className="text-sm">Loading images...</span>
+          </div>
+        </div>
+      )}
+
       {/* Moving grid background */}
-      <div className="absolute inset-0 grid-container">
+      <div className={`absolute inset-0 grid-container ${allImagesLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
         <div className="grid-column grid-column-1">
           {gridImages1.map((src: string, index: number) => (
             <motion.div 
               key={`${src}-${index}`} 
               className="grid-item-wrapper"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={{ opacity: allImagesLoaded ? 1 : 0 }}
               transition={{ 
                 duration: 0.3, 
-                delay: index * 0.1,
+                delay: allImagesLoaded ? index * 0.05 : 0,
                 ease: "easeOut" 
               }}
             >
@@ -42,6 +79,7 @@ export default function MovingGridBackground({ images, className, style }: Movin
                 height={200}
                 className="grid-item"
                 alt="Rasayel screenshot"
+                priority={index < 6}
               />
             </motion.div>
           ))}
@@ -52,10 +90,10 @@ export default function MovingGridBackground({ images, className, style }: Movin
               key={`${src}-${index}-2`} 
               className="grid-item-wrapper"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={{ opacity: allImagesLoaded ? 1 : 0 }}
               transition={{ 
                 duration: 0.3, 
-                delay: index * 0.1 + 0.2,
+                delay: allImagesLoaded ? index * 0.05 + 0.1 : 0,
                 ease: "easeOut" 
               }}
             >
@@ -65,6 +103,7 @@ export default function MovingGridBackground({ images, className, style }: Movin
                 height={200}
                 className="grid-item"
                 alt="Rasayel screenshot"
+                priority={index < 6}
               />
             </motion.div>
           ))}
@@ -75,10 +114,10 @@ export default function MovingGridBackground({ images, className, style }: Movin
               key={`${src}-${index}-3`} 
               className="grid-item-wrapper"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={{ opacity: allImagesLoaded ? 1 : 0 }}
               transition={{ 
                 duration: 0.3, 
-                delay: index * 0.1 + 0.4,
+                delay: allImagesLoaded ? index * 0.05 + 0.2 : 0,
                 ease: "easeOut" 
               }}
             >
@@ -88,6 +127,7 @@ export default function MovingGridBackground({ images, className, style }: Movin
                 height={200}
                 className="grid-item"
                 alt="Rasayel screenshot"
+                priority={index < 6}
               />
             </motion.div>
           ))}
@@ -98,10 +138,10 @@ export default function MovingGridBackground({ images, className, style }: Movin
               key={`${src}-${index}-4`} 
               className="grid-item-wrapper"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={{ opacity: allImagesLoaded ? 1 : 0 }}
               transition={{ 
                 duration: 0.3, 
-                delay: index * 0.1 + 0.6,
+                delay: allImagesLoaded ? index * 0.05 + 0.3 : 0,
                 ease: "easeOut" 
               }}
             >
@@ -111,6 +151,7 @@ export default function MovingGridBackground({ images, className, style }: Movin
                 height={200}
                 className="grid-item"
                 alt="Rasayel screenshot"
+                priority={index < 6}
               />
             </motion.div>
           ))}
