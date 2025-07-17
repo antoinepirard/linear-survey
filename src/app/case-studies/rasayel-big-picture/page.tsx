@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { motion } from 'motion/react';
 import { ChevronLeftIcon, LinkIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import ProjectsTable from '@/components/ProjectsTable';
+import MovingGridBackground from '@/components/MovingGridBackground';
 
 const FocusBanner = dynamic(() => import('@/components/FocusBanner'), {
   ssr: false
@@ -16,6 +16,34 @@ const FocusBanner = dynamic(() => import('@/components/FocusBanner'), {
 const TableOfContents = dynamic(() => import('@/components/TableOfContents'), {
   loading: () => <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40 hidden lg:block opacity-0" />
 });
+
+const HeroImageShowcase = () => {
+  const images = [
+    '/case-studies/rasayel-big-picture/RS-tickets.jpg',
+    '/case-studies/rasayel-big-picture/Default.jpg',
+    '/case-studies/rasayel-big-picture/accountsettings.jpg',
+    '/case-studies/rasayel-big-picture/actions.jpg',
+    '/case-studies/rasayel-big-picture/campaign-sending.jpg',
+    '/case-studies/rasayel-big-picture/carousels.jpg',
+    '/case-studies/rasayel-big-picture/joinworkspace.jpg',
+    '/case-studies/rasayel-big-picture/mynumbers.jpg',
+    '/case-studies/rasayel-big-picture/propertysync.jpg',
+    '/case-studies/rasayel-big-picture/search with ai.jpg',
+    '/case-studies/rasayel-big-picture/waprofile.jpg',
+    '/case-studies/rasayel-big-picture/Expand Button.jpg'
+  ];
+
+  return (
+    <MovingGridBackground 
+      images={images}
+      className="mb-12"
+      style={{ 
+        width: 'calc(896px * 1.15)', // 15% larger than max-w-4xl (896px)
+        maxWidth: '90vw' // Responsive fallback
+      }}
+    />
+  );
+};
 
 
 
@@ -77,26 +105,8 @@ export default function RasayelBigPictureCaseStudy() {
         </header>
       </div>
 
-      {/* Hero Image - Outside main container */}
-      <div
-        className="mb-12 bg-slate-50 rounded-md overflow-hidden relative mx-auto aspect-[16/9] sm:aspect-[2/1]"
-        style={{ 
-          width: 'calc(896px * 1.15)', // 15% larger than max-w-4xl (896px)
-          maxWidth: '90vw' // Responsive fallback
-        }}
-      >
-        <Image
-          src="/case-studies/rasayel-big-picture/RS-tickets.jpg"
-          alt="Rasayel inbox tickets interface showing customer support workflow"
-          width={1200}
-          height={600}
-          className="absolute bottom-0 left-0"
-          style={{ 
-            transform: 'translate(-12%, 25%)'
-          }}
-          priority
-        />
-      </div>
+      {/* Hero Image Showcase - Outside main container */}
+      <HeroImageShowcase />
 
       <div className="max-w-4xl mx-auto px-6">
         {/* Content */}
