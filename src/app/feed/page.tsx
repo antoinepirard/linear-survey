@@ -5,7 +5,7 @@ import { AnimationWrapper } from '@/hooks/useAnimation';
 import { feedImages, FeedImage } from '@/data/feed';
 import HeaderSection from '@/components/HeaderSection';
 import FeedImageItem from '@/components/FeedImageItem';
-import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ArrowUpRightIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 
 export default function Feed() {
@@ -97,7 +97,7 @@ export default function Feed() {
                   className="rounded-sm"
                 />
                 read my substack
-                <ChevronRightIcon className="w-3 h-3" />
+                <ArrowUpRightIcon className="w-4 h-4" />
               </a>
             </div>
           </AnimationWrapper>
