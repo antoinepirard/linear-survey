@@ -45,18 +45,9 @@ export default function MovingGridBackground({ images, className, style }: Movin
 
   return (
     <div
-      className={`bg-slate-50 rounded-md overflow-hidden relative mx-auto aspect-[16/9] sm:aspect-[2/1] ${className || ''}`}
+      className={`${allImagesLoaded ? 'bg-slate-50' : 'bg-white'} rounded-md overflow-hidden relative mx-auto aspect-[16/9] sm:aspect-[2/1] transition-colors duration-700 ${className || ''}`}
       style={style}
     >
-      {/* Loading state */}
-      {!allImagesLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-50">
-          <div className="flex items-center space-x-2 text-slate-500">
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-slate-300 border-t-slate-600"></div>
-            <span className="text-sm">Loading images...</span>
-          </div>
-        </div>
-      )}
 
       {/* Moving grid background */}
       <div className={`absolute inset-0 grid-container ${allImagesLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
