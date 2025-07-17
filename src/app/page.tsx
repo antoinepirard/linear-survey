@@ -103,7 +103,7 @@ export default function Home() {
                 I design softwares that customers want to use.
               </p>
               <p className="text-base leading-relaxed text-slate-700">
-                — I care obsessively about solving problems for the business, the customers and the team I work with.
+                — and I do it with obsessive care.
               </p>
               </AnimationWrapper>
 
