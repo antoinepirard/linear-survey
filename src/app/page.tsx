@@ -103,14 +103,14 @@ export default function Home() {
                 I design softwares that customers want to use.
               </p>
               <p className="text-base leading-relaxed text-slate-700">
-                — I truly care about the business, the customers and the team I work with.
+                — I care obsessively about solving problems for the business, the customers and the team I work with.
               </p>
               </AnimationWrapper>
 
               <AnimationWrapper delay="200ms">
               <p className="text-base leading-relaxed text-slate-600">
-                I&apos;ve spent the last decade working at startups and collaborating with brillant engineers to solve user problems through thoughtful experiences.
-                I enjoy finding my way through the chaos to figure out the most valuable problems to solve, with care and from first principles. 
+                I&apos;ve spent the last decade working at startups and collaborating with brillant engineers.
+                I enjoy finding my way through the chaos to figure out the most valuable problems to solve, from first principles. I&apos;m the type of person who wakes up thinking about new angles to solve a problem.
               </p>
               </AnimationWrapper>
             </div>
