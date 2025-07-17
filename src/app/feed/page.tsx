@@ -5,6 +5,8 @@ import { AnimationWrapper } from '@/hooks/useAnimation';
 import { feedImages, FeedImage } from '@/data/feed';
 import HeaderSection from '@/components/HeaderSection';
 import FeedImageItem from '@/components/FeedImageItem';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 
 export default function Feed() {
   
@@ -84,7 +86,20 @@ export default function Feed() {
           
           <AnimationWrapper delay="50ms">
             <h1 className="text-4xl sm:text-6xl font-light text-slate-900 mb-2 text-center">Feed</h1>
-            <p className="font-regular text-slate-600 mb-12 text-center">A visual collection of moments and work</p>
+            <p className="font-regular text-slate-600 mb-4 text-center">A visual collection of moments and work</p>
+            <div className="flex justify-center mb-12">
+              <a href="https://ninethirty.substack.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-white border border-slate-100 text-slate-700 hover:border-slate-200 transition-colors">
+                <Image 
+                  src="/Assets/Images/substack.png" 
+                  alt="Substack logo" 
+                  width={16} 
+                  height={16}
+                  className="rounded-sm"
+                />
+                read my substack
+                <ChevronRightIcon className="w-3 h-3" />
+              </a>
+            </div>
           </AnimationWrapper>
         </div>
       </div>
