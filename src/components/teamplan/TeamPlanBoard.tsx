@@ -246,7 +246,7 @@ export default function TeamPlanBoard({
                   return (
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
-                      className="group min-h-20 p-3 border-b border-slate-200 transition-all duration-200 bg-white relative"
+                      className="min-h-20 p-3 border-b border-slate-200 transition-all duration-200 bg-white relative"
                       onDragOver={(e) => handleDragOver(e, person.id, timeSlot.id)}
                       onDragLeave={handleDragLeave}
                       onDrop={(e) => handleDrop(e, person.id, timeSlot.id)}
@@ -297,7 +297,7 @@ export default function TeamPlanBoard({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleAddProject(person.id, timeSlot.id)}
-                          className="w-full border border-dashed border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                          className="w-full border border-dashed border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 text-xs opacity-0 hover:opacity-100 transition-opacity duration-200"
                         >
                           <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
