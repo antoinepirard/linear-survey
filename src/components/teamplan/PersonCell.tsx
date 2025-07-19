@@ -42,33 +42,24 @@ export default function PersonCell({
     }
   };
 
+  const handleBlur = () => {
+    handleSave();
+  };
+
   return (
     <div className="border-b border-slate-200 bg-white p-3 flex items-start justify-between group hover:bg-white min-h-20">
       {isEditing ? (
-        <div className="flex-1 space-y-2">
+        <div className="flex-1">
           <input
             type="text"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
             placeholder="Name"
-            className="w-full text-sm font-medium bg-white border border-slate-300 rounded px-2 py-1"
+            className="w-full text-sm font-medium bg-gray-100 border-0 outline-none px-2 py-1 rounded"
             autoFocus
           />
-          <div className="flex gap-1">
-            <button
-              onClick={handleSave}
-              className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Save
-            </button>
-            <button
-              onClick={handleCancel}
-              className="px-2 py-1 text-xs bg-white text-slate-700 rounded hover:bg-white border border-slate-300"
-            >
-              Cancel
-            </button>
-          </div>
         </div>
       ) : (
         <>
@@ -76,7 +67,7 @@ export default function PersonCell({
             className="flex-1 cursor-pointer"
             onClick={() => setIsEditing(true)}
           >
-            <h4 className="text-sm font-medium text-slate-900">{person.name}</h4>
+            <h4 className="text-sm font-medium text-slate-900 px-2 py-1 rounded">{person.name}</h4>
           </div>
           
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
