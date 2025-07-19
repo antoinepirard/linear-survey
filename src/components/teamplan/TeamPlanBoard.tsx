@@ -23,66 +23,33 @@ export default function TeamPlanBoard({
   const [draggedProject, setDraggedProject] = useState<string | null>(null);
   const [dragOverCell, setDragOverCell] = useState<{ personId: string; timeSlotId: string; insertIndex: number } | null>(null);
   const [newProjectId, setNewProjectId] = useState<string | null>(null);
+  const [draggedProjectData, setDraggedProjectData] = useState<Project | null>(null);
 
-  const handleDragStart = (e: React.DragEvent, projectId: string) => {
+  const handleDragStart = (projectId: string) => {
+    const project = boardData.projects.find(p => p.id === projectId);
     setDraggedProject(projectId);
-    e.dataTransfer.setData('text/plain', projectId);
-    e.dataTransfer.effectAllowed = 'move';
+    setDraggedProjectData(project || null);
   };
 
-  const handleDragOver = (e: React.DragEvent, personId: string, timeSlotId: string) => {
-    e.preventDefault();
-    
-    // Calculate insertion index based on mouse position
-    const rect = e.currentTarget.getBoundingClientRect();
-    const mouseY = e.clientY - rect.top;
-    const cellProjects = getProjectsForCell(boardData.projects, personId, timeSlotId);
-    
-    // Find all project card elements in this cell
-    const projectElements = Array.from(e.currentTarget.querySelectorAll('[data-project-card]'));
-    
-    let insertIndex = 0;
-    for (let i = 0; i < projectElements.length; i++) {
-      const element = projectElements[i] as HTMLElement;
-      const elementRect = element.getBoundingClientRect();
-      const elementMiddle = elementRect.top + elementRect.height / 2 - rect.top;
-      
-      if (mouseY > elementMiddle) {
-        insertIndex = i + 1;
-      }
-    }
-    
-    // If no projects, insert at 0
-    if (cellProjects.length === 0) {
-      insertIndex = 0;
-    }
-    
-    setDragOverCell({ personId, timeSlotId, insertIndex });
-  };
-
-  const handleDragLeave = () => {
-    setDragOverCell(null);
-  };
-
-  const handleDrop = (e: React.DragEvent, personId: string, timeSlotId: string) => {
-    e.preventDefault();
-    const projectId = e.dataTransfer.getData('text/plain');
-    
-    if (projectId && dragOverCell) {
-      // Remove the dragged project from its current position
-      const otherProjects = boardData.projects.filter(p => p.id !== projectId);
-      const draggedProject = boardData.projects.find(p => p.id === projectId);
-      
-      if (draggedProject) {
+  const handleDragEnd = () => {
+    // Use a timeout to ensure the drag animation completes before updating
+    setTimeout(() => {
+      // Check if we have a valid drop target
+      if (dragOverCell && draggedProjectData) {
+        const { personId, timeSlotId, insertIndex } = dragOverCell;
+        
+        // Remove the dragged project from its current position
+        const otherProjects = boardData.projects.filter(p => p.id !== draggedProjectData.id);
+        
         // Get projects in the target cell (excluding the dragged one)
         const cellProjects = otherProjects.filter(p => p.personId === personId && p.timeSlotId === timeSlotId);
         
         // Create updated project with new position
-        const updatedProject = { ...draggedProject, personId, timeSlotId };
+        const updatedProject = { ...draggedProjectData, personId, timeSlotId };
         
         // Insert at the correct position
-        const insertIndex = Math.min(dragOverCell.insertIndex, cellProjects.length);
-        cellProjects.splice(insertIndex, 0, updatedProject);
+        const finalInsertIndex = Math.min(insertIndex, cellProjects.length);
+        cellProjects.splice(finalInsertIndex, 0, updatedProject);
         
         // Combine with projects from other cells
         const otherCellProjects = otherProjects.filter(p => !(p.personId === personId && p.timeSlotId === timeSlotId));
@@ -92,10 +59,66 @@ export default function TeamPlanBoard({
         setBoardData(newData);
         onChange?.(newData);
       }
-    }
-    
-    setDraggedProject(null);
-    setDragOverCell(null);
+      
+      // Clear drag state
+      setDraggedProject(null);
+      setDraggedProjectData(null);
+      setDragOverCell(null);
+    }, 0);
+  };
+
+  // Position-based drop detection for Framer Motion drag
+  const updateDropTarget = (draggedElement: HTMLElement) => {
+    if (!draggedProject) return;
+
+    const draggedRect = draggedElement.getBoundingClientRect();
+    const draggedCenter = {
+      x: draggedRect.left + draggedRect.width / 2,
+      y: draggedRect.top + draggedRect.height / 2
+    };
+
+    // Find all drop zone cells
+    const cells = document.querySelectorAll('[data-drop-zone]');
+    let bestMatch: { personId: string; timeSlotId: string; insertIndex: number } | null = null;
+    let bestDistance = Infinity;
+
+    cells.forEach(cell => {
+      const cellElement = cell as HTMLElement;
+      const cellRect = cellElement.getBoundingClientRect();
+      
+      // Check if drag center is over this cell
+      if (
+        draggedCenter.x >= cellRect.left &&
+        draggedCenter.x <= cellRect.right &&
+        draggedCenter.y >= cellRect.top &&
+        draggedCenter.y <= cellRect.bottom
+      ) {
+        const personId = cellElement.getAttribute('data-person-id')!;
+        const timeSlotId = cellElement.getAttribute('data-timeslot-id')!;
+        
+        // Calculate insertion index based on vertical position        
+        const projectElements = Array.from(cellElement.querySelectorAll('[data-project-card]'));
+        let insertIndex = 0;
+        
+        for (let i = 0; i < projectElements.length; i++) {
+          const element = projectElements[i] as HTMLElement;
+          const elementRect = element.getBoundingClientRect();
+          const elementMiddle = elementRect.top + elementRect.height / 2;
+          
+          if (draggedCenter.y > elementMiddle) {
+            insertIndex = i + 1;
+          }
+        }
+        
+        const distance = Math.abs(draggedCenter.y - (cellRect.top + cellRect.height / 2));
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestMatch = { personId, timeSlotId, insertIndex };
+        }
+      }
+    });
+
+    setDragOverCell(bestMatch);
   };
 
   const handleAddProject = (personId: string, timeSlotId: string) => {
@@ -256,9 +279,9 @@ export default function TeamPlanBoard({
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
                       className="min-h-20 p-3 pt-4 pb-4 border-b border-dashed border-slate-200 transition-all duration-200 bg-white relative overflow-visible group"
-                      onDragOver={(e) => handleDragOver(e, person.id, timeSlot.id)}
-                      onDragLeave={handleDragLeave}
-                      onDrop={(e) => handleDrop(e, person.id, timeSlot.id)}
+                      data-drop-zone
+                      data-person-id={person.id}
+                      data-timeslot-id={timeSlot.id}
                       role="region"
                       aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
                     >
@@ -306,6 +329,8 @@ export default function TeamPlanBoard({
                                 onEdit={handleEditProject}
                                 onDelete={handleDeleteProject}
                                 onDragStart={handleDragStart}
+                                onDragEnd={handleDragEnd}
+                                onDrag={updateDropTarget}
                               />
                               
                               {/* Fixed insertion placeholder after each card */}

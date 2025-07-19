@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { Project } from '@/data/teamplan';
@@ -13,7 +13,8 @@ interface ProjectCardProps {
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
   onDragStart?: (projectId: string) => void;
-  onDragEnd?: (projectId: string) => void;
+  onDragEnd?: () => void;
+  onDrag?: (element: HTMLElement) => void;
 }
 
 export default function ProjectCard({ 
@@ -22,10 +23,13 @@ export default function ProjectCard({
   isEditing = false,
   onEdit,
   onDelete,
-  onDragStart
+  onDragStart,
+  onDragEnd,
+  onDrag
 }: ProjectCardProps) {
   const [isEditingLocal, setIsEditingLocal] = useState(isEditing);
   const [editTitle, setEditTitle] = useState(project.title);
+  const dragRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isEditing) {
@@ -74,42 +78,72 @@ export default function ProjectCard({
     setEditTitle(project.title);
   };
 
-  const handleDragStart = (e: React.DragEvent) => {
+  const handleDragStart = () => {
     if (onDragStart) {
-      onDragStart(e, project.id);
+      onDragStart(project.id);
+    }
+  };
+
+  const handleDragEnd = () => {
+    // Reset drag position to prevent bad positioning
+    if (dragRef.current) {
+      dragRef.current.style.transform = '';
+    }
+    if (onDragEnd) {
+      onDragEnd();
+    }
+  };
+
+  const handleDrag = (event: MouseEvent | TouchEvent | PointerEvent) => {
+    if (onDrag) {
+      const element = (event.target as HTMLElement).closest('[data-project-card]') as HTMLElement;
+      if (element) {
+        onDrag(element);
+      }
     }
   };
   return (
     <motion.div
+      ref={dragRef}
       layout
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ 
         opacity: isDragging ? 0.5 : 1,
-        scale: isDragging ? 0.95 : 1,
-        rotate: isDragging ? 2 : 0
+        scale: 1,
+        rotate: 0,
+        x: 0,
+        y: 0
       }}
       exit={{ opacity: 0, scale: 0.8 }}
+      whileDrag={{ 
+        scale: 1.02,
+        rotate: 1,
+        zIndex: 1000,
+        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15)"
+      }}
+      drag
+      dragMomentum={false}
+      dragElastic={0}
+      dragSnapToOrigin={false}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDrag={handleDrag}
       transition={{
         type: "spring",
         stiffness: 300,
-        damping: 30
+        damping: 30,
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        y: { type: "spring", stiffness: 300, damping: 30 }
       }}
+      data-project-card
+      className={`
+        relative group cursor-move p-3 rounded-lg ring-1 font-regular text-sm
+        shadow-sm hover:shadow-md
+        ${project.color}
+        ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-300/50'}
+      `}
+      aria-label={`Project: ${project.title}`}
     >
-      <div
-        data-project-card
-        className={`
-          relative group cursor-move p-3 rounded-lg ring-1 font-regular text-sm
-          shadow-sm hover:shadow-md focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all duration-200
-          ${project.color}
-          ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-300/50'}
-          ${isDragging ? 'scale-105 rotate-1 shadow-lg' : ''}
-        `}
-        draggable
-        onDragStart={handleDragStart}
-        role="button"
-        tabIndex={0}
-        aria-label={`Project: ${project.title}`}
-      >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           {isEditingLocal ? (
@@ -152,7 +186,6 @@ export default function ProjectCard({
             </Button>
           </div>
         )}
-      </div>
       </div>
     </motion.div>
   );
