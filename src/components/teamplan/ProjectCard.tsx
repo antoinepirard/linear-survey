@@ -136,6 +136,7 @@ export default function ProjectCard({
         y: { type: "spring", stiffness: 300, damping: 30 }
       }}
       data-project-card
+      data-project-id={project.id}
       className={`
         relative group cursor-move p-3 rounded-lg ring-1 font-regular text-sm
         shadow-sm hover:shadow-md

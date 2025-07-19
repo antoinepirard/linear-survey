@@ -32,39 +32,44 @@ export default function TeamPlanBoard({
   };
 
   const handleDragEnd = () => {
-    // Use a timeout to ensure the drag animation completes before updating
-    setTimeout(() => {
-      // Check if we have a valid drop target
-      if (dragOverCell && draggedProjectData) {
-        const { personId, timeSlotId, insertIndex } = dragOverCell;
-        
-        // Remove the dragged project from its current position
-        const otherProjects = boardData.projects.filter(p => p.id !== draggedProjectData.id);
-        
-        // Get projects in the target cell (excluding the dragged one)
-        const cellProjects = otherProjects.filter(p => p.personId === personId && p.timeSlotId === timeSlotId);
-        
-        // Create updated project with new position
-        const updatedProject = { ...draggedProjectData, personId, timeSlotId };
-        
-        // Insert at the correct position
-        const finalInsertIndex = Math.min(insertIndex, cellProjects.length);
-        cellProjects.splice(finalInsertIndex, 0, updatedProject);
-        
-        // Combine with projects from other cells
-        const otherCellProjects = otherProjects.filter(p => !(p.personId === personId && p.timeSlotId === timeSlotId));
-        const allProjects = [...otherCellProjects, ...cellProjects];
-        
-        const newData = { ...boardData, projects: allProjects };
-        setBoardData(newData);
-        onChange?.(newData);
+    // Check if we have a valid drop target
+    if (dragOverCell && draggedProjectData) {
+      const { personId, timeSlotId, insertIndex } = dragOverCell;
+      
+      // Create a completely new projects array with proper ordering
+      const allProjects = [...boardData.projects];
+      
+      // Remove the dragged project from its current position
+      const draggedIndex = allProjects.findIndex(p => p.id === draggedProjectData.id);
+      if (draggedIndex !== -1) {
+        allProjects.splice(draggedIndex, 1);
       }
       
-      // Clear drag state
-      setDraggedProject(null);
-      setDraggedProjectData(null);
-      setDragOverCell(null);
-    }, 0);
+      // Get projects in the target cell (after removing the dragged one)
+      const cellProjects = allProjects.filter(p => p.personId === personId && p.timeSlotId === timeSlotId);
+      
+      // Create updated project with new position
+      const updatedProject = { ...draggedProjectData, personId, timeSlotId };
+      
+      // Calculate correct insertion index
+      const finalInsertIndex = Math.min(Math.max(0, insertIndex), cellProjects.length);
+      
+      // Insert the project at the correct position within the cell
+      cellProjects.splice(finalInsertIndex, 0, updatedProject);
+      
+      // Rebuild the complete projects array maintaining order for other cells
+      const otherCellProjects = allProjects.filter(p => !(p.personId === personId && p.timeSlotId === timeSlotId));
+      const finalProjects = [...otherCellProjects, ...cellProjects];
+      
+      const newData = { ...boardData, projects: finalProjects };
+      setBoardData(newData);
+      onChange?.(newData);
+    }
+    
+    // Clear drag state immediately
+    setDraggedProject(null);
+    setDraggedProjectData(null);
+    setDragOverCell(null);
   };
 
   // Position-based drop detection for Framer Motion drag
@@ -96,8 +101,14 @@ export default function TeamPlanBoard({
         const personId = cellElement.getAttribute('data-person-id')!;
         const timeSlotId = cellElement.getAttribute('data-timeslot-id')!;
         
-        // Calculate insertion index based on vertical position        
-        const projectElements = Array.from(cellElement.querySelectorAll('[data-project-card]'));
+        // Calculate insertion index based on vertical position
+        const projectElements = Array.from(cellElement.querySelectorAll('[data-project-card]'))
+          .filter(el => {
+            // Exclude the currently dragged project from position calculations
+            const projectId = (el as HTMLElement).getAttribute('data-project-id');
+            return projectId !== draggedProject;
+          });
+        
         let insertIndex = 0;
         
         for (let i = 0; i < projectElements.length; i++) {
