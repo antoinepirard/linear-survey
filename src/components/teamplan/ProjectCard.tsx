@@ -79,31 +79,16 @@ export default function ProjectCard({
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           {isEditingLocal ? (
-            <div className="space-y-2">
-              <input
-                type="text"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Project title"
-                className="w-full text-xs font-semibold bg-white border border-slate-300 rounded px-2 py-1"
-                autoFocus
-              />
-              <div className="flex gap-1">
-                <button
-                  onClick={handleSave}
-                  className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="px-2 py-1 text-xs bg-white text-slate-700 rounded hover:bg-gray-50 border border-slate-300"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={handleSave}
+              placeholder="Project title"
+              className="w-full font-semibold leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit min-h-[1.375rem]"
+              autoFocus
+            />
           ) : (
             <h4 
               className="font-semibold leading-snug truncate cursor-pointer hover:text-blue-600 transition-colors"
