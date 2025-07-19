@@ -326,13 +326,14 @@ export default function TeamPlanBoard({
                             <motion.div 
                               key={project.id}
                               layout={!draggedProject}
-                              initial={{ opacity: 0, y: 20 }}
+                              initial={{ opacity: 0.8, y: 2 }}
                               animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -20 }}
+                              exit={{ opacity: 0.8, y: -2 }}
                               transition={{
                                 type: "spring",
-                                stiffness: 300,
-                                damping: 25
+                                stiffness: 600,
+                                damping: 50,
+                                duration: 0.05
                               }}
                             >
                               <ProjectCard

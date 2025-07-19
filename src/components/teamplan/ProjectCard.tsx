@@ -101,12 +101,12 @@ export default function ProjectCard({
   return (
     <motion.div
       ref={dragRef}
-      initial={{ opacity: 0, scale: 0.8 }}
+      initial={{ opacity: 0.9, scale: 0.98 }}
       animate={{ 
         opacity: isDragging ? 0.5 : 1,
         scale: 1
       }}
-      exit={{ opacity: 0, scale: 0.8 }}
+      exit={{ opacity: 0.9, scale: 0.98 }}
       whileDrag={{ 
         scale: 1.02,
         rotate: 1,
