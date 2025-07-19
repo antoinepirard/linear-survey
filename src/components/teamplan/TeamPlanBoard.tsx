@@ -149,7 +149,7 @@ export default function TeamPlanBoard({
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto p-6">
         <div className="min-w-fit h-full">
           {/* Header */}
           <TimelineHeader
@@ -180,7 +180,7 @@ export default function TeamPlanBoard({
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
                       className={`
-                        min-h-20 p-3 border-t border-b border-slate-200 transition-all duration-200 bg-white
+                        min-h-20 p-3 border-b border-slate-200 transition-all duration-200 bg-white
                         ${isDropping 
                           ? 'border-blue-400 bg-blue-50' 
                           : 'hover:bg-white'
@@ -209,7 +209,7 @@ export default function TeamPlanBoard({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleAddProject(person.id, timeSlot.id)}
-                          className="w-full border border-dashed border-slate-300 hover:border-slate-400 text-slate-500 hover:text-slate-600 text-xs"
+                          className="w-full border border-dashed border-slate-200 hover:border-slate-400 text-slate-500 hover:text-slate-600 text-xs"
                         >
                           <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -227,7 +227,7 @@ export default function TeamPlanBoard({
             <div className="grid gap-0" style={{ gridTemplateColumns: `200px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr))` }}>
               <AddPersonCell onAddPerson={handleAddPerson} />
               {boardData.timeSlots.map(timeSlot => (
-                <div key={`add-person-${timeSlot.id}`} className="border-t border-b border-slate-200 bg-white min-h-16" />
+                <div key={`add-person-${timeSlot.id}`} className=" bg-white min-h-16" />
               ))}
             </div>
           </div>

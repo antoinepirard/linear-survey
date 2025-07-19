@@ -46,7 +46,7 @@ export default function PersonCell({
   };
 
   return (
-    <div className="border-t border-b border-slate-200 bg-white p-3 flex items-center justify-between group hover:bg-white min-h-20">
+    <div className="border-b border-slate-200 bg-white p-3 flex items-center justify-between group hover:bg-white min-h-20">
       {isEditing ? (
         <div className="flex-1 space-y-2">
           <input

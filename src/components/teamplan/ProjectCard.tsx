@@ -26,8 +26,10 @@ export default function ProjectCard({
       exit={{ opacity: 0, scale: 0.8 }}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className={`
-        relative group cursor-move p-3 rounded-lg border-2 text-xs font-medium
+    >
+      <div
+        className={`
+        relative group cursor-move p-3 rounded-lg ring-1 ring-slate-300/50 text-xs font-medium
         shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400
         ${project.color}
         ${isDragging ? 'opacity-50 rotate-2' : ''}
@@ -84,6 +86,7 @@ export default function ProjectCard({
             </button>
           )}
         </div>
+      </div>
       </div>
     </motion.div>
   );

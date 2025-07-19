@@ -41,7 +41,7 @@ export default function AddPersonCell({ onAddPerson }: AddPersonCellProps) {
   };
 
   return (
-    <div className="border border-slate-200 bg-slate-50/50 p-3 flex items-center justify-center min-h-16">
+    <div className="p-3 flex items-center justify-center min-h-16">
       {isAdding ? (
         <div className="w-full space-y-2">
           <input
@@ -50,7 +50,7 @@ export default function AddPersonCell({ onAddPerson }: AddPersonCellProps) {
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Person name"
-            className="w-full text-sm font-medium bg-white border border-slate-300 rounded px-2 py-1"
+            className="w-full text-sm font-medium bg-white border border-slate-200 rounded px-2 py-1"
             autoFocus
           />
           <input
@@ -59,7 +59,7 @@ export default function AddPersonCell({ onAddPerson }: AddPersonCellProps) {
             onChange={(e) => setNewRole(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Role (optional)"
-            className="w-full text-xs bg-white border border-slate-300 rounded px-2 py-1"
+            className="w-full text-xs bg-white border border-slate-200 rounded px-2 py-1"
           />
           <div className="flex gap-1">
             <button
@@ -71,7 +71,7 @@ export default function AddPersonCell({ onAddPerson }: AddPersonCellProps) {
             </button>
             <button
               onClick={handleCancel}
-              className="px-2 py-1 text-xs bg-slate-300 text-slate-700 rounded hover:bg-slate-400"
+              className="px-2 py-1 text-xs bg-slate-200 text-slate-700 rounded hover:bg-slate-400"
             >
               Cancel
             </button>
