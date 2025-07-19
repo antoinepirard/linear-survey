@@ -30,7 +30,7 @@ export default function ProjectCard({
       <div
         className={`
         relative group cursor-move p-3 rounded-lg ring-1 ring-slate-300/50 text-xs font-medium
-        shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400
+        shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-blue-400
         ${project.color}
         ${isDragging ? 'opacity-50 rotate-2' : ''}
       `}
