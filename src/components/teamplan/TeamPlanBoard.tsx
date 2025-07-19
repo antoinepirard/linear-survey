@@ -135,12 +135,20 @@ export default function TeamPlanBoard({
       )
     };
     setBoardData(newData);
-    onChange?.(newData);
     
-    // Clear the new project editing state when editing is complete
+    // If this was a newly created project, focus the Add Project button
     if (newProjectId === updatedProject.id) {
-      setNewProjectId(null);
+      const buttonId = `add-project-${updatedProject.personId}-${updatedProject.timeSlotId}`;
+      setTimeout(() => {
+        const button = document.getElementById(buttonId);
+        if (button) {
+          button.focus();
+        }
+      }, 0);
     }
+    
+    setNewProjectId(null);
+    onChange?.(newData);
   };
 
   const handleAddTimeSlot = (timeSlot: TimeSlot) => {
@@ -276,8 +284,10 @@ export default function TeamPlanBoard({
                                 isDragging={draggedProject === project.id}
                                 isEditing={newProjectId === project.id}
                                 onEdit={handleEditProject}
+
                                 onDelete={handleDeleteProject}
                                 onDragStart={handleDragStart}
+
                               />
                               
                               {/* Fixed insertion placeholder after each card */}
@@ -298,6 +308,7 @@ export default function TeamPlanBoard({
                         </AnimatePresence>
                         
                         <Button
+                          id={`add-project-${person.id}-${timeSlot.id}`}
                           variant="ghost"
                           size="sm"
                           onClick={() => handleAddProject(person.id, timeSlot.id)}
