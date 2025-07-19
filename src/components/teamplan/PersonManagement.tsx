@@ -20,21 +20,17 @@ export default function PersonManagement({
 }: PersonManagementProps) {
   const [isAddingPerson, setIsAddingPerson] = useState(false);
   const [newPersonName, setNewPersonName] = useState('');
-  const [newPersonRole, setNewPersonRole] = useState('');
   const [editingPerson, setEditingPerson] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
-  const [editRole, setEditRole] = useState('');
 
   const handleAddPerson = () => {
     if (newPersonName.trim()) {
       const newPerson: Person = {
         id: generateId(),
-        name: newPersonName.trim(),
-        role: newPersonRole.trim() || undefined
+        name: newPersonName.trim()
       };
       onAddPerson(newPerson);
       setNewPersonName('');
-      setNewPersonRole('');
       setIsAddingPerson(false);
     }
   };
@@ -42,27 +38,23 @@ export default function PersonManagement({
   const handleStartEdit = (person: Person) => {
     setEditingPerson(person.id);
     setEditName(person.name);
-    setEditRole(person.role || '');
   };
 
   const handleSaveEdit = (personId: string) => {
     if (editName.trim()) {
       const updatedPerson: Person = {
         id: personId,
-        name: editName.trim(),
-        role: editRole.trim() || undefined
+        name: editName.trim()
       };
       onUpdatePerson(updatedPerson);
     }
     setEditingPerson(null);
     setEditName('');
-    setEditRole('');
   };
 
   const handleCancelEdit = () => {
     setEditingPerson(null);
     setEditName('');
-    setEditRole('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, action: () => void) => {
@@ -72,7 +64,6 @@ export default function PersonManagement({
       if (isAddingPerson) {
         setIsAddingPerson(false);
         setNewPersonName('');
-        setNewPersonRole('');
       } else {
         handleCancelEdit();
       }
@@ -102,14 +93,6 @@ export default function PersonManagement({
                   className="w-full font-medium text-slate-900 bg-slate-50 border border-slate-300 rounded px-3 py-1"
                   autoFocus
                 />
-                <input
-                  type="text"
-                  value={editRole}
-                  onChange={(e) => setEditRole(e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(e, () => handleSaveEdit(person.id))}
-                  placeholder="Role (optional)"
-                  className="w-full text-sm text-slate-500 bg-slate-50 border border-slate-300 rounded px-3 py-1"
-                />
                 <div className="flex gap-2">
                   <Button size="sm" onClick={() => handleSaveEdit(person.id)}>
                     Save
@@ -126,9 +109,6 @@ export default function PersonManagement({
                   onClick={() => handleStartEdit(person)}
                 >
                   <h4 className="font-medium text-slate-900">{person.name}</h4>
-                  {person.role && (
-                    <p className="text-sm text-slate-500">{person.role}</p>
-                  )}
                 </div>
                 
                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -176,14 +156,6 @@ export default function PersonManagement({
             className="w-full font-medium bg-white border border-slate-300 rounded px-3 py-2"
             autoFocus
           />
-          <input
-            type="text"
-            value={newPersonRole}
-            onChange={(e) => setNewPersonRole(e.target.value)}
-            onKeyDown={(e) => handleKeyDown(e, handleAddPerson)}
-            placeholder="Role (optional)"
-            className="w-full text-sm bg-white border border-slate-300 rounded px-3 py-2"
-          />
           <div className="flex gap-2">
             <Button 
               size="sm" 
@@ -198,7 +170,6 @@ export default function PersonManagement({
               onClick={() => {
                 setIsAddingPerson(false);
                 setNewPersonName('');
-                setNewPersonRole('');
               }}
             >
               Cancel
