@@ -180,10 +180,10 @@ export default function TeamPlanBoard({
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
                       className={`
-                        min-h-20 p-3 border border-slate-200 transition-all duration-200 bg-white
+                        min-h-20 p-3 border-t border-b border-slate-200 transition-all duration-200 bg-white
                         ${isDropping 
                           ? 'border-blue-400 bg-blue-50' 
-                          : 'hover:bg-slate-50'
+                          : 'hover:bg-white'
                         }
                       `}
                       onDragOver={(e) => handleDragOver(e, person.id, timeSlot.id)}
@@ -227,7 +227,7 @@ export default function TeamPlanBoard({
             <div className="grid gap-0" style={{ gridTemplateColumns: `200px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr))` }}>
               <AddPersonCell onAddPerson={handleAddPerson} />
               {boardData.timeSlots.map(timeSlot => (
-                <div key={`add-person-${timeSlot.id}`} className="border border-slate-200 bg-slate-50/50 min-h-16" />
+                <div key={`add-person-${timeSlot.id}`} className="border-t border-b border-slate-200 bg-white min-h-16" />
               ))}
             </div>
           </div>

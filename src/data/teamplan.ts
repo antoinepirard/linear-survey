@@ -30,14 +30,14 @@ export interface TeamPlanData {
 
 // Project colors for visual variety
 export const PROJECT_COLORS = [
-  'bg-blue-100 border-blue-200 text-blue-800',
-  'bg-green-100 border-green-200 text-green-800',
-  'bg-purple-100 border-purple-200 text-purple-800',
-  'bg-orange-100 border-orange-200 text-orange-800',
-  'bg-pink-100 border-pink-200 text-pink-800',
-  'bg-indigo-100 border-indigo-200 text-indigo-800',
-  'bg-teal-100 border-teal-200 text-teal-800',
-  'bg-red-100 border-red-200 text-red-800',
+  'bg-white border-slate-200 text-slate-800',
+  'bg-white border-slate-200 text-slate-800',
+  'bg-white border-slate-200 text-slate-800',
+  'bg-white border-slate-200 text-slate-800',
+  'bg-white border-slate-200 text-slate-800',
+  'bg-white border-slate-200 text-slate-800',
+  'bg-white border-slate-200 text-slate-800',
+  'bg-white border-slate-200 text-slate-800',
 ] as const;
 
 // Default sample data

@@ -45,7 +45,7 @@ export default function MovingGridBackground({ images, className, style }: Movin
 
   return (
     <div
-      className={`${allImagesLoaded ? 'bg-slate-50' : 'bg-white'} rounded-md overflow-hidden relative mx-auto aspect-[16/9] sm:aspect-[2/1] transition-colors duration-700 ${className || ''}`}
+      className={`bg-white rounded-md overflow-hidden relative mx-auto aspect-[16/9] sm:aspect-[2/1] transition-colors duration-700 ${className || ''}`}
       style={style}
     >
 

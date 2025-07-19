@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
 import { TeamPlanData, DEFAULT_TEAMPLAN_DATA } from '@/data/teamplan';
 

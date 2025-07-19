@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TeamPlanData, Project, TimeSlot, Person, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor } from '@/data/teamplan';
 import ProjectCard from './ProjectCard';
@@ -161,7 +161,7 @@ export default function TeamPlanBoard({
 
           {/* Board Grid */}
           <div className="space-y-0">
-            {boardData.people.map((person, index) => (
+            {boardData.people.map((person) => (
               <div key={person.id} className="grid gap-0" style={{ gridTemplateColumns: `200px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr))` }}>
                 {/* Person Column with Inline Editing */}
                 <PersonCell

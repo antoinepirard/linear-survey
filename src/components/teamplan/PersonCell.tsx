@@ -46,7 +46,7 @@ export default function PersonCell({
   };
 
   return (
-    <div className="border border-slate-200 bg-white p-3 flex items-center justify-between group hover:bg-slate-50/50 min-h-20">
+    <div className="border-t border-b border-slate-200 bg-white p-3 flex items-center justify-between group hover:bg-white min-h-20">
       {isEditing ? (
         <div className="flex-1 space-y-2">
           <input
@@ -75,7 +75,7 @@ export default function PersonCell({
             </button>
             <button
               onClick={handleCancel}
-              className="px-2 py-1 text-xs bg-slate-300 text-slate-700 rounded hover:bg-slate-400"
+              className="px-2 py-1 text-xs bg-white text-slate-700 rounded hover:bg-white border border-slate-300"
             >
               Cancel
             </button>
@@ -96,7 +96,7 @@ export default function PersonCell({
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => setIsEditing(true)}
-              className="p-1 hover:bg-slate-200 rounded transition-colors"
+              className="p-1 hover:bg-white rounded transition-colors"
               title="Edit person"
             >
               <svg className="w-3 h-3 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

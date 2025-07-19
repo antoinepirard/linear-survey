@@ -155,7 +155,6 @@ export default function LocationTime() {
         </div>
       </div>
       
-      <div className="w-px h-4 bg-slate-200" />
       <div className="flex items-center gap-1 relative group cursor-help">
         <ClockIcon className="h-4 w-4 text-slate-400" />
         <div className="w-10 text-sm font-regular">

@@ -60,7 +60,7 @@ export default function TimelineHeader({
   return (
     <div className="grid gap-0 mb-0" style={{ gridTemplateColumns: `200px repeat(${timeSlots.length}, minmax(200px, 1fr))` }}>
       {/* Team Header */}
-      <div className="p-4 bg-slate-100 border border-slate-200 flex items-center justify-between">
+      <div className="p-4 bg-white border-t border-b border-slate-200 flex items-center justify-between">
         <h3 className="font-semibold text-slate-700">Team</h3>
       </div>
 
@@ -71,7 +71,7 @@ export default function TimelineHeader({
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: index * 0.05 }}
-          className="p-4 bg-slate-100 border border-slate-200 group relative"
+          className="p-4 bg-white border-t border-b border-slate-200 group relative"
         >
           <div className="flex items-center justify-between">
             {editingSlot === timeSlot.id ? (
