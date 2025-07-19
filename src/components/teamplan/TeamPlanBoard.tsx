@@ -256,16 +256,18 @@ export default function TeamPlanBoard({
                       <div className="space-y-2">
                         <AnimatePresence>
                           {cellProjects.map((project, index) => (
-                            <div key={project.id} className="relative">
+                            <div key={project.id}>
                               {/* Insertion line above */}
-                              {isDropping && getInsertionIndex(person.id, timeSlot.id) === index && (
-                                <motion.div
-                                  initial={{ opacity: 0, scaleX: 0 }}
-                                  animate={{ opacity: 1, scaleX: 1 }}
-                                  exit={{ opacity: 0, scaleX: 0 }}
-                                  className="absolute -top-1 left-0 right-0 h-0.5 bg-blue-400 rounded-full z-10"
-                                />
-                              )}
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ 
+                                  height: isDropping && getInsertionIndex(person.id, timeSlot.id) === index ? '2px' : 0,
+                                  opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === index ? 1 : 0
+                                }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="bg-blue-400 rounded-full mx-0"
+                                style={{ minHeight: isDropping && getInsertionIndex(person.id, timeSlot.id) === index ? '2px' : 0 }}
+                              />
                               
                               <ProjectCard
                                 project={project}
@@ -275,28 +277,20 @@ export default function TeamPlanBoard({
                                 onDelete={handleDeleteProject}
                                 onDragStart={handleDragStart}
                               />
-                              
-                              {/* Insertion line below (for last item or when inserting at end) */}
-                              {isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 && (
-                                <motion.div
-                                  initial={{ opacity: 0, scaleX: 0 }}
-                                  animate={{ opacity: 1, scaleX: 1 }}
-                                  exit={{ opacity: 0, scaleX: 0 }}
-                                  className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-400 rounded-full z-10"
-                                />
-                              )}
                             </div>
                           ))}
                           
-                          {/* Insertion line for empty cell or at the very end */}
-                          {isDropping && getInsertionIndex(person.id, timeSlot.id) === cellProjects.length && cellProjects.length === 0 && (
-                            <motion.div
-                              initial={{ opacity: 0, scaleX: 0 }}
-                              animate={{ opacity: 1, scaleX: 1 }}
-                              exit={{ opacity: 0, scaleX: 0 }}
-                              className="h-0.5 bg-blue-400 rounded-full"
-                            />
-                          )}
+                          {/* Insertion line for end position */}
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ 
+                              height: isDropping && getInsertionIndex(person.id, timeSlot.id) === cellProjects.length ? '2px' : 0,
+                              opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === cellProjects.length ? 1 : 0
+                            }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="bg-blue-400 rounded-full mx-0"
+                            style={{ minHeight: isDropping && getInsertionIndex(person.id, timeSlot.id) === cellProjects.length ? '2px' : 0 }}
+                          />
                         </AnimatePresence>
                         
                         <Button
