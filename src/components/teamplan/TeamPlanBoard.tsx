@@ -94,7 +94,10 @@ export default function TeamPlanBoard({
     }
     
     setDraggedProject(null);
-    setDragOverCell(null);
+    // Delay clearing the drag over cell to allow smooth transition
+    setTimeout(() => {
+      setDragOverCell(null);
+    }, 150);
   };
 
   const handleAddProject = (personId: string, timeSlotId: string) => {
@@ -255,18 +258,20 @@ export default function TeamPlanBoard({
                     >
                       <div className="space-y-2">
                         <AnimatePresence>
+                          {/* Insertion placeholder at the top */}
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ 
+                              height: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? '2px' : 0,
+                              opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? 1 : 0
+                            }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                            className="bg-blue-400 rounded-full overflow-hidden"
+                          />
+                          
                           {cellProjects.map((project, index) => (
-                            <div key={project.id} className="relative">
-                              {/* Insertion line above - positioned within container */}
-                              {isDropping && getInsertionIndex(person.id, timeSlot.id) === index && (
-                                <motion.div
-                                  initial={{ opacity: 0, scaleX: 0 }}
-                                  animate={{ opacity: 1, scaleX: 1 }}
-                                  exit={{ opacity: 0, scaleX: 0 }}
-                                  className="absolute top-0 left-0 right-0 h-0.5 bg-blue-400 rounded-full z-10 transform -translate-y-0.5"
-                                />
-                              )}
-                              
+                            <div key={project.id}>
                               <ProjectCard
                                 project={project}
                                 isDragging={draggedProject === project.id}
@@ -276,27 +281,19 @@ export default function TeamPlanBoard({
                                 onDragStart={handleDragStart}
                               />
                               
-                              {/* Insertion line below - positioned within container */}
-                              {isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 && (
-                                <motion.div
-                                  initial={{ opacity: 0, scaleX: 0 }}
-                                  animate={{ opacity: 1, scaleX: 1 }}
-                                  exit={{ opacity: 0, scaleX: 0 }}
-                                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400 rounded-full z-10 transform translate-y-0.5"
-                                />
-                              )}
+                              {/* Insertion placeholder after each card */}
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ 
+                                  height: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? '2px' : 0,
+                                  opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? 1 : 0
+                                }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.15 }}
+                                className="bg-blue-400 rounded-full overflow-hidden"
+                              />
                             </div>
                           ))}
-                          
-                          {/* Insertion line for empty cell */}
-                          {isDropping && getInsertionIndex(person.id, timeSlot.id) === cellProjects.length && cellProjects.length === 0 && (
-                            <motion.div
-                              initial={{ opacity: 0, scaleX: 0 }}
-                              animate={{ opacity: 1, scaleX: 1 }}
-                              exit={{ opacity: 0, scaleX: 0 }}
-                              className="h-0.5 bg-blue-400 rounded-full"
-                            />
-                          )}
                         </AnimatePresence>
                         
                         <Button
