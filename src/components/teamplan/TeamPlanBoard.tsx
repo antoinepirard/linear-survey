@@ -265,7 +265,7 @@ export default function TeamPlanBoard({
                       <div className="space-y-2">
                         <AnimatePresence>
                           {/* Fixed insertion placeholder at the top */}
-                          <div className="h-0.5 flex items-center">
+                          <div className="h-0.25 flex items-center">
                             <motion.div
                               initial={{ opacity: 0, scaleX: 0 }}
                               animate={{ 
@@ -274,7 +274,7 @@ export default function TeamPlanBoard({
                               }}
                               exit={{ opacity: 0, scaleX: 0 }}
                               transition={{ duration: 0.15 }}
-                              className="w-full h-0.5 bg-blue-400 rounded-full origin-center"
+                              className="w-full h-0.25 bg-blue-400 rounded-full origin-center"
                             />
                           </div>
                           
@@ -292,7 +292,7 @@ export default function TeamPlanBoard({
                               />
                               
                               {/* Fixed insertion placeholder after each card */}
-                              <div className="h-0.5 flex items-center">
+                              <div className="h-0.25 flex items-center">
                                 <motion.div
                                   initial={{ opacity: 0, scaleX: 0 }}
                                   animate={{ 
@@ -301,7 +301,7 @@ export default function TeamPlanBoard({
                                   }}
                                   exit={{ opacity: 0, scaleX: 0 }}
                                   transition={{ duration: 0.15 }}
-                                  className="w-full h-0.5 bg-blue-400 rounded-full origin-center"
+                                  className="w-full h-0.25 bg-blue-400 rounded-full origin-center"
                                 />
                               </div>
                             </div>
