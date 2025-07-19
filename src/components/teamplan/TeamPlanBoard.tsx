@@ -21,6 +21,7 @@ export default function TeamPlanBoard({
   const [boardData, setBoardData] = useState<TeamPlanData>(data);
   const [draggedProject, setDraggedProject] = useState<string | null>(null);
   const [dragOverCell, setDragOverCell] = useState<{ personId: string; timeSlotId: string } | null>(null);
+  const [newProjectId, setNewProjectId] = useState<string | null>(null);
 
   const handleDragStart = (e: React.DragEvent, projectId: string) => {
     setDraggedProject(projectId);
@@ -58,8 +59,9 @@ export default function TeamPlanBoard({
   };
 
   const handleAddProject = (personId: string, timeSlotId: string) => {
+    const projectId = generateId();
     const newProject: Project = {
-      id: generateId(),
+      id: projectId,
       title: 'New Project',
       color: getRandomColor(),
       personId,
@@ -72,6 +74,9 @@ export default function TeamPlanBoard({
     };
     setBoardData(newData);
     onChange?.(newData);
+    
+    // Set this project as the one being edited
+    setNewProjectId(projectId);
   };
 
   const handleDeleteProject = (projectId: string) => {
@@ -81,6 +86,22 @@ export default function TeamPlanBoard({
     };
     setBoardData(newData);
     onChange?.(newData);
+  };
+
+  const handleEditProject = (updatedProject: Project) => {
+    const newData = {
+      ...boardData,
+      projects: boardData.projects.map(p => 
+        p.id === updatedProject.id ? updatedProject : p
+      )
+    };
+    setBoardData(newData);
+    onChange?.(newData);
+    
+    // Clear the new project editing state when editing is complete
+    if (newProjectId === updatedProject.id) {
+      setNewProjectId(null);
+    }
   };
 
   const handleAddTimeSlot = (timeSlot: TimeSlot) => {
@@ -199,6 +220,8 @@ export default function TeamPlanBoard({
                               key={project.id}
                               project={project}
                               isDragging={draggedProject === project.id}
+                              isEditing={newProjectId === project.id}
+                              onEdit={handleEditProject}
                               onDelete={handleDeleteProject}
                               onDragStart={handleDragStart}
                             />

@@ -1,7 +1,6 @@
 export interface Project {
   id: string;
   title: string;
-  description?: string;
   color: string;
   personId: string;
   timeSlotId: string;
@@ -56,7 +55,6 @@ export const DEFAULT_TEAMPLAN_DATA: TeamPlanData = {
     {
       id: '1',
       title: 'User Research',
-      description: 'Conduct user interviews',
       color: PROJECT_COLORS[0],
       personId: '1',
       timeSlotId: '1',
@@ -64,7 +62,6 @@ export const DEFAULT_TEAMPLAN_DATA: TeamPlanData = {
     {
       id: '2',
       title: 'Login Flow',
-      description: 'Implement authentication',
       color: PROJECT_COLORS[1],
       personId: '2',
       timeSlotId: '2',
@@ -72,7 +69,6 @@ export const DEFAULT_TEAMPLAN_DATA: TeamPlanData = {
     {
       id: '3',
       title: 'Design System',
-      description: 'Create component library',
       color: PROJECT_COLORS[2],
       personId: '3',
       timeSlotId: '1',
