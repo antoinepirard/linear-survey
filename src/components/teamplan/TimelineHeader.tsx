@@ -61,16 +61,13 @@ export default function TimelineHeader({
     <div className="grid gap-0 mb-0" style={{ gridTemplateColumns: `200px repeat(${timeSlots.length}, minmax(200px, 1fr))` }}>
       {/* Team Header */}
       <div className="p-4 bg-white border-b border-slate-300 flex items-center justify-between">
-        <h3 className="font-semibold text-slate-700">Team</h3>
+        <p className="font-mono text-xs text-slate-700">Team</p>
       </div>
 
       {/* Time Slot Headers */}
-      {timeSlots.map((timeSlot, index) => (
+      {timeSlots.map((timeSlot) => (
         <motion.div
           key={timeSlot.id}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, delay: index * 0.05 }}
           className="p-4 bg-white border-b border-slate-300 group relative"
         >
           <div className="flex items-center justify-between">

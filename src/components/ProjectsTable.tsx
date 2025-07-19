@@ -142,19 +142,11 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
       <AnimatePresence>
         {selectedProject && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
             className="fixed inset-0 bg-black/10 backdrop-blur-sm z-50 flex items-center justify-center p-"
             onClick={closeModal}
           >
             {/* ESC hint tag */}
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2, delay: 0.1 }}
               className="absolute top-4 right-4 bg-white text-slate-900 text-xs px-2 py-1 rounded-md font-mono"
             >
               ESC to close
@@ -162,14 +154,6 @@ export default function ProjectsTable({ onProjectHover }: ProjectsTableProps) {
             
             <motion.div
               key={`modal-${selectedProject.projectName}-${selectedProject.year}`}
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ 
-                opacity: { duration: 0.2, ease: 'easeOut' },
-                scale: { duration: 0.2, ease: 'easeOut' },
-                y: { duration: 0.2, ease: 'easeOut' }
-              }}
               className="bg-white rounded-md shadow-xl max-w-4xl w-full max-h-[90vh] overflow-auto"
               onClick={(e) => e.stopPropagation()}
             >
