@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
 import { Project } from '@/data/teamplan';
 
 interface ProjectCardProps {
