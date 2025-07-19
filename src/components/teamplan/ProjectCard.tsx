@@ -76,7 +76,7 @@ export default function ProjectCard({
       <div
         data-project-card
         className={`
-        relative group cursor-move p-3 rounded-lg ring-1 text-xs font-medium
+        relative group cursor-move p-3 rounded-lg ring-1 font-regular text-sm
         shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-blue-400
         ${project.color}
         ${isDragging ? 'opacity-30 scale-95 rotate-1 shadow-lg cursor-grabbing' : 'cursor-grab'}
@@ -102,12 +102,12 @@ export default function ProjectCard({
               onKeyDown={handleKeyDown}
               onBlur={handleSave}
               placeholder="Project title"
-              className="w-full font-semibold leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit h-6 flex items-center"
+              className="w-full font-medium leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit h-6 flex items-center"
               autoFocus
             />
           ) : (
             <h4 
-              className="font-semibold leading-snug truncate cursor-pointer hover:after:opacity-100 transition-all h-6 flex items-center relative after:content-[''] after:absolute after:left-0 after:top-full after:mt-1 after:h-px after:w-full after:bg-slate-300 after:opacity-0 after:transition-opacity"
+              className="font-medium leading-snug truncate cursor-pointer hover:after:opacity-100 transition-all h-6 flex items-center relative after:content-[''] after:absolute after:left-0 after:top-full after:mt-1 after:h-px after:w-full after:bg-slate-300 after:opacity-0 after:transition-opacity"
               onClick={startEditing}
               title="Click to edit project title"
             >
