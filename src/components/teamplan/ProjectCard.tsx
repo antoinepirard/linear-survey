@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { TrashIcon } from '@heroicons/react/24/outline';
 import { Project } from '@/data/teamplan';
+import { Button } from '@/components/ui/button';
 
 interface ProjectCardProps {
   project: Project;
@@ -87,12 +89,12 @@ export default function ProjectCard({
               onKeyDown={handleKeyDown}
               onBlur={handleSave}
               placeholder="Project title"
-              className="w-full font-semibold leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit min-h-[1.375rem]"
+              className="w-full font-semibold leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit h-6 flex items-center"
               autoFocus
             />
           ) : (
             <h4 
-              className="font-semibold leading-snug truncate cursor-pointer hover:text-blue-600 transition-colors"
+              className="font-semibold leading-snug truncate cursor-pointer hover:after:opacity-100 transition-all h-6 flex items-center relative after:content-[''] after:absolute after:left-0 after:top-full after:mt-1 after:h-px after:w-full after:bg-slate-300 after:opacity-0 after:transition-opacity"
               onClick={startEditing}
               title="Click to edit project title"
             >
@@ -101,36 +103,20 @@ export default function ProjectCard({
           )}
         </div>
         
-        {!isEditingLocal && (
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1">
-            {onEdit && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  startEditing();
-                }}
-                className="p-1 rounded hover:bg-black/10 transition-colors"
-                title="Edit project"
-              >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </button>
-            )}
-            {onDelete && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(project.id);
-                }}
-                className="p-1 rounded hover:bg-red-500/20 transition-colors"
-                title="Delete project"
-              >
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
+        {!isEditingLocal && onDelete && (
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center">
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(project.id);
+              }}
+              title="Delete project"
+              variant="ghost"
+              size="sm"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 h-6 w-6 p-1"
+            >
+              <TrashIcon />
+            </Button>
           </div>
         )}
       </div>
