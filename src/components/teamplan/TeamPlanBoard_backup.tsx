@@ -200,7 +200,7 @@ export default function TeamPlanBoard({
                               project={project}
                               isDragging={draggedProject === project.id}
                               onDelete={handleDeleteProject}
-                              onDragStart={handleDragStart}
+                              onDragStart={(projectId) => handleDragStart({} as React.DragEvent, projectId)}
                             />
                           ))}
                         </AnimatePresence>
