@@ -254,7 +254,7 @@ export default function TeamPlanBoard({
                   return (
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
-                      className="min-h-20 p-3 pt-4 pb-4 border-b border-dashed border-slate-200 transition-all duration-200 bg-white relative overflow-hidden"
+                      className="min-h-20 p-3 pt-4 pb-4 border-b border-dashed border-slate-200 transition-all duration-200 bg-white relative overflow-visible"
                       onDragOver={(e) => handleDragOver(e, person.id, timeSlot.id)}
                       onDragLeave={handleDragLeave}
                       onDrop={(e) => handleDrop(e, person.id, timeSlot.id)}
