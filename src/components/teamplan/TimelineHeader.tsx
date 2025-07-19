@@ -58,9 +58,9 @@ export default function TimelineHeader({
   };
 
   return (
-    <div className="grid gap-2 mb-4" style={{ gridTemplateColumns: `180px repeat(${timeSlots.length}, minmax(200px, 1fr)) minmax(200px, 1fr)` }}>
+    <div className="grid gap-0 mb-0" style={{ gridTemplateColumns: `200px repeat(${timeSlots.length}, minmax(200px, 1fr))` }}>
       {/* Team Header */}
-      <div className="p-4 flex items-center justify-between">
+      <div className="p-4 bg-slate-100 border border-slate-200 flex items-center justify-between">
         <h3 className="font-semibold text-slate-700">Team</h3>
       </div>
 
@@ -71,7 +71,7 @@ export default function TimelineHeader({
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: index * 0.05 }}
-          className="p-4 bg-slate-50 rounded-lg group relative"
+          className="p-4 bg-slate-100 border border-slate-200 group relative"
         >
           <div className="flex items-center justify-between">
             {editingSlot === timeSlot.id ? (
@@ -108,14 +108,12 @@ export default function TimelineHeader({
           </div>
         </motion.div>
       ))}
-
-      {/* Add Time Slot Button */}
-      <div className="p-4 flex items-center justify-center">
+      
+      {/* Add Week Button as overlay */}
+      <div className="fixed bottom-4 right-4 z-10">
         <Button
-          variant="outline"
-          size="sm"
           onClick={handleAddSlot}
-          className="w-full border-2 border-dashed border-slate-300 hover:border-slate-400"
+          className="bg-blue-500 hover:bg-blue-600 text-white shadow-lg"
         >
           <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

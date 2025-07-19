@@ -8,13 +8,15 @@ interface ProjectCardProps {
   isDragging?: boolean;
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
+  onDragStart?: (e: React.DragEvent, projectId: string) => void;
 }
 
 export default function ProjectCard({ 
   project, 
   isDragging = false,
   onEdit,
-  onDelete 
+  onDelete,
+  onDragStart
 }: ProjectCardProps) {
   return (
     <motion.div
@@ -32,8 +34,9 @@ export default function ProjectCard({
       `}
       draggable
       onDragStart={(e) => {
-        e.dataTransfer.setData('text/plain', project.id);
-        e.dataTransfer.effectAllowed = 'move';
+        if (onDragStart) {
+          onDragStart(e, project.id);
+        }
       }}
       role="button"
       tabIndex={0}

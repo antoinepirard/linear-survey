@@ -34,30 +34,11 @@ export default function TeamPlanPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
-      <div className="max-w-full mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 mb-2">TeamPlan</h1>
-          <p className="text-slate-600">Intuitive project planning for product teams</p>
-        </motion.div>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 sm:p-6"
-        >
-          <TeamPlanBoard 
-            data={teamPlanData}
-            onChange={handleDataChange}
-          />
-        </motion.div>
-      </div>
+    <div className="h-screen bg-white overflow-hidden">
+      <TeamPlanBoard 
+        data={teamPlanData}
+        onChange={handleDataChange}
+      />
     </div>
   );
 }
