@@ -38,13 +38,25 @@ export default function ProjectCard({
         ...project,
         title: editTitle.trim()
       });
+      setIsEditingLocal(false);
+    } else {
+      // Delete project if no content when saving
+      if (onDelete) {
+        onDelete(project.id);
+      } else {
+        setIsEditingLocal(false);
+      }
     }
-    setIsEditingLocal(false);
   };
 
   const handleCancel = () => {
-    setEditTitle(project.title);
-    setIsEditingLocal(false);
+    // If project originally had no title (new project), delete it
+    if (!project.title.trim() && onDelete) {
+      onDelete(project.id);
+    } else {
+      setEditTitle(project.title);
+      setIsEditingLocal(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
