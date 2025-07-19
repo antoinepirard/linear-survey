@@ -18,14 +18,12 @@ export default function PersonCell({
 }: PersonCellProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(person.name);
-  const [editRole, setEditRole] = useState(person.role || '');
 
   const handleSave = () => {
     if (editName.trim()) {
       onUpdatePerson({
         ...person,
-        name: editName.trim(),
-        role: editRole.trim() || undefined
+        name: editName.trim()
       });
     }
     setIsEditing(false);
@@ -33,7 +31,6 @@ export default function PersonCell({
 
   const handleCancel = () => {
     setEditName(person.name);
-    setEditRole(person.role || '');
     setIsEditing(false);
   };
 
@@ -58,14 +55,6 @@ export default function PersonCell({
             className="w-full text-sm font-medium bg-white border border-slate-300 rounded px-2 py-1"
             autoFocus
           />
-          <input
-            type="text"
-            value={editRole}
-            onChange={(e) => setEditRole(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Role (optional)"
-            className="w-full text-xs bg-white border border-slate-300 rounded px-2 py-1"
-          />
           <div className="flex gap-1">
             <button
               onClick={handleSave}
@@ -88,9 +77,6 @@ export default function PersonCell({
             onClick={() => setIsEditing(true)}
           >
             <h4 className="text-sm font-medium text-slate-900">{person.name}</h4>
-            {person.role && (
-              <p className="text-xs text-slate-500">{person.role}</p>
-            )}
           </div>
           
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

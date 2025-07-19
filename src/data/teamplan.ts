@@ -10,7 +10,6 @@ export interface Project {
 export interface Person {
   id: string;
   name: string;
-  role?: string;
   avatar?: string;
 }
 
@@ -43,9 +42,9 @@ export const PROJECT_COLORS = [
 // Default sample data
 export const DEFAULT_TEAMPLAN_DATA: TeamPlanData = {
   people: [
-    { id: '1', name: 'Alice Johnson', role: 'Product Manager' },
-    { id: '2', name: 'Bob Smith', role: 'Frontend Developer' },
-    { id: '3', name: 'Carol Davis', role: 'Designer' },
+    { id: '1', name: 'Alice Johnson' },
+    { id: '2', name: 'Bob Smith' },
+    { id: '3', name: 'Carol Davis' },
   ],
   timeSlots: [
     { id: '1', label: 'Week 1', type: 'week' },

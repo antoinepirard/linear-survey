@@ -10,25 +10,21 @@ interface AddPersonCellProps {
 export default function AddPersonCell({ onAddPerson }: AddPersonCellProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
-  const [newRole, setNewRole] = useState('');
 
   const handleAdd = () => {
     if (newName.trim()) {
       const newPerson: Person = {
         id: generateId(),
-        name: newName.trim(),
-        role: newRole.trim() || undefined
+        name: newName.trim()
       };
       onAddPerson(newPerson);
       setNewName('');
-      setNewRole('');
       setIsAdding(false);
     }
   };
 
   const handleCancel = () => {
     setNewName('');
-    setNewRole('');
     setIsAdding(false);
   };
 
@@ -52,14 +48,6 @@ export default function AddPersonCell({ onAddPerson }: AddPersonCellProps) {
             placeholder="Person name"
             className="w-full text-sm font-medium bg-white border border-slate-200 rounded px-2 py-1"
             autoFocus
-          />
-          <input
-            type="text"
-            value={newRole}
-            onChange={(e) => setNewRole(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Role (optional)"
-            className="w-full text-xs bg-white border border-slate-200 rounded px-2 py-1"
           />
           <div className="flex gap-1">
             <button
