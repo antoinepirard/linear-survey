@@ -20,7 +20,7 @@ export default function TeamPlanBoard({
 }: TeamPlanBoardProps) {
   const [boardData, setBoardData] = useState<TeamPlanData>(data);
   const [draggedProject, setDraggedProject] = useState<string | null>(null);
-  const [dragOverCell, setDragOverCell] = useState<{ personId: string; timeSlotId: string } | null>(null);
+  const [dragOverCell, setDragOverCell] = useState<{ personId: string; timeSlotId: string; insertIndex: number } | null>(null);
   const [newProjectId, setNewProjectId] = useState<string | null>(null);
 
   const handleDragStart = (e: React.DragEvent, projectId: string) => {
@@ -31,7 +31,32 @@ export default function TeamPlanBoard({
 
   const handleDragOver = (e: React.DragEvent, personId: string, timeSlotId: string) => {
     e.preventDefault();
-    setDragOverCell({ personId, timeSlotId });
+    
+    // Calculate insertion index based on mouse position
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mouseY = e.clientY - rect.top;
+    const cellProjects = getProjectsForCell(boardData.projects, personId, timeSlotId);
+    
+    // Find all project card elements in this cell
+    const projectElements = Array.from(e.currentTarget.querySelectorAll('[data-project-card]'));
+    
+    let insertIndex = 0;
+    for (let i = 0; i < projectElements.length; i++) {
+      const element = projectElements[i] as HTMLElement;
+      const elementRect = element.getBoundingClientRect();
+      const elementMiddle = elementRect.top + elementRect.height / 2 - rect.top;
+      
+      if (mouseY > elementMiddle) {
+        insertIndex = i + 1;
+      }
+    }
+    
+    // If no projects, insert at 0
+    if (cellProjects.length === 0) {
+      insertIndex = 0;
+    }
+    
+    setDragOverCell({ personId, timeSlotId, insertIndex });
   };
 
   const handleDragLeave = () => {
@@ -42,16 +67,30 @@ export default function TeamPlanBoard({
     e.preventDefault();
     const projectId = e.dataTransfer.getData('text/plain');
     
-    if (projectId) {
-      const updatedProjects = boardData.projects.map(project =>
-        project.id === projectId
-          ? { ...project, personId, timeSlotId }
-          : project
-      );
+    if (projectId && dragOverCell) {
+      // Remove the dragged project from its current position
+      const otherProjects = boardData.projects.filter(p => p.id !== projectId);
+      const draggedProject = boardData.projects.find(p => p.id === projectId);
       
-      const newData = { ...boardData, projects: updatedProjects };
-      setBoardData(newData);
-      onChange?.(newData);
+      if (draggedProject) {
+        // Get projects in the target cell (excluding the dragged one)
+        const cellProjects = otherProjects.filter(p => p.personId === personId && p.timeSlotId === timeSlotId);
+        
+        // Create updated project with new position
+        const updatedProject = { ...draggedProject, personId, timeSlotId };
+        
+        // Insert at the correct position
+        const insertIndex = Math.min(dragOverCell.insertIndex, cellProjects.length);
+        cellProjects.splice(insertIndex, 0, updatedProject);
+        
+        // Combine with projects from other cells
+        const otherCellProjects = otherProjects.filter(p => !(p.personId === personId && p.timeSlotId === timeSlotId));
+        const allProjects = [...otherCellProjects, ...cellProjects];
+        
+        const newData = { ...boardData, projects: allProjects };
+        setBoardData(newData);
+        onChange?.(newData);
+      }
     }
     
     setDraggedProject(null);
@@ -168,6 +207,13 @@ export default function TeamPlanBoard({
     return dragOverCell?.personId === personId && dragOverCell?.timeSlotId === timeSlotId;
   };
 
+  const getInsertionIndex = (personId: string, timeSlotId: string) => {
+    if (dragOverCell?.personId === personId && dragOverCell?.timeSlotId === timeSlotId) {
+      return dragOverCell.insertIndex;
+    }
+    return -1;
+  };
+
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <div className="flex-1 overflow-auto p-6">
@@ -200,13 +246,7 @@ export default function TeamPlanBoard({
                   return (
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
-                      className={`
-                        group min-h-20 p-3 border-b border-slate-200 transition-all duration-200 bg-white
-                        ${isDropping 
-                          ? 'border-blue-400 bg-blue-50' 
-                          : 'hover:bg-white'
-                        }
-                      `}
+                      className="group min-h-20 p-3 border-b border-slate-200 transition-all duration-200 bg-white relative"
                       onDragOver={(e) => handleDragOver(e, person.id, timeSlot.id)}
                       onDragLeave={handleDragLeave}
                       onDrop={(e) => handleDrop(e, person.id, timeSlot.id)}
@@ -215,17 +255,48 @@ export default function TeamPlanBoard({
                     >
                       <div className="space-y-2">
                         <AnimatePresence>
-                          {cellProjects.map(project => (
-                            <ProjectCard
-                              key={project.id}
-                              project={project}
-                              isDragging={draggedProject === project.id}
-                              isEditing={newProjectId === project.id}
-                              onEdit={handleEditProject}
-                              onDelete={handleDeleteProject}
-                              onDragStart={handleDragStart}
-                            />
+                          {cellProjects.map((project, index) => (
+                            <div key={project.id} className="relative">
+                              {/* Insertion line above */}
+                              {isDropping && getInsertionIndex(person.id, timeSlot.id) === index && (
+                                <motion.div
+                                  initial={{ opacity: 0, scaleX: 0 }}
+                                  animate={{ opacity: 1, scaleX: 1 }}
+                                  exit={{ opacity: 0, scaleX: 0 }}
+                                  className="absolute -top-1 left-0 right-0 h-0.5 bg-blue-400 rounded-full z-10"
+                                />
+                              )}
+                              
+                              <ProjectCard
+                                project={project}
+                                isDragging={draggedProject === project.id}
+                                isEditing={newProjectId === project.id}
+                                onEdit={handleEditProject}
+                                onDelete={handleDeleteProject}
+                                onDragStart={handleDragStart}
+                              />
+                              
+                              {/* Insertion line below (for last item or when inserting at end) */}
+                              {isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 && (
+                                <motion.div
+                                  initial={{ opacity: 0, scaleX: 0 }}
+                                  animate={{ opacity: 1, scaleX: 1 }}
+                                  exit={{ opacity: 0, scaleX: 0 }}
+                                  className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-400 rounded-full z-10"
+                                />
+                              )}
+                            </div>
                           ))}
+                          
+                          {/* Insertion line for empty cell or at the very end */}
+                          {isDropping && getInsertionIndex(person.id, timeSlot.id) === cellProjects.length && cellProjects.length === 0 && (
+                            <motion.div
+                              initial={{ opacity: 0, scaleX: 0 }}
+                              animate={{ opacity: 1, scaleX: 1 }}
+                              exit={{ opacity: 0, scaleX: 0 }}
+                              className="h-0.5 bg-blue-400 rounded-full"
+                            />
+                          )}
                         </AnimatePresence>
                         
                         <Button
