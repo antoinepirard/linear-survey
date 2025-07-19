@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { Project } from '@/data/teamplan';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,8 @@ interface ProjectCardProps {
   isEditing?: boolean;
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
-  onDragStart?: (e: React.DragEvent, projectId: string) => void;
+  onDragStart?: (projectId: string) => void;
+  onDragEnd?: (projectId: string) => void;
 }
 
 export default function ProjectCard({ 
@@ -71,27 +73,43 @@ export default function ProjectCard({
     setIsEditingLocal(true);
     setEditTitle(project.title);
   };
+
+  const handleDragStart = (e: React.DragEvent) => {
+    if (onDragStart) {
+      onDragStart(e, project.id);
+    }
+  };
   return (
-    <div>
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ 
+        opacity: isDragging ? 0.5 : 1,
+        scale: isDragging ? 0.95 : 1,
+        rotate: isDragging ? 2 : 0
+      }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 30
+      }}
+    >
       <div
         data-project-card
         className={`
-        relative group cursor-move p-3 rounded-lg ring-1 font-regular text-sm
-        shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-blue-400
-        ${project.color}
-        ${isDragging ? 'opacity-30 scale-95 rotate-1 shadow-lg cursor-grabbing' : 'cursor-grab'}
-        ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-300/50'}
-      `}
-      draggable
-      onDragStart={(e) => {
-        if (onDragStart) {
-          onDragStart(e, project.id);
-        }
-      }}
-      role="button"
-      tabIndex={0}
-      aria-label={`Project: ${project.title}`}
-    >
+          relative group cursor-move p-3 rounded-lg ring-1 font-regular text-sm
+          shadow-sm hover:shadow-md focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all duration-200
+          ${project.color}
+          ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-300/50'}
+          ${isDragging ? 'scale-105 rotate-1 shadow-lg' : ''}
+        `}
+        draggable
+        onDragStart={handleDragStart}
+        role="button"
+        tabIndex={0}
+        aria-label={`Project: ${project.title}`}
+      >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           {isEditingLocal ? (
@@ -136,6 +154,6 @@ export default function ProjectCard({
         )}
       </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

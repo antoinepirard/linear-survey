@@ -263,48 +263,73 @@ export default function TeamPlanBoard({
                       aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
                     >
                       <div className="space-y-2">
-                        <AnimatePresence>
+                        <AnimatePresence mode="popLayout">
                           {/* Fixed insertion placeholder at the top */}
-                          <div className="h-0.25 flex items-center">
+                          <motion.div 
+                            className="h-1 flex items-center justify-center"
+                            layout
+                          >
                             <motion.div
                               initial={{ opacity: 0, scaleX: 0 }}
                               animate={{ 
-                                opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? 1 : 0,
+                                opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? 0.7 : 0,
                                 scaleX: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? 1 : 0
                               }}
                               exit={{ opacity: 0, scaleX: 0 }}
-                              transition={{ duration: 0.15 }}
-                              className="w-full h-0.25 bg-blue-400 rounded-full origin-center"
+                              transition={{ 
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 30,
+                                duration: 0.15 
+                              }}
+                              className="w-8 h-0.5 bg-blue-400 rounded-full"
                             />
-                          </div>
+                          </motion.div>
                           
                           {cellProjects.map((project, index) => (
-                            <div key={project.id}>
+                            <motion.div 
+                              key={project.id}
+                              layout
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -20 }}
+                              transition={{
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 25
+                              }}
+                            >
                               <ProjectCard
                                 project={project}
                                 isDragging={draggedProject === project.id}
                                 isEditing={newProjectId === project.id}
                                 onEdit={handleEditProject}
-
                                 onDelete={handleDeleteProject}
                                 onDragStart={handleDragStart}
-
                               />
                               
                               {/* Fixed insertion placeholder after each card */}
-                              <div className="h-0.25 flex items-center">
+                              <motion.div 
+                                className="h-1 flex items-center justify-center"
+                                layout
+                              >
                                 <motion.div
                                   initial={{ opacity: 0, scaleX: 0 }}
                                   animate={{ 
-                                    opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? 1 : 0,
+                                    opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? 0.7 : 0,
                                     scaleX: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? 1 : 0
                                   }}
                                   exit={{ opacity: 0, scaleX: 0 }}
-                                  transition={{ duration: 0.15 }}
-                                  className="w-full h-0.25 bg-blue-400 rounded-full origin-center"
+                                  transition={{ 
+                                    type: "spring",
+                                    stiffness: 300,
+                                    damping: 30,
+                                    duration: 0.15 
+                                  }}
+                                  className="w-8 h-0.5 bg-blue-400 rounded-full"
                                 />
-                              </div>
-                            </div>
+                              </motion.div>
+                            </motion.div>
                           ))}
                         </AnimatePresence>
                         
