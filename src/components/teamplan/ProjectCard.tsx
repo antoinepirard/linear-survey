@@ -85,10 +85,6 @@ export default function ProjectCard({
   };
 
   const handleDragEnd = () => {
-    // Reset drag position to prevent bad positioning
-    if (dragRef.current) {
-      dragRef.current.style.transform = '';
-    }
     if (onDragEnd) {
       onDragEnd();
     }
@@ -105,14 +101,10 @@ export default function ProjectCard({
   return (
     <motion.div
       ref={dragRef}
-      layout
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ 
         opacity: isDragging ? 0.5 : 1,
-        scale: 1,
-        rotate: 0,
-        x: 0,
-        y: 0
+        scale: 1
       }}
       exit={{ opacity: 0, scale: 0.8 }}
       whileDrag={{ 
@@ -124,16 +116,14 @@ export default function ProjectCard({
       drag
       dragMomentum={false}
       dragElastic={0}
-      dragSnapToOrigin={false}
+      dragSnapToOrigin={true}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDrag={handleDrag}
       transition={{
         type: "spring",
         stiffness: 300,
-        damping: 30,
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        y: { type: "spring", stiffness: 300, damping: 30 }
+        damping: 25
       }}
       data-project-card
       data-project-id={project.id}

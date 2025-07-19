@@ -27,16 +27,20 @@ export default function TeamPlanBoard({
 
   const handleDragStart = (projectId: string) => {
     const project = boardData.projects.find(p => p.id === projectId);
+    if (!project) {
+      console.warn(`Project with id ${projectId} not found`);
+      return;
+    }
     setDraggedProject(projectId);
-    setDraggedProjectData(project || null);
+    setDraggedProjectData(project);
   };
 
   const handleDragEnd = () => {
-    // Check if we have a valid drop target
+    // Check if we have a valid drop target and dragged project data
     if (dragOverCell && draggedProjectData) {
       const { personId, timeSlotId, insertIndex } = dragOverCell;
       
-      // Create a completely new projects array with proper ordering
+      // Create a completely new projects array
       const allProjects = [...boardData.projects];
       
       // Remove the dragged project from its current position
@@ -51,7 +55,7 @@ export default function TeamPlanBoard({
       // Create updated project with new position
       const updatedProject = { ...draggedProjectData, personId, timeSlotId };
       
-      // Calculate correct insertion index
+      // Calculate correct insertion index with bounds checking
       const finalInsertIndex = Math.min(Math.max(0, insertIndex), cellProjects.length);
       
       // Insert the project at the correct position within the cell
@@ -66,7 +70,7 @@ export default function TeamPlanBoard({
       onChange?.(newData);
     }
     
-    // Clear drag state immediately
+    // Clear drag state
     setDraggedProject(null);
     setDraggedProjectData(null);
     setDragOverCell(null);
@@ -74,62 +78,71 @@ export default function TeamPlanBoard({
 
   // Position-based drop detection for Framer Motion drag
   const updateDropTarget = (draggedElement: HTMLElement) => {
-    if (!draggedProject) return;
+    if (!draggedProject || !draggedElement) return;
 
-    const draggedRect = draggedElement.getBoundingClientRect();
-    const draggedCenter = {
-      x: draggedRect.left + draggedRect.width / 2,
-      y: draggedRect.top + draggedRect.height / 2
-    };
+    try {
+      const draggedRect = draggedElement.getBoundingClientRect();
+      const draggedCenter = {
+        x: draggedRect.left + draggedRect.width / 2,
+        y: draggedRect.top + draggedRect.height / 2
+      };
 
-    // Find all drop zone cells
-    const cells = document.querySelectorAll('[data-drop-zone]');
-    let bestMatch: { personId: string; timeSlotId: string; insertIndex: number } | null = null;
-    let bestDistance = Infinity;
+      // Find all drop zone cells
+      const cells = document.querySelectorAll('[data-drop-zone]');
+      let bestMatch: { personId: string; timeSlotId: string; insertIndex: number } | null = null;
+      let bestDistance = Infinity;
 
-    cells.forEach(cell => {
-      const cellElement = cell as HTMLElement;
-      const cellRect = cellElement.getBoundingClientRect();
-      
-      // Check if drag center is over this cell
-      if (
-        draggedCenter.x >= cellRect.left &&
-        draggedCenter.x <= cellRect.right &&
-        draggedCenter.y >= cellRect.top &&
-        draggedCenter.y <= cellRect.bottom
-      ) {
-        const personId = cellElement.getAttribute('data-person-id')!;
-        const timeSlotId = cellElement.getAttribute('data-timeslot-id')!;
+      cells.forEach(cell => {
+        const cellElement = cell as HTMLElement;
+        const cellRect = cellElement.getBoundingClientRect();
         
-        // Calculate insertion index based on vertical position
-        const projectElements = Array.from(cellElement.querySelectorAll('[data-project-card]'))
-          .filter(el => {
-            // Exclude the currently dragged project from position calculations
-            const projectId = (el as HTMLElement).getAttribute('data-project-id');
-            return projectId !== draggedProject;
-          });
-        
-        let insertIndex = 0;
-        
-        for (let i = 0; i < projectElements.length; i++) {
-          const element = projectElements[i] as HTMLElement;
-          const elementRect = element.getBoundingClientRect();
-          const elementMiddle = elementRect.top + elementRect.height / 2;
+        // Check if drag center is over this cell
+        if (
+          draggedCenter.x >= cellRect.left &&
+          draggedCenter.x <= cellRect.right &&
+          draggedCenter.y >= cellRect.top &&
+          draggedCenter.y <= cellRect.bottom
+        ) {
+          const personId = cellElement.getAttribute('data-person-id');
+          const timeSlotId = cellElement.getAttribute('data-timeslot-id');
           
-          if (draggedCenter.y > elementMiddle) {
-            insertIndex = i + 1;
+          if (!personId || !timeSlotId) {
+            console.warn('Drop zone missing required data attributes');
+            return;
+          }
+          
+          // Calculate insertion index based on vertical position
+          const projectElements = Array.from(cellElement.querySelectorAll('[data-project-card]'))
+            .filter(el => {
+              // Exclude the currently dragged project from position calculations
+              const projectId = (el as HTMLElement).getAttribute('data-project-id');
+              return projectId !== draggedProject;
+            });
+          
+          let insertIndex = 0;
+          
+          for (let i = 0; i < projectElements.length; i++) {
+            const element = projectElements[i] as HTMLElement;
+            const elementRect = element.getBoundingClientRect();
+            const elementMiddle = elementRect.top + elementRect.height / 2;
+            
+            if (draggedCenter.y > elementMiddle) {
+              insertIndex = i + 1;
+            }
+          }
+          
+          const distance = Math.abs(draggedCenter.y - (cellRect.top + cellRect.height / 2));
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestMatch = { personId, timeSlotId, insertIndex };
           }
         }
-        
-        const distance = Math.abs(draggedCenter.y - (cellRect.top + cellRect.height / 2));
-        if (distance < bestDistance) {
-          bestDistance = distance;
-          bestMatch = { personId, timeSlotId, insertIndex };
-        }
-      }
-    });
+      });
 
-    setDragOverCell(bestMatch);
+      setDragOverCell(bestMatch);
+    } catch (error) {
+      console.error('Error updating drop target:', error);
+    }
   };
 
   const handleAddProject = (personId: string, timeSlotId: string) => {
@@ -299,31 +312,20 @@ export default function TeamPlanBoard({
                       <div className="space-y-2">
                         <AnimatePresence mode="popLayout">
                           {/* Fixed insertion placeholder at the top */}
-                          <motion.div 
-                            className="h-1 flex items-center justify-center"
-                            layout
-                          >
-                            <motion.div
-                              initial={{ opacity: 0, scaleX: 0 }}
-                              animate={{ 
-                                opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? 0.7 : 0,
-                                scaleX: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? 1 : 0
-                              }}
-                              exit={{ opacity: 0, scaleX: 0 }}
-                              transition={{ 
-                                type: "spring",
-                                stiffness: 300,
-                                damping: 30,
-                                duration: 0.15 
-                              }}
-                              className="w-8 h-0.5 bg-blue-400 rounded-full"
+                          <div className="h-1 flex items-center justify-center">
+                            <div
+                              className={`w-8 h-0.5 bg-blue-400 rounded-full transition-all duration-150 ${
+                                isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 
+                                  ? 'opacity-70 scale-x-100' 
+                                  : 'opacity-0 scale-x-0'
+                              }`}
                             />
-                          </motion.div>
+                          </div>
                           
                           {cellProjects.map((project, index) => (
                             <motion.div 
                               key={project.id}
-                              layout
+                              layout={!draggedProject}
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -20 }}
@@ -345,26 +347,15 @@ export default function TeamPlanBoard({
                               />
                               
                               {/* Fixed insertion placeholder after each card */}
-                              <motion.div 
-                                className="h-1 flex items-center justify-center"
-                                layout
-                              >
-                                <motion.div
-                                  initial={{ opacity: 0, scaleX: 0 }}
-                                  animate={{ 
-                                    opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? 0.7 : 0,
-                                    scaleX: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? 1 : 0
-                                  }}
-                                  exit={{ opacity: 0, scaleX: 0 }}
-                                  transition={{ 
-                                    type: "spring",
-                                    stiffness: 300,
-                                    damping: 30,
-                                    duration: 0.15 
-                                  }}
-                                  className="w-8 h-0.5 bg-blue-400 rounded-full"
+                              <div className="h-1 flex items-center justify-center">
+                                <div
+                                  className={`w-8 h-0.5 bg-blue-400 rounded-full transition-all duration-150 ${
+                                    isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1
+                                      ? 'opacity-70 scale-x-100'
+                                      : 'opacity-0 scale-x-0'
+                                  }`}
                                 />
-                              </motion.div>
+                              </div>
                             </motion.div>
                           ))}
                         </AnimatePresence>
