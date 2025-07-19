@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import { TeamPlanData, Project, TimeSlot, Person, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor } from '@/data/teamplan';
 import ProjectCard from './ProjectCard';
 import TimelineHeader from './TimelineHeader';
@@ -254,7 +255,7 @@ export default function TeamPlanBoard({
                   return (
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
-                      className="min-h-20 p-3 pt-4 pb-4 border-b border-dashed border-slate-200 transition-all duration-200 bg-white relative overflow-visible"
+                      className="min-h-20 p-3 pt-4 pb-4 border-b border-dashed border-slate-200 transition-all duration-200 bg-white relative overflow-visible group"
                       onDragOver={(e) => handleDragOver(e, person.id, timeSlot.id)}
                       onDragLeave={handleDragLeave}
                       onDrop={(e) => handleDrop(e, person.id, timeSlot.id)}
@@ -310,13 +311,10 @@ export default function TeamPlanBoard({
                         <Button
                           id={`add-project-${person.id}-${timeSlot.id}`}
                           variant="ghost"
-                          size="sm"
                           onClick={() => handleAddProject(person.id, timeSlot.id)}
-                          className="w-full border border-dashed border-slate-200 hover:border-slate-300 text-slate-500 hover:text-slate-600 text-xs opacity-0 hover:opacity-100 transition-opacity duration-200"
+                          className="w-full p-3 rounded-lg text-xs text-slate-600 hover:text-slate-800 font-medium bg-slate-50 hover:bg-slate-100 opacity-0 group-hover:opacity-100 transition-all duration-200 min-h-[3.25rem] flex items-center justify-center"
                         >
-                          <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                          </svg>
+                          <PlusIcon className="w-3 h-3 mr-1" />
                           Add Project
                         </Button>
                       </div>

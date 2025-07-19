@@ -76,10 +76,11 @@ export default function ProjectCard({
       <div
         data-project-card
         className={`
-        relative group cursor-move p-3 rounded-lg ring-1 ring-slate-300/50 text-xs font-medium
+        relative group cursor-move p-3 rounded-lg ring-1 text-xs font-medium
         shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-blue-400
         ${project.color}
         ${isDragging ? 'opacity-30 scale-95 rotate-1 shadow-lg cursor-grabbing' : 'cursor-grab'}
+        ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-300/50'}
       `}
       draggable
       onDragStart={(e) => {
