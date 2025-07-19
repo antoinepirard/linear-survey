@@ -44,7 +44,6 @@ export default function AnimatedGrid({
   }, []);
 
   // Calculate grid lines
-  const verticalLines = Math.ceil(dimensions.width / gridSize) + 1;
   const horizontalLines = Math.ceil(dimensions.height / gridSize) + 1;
 
   return (
@@ -55,26 +54,6 @@ export default function AnimatedGrid({
         className="absolute inset-0"
         style={{ zIndex: 0 }}
       >
-        {/* Vertical lines */}
-        {Array.from({ length: verticalLines }, (_, i) => (
-          <motion.line
-            key={`v-${i}`}
-            x1={i * gridSize}
-            y1={0}
-            x2={i * gridSize}
-            y2={dimensions.height}
-            stroke={color}
-            strokeWidth={strokeWidth}
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={isVisible ? { pathLength: 1, opacity: 1 } : {}}
-            transition={{
-              duration: animationDuration,
-              delay: i * delayBetweenLines,
-              ease: "easeInOut"
-            }}
-          />
-        ))}
-        
         {/* Horizontal lines */}
         {Array.from({ length: horizontalLines }, (_, i) => (
           <motion.line
@@ -89,7 +68,7 @@ export default function AnimatedGrid({
             animate={isVisible ? { pathLength: 1, opacity: 1 } : {}}
             transition={{
               duration: animationDuration,
-              delay: (verticalLines * delayBetweenLines) + (i * delayBetweenLines),
+              delay: i * delayBetweenLines,
               ease: "easeInOut"
             }}
           />
