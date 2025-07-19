@@ -101,7 +101,7 @@ export default function TeamPlanBoard({
     const projectId = generateId();
     const newProject: Project = {
       id: projectId,
-      title: 'New Project',
+      title: '',
       color: getRandomColor(),
       personId,
       timeSlotId,
@@ -237,7 +237,7 @@ export default function TeamPlanBoard({
           {/* Board Grid */}
           <div className="space-y-0">
             {boardData.people.map((person) => (
-              <div key={person.id} className="grid gap-0" style={{ gridTemplateColumns: `200px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr))` }}>
+              <div key={person.id} className="grid gap-0" style={{ gridTemplateColumns: `200px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
                 {/* Person Column with Inline Editing */}
                 <PersonCell
                   person={person}
@@ -323,15 +323,21 @@ export default function TeamPlanBoard({
                     </motion.div>
                   );
                 })}
+                
+                {/* Empty cell for the add column */}
+                <div className="min-h-20 border-b border-dashed border-slate-200 bg-white" />
               </div>
             ))}
             
             {/* Add Person Row */}
-            <div className="grid gap-0" style={{ gridTemplateColumns: `200px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr))` }}>
+            <div className="grid gap-0" style={{ gridTemplateColumns: `200px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
               <AddPersonCell onAddPerson={handleAddPerson} />
               {boardData.timeSlots.map(timeSlot => (
                 <div key={`add-person-${timeSlot.id}`} className=" bg-white min-h-16" />
               ))}
+              
+              {/* Empty cell for the add column */}
+              <div className="bg-white min-h-16" />
             </div>
           </div>
         </div>

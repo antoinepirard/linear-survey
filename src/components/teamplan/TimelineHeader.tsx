@@ -58,7 +58,7 @@ export default function TimelineHeader({
   };
 
   return (
-    <div className="grid gap-0 mb-0" style={{ gridTemplateColumns: `200px repeat(${timeSlots.length}, minmax(200px, 1fr))` }}>
+    <div className="grid gap-0 mb-0" style={{ gridTemplateColumns: `200px repeat(${timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
       {/* Team Header */}
       <div className="p-4 bg-white border-b border-slate-200 flex items-center justify-between">
         <p className="font-mono text-xs text-slate-700">Team</p>
@@ -106,16 +106,18 @@ export default function TimelineHeader({
         </motion.div>
       ))}
       
-      {/* Add Week Button as overlay */}
-      <div className="fixed bottom-4 right-4 z-10">
+      {/* Add Time Slot Column */}
+      <div className="p-2 bg-white border-b border-slate-200 flex items-center justify-center">
         <Button
           onClick={handleAddSlot}
-          className="bg-blue-500 hover:bg-blue-600 text-white shadow-lg"
+          variant="ghost"
+          size="sm"
+          className="w-full h-full text-slate-500 hover:text-slate-700 hover:bg-slate-50 border border-dashed border-slate-300 hover:border-slate-400 transition-colors"
+          title="Add time slot"
         >
-          <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Add Week
         </Button>
       </div>
     </div>

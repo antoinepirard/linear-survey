@@ -98,7 +98,9 @@ export default function ProjectCard({
               onClick={startEditing}
               title="Click to edit project title"
             >
-              {project.title}
+              {project.title || (
+                <span className="text-slate-300 italic">Project title...</span>
+              )}
             </h4>
           )}
         </div>
