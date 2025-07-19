@@ -94,10 +94,7 @@ export default function TeamPlanBoard({
     }
     
     setDraggedProject(null);
-    // Delay clearing the drag over cell to allow smooth transition
-    setTimeout(() => {
-      setDragOverCell(null);
-    }, 150);
+    setDragOverCell(null);
   };
 
   const handleAddProject = (personId: string, timeSlotId: string) => {
@@ -258,17 +255,19 @@ export default function TeamPlanBoard({
                     >
                       <div className="space-y-2">
                         <AnimatePresence>
-                          {/* Insertion placeholder at the top */}
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ 
-                              height: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? '2px' : 0,
-                              opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? 1 : 0
-                            }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.15 }}
-                            className="bg-blue-400 rounded-full overflow-hidden"
-                          />
+                          {/* Fixed insertion placeholder at the top */}
+                          <div className="h-0.5 flex items-center">
+                            <motion.div
+                              initial={{ opacity: 0, scaleX: 0 }}
+                              animate={{ 
+                                opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? 1 : 0,
+                                scaleX: isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 ? 1 : 0
+                              }}
+                              exit={{ opacity: 0, scaleX: 0 }}
+                              transition={{ duration: 0.15 }}
+                              className="w-full h-0.5 bg-blue-400 rounded-full origin-center"
+                            />
+                          </div>
                           
                           {cellProjects.map((project, index) => (
                             <div key={project.id}>
@@ -281,17 +280,19 @@ export default function TeamPlanBoard({
                                 onDragStart={handleDragStart}
                               />
                               
-                              {/* Insertion placeholder after each card */}
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ 
-                                  height: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? '2px' : 0,
-                                  opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? 1 : 0
-                                }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.15 }}
-                                className="bg-blue-400 rounded-full overflow-hidden"
-                              />
+                              {/* Fixed insertion placeholder after each card */}
+                              <div className="h-0.5 flex items-center">
+                                <motion.div
+                                  initial={{ opacity: 0, scaleX: 0 }}
+                                  animate={{ 
+                                    opacity: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? 1 : 0,
+                                    scaleX: isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1 ? 1 : 0
+                                  }}
+                                  exit={{ opacity: 0, scaleX: 0 }}
+                                  transition={{ duration: 0.15 }}
+                                  className="w-full h-0.5 bg-blue-400 rounded-full origin-center"
+                                />
+                              </div>
                             </div>
                           ))}
                         </AnimatePresence>
