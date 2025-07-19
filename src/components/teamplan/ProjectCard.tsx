@@ -116,7 +116,7 @@ export default function ProjectCard({
       drag
       dragMomentum={false}
       dragElastic={0}
-      dragSnapToOrigin={true}
+      dragSnapToOrigin={false}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDrag={handleDrag}

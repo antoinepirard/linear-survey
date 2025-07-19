@@ -36,15 +36,23 @@ export default function TeamPlanBoard({
   };
 
   const handleDragEnd = () => {
+    // Clear drag state immediately to hide ghost
+    const currentDragOverCell = dragOverCell;
+    const currentDraggedProjectData = draggedProjectData;
+    
+    setDraggedProject(null);
+    setDraggedProjectData(null);
+    setDragOverCell(null);
+    
     // Check if we have a valid drop target and dragged project data
-    if (dragOverCell && draggedProjectData) {
-      const { personId, timeSlotId, insertIndex } = dragOverCell;
+    if (currentDragOverCell && currentDraggedProjectData) {
+      const { personId, timeSlotId, insertIndex } = currentDragOverCell;
       
       // Create a completely new projects array
       const allProjects = [...boardData.projects];
       
       // Remove the dragged project from its current position
-      const draggedIndex = allProjects.findIndex(p => p.id === draggedProjectData.id);
+      const draggedIndex = allProjects.findIndex(p => p.id === currentDraggedProjectData.id);
       if (draggedIndex !== -1) {
         allProjects.splice(draggedIndex, 1);
       }
@@ -53,7 +61,7 @@ export default function TeamPlanBoard({
       const cellProjects = allProjects.filter(p => p.personId === personId && p.timeSlotId === timeSlotId);
       
       // Create updated project with new position
-      const updatedProject = { ...draggedProjectData, personId, timeSlotId };
+      const updatedProject = { ...currentDraggedProjectData, personId, timeSlotId };
       
       // Calculate correct insertion index with bounds checking
       const finalInsertIndex = Math.min(Math.max(0, insertIndex), cellProjects.length);
@@ -69,11 +77,6 @@ export default function TeamPlanBoard({
       setBoardData(newData);
       onChange?.(newData);
     }
-    
-    // Clear drag state
-    setDraggedProject(null);
-    setDraggedProjectData(null);
-    setDragOverCell(null);
   };
 
   // Position-based drop detection for Framer Motion drag
