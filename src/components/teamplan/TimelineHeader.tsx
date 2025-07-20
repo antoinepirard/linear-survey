@@ -79,7 +79,7 @@ export default function TimelineHeader({
                 onChange={(e) => setEditValue(e.target.value)}
                 onBlur={() => handleSaveEdit(timeSlot.id)}
                 onKeyDown={(e) => handleKeyDown(e, timeSlot.id)}
-                className="font-mono uppercase text-xs text-slate-700 bg-transparent border-none outline-none px-2 py-1 text-center w-full"
+                className="font-mono uppercase text-xs text-slate-700 bg-transparent focus:bg-slate-50 border-none outline-none px-2 py-1 text-center w-full transition-colors"
                 autoFocus
               />
             ) : (
@@ -111,14 +111,12 @@ export default function TimelineHeader({
       <div className="p-2 bg-white border-b border-slate-200 flex items-center justify-center">
         <Button
           onClick={handleAddSlot}
-          variant="ghost"
-          size="sm"
-          className="w-full h-full text-slate-500 hover:text-slate-700 hover:bg-slate-50 border border-dashed border-slate-300 hover:border-slate-400 transition-colors"
+          variant="secondary"
+          size="icon"
+          className="w-full h-full border border-dashed border-slate-300 hover:border-slate-400"
           title="Add time slot"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <PlusIcon />
         </Button>
       </div>
     </div>
