@@ -315,4 +315,7 @@ img {
   body {
     @apply bg-background text-foreground;
   }
+  p {
+    font-size: 16px;
+  }
 }
