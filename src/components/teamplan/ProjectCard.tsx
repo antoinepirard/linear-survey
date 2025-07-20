@@ -299,7 +299,7 @@ export default function ProjectCard({
         data-project-id={project.id}
         className={`
           relative cursor-move p-3 rounded-lg ring-1 font-regular text-sm
-          shadow-sm hover:shadow-md
+          shadow-sm hover:shadow-md transition-shadow duration-200
           ${project.color}
           ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-300/50'}
         `}
