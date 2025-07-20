@@ -18,7 +18,7 @@ interface NotePadProps {
 }
 
 export default function NotePad({ className = '' }: NotePadProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [title, setTitle] = useState('');
 
@@ -111,8 +111,20 @@ export default function NotePad({ className = '' }: NotePadProps) {
             className="bg-white border-r border-slate-200 overflow-hidden h-full"
           >
             <div className="h-full flex flex-col">
+              {/* Header with collapse button */}
+              <div className="flex items-center justify-between px-6 pt-4 pb-2">
+                <div className="flex-1" />
+                <button
+                  onClick={toggleExpanded}
+                  className="w-8 h-8 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md flex items-center justify-center transition-colors duration-200 group shadow-sm"
+                  aria-label="Collapse notes"
+                >
+                  <ChevronLeftIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
+                </button>
+              </div>
+
               {/* Title Input */}
-              <div className="px-6 pt-12 pb-4">
+              <div className="px-6 pb-4">
                 <input
                   type="text"
                   value={title}
@@ -134,18 +146,16 @@ export default function NotePad({ className = '' }: NotePadProps) {
         )}
       </AnimatePresence>
 
-      {/* Toggle Button - Top Left */}
-      <button
-        onClick={toggleExpanded}
-        className="absolute top-4 left-4 z-10 w-8 h-8 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md flex items-center justify-center transition-colors duration-200 group shadow-sm"
-        aria-label={isExpanded ? "Collapse notes" : "Expand notes"}
-      >
-        {isExpanded ? (
-          <ChevronLeftIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
-        ) : (
+      {/* Expand Button when collapsed */}
+      {!isExpanded && (
+        <button
+          onClick={toggleExpanded}
+          className="w-12 h-12 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center transition-colors duration-200 group"
+          aria-label="Expand notes"
+        >
           <ChevronRightIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
-        )}
-      </button>
+        </button>
+      )}
     </div>
   );
 }

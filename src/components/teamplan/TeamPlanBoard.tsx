@@ -377,7 +377,7 @@ export default function TeamPlanBoard({
                           id={`add-project-${person.id}-${timeSlot.id}`}
                           variant="ghost"
                           onClick={() => handleAddProject(person.id, timeSlot.id)}
-                          className="w-full p-3 rounded-lg text-xs text-slate-600 hover:text-slate-800 font-medium bg-slate-50 hover:bg-slate-100 opacity-0 group-hover:opacity-100 transition-all duration-200 min-h-[3.25rem] flex items-center justify-center select-none"
+                          className="w-full p-3 rounded-lg text-xs text-slate-600 hover:text-slate-800 font-medium bg-transparent hover:bg-transparent border border-dashed border-slate-200 hover:border-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-200 min-h-[3.25rem] flex items-center justify-center select-none"
                         >
                           <PlusIcon className="w-3 h-3 mr-1" />
                           Add Project
