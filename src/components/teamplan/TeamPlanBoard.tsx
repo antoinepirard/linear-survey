@@ -42,36 +42,23 @@ export default function TeamPlanBoard({
     
     // Check if we have a valid drop target and dragged project data
     if (currentDragOverCell && currentDraggedProjectData) {
-      const { personId, timeSlotId, insertIndex } = currentDragOverCell;
+      const { personId, timeSlotId } = currentDragOverCell;
       
-      // Create a completely new projects array
-      const allProjects = [...boardData.projects];
-      
-      // Remove the dragged project from its current position
-      const draggedIndex = allProjects.findIndex(p => p.id === currentDraggedProjectData.id);
-      if (draggedIndex !== -1) {
-        allProjects.splice(draggedIndex, 1);
+      // Only allow drops to different cells (no reordering within same cell)
+      if (personId !== currentDraggedProjectData.personId || timeSlotId !== currentDraggedProjectData.timeSlotId) {
+        // Create updated project with new position
+        const updatedProject = { ...currentDraggedProjectData, personId, timeSlotId };
+        
+        // Update the projects array
+        const newData = {
+          ...boardData,
+          projects: boardData.projects.map(p => 
+            p.id === currentDraggedProjectData.id ? updatedProject : p
+          )
+        };
+        setBoardData(newData);
+        onChange?.(newData);
       }
-      
-      // Get projects in the target cell (after removing the dragged one)
-      const cellProjects = allProjects.filter(p => p.personId === personId && p.timeSlotId === timeSlotId);
-      
-      // Create updated project with new position
-      const updatedProject = { ...currentDraggedProjectData, personId, timeSlotId };
-      
-      // Calculate correct insertion index with bounds checking
-      const finalInsertIndex = Math.min(Math.max(0, insertIndex), cellProjects.length);
-      
-      // Insert the project at the correct position within the cell
-      cellProjects.splice(finalInsertIndex, 0, updatedProject);
-      
-      // Rebuild the complete projects array maintaining order for other cells
-      const otherCellProjects = allProjects.filter(p => !(p.personId === personId && p.timeSlotId === timeSlotId));
-      const finalProjects = [...otherCellProjects, ...cellProjects];
-      
-      const newData = { ...boardData, projects: finalProjects };
-      setBoardData(newData);
-      onChange?.(newData);
     }
     
     // Clear drag state after data updates to prevent animation glitches
@@ -115,30 +102,17 @@ export default function TeamPlanBoard({
             return;
           }
           
-          // Calculate insertion index based on vertical position
-          const projectElements = Array.from(cellElement.querySelectorAll('[data-project-card]'))
-            .filter(el => {
-              // Exclude the currently dragged project from position calculations
-              const projectId = (el as HTMLElement).getAttribute('data-project-id');
-              return projectId !== draggedProject;
-            });
+          // Get the dragged project data to check if this is a different cell
+          const draggedProjectData = boardData.projects.find(p => p.id === draggedProject);
           
-          let insertIndex = 0;
-          
-          for (let i = 0; i < projectElements.length; i++) {
-            const element = projectElements[i] as HTMLElement;
-            const elementRect = element.getBoundingClientRect();
-            const elementMiddle = elementRect.top + elementRect.height / 2;
-            
-            if (draggedCenter.y > elementMiddle) {
-              insertIndex = i + 1;
+          // Only allow drops to different cells
+          if (draggedProjectData && (personId !== draggedProjectData.personId || timeSlotId !== draggedProjectData.timeSlotId)) {
+            const distance = Math.abs(draggedCenter.y - (cellRect.top + cellRect.height / 2));
+            if (distance < bestDistance) {
+              bestDistance = distance;
+              // For cross-cell drops, always append to the end
+              bestMatch = { personId, timeSlotId, insertIndex: 0 };
             }
-          }
-          
-          const distance = Math.abs(draggedCenter.y - (cellRect.top + cellRect.height / 2));
-          if (distance < bestDistance) {
-            bestDistance = distance;
-            bestMatch = { personId, timeSlotId, insertIndex };
           }
         }
       });
@@ -264,12 +238,20 @@ export default function TeamPlanBoard({
   };
 
   const isDropTarget = (personId: string, timeSlotId: string) => {
-    return dragOverCell?.personId === personId && dragOverCell?.timeSlotId === timeSlotId;
+    if (!draggedProject || !dragOverCell) return false;
+    
+    // Get the dragged project data
+    const draggedProjectData = boardData.projects.find(p => p.id === draggedProject);
+    if (!draggedProjectData) return false;
+    
+    // Only show drop indicators for different cells
+    const isDifferentCell = personId !== draggedProjectData.personId || timeSlotId !== draggedProjectData.timeSlotId;
+    return isDifferentCell && dragOverCell.personId === personId && dragOverCell.timeSlotId === timeSlotId;
   };
 
   const getInsertionIndex = (personId: string, timeSlotId: string) => {
-    if (dragOverCell?.personId === personId && dragOverCell?.timeSlotId === timeSlotId) {
-      return dragOverCell.insertIndex;
+    if (isDropTarget(personId, timeSlotId)) {
+      return dragOverCell!.insertIndex;
     }
     return -1;
   };
