@@ -53,7 +53,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-600 underline hover:text-blue-800 cursor-pointer',
+          class: 'text-slate-700 underline decoration-dashed decoration-1 underline-offset-2 cursor-pointer hover:text-slate-900',
         },
       }),
       Placeholder.configure({
