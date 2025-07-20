@@ -9,13 +9,13 @@ import {
   ChevronDown,
   Bold,
   Italic,
-  Code,
   List
 } from 'react-feather';
 import { 
   StrikethroughIcon,
-  Bars3Icon,
-  Bars2Icon,
+  H1Icon,
+  H2Icon,
+  H3Icon,
   NumberedListIcon,
   DocumentTextIcon
 } from '@heroicons/react/24/outline';
@@ -91,29 +91,23 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
       isActive: editor.isActive('strike'),
       onClick: () => editor.chain().focus().toggleStrike().run(),
     },
-    {
-      icon: <Code size={16} />,
-      title: "Code",
-      isActive: editor.isActive('code'),
-      onClick: () => editor.chain().focus().toggleCode().run(),
-    },
   ];
 
   const structuralActions = [
     {
-      icon: <Bars3Icon className="h-4 w-4" />,
+      icon: <H1Icon className="h-4 w-4" />,
       title: "Heading 1",
       isActive: editor.isActive('heading', { level: 1 }),
       onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
     },
     {
-      icon: <Bars3Icon className="h-4 w-4" />,
+      icon: <H2Icon className="h-4 w-4" />,
       title: "Heading 2",
       isActive: editor.isActive('heading', { level: 2 }),
       onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
     },
     {
-      icon: <Bars2Icon className="h-4 w-4" />,
+      icon: <H3Icon className="h-4 w-4" />,
       title: "Heading 3",
       isActive: editor.isActive('heading', { level: 3 }),
       onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
