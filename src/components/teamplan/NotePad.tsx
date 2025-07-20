@@ -20,6 +20,7 @@ interface NotePadProps {
 export default function NotePad({ className = '' }: NotePadProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const [title, setTitle] = useState('');
 
   const editor = useEditor({
@@ -80,6 +81,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
   };
 
   const toggleExpanded = () => {
+    setHasAnimated(true);
     setIsExpanded(!isExpanded);
   };
 
@@ -99,15 +101,15 @@ export default function NotePad({ className = '' }: NotePadProps) {
       <AnimatePresence mode="wait">
         {isExpanded && (
           <motion.div
-            initial={{ width: 0, opacity: 0 }}
+            initial={hasAnimated ? { width: 0, opacity: 0 } : { width: 400, opacity: 1 }}
             animate={{ width: 400, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            transition={{ 
+            transition={hasAnimated ? { 
               type: "spring", 
               stiffness: 300, 
               damping: 30,
               opacity: { duration: 0.2 }
-            }}
+            } : { duration: 0 }}
             className="bg-white border-r border-slate-200 overflow-hidden h-full"
           >
             <div className="h-full flex flex-col">
@@ -116,7 +118,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
                 <div className="flex-1" />
                 <button
                   onClick={toggleExpanded}
-                  className="w-8 h-8 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md flex items-center justify-center transition-colors duration-200 group shadow-sm"
+                  className="w-8 h-8 bg-white hover:bg-slate-100 border border-slate-200 rounded-md flex items-center justify-center transition-colors duration-200 group"
                   aria-label="Collapse notes"
                 >
                   <ChevronLeftIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
@@ -150,7 +152,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
       {!isExpanded && (
         <button
           onClick={toggleExpanded}
-          className="w-12 h-12 bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center transition-colors duration-200 group"
+          className="w-8 h-8 m-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md flex items-center justify-center transition-colors duration-200 group"
           aria-label="Expand notes"
         >
           <ChevronRightIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
