@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
+import NotePad from '@/components/teamplan/NotePad';
 import { TeamPlanData, DEFAULT_TEAMPLAN_DATA } from '@/data/teamplan';
 
 const STORAGE_KEY = 'teamplan-data';
@@ -69,11 +70,14 @@ export default function TeamPlanPage() {
   }
 
   return (
-    <div className="h-screen bg-white overflow-hidden">
-      <TeamPlanBoard 
-        data={teamPlanData}
-        onChange={handleDataChange}
-      />
+    <div className="h-screen bg-white overflow-hidden flex">
+      <NotePad className="flex-shrink-0" />
+      <div className="flex-1 overflow-hidden">
+        <TeamPlanBoard 
+          data={teamPlanData}
+          onChange={handleDataChange}
+        />
+      </div>
     </div>
   );
 }
