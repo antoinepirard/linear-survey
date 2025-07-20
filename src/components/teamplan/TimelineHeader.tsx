@@ -108,15 +108,15 @@ export default function TimelineHeader({
       ))}
       
       {/* Add Time Slot Column */}
-      <div className="p-2 bg-white border-b border-slate-200 flex items-center justify-center">
+      <div className="bg-white border-b border-slate-200 flex items-center justify-center">
         <Button
           onClick={handleAddSlot}
           variant="secondary"
           size="icon"
-          className="w-full h-full border border-dashed border-slate-300 hover:border-slate-400"
+          className="bg-white ring-1 ring-slate-200/65 hover:ring-1 hover:ring-slate-300/50 size-7"
           title="Add time slot"
         >
-          <PlusIcon />
+          <PlusIcon className="size-3" />
         </Button>
       </div>
     </div>
