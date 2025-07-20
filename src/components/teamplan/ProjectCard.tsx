@@ -99,42 +99,72 @@ export default function ProjectCard({
     }
   };
   return (
-    <motion.div
-      ref={dragRef}
-      initial={{ opacity: 0.9, scale: 0.98 }}
-      animate={{ 
-        opacity: isDragging ? 0.5 : 1,
-        scale: 1
-      }}
-      exit={{ opacity: 0.9, scale: 0.98 }}
-      whileDrag={{ 
-        scale: 1.02,
-        rotate: 1,
-        zIndex: 1000,
-        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15)"
-      }}
-      drag
-      dragMomentum={false}
-      dragElastic={0}
-      dragSnapToOrigin={false}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onDrag={handleDrag}
-      transition={{
-        type: "spring",
-        stiffness: 300,
-        damping: 25
-      }}
-      data-project-card
-      data-project-id={project.id}
-      className={`
-        relative group cursor-move p-3 rounded-lg ring-1 font-regular text-sm
-        shadow-sm hover:shadow-md
-        ${project.color}
-        ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-300/50'}
-      `}
-      aria-label={`Project: ${project.title}`}
-    >
+    <div className="relative">
+      {/* Static placeholder that stays in original position when dragging */}
+      {isDragging && (
+        <div
+          className={`
+            absolute inset-0 p-3 rounded-lg ring-1 font-regular text-sm
+            shadow-sm opacity-30 pointer-events-none
+            ${project.color}
+            ring-slate-300/50
+          `}
+          aria-hidden="true"
+        >
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <h4 className="font-medium leading-snug truncate h-6 flex items-center">
+                {project.title || (
+                  <span className="text-slate-300 italic">Project title...</span>
+                )}
+              </h4>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Draggable element */}
+      <motion.div
+        ref={dragRef}
+        initial={{ opacity: 0.9, scale: 0.98 }}
+        animate={{ 
+          opacity: 1,
+          scale: 1
+        }}
+        exit={{ opacity: 0.9, scale: 0.98 }}
+        whileDrag={{ 
+          scale: 1.02,
+          rotate: 1,
+          zIndex: 1000,
+          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15)"
+        }}
+        drag
+        dragMomentum={false}
+        dragElastic={0}
+        dragSnapToOrigin={true}
+        dragTransition={{ 
+          bounceStiffness: 1000,
+          bounceDamping: 50
+        }}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDrag={handleDrag}
+        transition={{
+          type: "spring",
+          stiffness: 800,
+          damping: 40,
+          duration: 0.1
+        }}
+        data-project-card
+        data-project-id={project.id}
+        className={`
+          relative group cursor-move p-3 rounded-lg ring-1 font-regular text-sm
+          shadow-sm hover:shadow-md
+          ${project.color}
+          ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-300/50'}
+        `}
+        aria-label={`Project: ${project.title}`}
+      >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           {isEditingLocal ? (
@@ -179,5 +209,6 @@ export default function ProjectCard({
         )}
       </div>
     </motion.div>
+    </div>
   );
 }
