@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect, useRef } from 'react';
+import { motion } from 'motion/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { TeamPlanData, Project, TimeSlot, Person, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor } from '@/data/teamplan';
 import ProjectCard from './ProjectCard';
@@ -24,6 +24,8 @@ export default function TeamPlanBoard({
   const [dragOverCell, setDragOverCell] = useState<{ personId: string; timeSlotId: string; insertIndex: number } | null>(null);
   const [newProjectId, setNewProjectId] = useState<string | null>(null);
   const [draggedProjectData, setDraggedProjectData] = useState<Project | null>(null);
+  const [isDropAnimationActive, setIsDropAnimationActive] = useState(false);
+  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleDragStart = (projectId: string) => {
     const project = boardData.projects.find(p => p.id === projectId);
@@ -35,17 +37,23 @@ export default function TeamPlanBoard({
     setDraggedProjectData(project);
   };
 
+  useEffect(() => {
+    // Cleanup timeout on unmount
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleDragEnd = () => {
-    // Clear drag state immediately to hide ghost
+    // Keep a reference to the drag state to use after clearing
     const currentDragOverCell = dragOverCell;
     const currentDraggedProjectData = draggedProjectData;
     
-    setDraggedProject(null);
-    setDraggedProjectData(null);
-    setDragOverCell(null);
-    
     // Check if we have a valid drop target and dragged project data
     if (currentDragOverCell && currentDraggedProjectData) {
+      setIsDropAnimationActive(true);
       const { personId, timeSlotId, insertIndex } = currentDragOverCell;
       
       // Create a completely new projects array
@@ -76,7 +84,19 @@ export default function TeamPlanBoard({
       const newData = { ...boardData, projects: finalProjects };
       setBoardData(newData);
       onChange?.(newData);
+
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+      animationTimeoutRef.current = setTimeout(() => {
+        setIsDropAnimationActive(false);
+      }, 50);
     }
+    
+    // Clear drag state after data updates to prevent animation glitches
+    setDraggedProject(null);
+    setDraggedProjectData(null);
+    setDragOverCell(null);
   };
 
   // Position-based drop detection for Framer Motion drag
@@ -313,7 +333,7 @@ export default function TeamPlanBoard({
                       aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
                     >
                       <div className="space-y-2">
-                        <AnimatePresence mode="popLayout">
+                        {/* <AnimatePresence mode="popLayout"> */}
                           {/* Fixed insertion placeholder at the top */}
                           <div className="h-1 flex items-center justify-center">
                             <div
@@ -331,7 +351,7 @@ export default function TeamPlanBoard({
                               layout={!draggedProject}
                               initial={{ opacity: 0.8, y: 2 }}
                               animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0.8, y: -2 }}
+                              exit={isDropAnimationActive ? { opacity: 0, scale: 0.98 } : { opacity: 0.8, y: -2 }}
                               transition={{
                                 type: "spring",
                                 stiffness: 600,
@@ -362,7 +382,7 @@ export default function TeamPlanBoard({
                               </div>
                             </motion.div>
                           ))}
-                        </AnimatePresence>
+                        {/* </AnimatePresence> */}
                         
                         <Button
                           id={`add-project-${person.id}-${timeSlot.id}`}
