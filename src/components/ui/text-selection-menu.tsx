@@ -10,12 +10,15 @@ import {
   Bold,
   Italic,
   Code,
-  List,
-  Type,
-  Hash,
-  Edit3
+  List
 } from 'react-feather';
-import { StrikethroughIcon } from '@heroicons/react/24/outline';
+import { 
+  StrikethroughIcon,
+  Bars3Icon,
+  Bars2Icon,
+  NumberedListIcon,
+  DocumentTextIcon
+} from '@heroicons/react/24/outline';
 
 interface TextSelectionMenuProps {
   editor: Editor;
@@ -37,8 +40,8 @@ function MenuButton({ isActive, onClick, children, title }: MenuButtonProps) {
       onClick={onClick}
       title={title}
       className={cn(
-        "h-7 w-7 p-0 text-slate-300 hover:bg-slate-800 hover:text-white",
-        isActive && "text-blue-500 bg-slate-800 hover:bg-slate-500"
+        "h-7 w-7 p-0 text-slate-400 hover:bg-slate-800 hover:text-white",
+        isActive && "text-white hover:bg-slate-500"
       )}
     >
       {children}
@@ -98,19 +101,19 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
 
   const structuralActions = [
     {
-      icon: <Type size={16} />,
+      icon: <Bars3Icon className="h-4 w-4" />,
       title: "Heading 1",
       isActive: editor.isActive('heading', { level: 1 }),
       onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
     },
     {
-      icon: <Type size={16} />,
+      icon: <Bars3Icon className="h-4 w-4" />,
       title: "Heading 2",
       isActive: editor.isActive('heading', { level: 2 }),
       onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
     },
     {
-      icon: <Type size={16} />,
+      icon: <Bars2Icon className="h-4 w-4" />,
       title: "Heading 3",
       isActive: editor.isActive('heading', { level: 3 }),
       onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
@@ -122,7 +125,7 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
       onClick: () => editor.chain().focus().toggleBulletList().run(),
     },
     {
-      icon: <Hash size={16} />,
+      icon: <NumberedListIcon className="h-4 w-4" />,
       title: "Numbered List", 
       isActive: editor.isActive('orderedList'),
       onClick: () => editor.chain().focus().toggleOrderedList().run(),
@@ -133,7 +136,7 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
   
   // Get the currently active structural element for display
   const activeStructural = structuralActions.find(action => action.isActive);
-  const submenuIcon = activeStructural ? activeStructural.icon : <Edit3 size={16} />;
+  const submenuIcon = activeStructural ? activeStructural.icon : <DocumentTextIcon className="h-4 w-4" />;
 
   return (
     <div className="relative">
@@ -174,8 +177,8 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
             onMouseLeave={handleSubmenuLeave}
             title="Headings & Lists"
             className={cn(
-              "h-7 px-2 text-slate-300 hover:bg-slate-800 hover:text-white relative flex items-center gap-1",
-              hasActiveStructural && "bg-slate-800 text-white hover:bg-slate-500"
+              "h-7 px-2 text-slate-400 hover:bg-slate-800 hover:text-white relative flex items-center gap-1",
+              hasActiveStructural && "text-white hover:bg-slate-500"
             )}
           >
             {submenuIcon}

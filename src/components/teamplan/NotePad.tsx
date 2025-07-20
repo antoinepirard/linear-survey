@@ -33,6 +33,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
   const [isResizing, setIsResizing] = useState(false);
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+  const [menuUpdateKey, setMenuUpdateKey] = useState(0);
   const editorRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
@@ -111,6 +112,17 @@ export default function NotePad({ className = '' }: NotePadProps) {
         setShowSelectionMenu(true);
       } else {
         setShowSelectionMenu(false);
+      }
+    },
+    onTransaction: ({ editor }) => {
+      // Force re-render of selection menu when editor state changes
+      // This ensures the active states update immediately after formatting
+      const { selection } = editor.state;
+      const { empty } = selection;
+      
+      if (!empty && showSelectionMenu) {
+        // Increment key to force menu re-render without flickering
+        setMenuUpdateKey(prev => prev + 1);
       }
     },
   });
@@ -263,7 +275,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
                       transform: 'translateX(-50%)',
                     }}
                   >
-                    <TextSelectionMenu editor={editor} />
+                    <TextSelectionMenu key={menuUpdateKey} editor={editor} />
                   </div>
                 )}
               </div>
