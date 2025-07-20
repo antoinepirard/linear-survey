@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Placeholder from '@tiptap/extension-placeholder';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ChevronLeftIcon, 
-  ChevronRightIcon,
-  DocumentTextIcon 
+  ChevronRightIcon 
 } from '@heroicons/react/24/outline';
 
 const STORAGE_KEY = 'teamplan-notes';
@@ -20,6 +20,7 @@ interface NotePadProps {
 export default function NotePad({ className = '' }: NotePadProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [title, setTitle] = useState('');
 
   const editor = useEditor({
     extensions: [
@@ -36,12 +37,15 @@ export default function NotePad({ className = '' }: NotePadProps) {
           keepAttributes: false,
         },
       }),
+      Placeholder.configure({
+        placeholder: 'Start writing your notes here...',
+      }),
     ],
-    content: '<p>Start writing your notes here...</p>',
+    content: '',
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'focus:outline-none p-4 min-h-[400px]',
+        class: 'focus:outline-none px-6 pb-4 min-h-[400px]',
       },
     },
     onUpdate: ({ editor }) => {
@@ -52,16 +56,28 @@ export default function NotePad({ className = '' }: NotePadProps) {
     },
   });
 
-  // Load saved content from localStorage
+  // Load saved content and title from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined' && editor) {
       const savedContent = localStorage.getItem(STORAGE_KEY);
+      const savedTitle = localStorage.getItem(TITLE_STORAGE_KEY);
+      
       if (savedContent) {
         editor.commands.setContent(savedContent);
+      }
+      if (savedTitle) {
+        setTitle(savedTitle);
       }
       setIsLoading(false);
     }
   }, [editor]);
+
+  const handleTitleChange = (newTitle: string) => {
+    setTitle(newTitle);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(TITLE_STORAGE_KEY, newTitle);
+    }
+  };
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
@@ -95,12 +111,15 @@ export default function NotePad({ className = '' }: NotePadProps) {
             className="bg-white border-r border-slate-200 overflow-hidden"
           >
             <div className="h-full flex flex-col">
-              {/* Header */}
-              <div className="p-3 border-b border-slate-100 bg-slate-50">
-                <div className="flex items-center space-x-2">
-                  <DocumentTextIcon className="w-4 h-4 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-700">Notes</span>
-                </div>
+              {/* Title Input */}
+              <div className="px-6 pt-6 pb-4">
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  placeholder="Enter note title..."
+                  className="w-full text-2xl font-semibold text-slate-800 bg-transparent border-none outline-none placeholder:text-slate-300"
+                />
               </div>
 
               {/* Editor */}
@@ -112,7 +131,10 @@ export default function NotePad({ className = '' }: NotePadProps) {
                     [&_.ProseMirror]:text-sm 
                     [&_.ProseMirror]:text-slate-700 
                     [&_.ProseMirror]:leading-6
-                    [&_.ProseMirror_h1]:text-xl 
+                    [&_.ProseMirror.ProseMirror-focused]:outline-none
+                    [&_.ProseMirror_.is-editor-empty_.is-empty::before]:text-slate-300
+                    [&_.ProseMirror_.is-editor-empty_.is-empty::before]:pointer-events-none
+                    [&_.ProseMirror_h1]:text-2xl 
                     [&_.ProseMirror_h1]:font-bold 
                     [&_.ProseMirror_h1]:text-slate-800 
                     [&_.ProseMirror_h1]:mb-4 
@@ -142,7 +164,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
                     [&_.ProseMirror_ol]:list-decimal 
                     [&_.ProseMirror_ol]:ml-6 
                     [&_.ProseMirror_ol]:mb-3
-                    [&_.ProseMirror_li]:mb-1
+                    [&_.ProseMirror_li]:mb-0
                     [&_.ProseMirror_code]:bg-slate-100 
                     [&_.ProseMirror_code]:px-1 
                     [&_.ProseMirror_code]:rounded 
@@ -150,21 +172,6 @@ export default function NotePad({ className = '' }: NotePadProps) {
                     [&_.ProseMirror_code]:font-mono 
                     [&_.ProseMirror_code]:text-sm"
                 />
-              </div>
-
-              {/* Formatting Shortcuts Help */}
-              <div className="p-3 border-t border-slate-100 bg-slate-50">
-                <div className="text-xs text-slate-500 space-y-1">
-                  <div className="font-medium">Markdown shortcuts:</div>
-                  <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-                    <div>**bold**</div>
-                    <div>*italic*</div>
-                    <div># Heading</div>
-                    <div>- List</div>
-                    <div>1. Numbered</div>
-                    <div>&gt; Quote</div>
-                  </div>
-                </div>
               </div>
             </div>
           </motion.div>
