@@ -10,6 +10,7 @@ interface ProjectCardProps {
   project: Project;
   isDragging?: boolean;
   isEditing?: boolean;
+  availableGroups?: string[];
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
   onDragStart?: (projectId: string) => void;
@@ -21,6 +22,7 @@ export default function ProjectCard({
   project, 
   isDragging = false,
   isEditing = false,
+  availableGroups = [],
   onEdit,
   onDelete,
   onDragStart,
@@ -28,44 +30,118 @@ export default function ProjectCard({
   onDrag
 }: ProjectCardProps) {
   const [isEditingLocal, setIsEditingLocal] = useState(isEditing);
-  const [editTitle, setEditTitle] = useState(project.title);
+  const [editValue, setEditValue] = useState(project.title + (project.group ? `/${project.group}` : ''));
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const dragRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isEditing) {
       setIsEditingLocal(true);
-      setEditTitle(project.title);
+      setEditValue(project.title + (project.group ? `/${project.group}` : ''));
     }
-  }, [isEditing, project.title]);
+  }, [isEditing, project.title, project.group]);
+
+
+  const parseValue = (value: string) => {
+    const slashIndex = value.indexOf('/');
+    if (slashIndex !== -1) {
+      return {
+        title: value.slice(0, slashIndex).trim(),
+        group: value.slice(slashIndex + 1).trim() || undefined
+      };
+    }
+    return { title: value.trim(), group: undefined };
+  };
 
   const handleSave = () => {
-    if (editTitle.trim() && onEdit) {
+    const { title, group } = parseValue(editValue);
+    if (title && onEdit) {
       onEdit({
         ...project,
-        title: editTitle.trim()
+        title,
+        group
       });
       setIsEditingLocal(false);
+      setShowAutocomplete(false);
     } else {
       // Delete project if no content when saving
       if (onDelete) {
         onDelete(project.id);
       } else {
         setIsEditingLocal(false);
+        setShowAutocomplete(false);
       }
     }
   };
 
   const handleCancel = () => {
     // If project originally had no title (new project), delete it
-    if (!project.title.trim() && onDelete) {
+    if (!project.title.trim() && !project.group && onDelete) {
       onDelete(project.id);
     } else {
-      setEditTitle(project.title);
+      setEditValue(project.title + (project.group ? `/${project.group}` : ''));
       setIsEditingLocal(false);
+      setShowAutocomplete(false);
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEditValue(value);
+    
+    // Show autocomplete if user is typing after /
+    const slashIndex = value.lastIndexOf('/');
+    setShowAutocomplete(slashIndex !== -1);
+    setSelectedIndex(0); // Reset selection when typing
+  };
+
+  const handleSelectGroup = (group: string) => {
+    const slashIndex = editValue.lastIndexOf('/');
+    if (slashIndex !== -1) {
+      const beforeSlash = editValue.slice(0, slashIndex + 1);
+      setEditValue(beforeSlash + group);
+    } else {
+      setEditValue(editValue + '/' + group);
+    }
+    setShowAutocomplete(false);
+    setSelectedIndex(0);
+    inputRef.current?.focus();
+  };
+
+  const getFilteredGroups = () => {
+    const slashIndex = editValue.lastIndexOf('/');
+    if (slashIndex === -1) return availableGroups;
+    const searchTerm = editValue.slice(slashIndex + 1).toLowerCase();
+    return availableGroups.filter(group => 
+      group.toLowerCase().includes(searchTerm)
+    );
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (showAutocomplete) {
+      const filteredGroups = getFilteredGroups();
+      
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex(prev => (prev + 1) % filteredGroups.length);
+        return;
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex(prev => prev === 0 ? filteredGroups.length - 1 : prev - 1);
+        return;
+      } else if (e.key === 'Enter' && filteredGroups.length > 0) {
+        e.preventDefault();
+        handleSelectGroup(filteredGroups[selectedIndex]);
+        return;
+      } else if (e.key === 'Escape') {
+        setShowAutocomplete(false);
+        setSelectedIndex(0);
+        return;
+      }
+    }
+    
     if (e.key === 'Enter') {
       handleSave();
     } else if (e.key === 'Escape') {
@@ -75,7 +151,8 @@ export default function ProjectCard({
 
   const startEditing = () => {
     setIsEditingLocal(true);
-    setEditTitle(project.title);
+    setEditValue(project.title + (project.group ? `/${project.group}` : ''));
+    setShowAutocomplete(false);
   };
 
   const handleDragStart = () => {
@@ -168,26 +245,56 @@ export default function ProjectCard({
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           {isEditingLocal ? (
-            <input
-              type="text"
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onBlur={handleSave}
-              placeholder="Project title"
-              className="w-full font-medium leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit h-6 flex items-center"
-              autoFocus
-            />
-          ) : (
-            <h4 
-              className="font-medium leading-snug truncate cursor-pointer hover:after:opacity-100 transition-all h-6 flex items-center relative after:content-[''] after:absolute after:left-0 after:top-full after:mt-1 after:h-px after:w-full after:bg-slate-300 after:opacity-0 after:transition-opacity"
-              onClick={startEditing}
-              title="Click to edit project title"
-            >
-              {project.title || (
-                <span className="text-slate-300 italic">Project title...</span>
+            <div className="relative flex-1">
+              <input
+                ref={inputRef}
+                type="text"
+                value={editValue}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                onBlur={handleSave}
+                placeholder="Project title"
+                className="w-full font-medium leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit h-6"
+                autoFocus
+              />
+              {showAutocomplete && availableGroups.length > 0 && (
+                <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-md shadow-lg z-50 min-w-32">
+                  <div className="px-3 py-2 text-xs text-slate-500 border-b border-slate-100">
+                    Select a group:
+                  </div>
+                  {getFilteredGroups().map((group, index) => (
+                    <div
+                      key={group}
+                      className={`px-3 py-2 text-sm cursor-pointer transition-colors ${
+                        index === selectedIndex 
+                          ? 'bg-blue-100 text-blue-900' 
+                          : 'text-slate-700 hover:bg-slate-100'
+                      }`}
+                      onClick={() => handleSelectGroup(group)}
+                    >
+                      {group}
+                    </div>
+                  ))}
+                </div>
               )}
-            </h4>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 flex-1">
+              <h4 
+                className="font-medium leading-snug truncate cursor-pointer hover:after:opacity-100 transition-all h-6 flex items-center relative after:content-[''] after:absolute after:left-0 after:top-full after:mt-1 after:h-px after:w-full after:bg-slate-300 after:opacity-0 after:transition-opacity"
+                onClick={startEditing}
+                title="Click to edit project title"
+              >
+                {project.title || (
+                  <span className="text-slate-300 italic">Project title...</span>
+                )}
+              </h4>
+              {project.group && (
+                <span className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full border border-slate-200 whitespace-nowrap">
+                  {project.group}
+                </span>
+              )}
+            </div>
           )}
         </div>
         

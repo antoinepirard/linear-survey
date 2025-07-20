@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
-import { TeamPlanData, Project, TimeSlot, Person, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor } from '@/data/teamplan';
+import { TeamPlanData, Project, TimeSlot, Person, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor, getAllGroups } from '@/data/teamplan';
 import ProjectCard from './ProjectCard';
 import TimelineHeader from './TimelineHeader';
 import PersonCell from './PersonCell';
@@ -24,6 +24,9 @@ export default function TeamPlanBoard({
   const [dragOverCell, setDragOverCell] = useState<{ personId: string; timeSlotId: string; insertIndex: number } | null>(null);
   const [newProjectId, setNewProjectId] = useState<string | null>(null);
   const [draggedProjectData, setDraggedProjectData] = useState<Project | null>(null);
+
+  // Get all unique groups from existing projects
+  const getAvailableGroups = () => getAllGroups(boardData.projects);
 
   const handleDragStart = (projectId: string) => {
     const project = boardData.projects.find(p => p.id === projectId);
@@ -331,6 +334,7 @@ export default function TeamPlanBoard({
                                 project={project}
                                 isDragging={draggedProject === project.id}
                                 isEditing={newProjectId === project.id}
+                                availableGroups={getAvailableGroups()}
                                 onEdit={handleEditProject}
                                 onDelete={handleDeleteProject}
                                 onDragStart={handleDragStart}

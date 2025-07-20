@@ -4,6 +4,7 @@ export interface Project {
   color: string;
   personId: string;
   timeSlotId: string;
+  group?: string;
 }
 
 export interface Person {
@@ -58,6 +59,7 @@ export const DEFAULT_TEAMPLAN_DATA: TeamPlanData = {
       color: PROJECT_COLORS[0],
       personId: '1',
       timeSlotId: '1',
+      group: 'research',
     },
     {
       id: '2',
@@ -65,6 +67,7 @@ export const DEFAULT_TEAMPLAN_DATA: TeamPlanData = {
       color: PROJECT_COLORS[1],
       personId: '2',
       timeSlotId: '2',
+      group: 'frontend',
     },
     {
       id: '3',
@@ -72,6 +75,7 @@ export const DEFAULT_TEAMPLAN_DATA: TeamPlanData = {
       color: PROJECT_COLORS[2],
       personId: '3',
       timeSlotId: '1',
+      group: 'design',
     },
   ],
 };
@@ -84,3 +88,6 @@ export const getRandomColor = () =>
 
 export const getProjectsForCell = (projects: Project[], personId: string, timeSlotId: string) =>
   projects.filter(project => project.personId === personId && project.timeSlotId === timeSlotId);
+
+export const getAllGroups = (projects: Project[]): string[] =>
+  [...new Set(projects.map(p => p.group).filter((group): group is string => Boolean(group)))].sort();
