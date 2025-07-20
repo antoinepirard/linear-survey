@@ -33,6 +33,7 @@ export default function ProjectCard({
   const [editValue, setEditValue] = useState(project.title + (project.group ? `/${project.group}` : ''));
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
   const dragRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -297,11 +298,13 @@ export default function ProjectCard({
         data-project-card
         data-project-id={project.id}
         className={`
-          relative group cursor-move p-3 rounded-lg ring-1 font-regular text-sm
+          relative cursor-move p-3 rounded-lg ring-1 font-regular text-sm
           shadow-sm hover:shadow-md
           ${project.color}
           ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-300/50'}
         `}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         aria-label={`Project: ${project.title}`}
       >
       <div className="flex items-center justify-between gap-2">
@@ -366,12 +369,12 @@ export default function ProjectCard({
           <div className="relative flex items-center justify-end min-w-0 flex-shrink-0">
             {/* Show tag by default, trash icon on hover */}
             {project.group && (
-              <span className={`group-hover:opacity-0 transition-opacity duration-200 text-[10px] px-1.5 py-0.5 rounded-full font-mono max-w-16 truncate ${getGroupColor(project.group).bg} ${getGroupColor(project.group).text}`}>
+              <span className={`transition-opacity duration-200 text-[10px] px-1.5 py-0.5 rounded-full font-mono max-w-16 truncate ${getGroupColor(project.group).bg} ${getGroupColor(project.group).text} ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
                 {project.group}
               </span>
             )}
             {onDelete && (
-              <div className="absolute right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center">
+              <div className={`absolute right-0 transition-opacity duration-200 flex items-center ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
