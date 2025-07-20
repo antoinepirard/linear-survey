@@ -47,6 +47,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
       }),
       Placeholder.configure({
         placeholder: 'Start writing your notes here...',
+        includeChildren: true,
       }),
     ],
     content: '',
