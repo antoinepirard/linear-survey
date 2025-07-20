@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { TeamPlanData, Project, TimeSlot, Person, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor, getAllGroups } from '@/data/teamplan';
@@ -25,6 +25,13 @@ export default function TeamPlanBoard({
   const [newProjectId, setNewProjectId] = useState<string | null>(null);
   const [draggedProjectData, setDraggedProjectData] = useState<Project | null>(null);
 
+  // Sync internal state with prop changes (e.g., when data is loaded from localStorage)
+  useEffect(() => {
+    console.log('🔄 TeamPlanBoard: Prop data changed, updating internal state');
+    console.log('🔄 TeamPlanBoard: New prop data projects count:', data.projects?.length || 0);
+    setBoardData(data);
+  }, [data]);
+
   // Get all unique groups from existing projects
   const getAvailableGroups = () => getAllGroups(boardData.projects);
 
@@ -39,6 +46,7 @@ export default function TeamPlanBoard({
   };
 
   const handleDragEnd = () => {
+    console.log('🎯 TeamPlanBoard: handleDragEnd called');
     // Keep a reference to the drag state to use after clearing
     const currentDragOverCell = dragOverCell;
     const currentDraggedProjectData = draggedProjectData;
@@ -46,6 +54,7 @@ export default function TeamPlanBoard({
     // Check if we have a valid drop target and dragged project data
     if (currentDragOverCell && currentDraggedProjectData) {
       const { personId, timeSlotId } = currentDragOverCell;
+      console.log('🚚 TeamPlanBoard: Moving project', currentDraggedProjectData.id, 'to', personId, timeSlotId);
       
       // Only allow drops to different cells (no reordering within same cell)
       if (personId !== currentDraggedProjectData.personId || timeSlotId !== currentDraggedProjectData.timeSlotId) {
@@ -60,8 +69,13 @@ export default function TeamPlanBoard({
           )
         };
         setBoardData(newData);
+        console.log('📤 TeamPlanBoard: Calling onChange with updated data (drag end)');
         onChange?.(newData);
+      } else {
+        console.log('🚫 TeamPlanBoard: No position change detected, skipping onChange');
       }
+    } else {
+      console.log('🚫 TeamPlanBoard: No valid drop target, skipping onChange');
     }
     
     // Clear drag state after data updates to prevent animation glitches
@@ -127,6 +141,7 @@ export default function TeamPlanBoard({
   };
 
   const handleAddProject = (personId: string, timeSlotId: string) => {
+    console.log('➕ TeamPlanBoard: handleAddProject called for person:', personId, 'timeSlot:', timeSlotId);
     const projectId = generateId();
     const newProject: Project = {
       id: projectId,
@@ -141,6 +156,7 @@ export default function TeamPlanBoard({
       projects: [...boardData.projects, newProject]
     };
     setBoardData(newData);
+    console.log('📤 TeamPlanBoard: Calling onChange with updated data (add project)');
     onChange?.(newData);
     
     // Set this project as the one being edited
@@ -157,6 +173,7 @@ export default function TeamPlanBoard({
   };
 
   const handleEditProject = (updatedProject: Project) => {
+    console.log('🎯 TeamPlanBoard: handleEditProject called for project:', updatedProject.id, updatedProject.title);
     const newData = {
       ...boardData,
       projects: boardData.projects.map(p => 
@@ -177,6 +194,7 @@ export default function TeamPlanBoard({
     }
     
     setNewProjectId(null);
+    console.log('📤 TeamPlanBoard: Calling onChange with updated data (edit project)');
     onChange?.(newData);
   };
 
