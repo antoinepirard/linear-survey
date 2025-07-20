@@ -159,7 +159,10 @@ export default function ProjectCard({
     }
     setShowAutocomplete(false);
     setSelectedIndex(0);
-    inputRef.current?.focus();
+    // Small delay to ensure the selection is processed before refocusing
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
   };
 
   const getFilteredGroups = () => {
@@ -329,7 +332,16 @@ export default function ProjectCard({
                           ? 'bg-blue-100 text-blue-900' 
                           : 'text-slate-700 hover:bg-slate-100'
                       }`}
-                      onClick={() => handleSelectGroup(group)}
+                      onMouseDown={(e) => {
+                        // Prevent the input from losing focus when clicking
+                        e.preventDefault();
+                        handleSelectGroup(group);
+                      }}
+                      onClick={(e) => {
+                        // Fallback for touch devices
+                        e.preventDefault();
+                        handleSelectGroup(group);
+                      }}
                     >
                       {group}
                     </div>
