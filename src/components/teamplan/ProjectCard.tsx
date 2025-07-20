@@ -304,7 +304,7 @@ export default function ProjectCard({
         `}
         aria-label={`Project: ${project.title}`}
       >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-center justify-between gap-2">
         <div className="flex-1 min-w-0">
           {isEditingLocal ? (
             <div className="relative flex-1">
@@ -350,39 +350,42 @@ export default function ProjectCard({
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2 flex-1">
-              <h4 
-                className="font-medium leading-snug truncate cursor-pointer hover:after:opacity-100 transition-all h-6 flex items-center relative after:content-[''] after:absolute after:left-0 after:top-full after:mt-1 after:h-px after:w-full after:bg-slate-300 after:opacity-0 after:transition-opacity"
-                onClick={startEditing}
-                title="Click to edit project title"
-              >
-                {project.title || (
-                  <span className="text-slate-300 italic">Project title...</span>
-                )}
-              </h4>
-              {project.group && (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap font-mono ${getGroupColor(project.group).bg} ${getGroupColor(project.group).text}`}>
-                  {project.group}
-                </span>
+            <h4 
+              className="font-medium leading-snug truncate cursor-pointer hover:after:opacity-100 transition-all h-6 flex items-center relative after:content-[''] after:absolute after:left-0 after:top-full after:mt-1 after:h-px after:w-full after:bg-slate-300 after:opacity-0 after:transition-opacity flex-1"
+              onClick={startEditing}
+              title="Click to edit project title"
+            >
+              {project.title || (
+                <span className="text-slate-300 italic">Project title...</span>
               )}
-            </div>
+            </h4>
           )}
         </div>
         
-        {!isEditingLocal && onDelete && (
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center">
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(project.id);
-              }}
-              title="Delete project"
-              variant="ghost"
-              size="sm"
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 h-6 w-6 p-1"
-            >
-              <TrashIcon />
-            </Button>
+        {!isEditingLocal && (
+          <div className="relative flex items-center justify-end min-w-0 flex-shrink-0">
+            {/* Show tag by default, trash icon on hover */}
+            {project.group && (
+              <span className={`group-hover:opacity-0 transition-opacity duration-200 text-[10px] px-1.5 py-0.5 rounded-full font-mono max-w-16 truncate ${getGroupColor(project.group).bg} ${getGroupColor(project.group).text}`}>
+                {project.group}
+              </span>
+            )}
+            {onDelete && (
+              <div className="absolute right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center">
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(project.id);
+                  }}
+                  title="Delete project"
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 h-6 w-6 p-1"
+                >
+                  <TrashIcon />
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
