@@ -77,9 +77,21 @@ export default function ProjectCard({
   const parseValue = (value: string) => {
     const slashIndex = value.indexOf('/');
     if (slashIndex !== -1) {
+      const beforeSlash = value.slice(0, slashIndex).trim();
+      const afterSlash = value.slice(slashIndex + 1).trim();
+      
+      // Check if we have group-first format: "/group project name"
+      if (slashIndex === 0 && afterSlash.includes(' ')) {
+        const spaceIndex = afterSlash.indexOf(' ');
+        const group = afterSlash.slice(0, spaceIndex).trim();
+        const title = afterSlash.slice(spaceIndex + 1).trim();
+        return { title, group: group || undefined };
+      }
+      
+      // Standard format: "project name/group"
       return {
-        title: value.slice(0, slashIndex).trim(),
-        group: value.slice(slashIndex + 1).trim() || undefined
+        title: beforeSlash,
+        group: afterSlash || undefined
       };
     }
     return { title: value.trim(), group: undefined };
@@ -121,9 +133,19 @@ export default function ProjectCard({
     const value = e.target.value;
     setEditValue(value);
     
-    // Show autocomplete if user is typing after /
+    // Show autocomplete logic
     const slashIndex = value.lastIndexOf('/');
-    setShowAutocomplete(slashIndex !== -1);
+    if (slashIndex !== -1) {
+      const afterSlash = value.slice(slashIndex + 1);
+      // Hide autocomplete if we're in group-first mode and already typed a space
+      if (slashIndex === 0 && afterSlash.includes(' ')) {
+        setShowAutocomplete(false);
+      } else {
+        setShowAutocomplete(true);
+      }
+    } else {
+      setShowAutocomplete(false);
+    }
     setSelectedIndex(0); // Reset selection when typing
   };
 
@@ -143,7 +165,14 @@ export default function ProjectCard({
   const getFilteredGroups = () => {
     const slashIndex = editValue.lastIndexOf('/');
     if (slashIndex === -1) return availableGroups;
-    const searchTerm = editValue.slice(slashIndex + 1).toLowerCase();
+    
+    const afterSlash = editValue.slice(slashIndex + 1);
+    // Don't filter if we're in project name mode (after space)
+    if (slashIndex === 0 && afterSlash.includes(' ')) {
+      return [];
+    }
+    
+    const searchTerm = afterSlash.toLowerCase();
     return availableGroups.filter(group => 
       group.toLowerCase().includes(searchTerm)
     );
