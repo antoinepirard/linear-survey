@@ -12,6 +12,11 @@ import {
 
 const STORAGE_KEY = 'teamplan-notes';
 const TITLE_STORAGE_KEY = 'teamplan-notes-title';
+const WIDTH_STORAGE_KEY = 'teamplan-notes-width';
+
+const MIN_WIDTH = 300;
+const MAX_WIDTH = 800;
+const DEFAULT_WIDTH = 400;
 
 interface NotePadProps {
   className?: string;
@@ -22,6 +27,8 @@ export default function NotePad({ className = '' }: NotePadProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasAnimated, setHasAnimated] = useState(false);
   const [title, setTitle] = useState('');
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
+  const [isResizing, setIsResizing] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -57,17 +64,24 @@ export default function NotePad({ className = '' }: NotePadProps) {
     },
   });
 
-  // Load saved content and title from localStorage
+  // Load saved content, title, and width from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined' && editor) {
       const savedContent = localStorage.getItem(STORAGE_KEY);
       const savedTitle = localStorage.getItem(TITLE_STORAGE_KEY);
+      const savedWidth = localStorage.getItem(WIDTH_STORAGE_KEY);
       
       if (savedContent) {
         editor.commands.setContent(savedContent);
       }
       if (savedTitle) {
         setTitle(savedTitle);
+      }
+      if (savedWidth) {
+        const parsedWidth = parseInt(savedWidth, 10);
+        if (parsedWidth >= MIN_WIDTH && parsedWidth <= MAX_WIDTH) {
+          setWidth(parsedWidth);
+        }
       }
       setIsLoading(false);
     }
@@ -83,6 +97,33 @@ export default function NotePad({ className = '' }: NotePadProps) {
   const toggleExpanded = () => {
     setHasAnimated(true);
     setIsExpanded(!isExpanded);
+  };
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+
+    const startX = e.clientX;
+    const startWidth = width;
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, startWidth + deltaX));
+      setWidth(newWidth);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(WIDTH_STORAGE_KEY, newWidth.toString());
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
   };
 
   if (isLoading) {
@@ -101,16 +142,16 @@ export default function NotePad({ className = '' }: NotePadProps) {
       <AnimatePresence mode="wait">
         {isExpanded && (
           <motion.div
-            initial={hasAnimated ? { width: 0, opacity: 0 } : { width: 400, opacity: 1 }}
-            animate={{ width: 400, opacity: 1 }}
+            initial={hasAnimated ? { width: 0, opacity: 0 } : { width, opacity: 1 }}
+            animate={{ width, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            transition={hasAnimated ? { 
+            transition={isResizing ? { duration: 0 } : hasAnimated ? { 
               type: "spring", 
               stiffness: 300, 
               damping: 30,
               opacity: { duration: 0.2 }
             } : { duration: 0 }}
-            className="bg-white border-r border-slate-200 overflow-hidden h-full"
+            className="bg-white border-r border-slate-200 overflow-hidden h-full relative"
           >
             <div className="h-full flex flex-col">
               {/* Header with collapse button */}
@@ -143,6 +184,18 @@ export default function NotePad({ className = '' }: NotePadProps) {
                   className="h-full"
                 />
               </div>
+            </div>
+
+            {/* Resize Handle */}
+            <div
+              onMouseDown={handleResizeStart}
+              className="absolute top-0 right-0 w-4 h-full cursor-col-resize flex items-center justify-center"
+            >
+              <div
+                className={`w-1 h-8 rounded-full transition-colors duration-150 ${
+                  isResizing ? 'bg-blue-500' : 'bg-slate-300 hover:bg-slate-400'
+                }`}
+              />
             </div>
           </motion.div>
         )}
