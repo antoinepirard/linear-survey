@@ -94,7 +94,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
   }
 
   return (
-    <div className={`relative flex ${className}`}>
+    <div className={`relative h-full flex ${className}`}>
       {/* Expandable Content */}
       <AnimatePresence mode="wait">
         {isExpanded && (
@@ -108,11 +108,11 @@ export default function NotePad({ className = '' }: NotePadProps) {
               damping: 30,
               opacity: { duration: 0.2 }
             }}
-            className="bg-white border-r border-slate-200 overflow-hidden"
+            className="bg-white border-r border-slate-200 overflow-hidden h-full"
           >
             <div className="h-full flex flex-col">
               {/* Title Input */}
-              <div className="px-6 pt-6 pb-4">
+              <div className="px-6 pt-12 pb-4">
                 <input
                   type="text"
                   value={title}
@@ -134,10 +134,10 @@ export default function NotePad({ className = '' }: NotePadProps) {
         )}
       </AnimatePresence>
 
-      {/* Toggle Button */}
+      {/* Toggle Button - Top Left */}
       <button
         onClick={toggleExpanded}
-        className="w-12 h-full bg-slate-50 hover:bg-slate-100 border-r border-slate-200 flex items-center justify-center transition-colors duration-200 group"
+        className="absolute top-4 left-4 z-10 w-8 h-8 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md flex items-center justify-center transition-colors duration-200 group shadow-sm"
         aria-label={isExpanded ? "Collapse notes" : "Expand notes"}
       >
         {isExpanded ? (

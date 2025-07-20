@@ -61,7 +61,7 @@ export default function TimelineHeader({
   return (
     <div className="grid gap-0 mb-0" style={{ gridTemplateColumns: `200px repeat(${timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
       {/* Team Header */}
-      <div className="p-4 bg-white border-b border-slate-200 flex items-center justify-between">
+      <div className="p-4 border-b border-slate-200 flex items-center justify-between">
         <p className="font-mono text-xs text-slate-700">Team</p>
       </div>
 
@@ -69,7 +69,7 @@ export default function TimelineHeader({
       {timeSlots.map((timeSlot) => (
         <motion.div
           key={timeSlot.id}
-          className="p-4 bg-white border-b border-slate-200 group relative"
+          className="p-4 border-b border-slate-200 group relative"
         >
           <div className="flex items-center justify-between">
             {editingSlot === timeSlot.id ? (
@@ -108,12 +108,12 @@ export default function TimelineHeader({
       ))}
       
       {/* Add Time Slot Column */}
-      <div className="bg-white border-b border-slate-200 flex items-center justify-center">
+      <div className="border-b border-slate-200 flex items-center justify-center">
         <Button
           onClick={handleAddSlot}
           variant="secondary"
           size="icon"
-          className="bg-white ring-1 ring-slate-200/65 hover:ring-1 hover:ring-slate-300/50 size-7"
+          className="ring-1 ring-slate-200/65 hover:ring-1 hover:ring-slate-300/50 size-7"
           title="Add time slot"
         >
           <PlusIcon className="size-3" />

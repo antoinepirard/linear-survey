@@ -301,7 +301,7 @@ export default function ProjectCard({
           relative cursor-move p-3 rounded-lg ring-1 font-regular text-sm
           shadow-sm hover:shadow-md transition-shadow duration-200
           ${project.color}
-          ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-300/50'}
+          ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-200/65'}
         `}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

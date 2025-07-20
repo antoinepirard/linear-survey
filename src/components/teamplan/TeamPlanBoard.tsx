@@ -309,7 +309,7 @@ export default function TeamPlanBoard({
                   return (
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
-                      className="min-h-20 p-3 pt-4 pb-4 border-b border-dashed border-slate-200 transition-all duration-200 bg-white relative overflow-visible group"
+                      className="min-h-20 p-3 pt-4 pb-4 border-b border-dashed border-slate-200 transition-all duration-20 relative overflow-visible group"
                       data-drop-zone
                       data-person-id={person.id}
                       data-timeslot-id={timeSlot.id}
@@ -319,7 +319,7 @@ export default function TeamPlanBoard({
                       {/* Inner drop target with glow effect */}
                       <div className={`absolute inset-2 rounded-lg transition-all duration-200 pointer-events-none ${
                         isDropping 
-                          ? 'bg-gradient-to-b from-blue-200/15 via-blue-100/10 to-transparent' 
+                          ? 'bg-gradient-to-b from-blue-200/20 via-blue-100/10 to-transparent transition-all duration-200' 
                           : ''
                       }`} />
                       
@@ -388,7 +388,7 @@ export default function TeamPlanBoard({
                 })}
                 
                 {/* Empty cell for the add column */}
-                <div className="min-h-20 border-b border-dashed border-slate-200 bg-white" />
+                <div className="min-h-20 border-b border-dashed border-slate-200" />
               </div>
             ))}
             
@@ -396,11 +396,11 @@ export default function TeamPlanBoard({
             <div className="grid gap-0" style={{ gridTemplateColumns: `200px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
               <AddPersonCell onAddPerson={handleAddPerson} />
               {boardData.timeSlots.map(timeSlot => (
-                <div key={`add-person-${timeSlot.id}`} className=" bg-white min-h-16" />
+                <div key={`add-person-${timeSlot.id}`} className=" min-h-16" />
               ))}
               
               {/* Empty cell for the add column */}
-              <div className="bg-white min-h-16" />
+              <div className="min-h-16" />
             </div>
           </div>
         </div>

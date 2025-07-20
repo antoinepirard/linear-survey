@@ -70,7 +70,7 @@ export default function TeamPlanPage() {
   }
 
   return (
-    <div className="h-screen bg-white overflow-hidden flex">
+    <div className="h-screen bg-slate-50 overflow-hidden flex">
       <NotePad className="flex-shrink-0" />
       <div className="flex-1 overflow-hidden">
         <TeamPlanBoard 
