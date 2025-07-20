@@ -1,0 +1,86 @@
+/* Tiptap NotePad Editor Styles */
+.ProseMirror {
+  outline: none !important;
+  font-size: 0.875rem;
+  color: rgb(51 65 85);
+  line-height: 1.5;
+  min-height: 400px;
+}
+
+.ProseMirror.is-empty::before {
+  content: attr(data-placeholder);
+  color: rgb(203 213 225) !important;
+  pointer-events: none;
+  position: absolute;
+  opacity: 0.6;
+}
+
+.ProseMirror h1 {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: rgb(30 41 59) !important;
+  margin-bottom: 1rem !important;
+  margin-top: 1.5rem !important;
+}
+
+.ProseMirror h2 {
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  color: rgb(30 41 59) !important;
+  margin-bottom: 0.75rem !important;
+  margin-top: 1.25rem !important;
+}
+
+.ProseMirror h3 {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: rgb(30 41 59) !important;
+  margin-bottom: 0.5rem !important;
+  margin-top: 1rem !important;
+}
+
+.ProseMirror p {
+  margin-bottom: 0.5rem !important;
+}
+
+.ProseMirror strong {
+  font-weight: 600 !important;
+  color: rgb(30 41 59) !important;
+}
+
+.ProseMirror em {
+  font-style: italic !important;
+}
+
+.ProseMirror ul {
+  list-style-type: disc !important;
+  margin-left: 1.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal !important;
+  margin-left: 1.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.ProseMirror li {
+  margin-bottom: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.ProseMirror blockquote {
+  border-left: 4px solid rgb(203 213 225) !important;
+  padding-left: 1rem !important;
+  font-style: italic !important;
+  color: rgb(71 85 105) !important;
+}
+
+.ProseMirror code {
+  background-color: rgb(241 245 249) !important;
+  padding: 0.125rem 0.25rem !important;
+  border-radius: 0.25rem !important;
+  color: rgb(30 41 59) !important;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: 0.875rem !important;
+}

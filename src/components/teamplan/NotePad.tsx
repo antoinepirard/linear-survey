@@ -126,51 +126,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
               <div className="flex-1 overflow-y-auto">
                 <EditorContent 
                   editor={editor} 
-                  className="h-full 
-                    [&_.ProseMirror]:min-h-full 
-                    [&_.ProseMirror]:text-sm 
-                    [&_.ProseMirror]:text-slate-700 
-                    [&_.ProseMirror]:leading-6
-                    [&_.ProseMirror.ProseMirror-focused]:outline-none
-                    [&_.ProseMirror_.is-editor-empty_.is-empty::before]:text-slate-300
-                    [&_.ProseMirror_.is-editor-empty_.is-empty::before]:pointer-events-none
-                    [&_.ProseMirror_h1]:text-2xl 
-                    [&_.ProseMirror_h1]:font-bold 
-                    [&_.ProseMirror_h1]:text-slate-800 
-                    [&_.ProseMirror_h1]:mb-4 
-                    [&_.ProseMirror_h1]:mt-6
-                    [&_.ProseMirror_h2]:text-lg 
-                    [&_.ProseMirror_h2]:font-semibold 
-                    [&_.ProseMirror_h2]:text-slate-800 
-                    [&_.ProseMirror_h2]:mb-3 
-                    [&_.ProseMirror_h2]:mt-5
-                    [&_.ProseMirror_h3]:text-base 
-                    [&_.ProseMirror_h3]:font-semibold 
-                    [&_.ProseMirror_h3]:text-slate-800 
-                    [&_.ProseMirror_h3]:mb-2 
-                    [&_.ProseMirror_h3]:mt-4
-                    [&_.ProseMirror_p]:mb-3
-                    [&_.ProseMirror_strong]:font-semibold 
-                    [&_.ProseMirror_strong]:text-slate-800
-                    [&_.ProseMirror_em]:italic
-                    [&_.ProseMirror_blockquote]:border-l-4 
-                    [&_.ProseMirror_blockquote]:border-slate-300 
-                    [&_.ProseMirror_blockquote]:pl-4 
-                    [&_.ProseMirror_blockquote]:italic 
-                    [&_.ProseMirror_blockquote]:text-slate-600
-                    [&_.ProseMirror_ul]:list-disc 
-                    [&_.ProseMirror_ul]:ml-6 
-                    [&_.ProseMirror_ul]:mb-3
-                    [&_.ProseMirror_ol]:list-decimal 
-                    [&_.ProseMirror_ol]:ml-6 
-                    [&_.ProseMirror_ol]:mb-3
-                    [&_.ProseMirror_li]:mb-0
-                    [&_.ProseMirror_code]:bg-slate-100 
-                    [&_.ProseMirror_code]:px-1 
-                    [&_.ProseMirror_code]:rounded 
-                    [&_.ProseMirror_code]:text-slate-800 
-                    [&_.ProseMirror_code]:font-mono 
-                    [&_.ProseMirror_code]:text-sm"
+                  className="h-full"
                 />
               </div>
             </div>
