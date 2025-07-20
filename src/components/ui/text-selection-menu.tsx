@@ -19,15 +19,6 @@ interface MenuButtonProps {
   title: string;
 }
 
-interface SubmenuButtonProps {
-  isActive?: boolean;
-  onClick: () => void;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-  children: React.ReactNode;
-  title: string;
-}
-
 function MenuButton({ isActive, onClick, children, title }: MenuButtonProps) {
   return (
     <Button
@@ -37,25 +28,6 @@ function MenuButton({ isActive, onClick, children, title }: MenuButtonProps) {
       title={title}
       className={cn(
         "h-8 w-8 p-0 hover:bg-slate-100",
-        isActive && "bg-slate-900 text-white hover:bg-slate-800"
-      )}
-    >
-      {children}
-    </Button>
-  );
-}
-
-function SubmenuButton({ isActive, onClick, onMouseEnter, onMouseLeave, children, title }: SubmenuButtonProps) {
-  return (
-    <Button
-      variant={isActive ? "default" : "ghost"}
-      size="sm"
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      title={title}
-      className={cn(
-        "h-8 w-8 p-0 hover:bg-slate-100 relative",
         isActive && "bg-slate-900 text-white hover:bg-slate-800"
       )}
     >
