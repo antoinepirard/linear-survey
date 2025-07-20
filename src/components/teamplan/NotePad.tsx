@@ -151,7 +151,9 @@ export default function NotePad({ className = '' }: NotePadProps) {
               damping: 30,
               opacity: { duration: 0.2 }
             } : { duration: 0 }}
-            className="bg-white border-r border-slate-200 overflow-hidden h-full relative"
+            className={`bg-white overflow-hidden h-full relative ${
+              isExpanded ? 'border-r border-slate-200' : ''
+            }`}
           >
             <div className="h-full flex flex-col">
               {/* Header with collapse button */}
@@ -192,8 +194,8 @@ export default function NotePad({ className = '' }: NotePadProps) {
               className="absolute top-0 right-0 w-4 h-full cursor-col-resize flex items-center justify-center"
             >
               <div
-                className={`w-1 h-8 rounded-full transition-colors duration-150 ${
-                  isResizing ? 'bg-blue-500' : 'bg-slate-300 hover:bg-slate-400'
+                className={`w-1 h-6 rounded-full transition-colors duration-150 ${
+                  isResizing ? 'bg-blue-500' : 'bg-slate-200 hover:bg-slate-400'
                 }`}
               />
             </div>
