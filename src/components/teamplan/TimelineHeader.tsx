@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import { TimeSlot, generateId } from '@/data/teamplan';
 import { Button } from '@/components/ui/button';
 
@@ -78,7 +79,7 @@ export default function TimelineHeader({
                 onChange={(e) => setEditValue(e.target.value)}
                 onBlur={() => handleSaveEdit(timeSlot.id)}
                 onKeyDown={(e) => handleKeyDown(e, timeSlot.id)}
-                className="font-mono uppercase text-xs text-slate-700 bg-white border border-slate-300 rounded px-2 py-1 text-center w-full"
+                className="font-mono uppercase text-xs text-slate-700 bg-transparent border-none outline-none px-2 py-1 text-center w-full"
                 autoFocus
               />
             ) : (
