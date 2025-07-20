@@ -295,7 +295,14 @@ export default function TeamPlanBoard({
                       role="region"
                       aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
                     >
-                      <div className="space-y-2">
+                      {/* Inner drop target with glow effect */}
+                      <div className={`absolute inset-2 rounded-lg transition-all duration-200 pointer-events-none ${
+                        isDropping 
+                          ? 'bg-gradient-to-b from-blue-200/15 via-blue-100/10 to-transparent' 
+                          : ''
+                      }`} />
+                      
+                      <div className="space-y-2 relative">
                           {/* Fixed insertion placeholder at the top */}
                           <div className="h-1 flex items-center justify-center">
                             <div
