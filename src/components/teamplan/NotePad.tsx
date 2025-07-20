@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -9,6 +9,7 @@ import {
   ChevronLeftIcon, 
   ChevronRightIcon 
 } from '@heroicons/react/24/outline';
+import TextSelectionMenu from '@/components/ui/text-selection-menu';
 
 const STORAGE_KEY = 'teamplan-notes';
 const TITLE_STORAGE_KEY = 'teamplan-notes-title';
@@ -29,6 +30,9 @@ export default function NotePad({ className = '' }: NotePadProps) {
   const [title, setTitle] = useState('');
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
+  const [showSelectionMenu, setShowSelectionMenu] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+  const editorRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
     extensions: [
@@ -63,6 +67,46 @@ export default function NotePad({ className = '' }: NotePadProps) {
         localStorage.setItem(STORAGE_KEY, content);
       }
     },
+    onSelectionUpdate: ({ editor }) => {
+      const { selection } = editor.state;
+      const { empty } = selection;
+      
+      if (!empty && editorRef.current) {
+        // Get selection position
+        const { from, to } = selection;
+        const start = editor.view.coordsAtPos(from);
+        const end = editor.view.coordsAtPos(to);
+        
+        // Calculate menu position
+        const editorRect = editorRef.current.getBoundingClientRect();
+        const menuWidth = 200; // Reduced width with submenu
+        const menuHeight = 40; // Approximate menu height
+        const submenuHeight = 40; // Additional space for submenu when shown
+        
+        let x = (start.left + end.left) / 2 - editorRect.left;
+        let y = start.top - editorRect.top - menuHeight - submenuHeight - 10; // Position above selection with space for submenu
+        
+        // Keep menu within editor bounds
+        const editorWidth = editorRect.width;
+        
+        // Adjust horizontal position if menu would go off-screen
+        if (x - menuWidth / 2 < 0) {
+          x = menuWidth / 2;
+        } else if (x + menuWidth / 2 > editorWidth) {
+          x = editorWidth - menuWidth / 2;
+        }
+        
+        // Adjust vertical position if menu would go above editor
+        if (y < 0) {
+          y = end.top - editorRect.top + 30; // Position below selection instead
+        }
+        
+        setMenuPosition({ x, y });
+        setShowSelectionMenu(true);
+      } else {
+        setShowSelectionMenu(false);
+      }
+    },
   });
 
   // Load saved content, title, and width from localStorage
@@ -87,6 +131,22 @@ export default function NotePad({ className = '' }: NotePadProps) {
       setIsLoading(false);
     }
   }, [editor]);
+
+  // Hide menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (editorRef.current && !editorRef.current.contains(event.target as Node)) {
+        setShowSelectionMenu(false);
+      }
+    };
+
+    if (showSelectionMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showSelectionMenu]);
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
@@ -181,11 +241,25 @@ export default function NotePad({ className = '' }: NotePadProps) {
               </div>
 
               {/* Editor */}
-              <div className="flex-1 overflow-y-auto">
+              <div ref={editorRef} className="flex-1 overflow-y-auto relative">
                 <EditorContent 
                   editor={editor} 
                   className="h-full"
                 />
+                
+                {/* Text Selection Menu */}
+                {editor && showSelectionMenu && (
+                  <div
+                    className="absolute z-50"
+                    style={{
+                      left: menuPosition.x,
+                      top: menuPosition.y,
+                      transform: 'translateX(-50%)',
+                    }}
+                  >
+                    <TextSelectionMenu editor={editor} />
+                  </div>
+                )}
               </div>
             </div>
 
