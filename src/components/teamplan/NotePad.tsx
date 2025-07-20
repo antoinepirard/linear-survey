@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import Link from '@tiptap/extension-link';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ChevronLeftIcon, 
@@ -49,6 +50,12 @@ export default function NotePad({ className = '' }: NotePadProps) {
           keepAttributes: false,
         },
       }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-600 underline hover:text-blue-800 cursor-pointer',
+        },
+      }),
       Placeholder.configure({
         placeholder: 'Start writing your notes here...',
         includeChildren: true,
@@ -81,10 +88,9 @@ export default function NotePad({ className = '' }: NotePadProps) {
         const editorRect = editorRef.current.getBoundingClientRect();
         const menuWidth = 200; // Reduced width with submenu
         const menuHeight = 40; // Approximate menu height
-        const submenuHeight = 40; // Additional space for submenu when shown
         
         let x = (start.left + end.left) / 2 - editorRect.left;
-        let y = start.top - editorRect.top - menuHeight - submenuHeight - 10; // Position above selection with space for submenu
+        let y = start.top - editorRect.top - menuHeight - 20; // Position above selection with comfortable gap
         
         // Keep menu within editor bounds
         const editorWidth = editorRect.width;
