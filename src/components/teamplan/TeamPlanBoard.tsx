@@ -23,6 +23,7 @@ export default function TeamPlanBoard({
   const [draggedProject, setDraggedProject] = useState<string | null>(null);
   const [isDuplicating, setIsDuplicating] = useState(false);
   const [dragOverCell, setDragOverCell] = useState<{ personId: string; timeSlotId: string; insertIndex: number } | null>(null);
+  const [dragOverAddPerson, setDragOverAddPerson] = useState(false);
   const [newProjectId, setNewProjectId] = useState<string | null>(null);
   const [draggedProjectData, setDraggedProjectData] = useState<Project | null>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
@@ -85,9 +86,62 @@ export default function TeamPlanBoard({
     // Keep a reference to the drag state to use after clearing
     const currentDragOverCell = dragOverCell;
     const currentDraggedProjectData = draggedProjectData;
+    const currentDragOverAddPerson = dragOverAddPerson;
     
+    // Check if dropped on add person area
+    if (currentDragOverAddPerson && currentDraggedProjectData) {
+      console.log('🚚 TeamPlanBoard: Creating new person from dropped project');
+      
+      // Create new person with "Unknown" name
+      const newPersonId = generateId();
+      const newPerson: Person = {
+        id: newPersonId,
+        name: 'Unknown'
+      };
+      
+      // Get first time slot for the new assignment
+      const firstTimeSlot = boardData.timeSlots[0];
+      if (firstTimeSlot) {
+        let updatedProject: Project;
+        let newProjects: Project[];
+        
+        if (isDuplicating) {
+          // Create a duplicate project assigned to the new person
+          const duplicateProjectId = generateId();
+          updatedProject = {
+            ...currentDraggedProjectData,
+            id: duplicateProjectId,
+            personId: newPersonId,
+            timeSlotId: firstTimeSlot.id,
+          };
+          newProjects = [...boardData.projects, updatedProject];
+        } else {
+          // Move the existing project to the new person
+          updatedProject = {
+            ...currentDraggedProjectData,
+            personId: newPersonId,
+            timeSlotId: firstTimeSlot.id,
+          };
+          newProjects = boardData.projects.map(p => 
+            p.id === currentDraggedProjectData.id ? updatedProject : p
+          );
+        }
+        
+        const newData = {
+          ...boardData,
+          people: [...boardData.people, newPerson],
+          projects: newProjects
+        };
+        setBoardData(newData);
+        onChange?.(newData);
+        
+        if (isDuplicating) {
+          setNewProjectId(updatedProject.id);
+        }
+      }
+    }
     // Check if we have a valid drop target and dragged project data
-    if (currentDragOverCell && currentDraggedProjectData) {
+    else if (currentDragOverCell && currentDraggedProjectData) {
       const { personId, timeSlotId } = currentDragOverCell;
       console.log('🚚 TeamPlanBoard: Moving project', currentDraggedProjectData.id, 'to', personId, timeSlotId);
 
@@ -136,6 +190,7 @@ export default function TeamPlanBoard({
     setDraggedProject(null);
     setDraggedProjectData(null);
     setDragOverCell(null);
+    setDragOverAddPerson(false);
     setIsDuplicating(false);
   };
 
@@ -149,6 +204,25 @@ export default function TeamPlanBoard({
         x: draggedRect.left + draggedRect.width / 2,
         y: draggedRect.top + draggedRect.height / 2
       };
+
+      // Check if dragging over add person zone first
+      const addPersonZone = document.querySelector('[data-add-person-zone]');
+      if (addPersonZone) {
+        const addPersonRect = addPersonZone.getBoundingClientRect();
+        if (
+          draggedCenter.x >= addPersonRect.left &&
+          draggedCenter.x <= addPersonRect.right &&
+          draggedCenter.y >= addPersonRect.top &&
+          draggedCenter.y <= addPersonRect.bottom
+        ) {
+          setDragOverCell(null);
+          setDragOverAddPerson(true);
+          return;
+        }
+      }
+
+      // Clear add person drag over state if not over add person zone
+      setDragOverAddPerson(false);
 
       // Find all drop zone cells
       const cells = document.querySelectorAll('[data-drop-zone]');
@@ -462,13 +536,11 @@ export default function TeamPlanBoard({
             
             {/* Add Person Row */}
             <div className="grid gap-0" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
-              <AddPersonCell onAddPerson={handleAddPerson} />
-              {boardData.timeSlots.map(timeSlot => (
-                <div key={`add-person-${timeSlot.id}`} className="min-h-12" />
-              ))}
-              
-              {/* Empty cell for the add column */}
-              <div className="min-h-12" />
+              <AddPersonCell 
+                onAddPerson={handleAddPerson}
+                isDraggedOver={dragOverAddPerson}
+                numTimeSlots={boardData.timeSlots.length}
+              />
             </div>
           </div>
         </div>
