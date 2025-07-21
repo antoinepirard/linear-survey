@@ -216,6 +216,9 @@ export default function NotePad({
               opacity: { duration: NOTEPAD_CONSTANTS.OPACITY_DURATION }
             } : { duration: 0 }}
             className={`bg-white overflow-hidden h-full relative notepad-container ${
+              // Add blue border effect when resizing - this will overlay the navigation border
+              isResizing ? 'border-r-2 border-blue-500' : ''
+            } ${
               // Mobile responsive classes
               width < 500 ? 'min-w-[280px]' : ''
             }`}
@@ -254,15 +257,15 @@ export default function NotePad({
           {/* Resize Handle - positioned outside the notepad */}
           <div
             onMouseDown={handleResizeStart}
-            className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-10"
+            className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-50"
             style={{ left: width }}
             role="separator"
             aria-label="Resize notepad"
             aria-orientation="vertical"
           >
             <div
-              className={`w-1 h-6 rounded-full transition-colors duration-150 ${
-                isResizing ? 'bg-blue-500' : 'bg-slate-200 hover:bg-slate-400'
+              className={`w-1 h-8 rounded-full transition-colors duration-150 shadow-sm ${
+                isResizing ? 'bg-blue-500 shadow-blue-200' : 'bg-slate-300 hover:bg-blue-400 hover:shadow-blue-100'
               }`}
             />
           </div>

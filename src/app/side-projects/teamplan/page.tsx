@@ -50,7 +50,7 @@ export default function TeamPlanPage() {
 
   if (!currentPlan) {
     return (
-      <div className="h-screen bg-slate-50/30 overflow-hidden flex items-center justify-center">
+      <div className="h-screen bg-slate-50/75 overflow-hidden flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-600 mb-4">No plan found</p>
           <button
@@ -65,11 +65,11 @@ export default function TeamPlanPage() {
   }
 
   return (
-    <div className="h-screen bg-slate-50/30 overflow-hidden flex">
+    <div className="h-screen bg-slate-50/75 overflow-hidden flex">
       {/* Left Panel: Plan Header + Navigation + Notepad */}
-      <div className="flex flex-col border-r border-slate-200">
+      <div className="flex flex-col border-r border-slate-200/65">
         {/* Plan Selector Header */}
-        <div className="bg-white border-b border-slate-200 px-4 py-2 flex-shrink-0">
+        <div className="bg-white border-b border-slate-200/65 px-4 py-2 flex-shrink-0">
           <PlanSelector
             currentPlan={currentPlan}
             allPlans={allPlans}
