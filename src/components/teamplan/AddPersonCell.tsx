@@ -63,7 +63,7 @@ export default function AddPersonCell({
           ? 'bg-gradient-to-b from-blue-200/20 via-blue-100/10 to-transparent border-1 border-dashed border-blue-300' 
           : isAdding 
             ? 'bg-white border border-slate-200 cursor-default' 
-            : 'border border-transparent hover:bg-slate-100'
+            : 'border border-transparent hover:border-slate-200/75'
       }`}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
