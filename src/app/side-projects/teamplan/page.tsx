@@ -60,7 +60,7 @@ export default function TeamPlanPage() {
 
   if (isLoading) {
     return (
-      <div className="h-screen bg-white overflow-hidden flex items-center justify-center">
+      <div className="h-screen bg-slate-50/30 overflow-hidden flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
           <p className="text-slate-600 text-sm">Loading your team plan...</p>
@@ -70,7 +70,7 @@ export default function TeamPlanPage() {
   }
 
   return (
-    <div className="h-screen bg-white overflow-hidden flex">
+    <div className="h-screen bg-slate-50/30 overflow-hidden flex">
       <NotePad className="flex-shrink-0" />
       <div className="flex-1 overflow-hidden">
         <TeamPlanBoard 

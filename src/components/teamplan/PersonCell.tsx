@@ -67,7 +67,7 @@ export default function PersonCell({
             className="flex-1 cursor-pointer"
             onClick={() => setIsEditing(true)}
           >
-            <h4 className="text-sm font-medium text-slate-900 px-2 py-0.5 rounded transition-colors">{person.name}</h4>
+            <h4 className="text-sm font-medium text-slate-900 px-2 pt-4 pb-0.5 rounded transition-colors">{person.name}</h4>
           </div>
           
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
