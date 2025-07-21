@@ -299,12 +299,15 @@ export default function ProjectCard({
         data-project-id={project.id}
         className={`
           relative cursor-move p-2 py-2.5 rounded-lg ring-1 font-regular text-sm
-          shadow-none hover:shadow-md transition-shadow duration-200
+          transition-shadow duration-200
+          ${isHovered ? 'shadow-md' : 'shadow-none'}
           ${project.color}
           ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-200/65'}
         `}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onTouchStart={() => setIsHovered(false)}
+        onTouchEnd={() => setIsHovered(false)}
         aria-label={`Project: ${project.title}`}
       >
       <div className="flex items-center justify-between gap-2">
