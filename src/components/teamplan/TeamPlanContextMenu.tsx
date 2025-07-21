@@ -7,9 +7,9 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, TrashIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
+import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, TrashIcon, DocumentDuplicateIcon, PlusIcon } from '@heroicons/react/24/outline';
 
-export type ContextMenuType = 'person' | 'timeSlot' | 'project';
+export type ContextMenuType = 'person' | 'timeSlot' | 'project' | 'cell';
 
 interface TeamPlanContextMenuProps {
   children: React.ReactNode;
@@ -21,6 +21,8 @@ interface TeamPlanContextMenuProps {
   onMoveDown?: () => void;
   onDelete: () => void;
   onDuplicate?: () => void;
+  onAddProject?: () => void;
+  personName?: string;
   label?: string;
 }
 
@@ -34,6 +36,8 @@ export default function TeamPlanContextMenu({
   onMoveDown,
   onDelete,
   onDuplicate,
+  onAddProject,
+  personName,
   label,
 }: TeamPlanContextMenuProps) {
   const getLabel = () => {
@@ -82,6 +86,46 @@ export default function TeamPlanContextMenu({
               <TrashIcon className="h-4 w-4" />
               Delete {getLabel()}
             </ContextMenuItem>
+          </>
+        ) : type === 'cell' ? (
+          <>
+            <ContextMenuItem
+              onClick={onAddProject}
+              className="flex items-center gap-2"
+            >
+              <PlusIcon className="h-4 w-4" />
+              Add Project
+            </ContextMenuItem>
+            {personName && (
+              <>
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                  onClick={onMoveUp}
+                  disabled={!canMoveUp}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronUpIcon className="h-4 w-4" />
+                  Move {personName} Up
+                </ContextMenuItem>
+                <ContextMenuItem
+                  onClick={onMoveDown}
+                  disabled={!canMoveDown}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronDownIcon className="h-4 w-4" />
+                  Move {personName} Down
+                </ContextMenuItem>
+                <ContextMenuItem
+                  onClick={onDelete}
+                  disabled={!canDelete}
+                  variant="destructive"
+                  className="flex items-center gap-2"
+                >
+                  <TrashIcon className="h-4 w-4" />
+                  Delete {personName}
+                </ContextMenuItem>
+              </>
+            )}
           </>
         ) : (
           <>

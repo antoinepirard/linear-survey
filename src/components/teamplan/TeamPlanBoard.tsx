@@ -8,6 +8,7 @@ import ProjectCard from './ProjectCard';
 import TimelineHeader from './TimelineHeader';
 import PersonCell from './PersonCell';
 import AddPersonCell from './AddPersonCell';
+import TeamPlanContextMenu from './TeamPlanContextMenu';
 import { Button } from '@/components/ui/button';
 
 interface TeamPlanBoardProps {
@@ -638,18 +639,23 @@ export default function TeamPlanBoard({
           {/* Board Grid */}
           <div className="space-y-0">
             {boardData.people.map((person, personIndex) => (
-              <div key={person.id} className="grid gap-0 bg-slate-50 rounded-lg my-1 p-1.5 group/row" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
-                {/* Person Column with Inline Editing */}
-                <PersonCell
-                  person={person}
-                  onUpdatePerson={handleUpdatePerson}
-                  onMoveUp={handleMovePersonUp}
-                  onMoveDown={handleMovePersonDown}
-                  onDelete={handleRemovePerson}
-                  canMoveUp={personIndex > 0}
-                  canMoveDown={personIndex < boardData.people.length - 1}
-                  canDelete={boardData.people.length > 1}
-                />
+              <TeamPlanContextMenu
+                key={person.id}
+                type="person"
+                canMoveUp={personIndex > 0}
+                canMoveDown={personIndex < boardData.people.length - 1}
+                canDelete={boardData.people.length > 1}
+                onMoveUp={() => handleMovePersonUp(person.id)}
+                onMoveDown={() => handleMovePersonDown(person.id)}
+                onDelete={() => handleRemovePerson(person.id)}
+                label={person.name}
+              >
+                <div className="grid gap-0 bg-slate-50 rounded-lg my-1 p-1.5 group/row" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+                  {/* Person Column with Inline Editing */}
+                  <PersonCell
+                    person={person}
+                    onUpdatePerson={handleUpdatePerson}
+                  />
               
                 {/* Project Cells */}
                 {boardData.timeSlots.map(timeSlot => {
@@ -657,15 +663,26 @@ export default function TeamPlanBoard({
                   const isDropping = isDropTarget(person.id, timeSlot.id);
                   
                   return (
-                    <motion.div
+                    <TeamPlanContextMenu
                       key={`${person.id}-${timeSlot.id}`}
-                      className="min-h-12 p-1.5 pt-2 pb-2 transition-all duration-20 relative overflow-visible group"
-                      data-drop-zone
-                      data-person-id={person.id}
-                      data-timeslot-id={timeSlot.id}
-                      role="region"
-                      aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
+                      type="cell"
+                      canMoveUp={personIndex > 0}
+                      canMoveDown={personIndex < boardData.people.length - 1}
+                      canDelete={boardData.people.length > 1}
+                      onMoveUp={() => handleMovePersonUp(person.id)}
+                      onMoveDown={() => handleMovePersonDown(person.id)}
+                      onDelete={() => handleRemovePerson(person.id)}
+                      onAddProject={() => handleAddProject(person.id, timeSlot.id)}
+                      personName={person.name}
                     >
+                      <motion.div
+                        className="min-h-12 p-1.5 pt-2 pb-2 transition-all duration-20 relative overflow-visible group"
+                        data-drop-zone
+                        data-person-id={person.id}
+                        data-timeslot-id={timeSlot.id}
+                        role="region"
+                        aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
+                      >
                       {/* Inner drop target with glow effect */}
                       <div className={`absolute inset-2 rounded-lg transition-all duration-200 pointer-events-none ${
                         isDropping 
@@ -735,7 +752,8 @@ export default function TeamPlanBoard({
                           Add Project
                         </Button>
                       </div>
-                    </motion.div>
+                      </motion.div>
+                    </TeamPlanContextMenu>
                   );
                 })}
                 
@@ -755,7 +773,8 @@ export default function TeamPlanBoard({
                     </Button>
                   )}
                 </div>
-              </div>
+                </div>
+              </TeamPlanContextMenu>
             ))}
             
             {/* Add Person Row */}
