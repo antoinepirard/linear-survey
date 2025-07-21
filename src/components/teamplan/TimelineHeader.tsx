@@ -78,7 +78,7 @@ export default function TimelineHeader({
                 onChange={(e) => setEditValue(e.target.value)}
                 onBlur={() => handleSaveEdit(timeSlot.id)}
                 onKeyDown={(e) => handleKeyDown(e, timeSlot.id)}
-                className="font-mono uppercase text-xs text-slate-700 bg-transparent border-none outline-none pl-4 pr-2 py-1 text-left w-full transition-colors"
+                className="font-mono uppercase text-xs text-slate-900 bg-transparent border-none outline-none pl-4 pr-2 py-1 text-left w-full transition-colors"
                 autoFocus
               />
             ) : (
