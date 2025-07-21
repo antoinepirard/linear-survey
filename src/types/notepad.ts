@@ -20,6 +20,7 @@ export interface NotePadProps {
   onToggle?: () => void;
   currentPlan?: Plan | null;
   onUpdatePlan?: (updates: Partial<Pick<Plan, 'notepadData'>>) => void;
+  planSelector?: React.ReactNode;
 }
 
 // Storage related interfaces

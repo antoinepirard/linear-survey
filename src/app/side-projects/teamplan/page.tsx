@@ -65,38 +65,33 @@ export default function TeamPlanPage() {
   }
 
   return (
-    <div className="h-screen bg-slate-50/30 overflow-hidden flex flex-col">
-      {/* Header with Plan Selector */}
-      <div className="h-12 bg-white border-b border-slate-200 flex items-center px-4">
-        <PlanSelector
-          currentPlan={currentPlan}
-          allPlans={allPlans}
-          onSelectPlan={switchToPlan}
-          onCreatePlan={createPlan}
-          onDeletePlan={deletePlan}
-        />
-      </div>
-      
-      {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
-        <VerticalNavigation 
-          isNotepadExpanded={isNotepadExpanded}
-          onToggleNotepad={handleToggleNotepad}
-          onOpenBacklog={handleOpenBacklog}
-        />
-        <NotePad 
-          className="flex-shrink-0" 
-          isExpanded={isNotepadExpanded}
-          onToggle={handleToggleNotepad}
-          currentPlan={currentPlan}
-          onUpdatePlan={updateCurrentPlan}
-        />
-        <div className="flex-1 overflow-hidden">
-          <TeamPlanBoard 
-            data={currentPlan.teamPlanData}
-            onChange={handleDataChange}
+    <div className="h-screen bg-slate-50/30 overflow-hidden flex">
+      <VerticalNavigation 
+        isNotepadExpanded={isNotepadExpanded}
+        onToggleNotepad={handleToggleNotepad}
+        onOpenBacklog={handleOpenBacklog}
+      />
+      <NotePad 
+        className="flex-shrink-0" 
+        isExpanded={isNotepadExpanded}
+        onToggle={handleToggleNotepad}
+        currentPlan={currentPlan}
+        onUpdatePlan={updateCurrentPlan}
+        planSelector={
+          <PlanSelector
+            currentPlan={currentPlan}
+            allPlans={allPlans}
+            onSelectPlan={switchToPlan}
+            onCreatePlan={createPlan}
+            onDeletePlan={deletePlan}
           />
-        </div>
+        }
+      />
+      <div className="flex-1 overflow-hidden">
+        <TeamPlanBoard 
+          data={currentPlan.teamPlanData}
+          onChange={handleDataChange}
+        />
       </div>
     </div>
   );

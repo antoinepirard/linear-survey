@@ -37,7 +37,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, onCr
     }
   };
 
-  const handleKeyDown = (e: React.KeyEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       onClose();
     }
@@ -51,7 +51,7 @@ const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, onCr
         className="bg-white rounded-lg shadow-lg p-6 w-96 max-w-[90vw]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">Create New Plan</h3>
+        <p className="text-sm font-semibold text-slate-900 mb-4">Create New Plan</p>
         <form onSubmit={handleSubmit}>
           <input
             ref={inputRef}
@@ -145,9 +145,9 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="flex items-center space-x-2 px-3 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors group"
+          className="flex items-center space-x-1 px-3 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors group"
         >
-          <span className="font-medium truncate max-w-[200px]">
+          <span className="text-sm font-medium truncate max-w-[200px]">
             {currentPlan?.name || 'No Plan Selected'}
           </span>
           <svg 

@@ -22,6 +22,7 @@ export default function NotePad({
   isExpanded = true,
   currentPlan = null,
   onUpdatePlan,
+  planSelector,
 }: NotePadProps) {
   const [hasAnimated] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -226,16 +227,18 @@ export default function NotePad({
           >
             <div className="h-full flex flex-col">
 
-              {/* Title Input */}
-              <div className="py-3 px-4 sm:px-6 border-b border-slate-200">
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder={NOTEPAD_CONSTANTS.TITLE_PLACEHOLDER}
-                  className="w-full text-sm font-medium text-slate-800 bg-transparent border-none outline-none placeholder:text-slate-300"
-                  aria-label="Note title"
-                />
+              {/* Plan Selector */}
+              <div className="py-1.5 px-4 sm:px-6 border-b border-slate-200">
+                {planSelector || (
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder={NOTEPAD_CONSTANTS.TITLE_PLACEHOLDER}
+                    className="w-full text-sm font-medium text-slate-800 bg-transparent border-none outline-none placeholder:text-slate-300"
+                    aria-label="Note title"
+                  />
+                )}
               </div>
 
               {/* Editor */}
