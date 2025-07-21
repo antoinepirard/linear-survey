@@ -225,7 +225,7 @@ export default function NotePad({
               opacity: { duration: NOTEPAD_CONSTANTS.OPACITY_DURATION }
             } : { duration: 0 }}
             className={`bg-white overflow-hidden h-full relative notepad-container ${
-              isExpanded ? 'border-r border-slate-200' : ''
+              isExpanded ? `border-r ${isResizing ? 'border-blue-500' : 'border-slate-200'}` : ''
             } ${
               // Mobile responsive classes
               width < 500 ? 'min-w-[280px]' : ''
