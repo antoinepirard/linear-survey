@@ -122,15 +122,6 @@ export default function TeamPlanBoard({
     onChange?.(newData);
   };
 
-  const handleRemovePerson = (personId: string) => {
-    const newData = {
-      ...boardData,
-      people: boardData.people.filter(p => p.id !== personId),
-      projects: boardData.projects.filter(p => p.personId !== personId)
-    };
-    setBoardData(newData);
-    onChange?.(newData);
-  };
 
   const handleUpdatePerson = (updatedPerson: Person) => {
     const newData = {
