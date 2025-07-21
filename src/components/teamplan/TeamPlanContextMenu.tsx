@@ -84,7 +84,7 @@ export default function TeamPlanContextMenu({
               className="flex items-center gap-2"
             >
               <TrashIcon className="h-4 w-4" />
-              Delete {getLabel()}
+              Delete <span className="text-red-400">{getLabel()}</span>
             </ContextMenuItem>
           </>
         ) : type === 'cell' ? (
@@ -122,7 +122,7 @@ export default function TeamPlanContextMenu({
                   className="flex items-center gap-2"
                 >
                   <TrashIcon className="h-4 w-4" />
-                  Delete {personName}
+                  Delete <span className="text-red-400">{personName}</span>
                 </ContextMenuItem>
               </>
             )}
@@ -153,7 +153,7 @@ export default function TeamPlanContextMenu({
               className="flex items-center gap-2"
             >
               <TrashIcon className="h-4 w-4" />
-              Delete {getLabel()}
+              Delete <span className="text-red-400">{getLabel()}</span>
             </ContextMenuItem>
           </>
         )}
