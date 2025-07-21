@@ -1,5 +1,11 @@
 export const staticHighlights = [
   {
+    title: "Plannr",
+    description: "Thinking and planning goes hand in hand.",
+    category: "SIDE PROJECT",
+    href: "/side-projects/teamplan"
+  },
+  {
     title: "Chatbot Flow Builder",
     description: "Building and iterating over Rasayel's chatbot flow builder.",
     category: "PROJECT",
