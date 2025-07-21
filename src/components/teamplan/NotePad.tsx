@@ -6,9 +6,6 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  ChevronRightIcon 
-} from '@heroicons/react/24/outline';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
 import { useNotePadStorage } from '@/hooks/useNotePadStorage';
 import { useResizable } from '@/hooks/useResizable';
