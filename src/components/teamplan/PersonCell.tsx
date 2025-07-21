@@ -47,7 +47,7 @@ export default function PersonCell({
   };
 
   return (
-    <div className="p-2 pt-3 pb-3 flex items-start justify-between group min-h-16 relative">
+    <div className="p-1.5 pt-2 pb-2 flex items-start justify-between group min-h-12 relative">
       {isEditing ? (
         <div className="flex-1">
           <input

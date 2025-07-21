@@ -355,7 +355,7 @@ export default function TeamPlanBoard({
           {/* Board Grid */}
           <div className="space-y-0">
             {boardData.people.map((person) => (
-              <div key={person.id} className="grid gap-0 bg-slate-50 rounded-lg my-1 p-2" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+              <div key={person.id} className="grid gap-0 bg-slate-50 rounded-lg my-1 p-1.5" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
                 {/* Person Column with Inline Editing */}
                 <PersonCell
                   person={person}
@@ -372,7 +372,7 @@ export default function TeamPlanBoard({
                   return (
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
-                      className="min-h-16 p-2 pt-3 pb-3 transition-all duration-20 relative overflow-visible group"
+                      className="min-h-12 p-1.5 pt-2 pb-2 transition-all duration-20 relative overflow-visible group"
                       data-drop-zone
                       data-person-id={person.id}
                       data-timeslot-id={timeSlot.id}
@@ -452,7 +452,7 @@ export default function TeamPlanBoard({
                 })}
                 
                 {/* Empty cell for the add column */}
-                <div className="min-h-16" />
+                <div className="min-h-12" />
               </div>
             ))}
             
