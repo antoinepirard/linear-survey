@@ -13,8 +13,9 @@ import {
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
 import { useNotePadStorage } from '@/hooks/useNotePadStorage';
 import { useResizable } from '@/hooks/useResizable';
+import { useTextSelection } from '@/hooks/useTextSelection';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
-import { NotePadProps, NotePadError, TipTapEditor } from '@/types/notepad';
+import { NotePadProps, NotePadError } from '@/types/notepad';
 
 export default function NotePad({ 
   className = '',
@@ -25,9 +26,6 @@ export default function NotePad({
 }: NotePadProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [showSelectionMenu, setShowSelectionMenu] = useState(false);
-  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
-  const [menuUpdateKey, setMenuUpdateKey] = useState(0);
   const editorRef = useRef<HTMLDivElement>(null);
 
   // Custom hooks for separated concerns
@@ -60,40 +58,6 @@ export default function NotePad({
     const notePadError: NotePadError = Object.assign(error, { code, details });
     console.error(`NotePad ${code}:`, error, details);
     onError?.(notePadError);
-  };
-
-  // Text selection menu positioning logic
-  const calculateMenuPosition = (editorInstance: TipTapEditor, container: HTMLElement) => {
-    const { selection } = editorInstance.state;
-    const { from, to } = selection;
-    
-    const start = editorInstance.view.coordsAtPos(from);
-    const end = editorInstance.view.coordsAtPos(to);
-    const containerRect = container.getBoundingClientRect();
-    
-    const menuWidth = NOTEPAD_CONSTANTS.MENU_WIDTH;
-    const menuHeight = NOTEPAD_CONSTANTS.MENU_HEIGHT;
-    const gap = NOTEPAD_CONSTANTS.MENU_GAP;
-    
-    let x = (start.left + end.left) / 2 - containerRect.left;
-    let y = start.top - containerRect.top - menuHeight - gap;
-    
-    // Horizontal bounds checking
-    const containerWidth = containerRect.width;
-    const halfMenuWidth = menuWidth / 2;
-    
-    if (x - halfMenuWidth < 0) {
-      x = halfMenuWidth;
-    } else if (x + halfMenuWidth > containerWidth) {
-      x = containerWidth - halfMenuWidth;
-    }
-    
-    // Vertical bounds checking
-    if (y < 0) {
-      y = end.top - containerRect.top + gap + 10;
-    }
-    
-    return { x, y };
   };
 
   const editor = useEditor({
@@ -160,6 +124,14 @@ export default function NotePad({
         
         return false;
       },
+      handleDOMEvents: {
+        mouseup: () => {
+          if (editor) {
+            handleMouseUp(editor);
+          }
+          return false;
+        },
+      },
     },
     onUpdate: ({ editor }) => {
       try {
@@ -171,28 +143,14 @@ export default function NotePad({
     },
     onSelectionUpdate: ({ editor }) => {
       try {
-        const { selection } = editor.state;
-        const { empty } = selection;
-        
-        if (!empty && editorRef.current) {
-          const position = calculateMenuPosition(editor, editorRef.current);
-          setMenuPosition(position);
-          setShowSelectionMenu(true);
-        } else {
-          setShowSelectionMenu(false);
-        }
+        handleSelectionUpdate(editor);
       } catch (error) {
         handleError(error as Error, 'EDITOR_ERROR', { action: 'selection_update' });
       }
     },
-    onTransaction: ({ editor }) => {
+    onTransaction: () => {
       try {
-        const { selection } = editor.state;
-        const { empty } = selection;
-        
-        if (!empty && showSelectionMenu) {
-          setMenuUpdateKey(prev => prev + 1);
-        }
+        handleTransaction();
       } catch (error) {
         handleError(error as Error, 'EDITOR_ERROR', { action: 'transaction' });
       }
@@ -209,21 +167,21 @@ export default function NotePad({
     },
   });
 
-  // Hide menu when clicking outside and cleanup on unmount
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (editorRef.current && !editorRef.current.contains(event.target as Node)) {
-        setShowSelectionMenu(false);
-      }
-    };
+  // Text selection hook
+  const {
+    showSelectionMenu,
+    menuPosition,
+    menuUpdateKey,
+    setShowSelectionMenu,
+    handleSelectionUpdate,
+    handleTransaction,
+    handleMouseUp,
+  } = useTextSelection({
+    editor,
+    containerRef: editorRef,
+  });
 
-    if (showSelectionMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }
-  }, [showSelectionMenu]);
+  // Click-outside handling is now managed by the useTextSelection hook
 
   // Cleanup on unmount
   useEffect(() => {

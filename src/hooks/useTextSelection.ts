@@ -8,7 +8,7 @@ interface Position {
 
 interface UseTextSelectionProps {
   editor: Editor | null;
-  containerRef: React.RefObject<HTMLElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 interface UseTextSelectionReturn {
@@ -18,6 +18,7 @@ interface UseTextSelectionReturn {
   setShowSelectionMenu: (show: boolean) => void;
   handleSelectionUpdate: (editor: Editor) => void;
   handleTransaction: () => void;
+  handleMouseUp: (editor: Editor) => void;
 }
 
 export function useTextSelection({
@@ -29,7 +30,8 @@ export function useTextSelection({
   const [menuUpdateKey, setMenuUpdateKey] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const calculateMenuPosition = useCallback((editor: Editor, container: HTMLElement): Position => {
+  const calculateMenuPosition = useCallback((editor: Editor, container: HTMLDivElement | null): Position => {
+    if (!container) return { x: 0, y: 0 };
     const { selection } = editor.state;
     const { from, to } = selection;
     
@@ -74,17 +76,14 @@ export function useTextSelection({
       timeoutRef.current = null;
     }
 
-    if (!empty) {
-      const position = calculateMenuPosition(editor, containerRef.current);
-      setMenuPosition(position);
-      setShowSelectionMenu(true);
-    } else {
+    // Only hide menu if selection becomes empty, don't show it here
+    if (empty) {
       // Add small delay to prevent flickering when selection changes quickly
       timeoutRef.current = setTimeout(() => {
         setShowSelectionMenu(false);
       }, 50);
     }
-  }, [containerRef, calculateMenuPosition]);
+  }, [containerRef]);
 
   const handleTransaction = useCallback(() => {
     if (!editor || !showSelectionMenu) return;
@@ -97,6 +96,20 @@ export function useTextSelection({
       setMenuUpdateKey(prev => prev + 1);
     }
   }, [editor, showSelectionMenu]);
+
+  const handleMouseUp = useCallback((editor: Editor) => {
+    if (!containerRef.current) return;
+
+    const { selection } = editor.state;
+    const { empty } = selection;
+    
+    // Only show menu if there's a non-empty selection after mouseup
+    if (!empty) {
+      const position = calculateMenuPosition(editor, containerRef.current);
+      setMenuPosition(position);
+      setShowSelectionMenu(true);
+    }
+  }, [containerRef, calculateMenuPosition]);
 
   // Handle clicks outside to hide menu
   useEffect(() => {
@@ -130,5 +143,6 @@ export function useTextSelection({
     setShowSelectionMenu,
     handleSelectionUpdate,
     handleTransaction,
+    handleMouseUp,
   };
 }
