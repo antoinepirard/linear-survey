@@ -11,7 +11,6 @@ import {
   ChevronRightIcon 
 } from '@heroicons/react/24/outline';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
-import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useNotePadStorage } from '@/hooks/useNotePadStorage';
 import { useResizable } from '@/hooks/useResizable';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
@@ -252,11 +251,11 @@ export default function NotePad({
   }
 
   return (
-    <ErrorBoundary onError={(error) => handleError(error, 'RENDER_ERROR')}>
-      <div className={`relative h-full flex ${className}`}>
+    <div className={`relative h-full flex ${className}`}>
       {/* Expandable Content */}
       <AnimatePresence mode="wait">
         {isExpanded && (
+          <>
           <motion.div
             initial={hasAnimated ? { width: 0, opacity: 0 } : { width, opacity: 1 }}
             animate={{ width, opacity: 1 }}
@@ -326,21 +325,24 @@ export default function NotePad({
               </div>
             </div>
 
-            {/* Resize Handle */}
-            <div
-              onMouseDown={handleResizeStart}
-              className="absolute top-0 right-0 w-4 h-full cursor-col-resize flex items-center justify-center"
-              role="separator"
-              aria-label="Resize notepad"
-              aria-orientation="vertical"
-            >
-              <div
-                className={`w-1 h-6 rounded-full transition-colors duration-150 ${
-                  isResizing ? 'bg-blue-500' : 'bg-slate-200 hover:bg-slate-400'
-                }`}
-              />
-            </div>
           </motion.div>
+          
+          {/* Resize Handle - positioned outside the notepad */}
+          <div
+            onMouseDown={handleResizeStart}
+            className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-10"
+            style={{ left: width }}
+            role="separator"
+            aria-label="Resize notepad"
+            aria-orientation="vertical"
+          >
+            <div
+              className={`w-1 h-6 rounded-full transition-colors duration-150 ${
+                isResizing ? 'bg-blue-500' : 'bg-slate-200 hover:bg-slate-400'
+              }`}
+            />
+          </div>
+          </>
         )}
       </AnimatePresence>
 
@@ -354,7 +356,6 @@ export default function NotePad({
           <ChevronRightIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
         </button>
       )}
-      </div>
-    </ErrorBoundary>
+    </div>
   );
 }
