@@ -80,25 +80,22 @@ export default function AddPersonCell({
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Person name"
-              className="text-sm bg-white border border-slate-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400"
+              className="text-sm bg-transparent border-none outline-none placeholder-slate-400 text-slate-700 px-1"
               autoFocus
             />
-            <button
-              onClick={handleAdd}
-              disabled={!newName.trim()}
-              className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Add
-            </button>
+            <div className="flex items-center gap-1 text-xs text-slate-400">
+              <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-mono">↵</kbd>
+              <span>to add</span>
+            </div>
             <button
               onClick={handleCancel}
-              className="px-2 py-1 text-xs text-slate-600 hover:text-slate-800"
+              className="text-xs text-slate-400 hover:text-slate-600 ml-1"
             >
-              Cancel
+              esc
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 transition-colors pointer-events-none">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 transition-colors pointer-events-none">
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
