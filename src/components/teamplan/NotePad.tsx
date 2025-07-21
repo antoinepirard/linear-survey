@@ -20,9 +20,8 @@ export default function NotePad({
   minWidth = NOTEPAD_CONSTANTS.MIN_WIDTH,
   defaultWidth = NOTEPAD_CONSTANTS.DEFAULT_WIDTH,
   isExpanded = true,
-  onToggle
 }: NotePadProps) {
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const [hasAnimated] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
   // Custom hooks for separated concerns
@@ -190,10 +189,6 @@ export default function NotePad({
     };
   }, [editor]);
 
-  const handleToggle = () => {
-    setHasAnimated(true);
-    onToggle?.();
-  };
 
   if (isLoading) {
     return (
@@ -231,13 +226,13 @@ export default function NotePad({
             <div className="h-full flex flex-col">
 
               {/* Title Input */}
-              <div className="pt-8 px-4 sm:px-6 pb-4 bg-linear-to-bottom from-white to-transparent">
+              <div className="py-3 px-4 sm:px-6 border-b border-slate-200">
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={NOTEPAD_CONSTANTS.TITLE_PLACEHOLDER}
-                  className="w-full text-xl sm:text-2xl font-semibold text-slate-800 bg-transparent border-none outline-none placeholder:text-slate-300"
+                  className="w-full text-sm font-medium text-slate-800 bg-transparent border-none outline-none placeholder:text-slate-300"
                   aria-label="Note title"
                 />
               </div>
