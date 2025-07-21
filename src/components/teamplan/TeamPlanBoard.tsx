@@ -92,9 +92,10 @@ export default function TeamPlanBoard({
       console.log('🚚 TeamPlanBoard: Moving project', currentDraggedProjectData.id, 'to', personId, timeSlotId);
 
       if (isDuplicating) {
+        const newProjectId = generateId();
         const newProject = {
           ...currentDraggedProjectData,
-          id: generateId(),
+          id: newProjectId,
           personId,
           timeSlotId,
         };
@@ -104,6 +105,9 @@ export default function TeamPlanBoard({
         };
         setBoardData(newData);
         onChange?.(newData);
+        
+        // Set focus on the newly created project
+        setNewProjectId(newProjectId);
       } else {
         // Only allow drops to different cells (no reordering within same cell)
         if (personId !== currentDraggedProjectData.personId || timeSlotId !== currentDraggedProjectData.timeSlotId) {
