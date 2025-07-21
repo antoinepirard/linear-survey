@@ -420,6 +420,24 @@ export default function TeamPlanBoard({
     onChange?.(newData);
   };
 
+  const handleDuplicateProject = (projectId: string) => {
+    const originalProject = boardData.projects.find(p => p.id === projectId);
+    if (!originalProject) return;
+
+    const duplicatedProject: Project = {
+      ...originalProject,
+      id: generateId(),
+      title: `${originalProject.title} (Copy)`
+    };
+
+    const newData = {
+      ...boardData,
+      projects: [...boardData.projects, duplicatedProject]
+    };
+    setBoardData(newData);
+    onChange?.(newData);
+  };
+
   const handleAddTimeSlot = (timeSlot: TimeSlot) => {
     const newData = {
       ...boardData,
@@ -429,15 +447,6 @@ export default function TeamPlanBoard({
     onChange?.(newData);
   };
 
-  const handleRemoveTimeSlot = (timeSlotId: string) => {
-    const newData = {
-      ...boardData,
-      timeSlots: boardData.timeSlots.filter(ts => ts.id !== timeSlotId),
-      projects: boardData.projects.filter(p => p.timeSlotId !== timeSlotId)
-    };
-    setBoardData(newData);
-    onChange?.(newData);
-  };
 
   const handleUpdateTimeSlot = (updatedTimeSlot: TimeSlot) => {
     const timeSlotIndex = boardData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
@@ -500,6 +509,76 @@ export default function TeamPlanBoard({
     onChange?.(newData);
   };
 
+  const handleMovePersonUp = (personId: string) => {
+    const currentIndex = boardData.people.findIndex(p => p.id === personId);
+    if (currentIndex <= 0) return;
+
+    const newPeople = [...boardData.people];
+    [newPeople[currentIndex - 1], newPeople[currentIndex]] = [newPeople[currentIndex], newPeople[currentIndex - 1]];
+
+    const newData = {
+      ...boardData,
+      people: newPeople
+    };
+    setBoardData(newData);
+    onChange?.(newData);
+  };
+
+  const handleMovePersonDown = (personId: string) => {
+    const currentIndex = boardData.people.findIndex(p => p.id === personId);
+    if (currentIndex >= boardData.people.length - 1) return;
+
+    const newPeople = [...boardData.people];
+    [newPeople[currentIndex], newPeople[currentIndex + 1]] = [newPeople[currentIndex + 1], newPeople[currentIndex]];
+
+    const newData = {
+      ...boardData,
+      people: newPeople
+    };
+    setBoardData(newData);
+    onChange?.(newData);
+  };
+
+  const handleMoveTimeSlotLeft = (timeSlotId: string) => {
+    const currentIndex = boardData.timeSlots.findIndex(t => t.id === timeSlotId);
+    if (currentIndex <= 0) return;
+
+    const newTimeSlots = [...boardData.timeSlots];
+    [newTimeSlots[currentIndex - 1], newTimeSlots[currentIndex]] = [newTimeSlots[currentIndex], newTimeSlots[currentIndex - 1]];
+
+    const newData = {
+      ...boardData,
+      timeSlots: newTimeSlots
+    };
+    setBoardData(newData);
+    onChange?.(newData);
+  };
+
+  const handleMoveTimeSlotRight = (timeSlotId: string) => {
+    const currentIndex = boardData.timeSlots.findIndex(t => t.id === timeSlotId);
+    if (currentIndex >= boardData.timeSlots.length - 1) return;
+
+    const newTimeSlots = [...boardData.timeSlots];
+    [newTimeSlots[currentIndex], newTimeSlots[currentIndex + 1]] = [newTimeSlots[currentIndex + 1], newTimeSlots[currentIndex]];
+
+    const newData = {
+      ...boardData,
+      timeSlots: newTimeSlots
+    };
+    setBoardData(newData);
+    onChange?.(newData);
+  };
+
+  const handleDeleteTimeSlot = (timeSlotId: string) => {
+    const newData = {
+      ...boardData,
+      timeSlots: boardData.timeSlots.filter(t => t.id !== timeSlotId),
+      projects: boardData.projects.filter(p => p.timeSlotId !== timeSlotId)
+    };
+    setBoardData(newData);
+    onChange?.(newData);
+  };
+
   const isDropTarget = (personId: string, timeSlotId: string) => {
     if (!draggedProject || !dragOverCell) return false;
     
@@ -519,8 +598,19 @@ export default function TeamPlanBoard({
     return -1;
   };
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    // Check if the target or any parent has a context menu trigger
+    const target = e.target as HTMLElement;
+    const hasContextMenu = target.closest('[data-radix-context-menu-trigger]');
+    
+    // If not a context menu trigger, prevent the default context menu
+    if (!hasContextMenu) {
+      e.preventDefault();
+    }
+  };
+
   return (
-    <div className="h-full flex flex-col overflow-hidden relative">
+    <div className="h-full flex flex-col overflow-hidden relative" onContextMenu={handleContextMenu}>
       {/* Left fade overlay */}
       <div className={`absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none transition-opacity duration-200 ${
         showLeftFade ? 'opacity-100' : 'opacity-0'
@@ -539,18 +629,26 @@ export default function TeamPlanBoard({
           <TimelineHeader
             timeSlots={boardData.timeSlots}
             onAddTimeSlot={handleAddTimeSlot}
-            onRemoveTimeSlot={handleRemoveTimeSlot}
+            onRemoveTimeSlot={handleDeleteTimeSlot}
             onUpdateTimeSlot={handleUpdateTimeSlot}
+            onMoveTimeSlotLeft={handleMoveTimeSlotLeft}
+            onMoveTimeSlotRight={handleMoveTimeSlotRight}
           />
 
           {/* Board Grid */}
           <div className="space-y-0">
-            {boardData.people.map((person) => (
+            {boardData.people.map((person, personIndex) => (
               <div key={person.id} className="grid gap-0 bg-slate-50 rounded-lg my-1 p-1.5 group/row" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
                 {/* Person Column with Inline Editing */}
                 <PersonCell
                   person={person}
                   onUpdatePerson={handleUpdatePerson}
+                  onMoveUp={handleMovePersonUp}
+                  onMoveDown={handleMovePersonDown}
+                  onDelete={handleRemovePerson}
+                  canMoveUp={personIndex > 0}
+                  canMoveDown={personIndex < boardData.people.length - 1}
+                  canDelete={boardData.people.length > 1}
                 />
               
                 {/* Project Cells */}
@@ -608,6 +706,7 @@ export default function TeamPlanBoard({
                                 availableGroups={getAvailableGroups()}
                                 onEdit={handleEditProject}
                                 onDelete={handleDeleteProject}
+                                onDuplicate={handleDuplicateProject}
                                 onDragStart={handleDragStart}
                                 onDragEnd={handleDragEnd}
                                 onDrag={updateDropTarget}

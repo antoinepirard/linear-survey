@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { Project } from '@/data/teamplan';
 import { Button } from '@/components/ui/button';
+import TeamPlanContextMenu from './TeamPlanContextMenu';
 
 interface ProjectCardProps {
   project: Project;
@@ -14,6 +15,7 @@ interface ProjectCardProps {
   availableGroups?: string[];
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
+  onDuplicate?: (projectId: string) => void;
   onDragStart?: (projectId: string, isDuplicating: boolean) => void;
   onDragEnd?: () => void;
   onDrag?: (element: HTMLElement) => void;
@@ -27,6 +29,7 @@ export default function ProjectCard({
   availableGroups = [],
   onEdit,
   onDelete,
+  onDuplicate,
   onDragStart,
   onDragEnd,
   onDrag
@@ -274,7 +277,14 @@ export default function ProjectCard({
       )}
       
       {/* Draggable element */}
-      <motion.div
+      <TeamPlanContextMenu
+        type="project"
+        canDelete={true}
+        onDelete={() => onDelete?.(project.id)}
+        onDuplicate={() => onDuplicate?.(project.id)}
+        label={project.title}
+      >
+        <motion.div
         ref={dragRef}
         initial={{ opacity: 0.9, scale: 0.98 }}
         animate={{ 
@@ -410,7 +420,8 @@ export default function ProjectCard({
           </div>
         )}
       </div>
-    </motion.div>
+        </motion.div>
+      </TeamPlanContextMenu>
     </div>
   );
 }

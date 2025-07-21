@@ -5,19 +5,24 @@ import { motion } from 'motion/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { TimeSlot, generateId } from '@/data/teamplan';
 import { Button } from '@/components/ui/button';
+import TeamPlanContextMenu from './TeamPlanContextMenu';
 
 interface TimelineHeaderProps {
   timeSlots: TimeSlot[];
   onAddTimeSlot: (timeSlot: TimeSlot) => void;
   onRemoveTimeSlot: (timeSlotId: string) => void;
   onUpdateTimeSlot: (timeSlot: TimeSlot) => void;
+  onMoveTimeSlotLeft: (timeSlotId: string) => void;
+  onMoveTimeSlotRight: (timeSlotId: string) => void;
 }
 
 export default function TimelineHeader({
   timeSlots,
   onAddTimeSlot,
   onRemoveTimeSlot,
-  onUpdateTimeSlot
+  onUpdateTimeSlot,
+  onMoveTimeSlotLeft,
+  onMoveTimeSlotRight
 }: TimelineHeaderProps) {
   const [editingSlot, setEditingSlot] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
@@ -120,45 +125,56 @@ export default function TimelineHeader({
       </div>
 
       {/* Time Slot Headers */}
-      {timeSlots.map((timeSlot) => (
-        <motion.div
+      {timeSlots.map((timeSlot, timeSlotIndex) => (
+        <TeamPlanContextMenu
           key={timeSlot.id}
-          className="p-2 group relative"
+          type="timeSlot"
+          canMoveUp={timeSlotIndex > 0}
+          canMoveDown={timeSlotIndex < timeSlots.length - 1}
+          canDelete={timeSlots.length > 1}
+          onMoveUp={() => onMoveTimeSlotLeft(timeSlot.id)}
+          onMoveDown={() => onMoveTimeSlotRight(timeSlot.id)}
+          onDelete={() => onRemoveTimeSlot(timeSlot.id)}
+          label={timeSlot.label}
         >
-          <div className="flex items-center justify-between">
-            {editingSlot === timeSlot.id ? (
-              <input
-                type="text"
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onBlur={() => handleSaveEdit(timeSlot.id)}
-                onKeyDown={(e) => handleKeyDown(e, timeSlot.id)}
-                className="font-mono uppercase text-xs text-slate-900 bg-transparent border-none outline-none pl-4 pr-2 py-1 text-left w-full transition-colors"
-                autoFocus
-              />
-            ) : (
-              <h3 
-                className="font-mono uppercase text-xs text-slate-700 text-left cursor-pointer hover:text-slate-900 flex-1 pl-4"
-                onClick={() => handleStartEdit(timeSlot)}
-                title="Click to edit"
-              >
-                {timeSlot.label}
-              </h3>
-            )}
-            
-            {timeSlots.length > 1 && (
-              <button
-                onClick={() => onRemoveTimeSlot(timeSlot.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 p-1 hover:bg-red-100 rounded"
-                title="Remove time slot"
-              >
-                <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-        </motion.div>
+          <motion.div
+            className="p-2 group relative"
+          >
+            <div className="flex items-center justify-between">
+              {editingSlot === timeSlot.id ? (
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={() => handleSaveEdit(timeSlot.id)}
+                  onKeyDown={(e) => handleKeyDown(e, timeSlot.id)}
+                  className="font-mono uppercase text-xs text-slate-900 bg-transparent border-none outline-none pl-4 pr-2 py-1 text-left w-full transition-colors"
+                  autoFocus
+                />
+              ) : (
+                <h3 
+                  className="font-mono uppercase text-xs text-slate-700 text-left cursor-pointer hover:text-slate-900 flex-1 pl-4"
+                  onClick={() => handleStartEdit(timeSlot)}
+                  title="Click to edit"
+                >
+                  {timeSlot.label}
+                </h3>
+              )}
+              
+              {timeSlots.length > 1 && (
+                <button
+                  onClick={() => onRemoveTimeSlot(timeSlot.id)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 p-1 hover:bg-red-100 rounded"
+                  title="Remove time slot"
+                >
+                  <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </motion.div>
+        </TeamPlanContextMenu>
       ))}
       
       {/* Add Time Slot Column */}
