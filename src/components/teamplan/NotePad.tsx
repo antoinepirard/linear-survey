@@ -11,30 +11,91 @@ import {
   ChevronRightIcon 
 } from '@heroicons/react/24/outline';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { useNotePadStorage } from '@/hooks/useNotePadStorage';
+import { useResizable } from '@/hooks/useResizable';
+import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
+import { NotePadProps, NotePadError, TipTapEditor } from '@/types/notepad';
 
-const STORAGE_KEY = 'teamplan-notes';
-const TITLE_STORAGE_KEY = 'teamplan-notes-title';
-const WIDTH_STORAGE_KEY = 'teamplan-notes-width';
-
-const MIN_WIDTH = 300;
-const MAX_WIDTH = 800;
-const DEFAULT_WIDTH = 400;
-
-interface NotePadProps {
-  className?: string;
-}
-
-export default function NotePad({ className = '' }: NotePadProps) {
+export default function NotePad({ 
+  className = '',
+  onError,
+  maxWidth = NOTEPAD_CONSTANTS.MAX_WIDTH,
+  minWidth = NOTEPAD_CONSTANTS.MIN_WIDTH,
+  defaultWidth = NOTEPAD_CONSTANTS.DEFAULT_WIDTH
+}: NotePadProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [title, setTitle] = useState('');
-  const [width, setWidth] = useState(DEFAULT_WIDTH);
-  const [isResizing, setIsResizing] = useState(false);
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [menuUpdateKey, setMenuUpdateKey] = useState(0);
   const editorRef = useRef<HTMLDivElement>(null);
+
+  // Custom hooks for separated concerns
+  const {
+    title,
+    width,
+    isLoading,
+    setTitle,
+    setWidth,
+    loadContent,
+    saveContent,
+  } = useNotePadStorage({
+    contentKey: NOTEPAD_CONSTANTS.STORAGE_KEY,
+    titleKey: NOTEPAD_CONSTANTS.TITLE_STORAGE_KEY,
+    widthKey: NOTEPAD_CONSTANTS.WIDTH_STORAGE_KEY,
+    defaultWidth,
+    minWidth,
+    maxWidth,
+  });
+
+  const { isResizing, handleResizeStart } = useResizable({
+    initialWidth: width,
+    minWidth,
+    maxWidth,
+    onWidthChange: setWidth,
+  });
+
+  // Error handling helper
+  const handleError = (error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
+    const notePadError: NotePadError = Object.assign(error, { code, details });
+    console.error(`NotePad ${code}:`, error, details);
+    onError?.(notePadError);
+  };
+
+  // Text selection menu positioning logic
+  const calculateMenuPosition = (editorInstance: TipTapEditor, container: HTMLElement) => {
+    const { selection } = editorInstance.state;
+    const { from, to } = selection;
+    
+    const start = editorInstance.view.coordsAtPos(from);
+    const end = editorInstance.view.coordsAtPos(to);
+    const containerRect = container.getBoundingClientRect();
+    
+    const menuWidth = NOTEPAD_CONSTANTS.MENU_WIDTH;
+    const menuHeight = NOTEPAD_CONSTANTS.MENU_HEIGHT;
+    const gap = NOTEPAD_CONSTANTS.MENU_GAP;
+    
+    let x = (start.left + end.left) / 2 - containerRect.left;
+    let y = start.top - containerRect.top - menuHeight - gap;
+    
+    // Horizontal bounds checking
+    const containerWidth = containerRect.width;
+    const halfMenuWidth = menuWidth / 2;
+    
+    if (x - halfMenuWidth < 0) {
+      x = halfMenuWidth;
+    } else if (x + halfMenuWidth > containerWidth) {
+      x = containerWidth - halfMenuWidth;
+    }
+    
+    // Vertical bounds checking
+    if (y < 0) {
+      y = end.top - containerRect.top + gap + 10;
+    }
+    
+    return { x, y };
+  };
 
   const editor = useEditor({
     extensions: [
@@ -58,7 +119,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
         },
       }),
       Placeholder.configure({
-        placeholder: 'Start writing your notes here...',
+        placeholder: NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT,
         includeChildren: true,
       }),
     ],
@@ -66,91 +127,90 @@ export default function NotePad({ className = '' }: NotePadProps) {
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'focus:outline-none px-6 pb-4 min-h-[400px]',
+        class: `focus:outline-none px-6 pb-4 min-h-[${NOTEPAD_CONSTANTS.MIN_EDITOR_HEIGHT}px]`,
+        'aria-label': 'Note editor',
+        role: 'textbox',
+        'aria-multiline': 'true',
+      },
+      handleKeyDown: (_view, event) => {
+        // Handle keyboard shortcuts
+        const mod = event.metaKey || event.ctrlKey;
+        const shift = event.shiftKey;
+        const alt = event.altKey;
+        
+        if (mod && !shift && !alt && event.key === 'b') {
+          editor?.chain().focus().toggleBold().run();
+          return true;
+        }
+        
+        if (mod && !shift && !alt && event.key === 'i') {
+          editor?.chain().focus().toggleItalic().run();
+          return true;
+        }
+        
+        if (mod && shift && !alt && event.key === 'S') {
+          editor?.chain().focus().toggleStrike().run();
+          return true;
+        }
+        
+        if (mod && alt && !shift && ['1', '2', '3'].includes(event.key)) {
+          const level = parseInt(event.key) as 1 | 2 | 3;
+          editor?.chain().focus().toggleHeading({ level }).run();
+          return true;
+        }
+        
+        return false;
       },
     },
     onUpdate: ({ editor }) => {
-      if (typeof window !== 'undefined') {
+      try {
         const content = editor.getHTML();
-        localStorage.setItem(STORAGE_KEY, content);
+        saveContent(content);
+      } catch (error) {
+        handleError(error as Error, 'EDITOR_ERROR', { action: 'save_content' });
       }
     },
     onSelectionUpdate: ({ editor }) => {
-      const { selection } = editor.state;
-      const { empty } = selection;
-      
-      if (!empty && editorRef.current) {
-        // Get selection position
-        const { from, to } = selection;
-        const start = editor.view.coordsAtPos(from);
-        const end = editor.view.coordsAtPos(to);
+      try {
+        const { selection } = editor.state;
+        const { empty } = selection;
         
-        // Calculate menu position
-        const editorRect = editorRef.current.getBoundingClientRect();
-        const menuWidth = 200; // Reduced width with submenu
-        const menuHeight = 40; // Approximate menu height
-        
-        let x = (start.left + end.left) / 2 - editorRect.left;
-        let y = start.top - editorRect.top - menuHeight - 20; // Position above selection with comfortable gap
-        
-        // Keep menu within editor bounds
-        const editorWidth = editorRect.width;
-        
-        // Adjust horizontal position if menu would go off-screen
-        if (x - menuWidth / 2 < 0) {
-          x = menuWidth / 2;
-        } else if (x + menuWidth / 2 > editorWidth) {
-          x = editorWidth - menuWidth / 2;
+        if (!empty && editorRef.current) {
+          const position = calculateMenuPosition(editor, editorRef.current);
+          setMenuPosition(position);
+          setShowSelectionMenu(true);
+        } else {
+          setShowSelectionMenu(false);
         }
-        
-        // Adjust vertical position if menu would go above editor
-        if (y < 0) {
-          y = end.top - editorRect.top + 30; // Position below selection instead
-        }
-        
-        setMenuPosition({ x, y });
-        setShowSelectionMenu(true);
-      } else {
-        setShowSelectionMenu(false);
+      } catch (error) {
+        handleError(error as Error, 'EDITOR_ERROR', { action: 'selection_update' });
       }
     },
     onTransaction: ({ editor }) => {
-      // Force re-render of selection menu when editor state changes
-      // This ensures the active states update immediately after formatting
-      const { selection } = editor.state;
-      const { empty } = selection;
-      
-      if (!empty && showSelectionMenu) {
-        // Increment key to force menu re-render without flickering
-        setMenuUpdateKey(prev => prev + 1);
+      try {
+        const { selection } = editor.state;
+        const { empty } = selection;
+        
+        if (!empty && showSelectionMenu) {
+          setMenuUpdateKey(prev => prev + 1);
+        }
+      } catch (error) {
+        handleError(error as Error, 'EDITOR_ERROR', { action: 'transaction' });
+      }
+    },
+    onCreate: ({ editor }) => {
+      try {
+        const savedContent = loadContent();
+        if (savedContent) {
+          editor.commands.setContent(savedContent);
+        }
+      } catch (error) {
+        handleError(error as Error, 'STORAGE_ERROR', { action: 'load_content' });
       }
     },
   });
 
-  // Load saved content, title, and width from localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined' && editor) {
-      const savedContent = localStorage.getItem(STORAGE_KEY);
-      const savedTitle = localStorage.getItem(TITLE_STORAGE_KEY);
-      const savedWidth = localStorage.getItem(WIDTH_STORAGE_KEY);
-      
-      if (savedContent) {
-        editor.commands.setContent(savedContent);
-      }
-      if (savedTitle) {
-        setTitle(savedTitle);
-      }
-      if (savedWidth) {
-        const parsedWidth = parseInt(savedWidth, 10);
-        if (parsedWidth >= MIN_WIDTH && parsedWidth <= MAX_WIDTH) {
-          setWidth(parsedWidth);
-        }
-      }
-      setIsLoading(false);
-    }
-  }, [editor]);
-
-  // Hide menu when clicking outside
+  // Hide menu when clicking outside and cleanup on unmount
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (editorRef.current && !editorRef.current.contains(event.target as Node)) {
@@ -166,43 +226,19 @@ export default function NotePad({ className = '' }: NotePadProps) {
     }
   }, [showSelectionMenu]);
 
-  const handleTitleChange = (newTitle: string) => {
-    setTitle(newTitle);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(TITLE_STORAGE_KEY, newTitle);
-    }
-  };
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Clean up any pending timeouts or event listeners
+      if (editor) {
+        editor.destroy();
+      }
+    };
+  }, [editor]);
 
   const toggleExpanded = () => {
     setHasAnimated(true);
     setIsExpanded(!isExpanded);
-  };
-
-  const handleResizeStart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsResizing(true);
-
-    const startX = e.clientX;
-    const startWidth = width;
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - startX;
-      const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, startWidth + deltaX));
-      setWidth(newWidth);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(WIDTH_STORAGE_KEY, newWidth.toString());
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
   };
 
   if (isLoading) {
@@ -216,7 +252,8 @@ export default function NotePad({ className = '' }: NotePadProps) {
   }
 
   return (
-    <div className={`relative h-full flex ${className}`}>
+    <ErrorBoundary onError={(error) => handleError(error, 'RENDER_ERROR')}>
+      <div className={`relative h-full flex ${className}`}>
       {/* Expandable Content */}
       <AnimatePresence mode="wait">
         {isExpanded && (
@@ -226,12 +263,15 @@ export default function NotePad({ className = '' }: NotePadProps) {
             exit={{ width: 0, opacity: 0 }}
             transition={isResizing ? { duration: 0 } : hasAnimated ? { 
               type: "spring", 
-              stiffness: 300, 
-              damping: 30,
-              opacity: { duration: 0.2 }
+              stiffness: NOTEPAD_CONSTANTS.SPRING_CONFIG.stiffness, 
+              damping: NOTEPAD_CONSTANTS.SPRING_CONFIG.damping,
+              opacity: { duration: NOTEPAD_CONSTANTS.OPACITY_DURATION }
             } : { duration: 0 }}
             className={`bg-white overflow-hidden h-full relative ${
               isExpanded ? 'border-r border-slate-200' : ''
+            } ${
+              // Mobile responsive classes
+              width < 500 ? 'min-w-[280px]' : ''
             }`}
           >
             <div className="h-full flex flex-col">
@@ -248,13 +288,14 @@ export default function NotePad({ className = '' }: NotePadProps) {
               </div>
 
               {/* Title Input */}
-              <div className="px-6 pb-4">
+              <div className="px-4 sm:px-6 pb-4">
                 <input
                   type="text"
                   value={title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="Enter note title..."
-                  className="w-full text-2xl font-semibold text-slate-800 bg-transparent border-none outline-none placeholder:text-slate-300"
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder={NOTEPAD_CONSTANTS.TITLE_PLACEHOLDER}
+                  className="w-full text-xl sm:text-2xl font-semibold text-slate-800 bg-transparent border-none outline-none placeholder:text-slate-300"
+                  aria-label="Note title"
                 />
               </div>
 
@@ -275,7 +316,11 @@ export default function NotePad({ className = '' }: NotePadProps) {
                       transform: 'translateX(-50%)',
                     }}
                   >
-                    <TextSelectionMenu key={menuUpdateKey} editor={editor} />
+                    <TextSelectionMenu 
+                      key={menuUpdateKey} 
+                      editor={editor}
+                      onClose={() => setShowSelectionMenu(false)}
+                    />
                   </div>
                 )}
               </div>
@@ -285,6 +330,9 @@ export default function NotePad({ className = '' }: NotePadProps) {
             <div
               onMouseDown={handleResizeStart}
               className="absolute top-0 right-0 w-4 h-full cursor-col-resize flex items-center justify-center"
+              role="separator"
+              aria-label="Resize notepad"
+              aria-orientation="vertical"
             >
               <div
                 className={`w-1 h-6 rounded-full transition-colors duration-150 ${
@@ -306,6 +354,7 @@ export default function NotePad({ className = '' }: NotePadProps) {
           <ChevronRightIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
         </button>
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

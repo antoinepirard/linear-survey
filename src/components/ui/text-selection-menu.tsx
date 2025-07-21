@@ -4,7 +4,7 @@ import { Editor } from '@tiptap/react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { 
   ChevronDown,
   Bold,
@@ -23,6 +23,7 @@ import {
 interface TextSelectionMenuProps {
   editor: Editor;
   className?: string;
+  onClose?: () => void;
 }
 
 interface MenuButtonProps {
@@ -49,88 +50,129 @@ function MenuButton({ isActive, onClick, children, title }: MenuButtonProps) {
   );
 }
 
-export default function TextSelectionMenu({ editor, className }: TextSelectionMenuProps) {
+export default function TextSelectionMenu({ editor, className, onClose }: TextSelectionMenuProps) {
   const [showSubmenu, setShowSubmenu] = useState(false);
   const [submenuTimeout, setSubmenuTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  if (!editor) {
-    return null;
-  }
-
-  const handleSubmenuEnter = () => {
+  // Memoize handlers to prevent unnecessary re-renders
+  const clearSubmenuTimeout = useCallback(() => {
     if (submenuTimeout) {
       clearTimeout(submenuTimeout);
       setSubmenuTimeout(null);
     }
-    setShowSubmenu(true);
-  };
+  }, [submenuTimeout]);
 
-  const handleSubmenuLeave = () => {
+  const handleSubmenuEnter = useCallback(() => {
+    clearSubmenuTimeout();
+    setShowSubmenu(true);
+  }, [clearSubmenuTimeout]);
+
+  const handleSubmenuLeave = useCallback(() => {
     const timeout = setTimeout(() => {
       setShowSubmenu(false);
     }, 150); // Small delay to allow moving to submenu
     setSubmenuTimeout(timeout);
-  };
+  }, []);
 
-  const formatActions = [
+  // Memoize actions to prevent recreation on every render
+  const formatActions = useMemo(() => [
     {
       icon: <Bold size={16} />,
       title: "Bold",
       isActive: editor.isActive('bold'),
-      onClick: () => editor.chain().focus().toggleBold().run(),
+      onClick: () => {
+        editor.chain().focus().toggleBold().run();
+        onClose?.();
+      },
     },
     {
       icon: <Italic size={16} />,
       title: "Italic", 
       isActive: editor.isActive('italic'),
-      onClick: () => editor.chain().focus().toggleItalic().run(),
+      onClick: () => {
+        editor.chain().focus().toggleItalic().run();
+        onClose?.();
+      },
     },
     {
       icon: <StrikethroughIcon className="h-4 w-4" />,
       title: "Strikethrough",
       isActive: editor.isActive('strike'),
-      onClick: () => editor.chain().focus().toggleStrike().run(),
+      onClick: () => {
+        editor.chain().focus().toggleStrike().run();
+        onClose?.();
+      },
     },
-  ];
+  ], [editor, onClose]);
 
-  const structuralActions = [
+  const structuralActions = useMemo(() => [
     {
       icon: <H1Icon className="h-4 w-4" />,
       title: "Heading 1",
       isActive: editor.isActive('heading', { level: 1 }),
-      onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
+      onClick: () => {
+        editor.chain().focus().toggleHeading({ level: 1 }).run();
+        setShowSubmenu(false);
+        onClose?.();
+      },
     },
     {
       icon: <H2Icon className="h-4 w-4" />,
       title: "Heading 2",
       isActive: editor.isActive('heading', { level: 2 }),
-      onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
+      onClick: () => {
+        editor.chain().focus().toggleHeading({ level: 2 }).run();
+        setShowSubmenu(false);
+        onClose?.();
+      },
     },
     {
       icon: <H3Icon className="h-4 w-4" />,
       title: "Heading 3",
       isActive: editor.isActive('heading', { level: 3 }),
-      onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
+      onClick: () => {
+        editor.chain().focus().toggleHeading({ level: 3 }).run();
+        setShowSubmenu(false);
+        onClose?.();
+      },
     },
     {
       icon: <List size={16} />,
       title: "Bullet List",
       isActive: editor.isActive('bulletList'),
-      onClick: () => editor.chain().focus().toggleBulletList().run(),
+      onClick: () => {
+        editor.chain().focus().toggleBulletList().run();
+        setShowSubmenu(false);
+        onClose?.();
+      },
     },
     {
       icon: <NumberedListIcon className="h-4 w-4" />,
       title: "Numbered List", 
       isActive: editor.isActive('orderedList'),
-      onClick: () => editor.chain().focus().toggleOrderedList().run(),
+      onClick: () => {
+        editor.chain().focus().toggleOrderedList().run();
+        setShowSubmenu(false);
+        onClose?.();
+      },
     },
-  ];
+  ], [editor, onClose]);
 
-  const hasActiveStructural = structuralActions.some(action => action.isActive);
-  
-  // Get the currently active structural element for display
-  const activeStructural = structuralActions.find(action => action.isActive);
-  const submenuIcon = activeStructural ? activeStructural.icon : <DocumentTextIcon className="h-4 w-4" />;
+  // Memoize computed values
+  const { hasActiveStructural, submenuIcon } = useMemo(() => {
+    const hasActive = structuralActions.some(action => action.isActive);
+    const activeStructural = structuralActions.find(action => action.isActive);
+    const icon = activeStructural ? activeStructural.icon : <DocumentTextIcon className="h-4 w-4" />;
+    
+    return {
+      hasActiveStructural: hasActive,
+      submenuIcon: icon,
+    };
+  }, [structuralActions]);
+
+  if (!editor) {
+    return null;
+  }
 
   return (
     <div className="relative">

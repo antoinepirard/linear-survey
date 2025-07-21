@@ -7,6 +7,22 @@
   min-height: 400px;
 }
 
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ProseMirror {
+    font-size: 1rem;
+    min-height: 300px;
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ProseMirror {
+    min-height: 250px;
+    padding: 0.75rem !important;
+  }
+}
+
 .ProseMirror.is-empty::before {
   content: attr(data-placeholder);
   color: rgb(203 213 225) !important;
