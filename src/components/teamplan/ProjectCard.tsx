@@ -34,6 +34,7 @@ export default function ProjectCard({
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isDraggingLocal, setIsDraggingLocal] = useState(false);
   const dragRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -219,12 +220,15 @@ export default function ProjectCard({
   };
 
   const handleDragStart = () => {
+    setIsDraggingLocal(true);
     if (onDragStart) {
       onDragStart(project.id);
     }
   };
 
   const handleDragEnd = () => {
+    setIsDraggingLocal(false);
+    setIsHovered(false); // Reset hover state on drag end
     if (onDragEnd) {
       onDragEnd();
     }
@@ -300,7 +304,7 @@ export default function ProjectCard({
         className={`
           relative cursor-move p-2 py-2.5 rounded-lg ring-1 font-regular text-sm
           transition-shadow duration-200
-          ${isHovered ? 'shadow-md' : 'shadow-none'}
+          ${isDraggingLocal ? '' : isHovered ? 'shadow-md' : 'shadow-none'}
           ${project.color}
           ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-200/65'}
         `}
