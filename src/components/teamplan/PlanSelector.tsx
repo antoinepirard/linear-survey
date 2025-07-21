@@ -1,7 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { PlanMetadata } from '@/types/plan';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ChevronsUpDown, Plus, Trash2 } from 'lucide-react';
 
 interface PlanSelectorProps {
   currentPlan: PlanMetadata | null;
@@ -12,76 +17,61 @@ interface PlanSelectorProps {
   onRenamePlan?: (planId: string, newName: string) => void;
 }
 
-interface CreatePlanModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface CreatePlanDialogProps {
   onCreatePlan: (name: string) => void;
 }
 
-const CreatePlanModal: React.FC<CreatePlanModalProps> = ({ isOpen, onClose, onCreatePlan }) => {
+const CreatePlanDialog: React.FC<CreatePlanDialogProps> = ({ onCreatePlan }) => {
   const [planName, setPlanName] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (planName.trim()) {
       onCreatePlan(planName.trim());
       setPlanName('');
-      onClose();
+      setIsOpen(false);
     }
   };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose();
-    }
-  };
-
-  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
-      <div 
-        className="bg-white rounded-lg shadow-lg p-6 w-96 max-w-[90vw]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <p className="text-sm font-semibold text-slate-900 mb-4">Create New Plan</p>
-        <form onSubmit={handleSubmit}>
-          <input
-            ref={inputRef}
-            type="text"
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-1">
+          <Plus className="h-3 w-3" />
+          New
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Create New Plan</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
             value={planName}
             onChange={(e) => setPlanName(e.target.value)}
-            onKeyDown={handleKeyDown}
             placeholder="Enter plan name..."
-            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             maxLength={50}
+            autoFocus
           />
-          <div className="flex justify-end space-x-3 mt-4">
-            <button
+          <div className="flex justify-end space-x-3">
+            <Button
               type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors"
+              variant="outline"
+              onClick={() => setIsOpen(false)}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={!planName.trim()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
             >
               Create Plan
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -92,28 +82,12 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
   onCreatePlan,
   onDeletePlan,
 }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    if (isDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isDropdownOpen]);
 
   const handleSelectPlan = (planId: string) => {
     onSelectPlan(planId);
-    setIsDropdownOpen(false);
+    setIsPopoverOpen(false);
   };
 
   const handleDeleteClick = (planId: string, e: React.MouseEvent) => {
@@ -142,107 +116,90 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
 
   return (
     <>
-      <div className="relative" ref={dropdownRef}>
-        <button
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="flex items-center space-x-1 px-3 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors group"
-        >
-          <span className="text-sm font-medium truncate max-w-[200px]">
-            {currentPlan?.name || 'No Plan Selected'}
-          </span>
-          <svg 
-            className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            role="combobox"
+            aria-expanded={isPopoverOpen}
+            className="w-full justify-between px-3 py-2 h-auto text-left font-medium"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-
-        {isDropdownOpen && (
-          <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50">
-            <div className="px-3 py-2 border-b border-slate-100">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-900">Your Plans</span>
-                <button
-                  onClick={() => {
-                    setIsCreateModalOpen(true);
-                    setIsDropdownOpen(false);
-                  }}
-                  className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
-                >
-                  + New
-                </button>
-              </div>
-            </div>
-            
-            <div className="max-h-60 overflow-y-auto">
-              {allPlans.map((plan) => (
-                <div
-                  key={plan.id}
-                  className={`px-3 py-2 hover:bg-slate-50 cursor-pointer flex items-center justify-between group ${
-                    currentPlan?.id === plan.id ? 'bg-blue-50 border-r-2 border-blue-600' : ''
-                  }`}
-                  onClick={() => handleSelectPlan(plan.id)}
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-slate-900 truncate">
-                      {plan.name}
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      Updated {formatDate(plan.updatedAt)}
-                    </div>
-                  </div>
-                  
-                  {allPlans.length > 1 && (
-                    <button
-                      onClick={(e) => handleDeleteClick(plan.id, e)}
-                      className="opacity-0 group-hover:opacity-100 ml-2 p-1 text-slate-400 hover:text-red-600 transition-all"
-                      title="Delete plan"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              ))}
+            <span className="text-sm truncate max-w-[200px]">
+              {currentPlan?.name || 'No Plan Selected'}
+            </span>
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-0" align="start">
+          <div className="p-3 border-b">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Your Plans</span>
+              <CreatePlanDialog onCreatePlan={onCreatePlan} />
             </div>
           </div>
-        )}
-      </div>
-
-      <CreatePlanModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onCreatePlan={onCreatePlan}
-      />
+          
+          <div className="max-h-60 overflow-y-auto">
+            {allPlans.map((plan) => (
+              <div
+                key={plan.id}
+                className={`px-3 py-2 hover:bg-accent cursor-pointer flex items-center justify-between group ${
+                  currentPlan?.id === plan.id ? 'bg-accent' : ''
+                }`}
+                onClick={() => handleSelectPlan(plan.id)}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm truncate">
+                    {plan.name}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Updated {formatDate(plan.updatedAt)}
+                  </div>
+                </div>
+                
+                {allPlans.length > 1 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => handleDeleteClick(plan.id, e)}
+                    className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
 
       {deleteConfirmId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96 max-w-[90vw]">
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Delete Plan</h3>
-            <p className="text-slate-600 mb-4">
-              Are you sure you want to delete &quot;{allPlans.find(p => p.id === deleteConfirmId)?.name}&quot;? 
-              This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setDeleteConfirmId(null)}
-                className="px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-              >
-                Delete
-              </button>
+        <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Delete Plan</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Are you sure you want to delete &quot;{allPlans.find(p => p.id === deleteConfirmId)?.name}&quot;? 
+                This action cannot be undone.
+              </p>
+              <div className="flex justify-end space-x-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setDeleteConfirmId(null)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmDelete}
+                >
+                  Delete
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
     </>
   );
