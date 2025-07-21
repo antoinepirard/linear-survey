@@ -86,7 +86,7 @@ export interface UseTextSelectionOptions {
 // Error types
 export interface NotePadError extends Error {
   code: 'STORAGE_ERROR' | 'EDITOR_ERROR' | 'RENDER_ERROR';
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 // Event handler types
