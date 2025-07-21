@@ -22,11 +22,66 @@ export default function TimelineHeader({
   const [editingSlot, setEditingSlot] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
 
+  const generateNextTimeSlotLabel = (): { label: string; type: 'week' | 'month' } => {
+    if (timeSlots.length === 0) {
+      return { label: 'Week 1', type: 'week' };
+    }
+
+    const lastSlot = timeSlots[timeSlots.length - 1];
+    const lastLabel = lastSlot.label;
+
+    // Pattern matching for common time slot formats
+    const patterns = [
+      // Week patterns: "Week 1", "week 2", "WEEK 3"
+      { regex: /^(week)\s+(\d+)$/i, prefix: 'Week', type: 'week' as const },
+      // Month patterns: "Month 1", "month 12"
+      { regex: /^(month)\s+(\d+)$/i, prefix: 'Month', type: 'month' as const },
+      // Quarter patterns: "Q1", "Q2", "Quarter 1"
+      { regex: /^q(\d+)$/i, prefix: 'Q', type: 'month' as const },
+      { regex: /^(quarter)\s+(\d+)$/i, prefix: 'Quarter', type: 'month' as const },
+      // Year patterns: "2024", "Year 2023"
+      { regex: /^(\d{4})$/, prefix: '', type: 'month' as const },
+      { regex: /^(year)\s+(\d+)$/i, prefix: 'Year', type: 'month' as const },
+      // Generic patterns: "Phase 1", "Sprint 15", etc.
+      { regex: /^([a-zA-Z]+)\s+(\d+)$/i, prefix: null, type: 'week' as const }
+    ];
+
+    for (const pattern of patterns) {
+      const match = lastLabel.match(pattern.regex);
+      if (match) {
+        let prefix = pattern.prefix;
+        let number: number;
+
+        if (pattern.regex.source.includes('\\d{4}')) {
+          // Year pattern: "2024" -> "2025"
+          number = parseInt(match[1]) + 1;
+          return { label: number.toString(), type: pattern.type };
+        } else if (pattern.regex.source.startsWith('^q')) {
+          // Q pattern: "Q1" -> "Q2"
+          number = parseInt(match[1]) + 1;
+          return { label: `${prefix}${number}`, type: pattern.type };
+        } else {
+          // Standard patterns: "Week 1" -> "Week 2"
+          if (prefix === null) {
+            // Generic pattern - preserve the original prefix case
+            prefix = match[1];
+          }
+          number = parseInt(match[2]) + 1;
+          return { label: `${prefix} ${number}`, type: pattern.type };
+        }
+      }
+    }
+
+    // Fallback: if no pattern is detected, default to Week pattern
+    return { label: `Week ${timeSlots.length + 1}`, type: 'week' };
+  };
+
   const handleAddSlot = () => {
+    const { label, type } = generateNextTimeSlotLabel();
     const newSlot: TimeSlot = {
       id: generateId(),
-      label: `Week ${timeSlots.length + 1}`,
-      type: 'week'
+      label,
+      type
     };
     onAddTimeSlot(newSlot);
   };
