@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { TeamPlanData, Project, TimeSlot, Person, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor, getAllGroups } from '@/data/teamplan';
@@ -25,6 +25,9 @@ export default function TeamPlanBoard({
   const [dragOverCell, setDragOverCell] = useState<{ personId: string; timeSlotId: string; insertIndex: number } | null>(null);
   const [newProjectId, setNewProjectId] = useState<string | null>(null);
   const [draggedProjectData, setDraggedProjectData] = useState<Project | null>(null);
+  const [showLeftFade, setShowLeftFade] = useState(false);
+  const [showRightFade, setShowRightFade] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Sync internal state with prop changes (e.g., when data is loaded from localStorage)
   useEffect(() => {
@@ -32,6 +35,36 @@ export default function TeamPlanBoard({
     console.log('🔄 TeamPlanBoard: New prop data projects count:', data.projects?.length || 0);
     setBoardData(data);
   }, [data]);
+
+  // Handle scroll events to show/hide fade overlays
+  const handleScroll = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    const maxScroll = scrollWidth - clientWidth;
+
+    setShowLeftFade(scrollLeft > 10);
+    setShowRightFade(scrollLeft < maxScroll - 10);
+  };
+
+  // Set up scroll listener and initial fade state
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    handleScroll(); // Check initial state
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Also check on resize
+    const handleResize = () => setTimeout(handleScroll, 100);
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   // Get all unique groups from existing projects
   const getAvailableGroups = () => getAllGroups(boardData.projects);
@@ -296,8 +329,20 @@ export default function TeamPlanBoard({
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
-      <div className="flex-1 overflow-auto p-6">
+    <div className="h-full flex flex-col overflow-hidden relative">
+      {/* Left fade overlay */}
+      <div className={`absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none transition-opacity duration-200 ${
+        showLeftFade ? 'opacity-100' : 'opacity-0'
+      }`} />
+      
+      {/* Right fade overlay */}
+      <div className={`absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none transition-opacity duration-200 ${
+        showRightFade ? 'opacity-100' : 'opacity-0'
+      }`} />
+      
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 overflow-auto p-6">
         <div className="min-w-fit h-full">
           {/* Header */}
           <TimelineHeader
