@@ -58,9 +58,9 @@ export default function AddPersonCell({
 
   return (
     <div 
-      className={`col-span-full p-2 m-1 rounded-md transition-all duration-200 cursor-pointer ${
+      className={`col-span-full p-2 m-1 rounded-md transition-all duration-200 cursor-pointer relative ${
         isDraggedOver 
-          ? 'bg-blue-50/30 border border-blue-200' 
+          ? 'bg-gradient-to-b from-blue-200/20 via-blue-100/10 to-transparent border-1 border-dashed border-blue-300' 
           : isAdding 
             ? 'bg-white border border-slate-200 cursor-default' 
             : 'border border-transparent hover:bg-slate-100'
@@ -72,6 +72,7 @@ export default function AddPersonCell({
       style={{ gridColumn: `1 / ${numTimeSlots + 3}` }}
     >
       <div className="flex items-center justify-center min-h-8">
+        
         {isAdding ? (
           <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <input
