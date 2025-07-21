@@ -122,12 +122,12 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
             variant="ghost"
             role="combobox"
             aria-expanded={isPopoverOpen}
-            className="w-full justify-between px-3 py-2 h-auto text-left font-medium"
+            className="w-auto justify-between px-3 py-2 h-auto text-left font-medium"
           >
             <span className="text-sm truncate max-w-[200px]">
               {currentPlan?.name || 'No Plan Selected'}
             </span>
-            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80 p-0" align="start">
