@@ -267,7 +267,7 @@ export default function NotePad({
               damping: NOTEPAD_CONSTANTS.SPRING_CONFIG.damping,
               opacity: { duration: NOTEPAD_CONSTANTS.OPACITY_DURATION }
             } : { duration: 0 }}
-            className={`bg-white overflow-hidden h-full relative ${
+            className={`bg-white overflow-hidden h-full relative notepad-container ${
               isExpanded ? 'border-r border-slate-200' : ''
             } ${
               // Mobile responsive classes
@@ -300,7 +300,7 @@ export default function NotePad({
               </div>
 
               {/* Editor */}
-              <div ref={editorRef} className="flex-1 overflow-y-auto relative">
+              <div ref={editorRef} className="flex-1 overflow-y-auto relative notepad-editor">
                 <EditorContent 
                   editor={editor} 
                   className="h-full"

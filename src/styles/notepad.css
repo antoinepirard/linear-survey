@@ -100,3 +100,51 @@
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
   font-size: 0.875rem !important;
 }
+
+/* Custom Scrollbar Styles */
+.notepad-editor {
+  /* Always reserve space for scrollbar to prevent text repositioning */
+  scrollbar-width: thin; /* Firefox - always show space */
+  scrollbar-gutter: stable; /* Reserve space for scrollbar */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Always reserve 12px width for scrollbar area */
+.notepad-editor::-webkit-scrollbar {
+  width: 12px;
+  background: transparent;
+}
+
+.notepad-editor::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 8px;
+}
+
+/* Scrollbar thumb - hidden by default */
+.notepad-editor::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Show scrollbar thumb on container hover */
+.notepad-container:hover .notepad-editor::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  background-clip: content-box;
+}
+
+.notepad-container:hover .notepad-editor::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+  background-clip: content-box;
+}
+
+/* Custom scrollbar for Firefox */
+.notepad-editor {
+  scrollbar-color: transparent transparent; /* Hidden by default */
+}
+
+.notepad-container:hover .notepad-editor {
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
