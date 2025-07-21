@@ -47,9 +47,9 @@ export default function PersonCell({
   };
 
   return (
-    <div className="p-1.5 pt-2 pb-2 flex items-start justify-between group min-h-12 relative">
-      {isEditing ? (
-        <div className="flex-1">
+    <div className="p-2 group relative">
+      <div className="flex items-center">
+        {isEditing ? (
           <input
             type="text"
             value={editName}
@@ -57,43 +57,29 @@ export default function PersonCell({
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
             placeholder="Name"
-            className="w-full text-sm font-medium bg-gray-100 border-0 outline-none px-2 py-0.5 rounded transition-colors"
+            className="text-sm font-medium text-slate-900 bg-transparent border-0 outline-none p-0 w-full"
             autoFocus
           />
-        </div>
-      ) : (
-        <>
-          <div 
-            className="flex-1 cursor-pointer"
+        ) : (
+          <h4
+            className="text-sm font-medium text-slate-900 p-0 transition-colors cursor-pointer"
             onClick={() => setIsEditing(true)}
           >
-            <h4 className="text-sm font-medium text-slate-900 px-2 pt-4 pb-0.5 rounded transition-colors">{person.name}</h4>
-          </div>
-          
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={() => setIsEditing(true)}
-              className="p-1 rounded transition-colors"
-              title="Edit person"
-            >
-              <svg className="w-3 h-3 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </button>
-            {canRemove && (
-              <button
-                onClick={() => onRemovePerson(person.id)}
-                className="p-1 hover:bg-red-100 rounded transition-colors"
-                title="Remove person"
-              >
-                <svg className="w-3 h-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-        </>
-      )}
+            {person.name}
+          </h4>
+        )}
+        {canRemove && (
+          <button
+            onClick={() => onRemovePerson(person.id)}
+            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-100 rounded ml-2"
+            title="Remove person"
+          >
+            <svg className="w-3 h-3 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
     </div>
   );
 }
