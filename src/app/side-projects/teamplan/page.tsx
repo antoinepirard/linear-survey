@@ -66,18 +66,10 @@ export default function TeamPlanPage() {
 
   return (
     <div className="h-screen bg-slate-50/30 overflow-hidden flex">
-      <VerticalNavigation 
-        isNotepadExpanded={isNotepadExpanded}
-        onToggleNotepad={handleToggleNotepad}
-        onOpenBacklog={handleOpenBacklog}
-      />
-      <NotePad 
-        className="flex-shrink-0" 
-        isExpanded={isNotepadExpanded}
-        onToggle={handleToggleNotepad}
-        currentPlan={currentPlan}
-        onUpdatePlan={updateCurrentPlan}
-        planSelector={
+      {/* Left Panel: Plan Header + Navigation + Notepad */}
+      <div className="flex flex-col border-r border-slate-200">
+        {/* Plan Selector Header */}
+        <div className="bg-white border-b border-slate-200 px-4 py-2 flex-shrink-0">
           <PlanSelector
             currentPlan={currentPlan}
             allPlans={allPlans}
@@ -85,8 +77,26 @@ export default function TeamPlanPage() {
             onCreatePlan={createPlan}
             onDeletePlan={deletePlan}
           />
-        }
-      />
+        </div>
+        
+        {/* Navigation + Notepad */}
+        <div className="flex flex-1">
+          <VerticalNavigation 
+            isNotepadExpanded={isNotepadExpanded}
+            onToggleNotepad={handleToggleNotepad}
+            onOpenBacklog={handleOpenBacklog}
+          />
+          <NotePad 
+            className="flex-shrink-0" 
+            isExpanded={isNotepadExpanded}
+            onToggle={handleToggleNotepad}
+            currentPlan={currentPlan}
+            onUpdatePlan={updateCurrentPlan}
+          />
+        </div>
+      </div>
+      
+      {/* Team Plan Board */}
       <div className="flex-1 overflow-hidden">
         <TeamPlanBoard 
           data={currentPlan.teamPlanData}

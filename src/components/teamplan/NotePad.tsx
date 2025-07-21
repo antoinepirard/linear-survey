@@ -22,17 +22,14 @@ export default function NotePad({
   isExpanded = true,
   currentPlan = null,
   onUpdatePlan,
-  planSelector,
 }: NotePadProps) {
   const [hasAnimated] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
   // Custom hooks for separated concerns
   const {
-    title,
     width,
     isLoading,
-    setTitle,
     setWidth,
     loadContent,
     saveContent,
@@ -219,27 +216,11 @@ export default function NotePad({
               opacity: { duration: NOTEPAD_CONSTANTS.OPACITY_DURATION }
             } : { duration: 0 }}
             className={`bg-white overflow-hidden h-full relative notepad-container ${
-              isExpanded ? `border-r ${isResizing ? 'border-blue-500' : 'border-slate-200'}` : ''
-            } ${
               // Mobile responsive classes
               width < 500 ? 'min-w-[280px]' : ''
             }`}
           >
             <div className="h-full flex flex-col">
-
-              {/* Plan Selector */}
-              <div className="py-1.5 px-4 sm:px-6 border-b border-slate-200">
-                {planSelector || (
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder={NOTEPAD_CONSTANTS.TITLE_PLACEHOLDER}
-                    className="w-full text-sm font-medium text-slate-800 bg-transparent border-none outline-none placeholder:text-slate-300"
-                    aria-label="Note title"
-                  />
-                )}
-              </div>
 
               {/* Editor */}
               <div ref={editorRef} className="flex-1 overflow-y-auto relative notepad-editor">
