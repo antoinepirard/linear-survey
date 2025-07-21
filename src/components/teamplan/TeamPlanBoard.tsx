@@ -641,7 +641,7 @@ export default function TeamPlanBoard({
                 })}
                 
                 {/* Delete Person Button */}
-                <div className="min-h-12 flex items-center justify-center">
+                <div className="min-h-12 flex items-start justify-center pt-5">
                   {boardData.people.length > 1 && (
                     <Button
                       onClick={() => handleRemovePerson(person.id)}

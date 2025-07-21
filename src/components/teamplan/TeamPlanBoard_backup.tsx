@@ -167,8 +167,6 @@ export default function TeamPlanBoard({
                 <PersonCell
                   person={person}
                   onUpdatePerson={handleUpdatePerson}
-                  onRemovePerson={handleRemovePerson}
-                  canRemove={boardData.people.length > 1}
                 />
               
                 {/* Project Cells */}
