@@ -7,7 +7,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import { motion, AnimatePresence } from 'motion/react';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
-import { useNotePadStorage } from '@/hooks/useNotePadStorage';
+import { usePlanNotePadStorage } from '@/hooks/usePlanNotePadStorage';
 import { useResizable } from '@/hooks/useResizable';
 import { useTextSelection } from '@/hooks/useTextSelection';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
@@ -20,6 +20,8 @@ export default function NotePad({
   minWidth = NOTEPAD_CONSTANTS.MIN_WIDTH,
   defaultWidth = NOTEPAD_CONSTANTS.DEFAULT_WIDTH,
   isExpanded = true,
+  currentPlan = null,
+  onUpdatePlan,
 }: NotePadProps) {
   const [hasAnimated] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -33,10 +35,9 @@ export default function NotePad({
     setWidth,
     loadContent,
     saveContent,
-  } = useNotePadStorage({
-    contentKey: NOTEPAD_CONSTANTS.STORAGE_KEY,
-    titleKey: NOTEPAD_CONSTANTS.TITLE_STORAGE_KEY,
-    widthKey: NOTEPAD_CONSTANTS.WIDTH_STORAGE_KEY,
+  } = usePlanNotePadStorage({
+    currentPlan,
+    onUpdatePlan,
     defaultWidth,
     minWidth,
     maxWidth,

@@ -1,63 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
 import NotePad from '@/components/teamplan/NotePad';
 import VerticalNavigation from '@/components/teamplan/VerticalNavigation';
-import { TeamPlanData, DEFAULT_TEAMPLAN_DATA } from '@/data/teamplan';
-
-const STORAGE_KEY = 'teamplan-data';
+import PlanSelector from '@/components/teamplan/PlanSelector';
+import { usePlanStorage } from '@/hooks/usePlanStorage';
+import { TeamPlanData } from '@/data/teamplan';
 
 export default function TeamPlanPage() {
-  const [teamPlanData, setTeamPlanData] = useState<TeamPlanData>(DEFAULT_TEAMPLAN_DATA);
-  const [isLoading, setIsLoading] = useState(true);
   const [isNotepadExpanded, setIsNotepadExpanded] = useState(true);
-
-  // Load data from localStorage on mount
-  useEffect(() => {
-    console.log('🔍 TeamPlanPage: Loading data from localStorage...');
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      console.log('🔍 TeamPlanPage: Retrieved from localStorage:', saved ? 'Data found' : 'No data found');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          console.log('🔍 TeamPlanPage: Parsed data:', parsed);
-          console.log('🔍 TeamPlanPage: Projects count:', parsed.projects?.length || 0);
-          setTeamPlanData(parsed);
-          console.log('✅ TeamPlanPage: Successfully loaded data from localStorage');
-        } catch (error) {
-          console.error('❌ TeamPlanPage: Failed to parse saved TeamPlan data:', error);
-        }
-      } else {
-        console.log('🔍 TeamPlanPage: No saved data found, using default data');
-      }
-    }
-    setIsLoading(false);
-  }, []);
+  const {
+    isLoading,
+    currentPlan,
+    allPlans,
+    createPlan,
+    deletePlan,
+    switchToPlan,
+    updateCurrentPlan
+  } = usePlanStorage();
 
   const handleDataChange = (newData: TeamPlanData) => {
     console.log('🔄 TeamPlanPage: handleDataChange called');
     console.log('🔄 TeamPlanPage: New data projects count:', newData.projects?.length || 0);
     console.log('🔄 TeamPlanPage: New data:', newData);
     
-    setTeamPlanData(newData);
-    
-    // Save to localStorage
-    if (typeof window !== 'undefined') {
-      try {
-        const serialized = JSON.stringify(newData);
-        localStorage.setItem(STORAGE_KEY, serialized);
-        console.log('✅ TeamPlanPage: Successfully saved to localStorage');
-        console.log('✅ TeamPlanPage: Saved data size:', serialized.length, 'characters');
-        
-        // Verify the save worked
-        const verification = localStorage.getItem(STORAGE_KEY);
-        console.log('🔍 TeamPlanPage: Verification - data saved correctly:', verification === serialized);
-      } catch (error) {
-        console.error('❌ TeamPlanPage: Failed to save to localStorage:', error);
-      }
-    }
+    updateCurrentPlan({ teamPlanData: newData });
   };
 
   const handleToggleNotepad = () => {
@@ -74,29 +42,61 @@ export default function TeamPlanPage() {
       <div className="h-screen bg-slate-50/30 overflow-hidden flex items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
-          <p className="text-slate-600 text-sm">Loading your team plan...</p>
+          <p className="text-slate-600 text-sm">Loading your plan...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentPlan) {
+    return (
+      <div className="h-screen bg-slate-50/30 overflow-hidden flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-600 mb-4">No plan found</p>
+          <button
+            onClick={() => createPlan('My First Plan')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Create Your First Plan
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen bg-slate-50/30 overflow-hidden flex">
-      <VerticalNavigation 
-        isNotepadExpanded={isNotepadExpanded}
-        onToggleNotepad={handleToggleNotepad}
-        onOpenBacklog={handleOpenBacklog}
-      />
-      <NotePad 
-        className="flex-shrink-0" 
-        isExpanded={isNotepadExpanded}
-        onToggle={handleToggleNotepad}
-      />
-      <div className="flex-1 overflow-hidden">
-        <TeamPlanBoard 
-          data={teamPlanData}
-          onChange={handleDataChange}
+    <div className="h-screen bg-slate-50/30 overflow-hidden flex flex-col">
+      {/* Header with Plan Selector */}
+      <div className="h-12 bg-white border-b border-slate-200 flex items-center px-4">
+        <PlanSelector
+          currentPlan={currentPlan}
+          allPlans={allPlans}
+          onSelectPlan={switchToPlan}
+          onCreatePlan={createPlan}
+          onDeletePlan={deletePlan}
         />
+      </div>
+      
+      {/* Main Content */}
+      <div className="flex-1 flex overflow-hidden">
+        <VerticalNavigation 
+          isNotepadExpanded={isNotepadExpanded}
+          onToggleNotepad={handleToggleNotepad}
+          onOpenBacklog={handleOpenBacklog}
+        />
+        <NotePad 
+          className="flex-shrink-0" 
+          isExpanded={isNotepadExpanded}
+          onToggle={handleToggleNotepad}
+          currentPlan={currentPlan}
+          onUpdatePlan={updateCurrentPlan}
+        />
+        <div className="flex-1 overflow-hidden">
+          <TeamPlanBoard 
+            data={currentPlan.teamPlanData}
+            onChange={handleDataChange}
+          />
+        </div>
       </div>
     </div>
   );

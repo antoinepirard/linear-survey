@@ -1,4 +1,5 @@
 import { Editor } from '@tiptap/react';
+import { Plan } from '@/types/plan';
 
 // Type for TipTap editor instance
 export type TipTapEditor = Editor;
@@ -17,6 +18,8 @@ export interface NotePadProps {
   defaultWidth?: number;
   isExpanded?: boolean;
   onToggle?: () => void;
+  currentPlan?: Plan | null;
+  onUpdatePlan?: (updates: Partial<Pick<Plan, 'notepadData'>>) => void;
 }
 
 // Storage related interfaces
