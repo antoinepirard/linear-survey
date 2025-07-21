@@ -372,7 +372,7 @@ export default function TeamPlanBoard({
                   return (
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
-                      className="min-h-16 p-2 pt-3 pb-3 mx-1 bg-slate-50 border-b border-dashed border-slate-200 transition-all duration-20 relative overflow-visible group"
+                      className="min-h-16 p-2 pt-3 pb-3 mx-1 bg-slate-50 border-b border-white transition-all duration-20 relative overflow-visible group"
                       data-drop-zone
                       data-person-id={person.id}
                       data-timeslot-id={timeSlot.id}
@@ -452,7 +452,7 @@ export default function TeamPlanBoard({
                 })}
                 
                 {/* Empty cell for the add column */}
-                <div className="min-h-16 mx-1 bg-slate-50 border-b border-dashed border-slate-200" />
+                <div className="min-h-16 mx-1 bg-slate-50" />
               </div>
             ))}
             

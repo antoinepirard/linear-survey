@@ -78,12 +78,12 @@ export default function TimelineHeader({
                 onChange={(e) => setEditValue(e.target.value)}
                 onBlur={() => handleSaveEdit(timeSlot.id)}
                 onKeyDown={(e) => handleKeyDown(e, timeSlot.id)}
-                className="font-mono uppercase text-xs text-slate-700 bg-transparent border-none outline-none px-2 py-1 text-center w-full transition-colors"
+                className="font-mono uppercase text-xs text-slate-700 bg-transparent border-none outline-none pl-4 pr-2 py-1 text-left w-full transition-colors"
                 autoFocus
               />
             ) : (
               <h3 
-                className="font-mono uppercase text-xs text-slate-700 text-center cursor-pointer hover:text-slate-900 flex-1"
+                className="font-mono uppercase text-xs text-slate-700 text-left cursor-pointer hover:text-slate-900 flex-1 pl-4"
                 onClick={() => handleStartEdit(timeSlot)}
                 title="Click to edit"
               >
