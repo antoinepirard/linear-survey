@@ -15,6 +15,8 @@ export interface NotePadProps {
   maxWidth?: number;
   minWidth?: number;
   defaultWidth?: number;
+  isExpanded?: boolean;
+  onToggle?: () => void;
 }
 
 // Storage related interfaces

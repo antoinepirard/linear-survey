@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
 import NotePad from '@/components/teamplan/NotePad';
+import VerticalNavigation from '@/components/teamplan/VerticalNavigation';
 import { TeamPlanData, DEFAULT_TEAMPLAN_DATA } from '@/data/teamplan';
 
 const STORAGE_KEY = 'teamplan-data';
@@ -10,6 +11,7 @@ const STORAGE_KEY = 'teamplan-data';
 export default function TeamPlanPage() {
   const [teamPlanData, setTeamPlanData] = useState<TeamPlanData>(DEFAULT_TEAMPLAN_DATA);
   const [isLoading, setIsLoading] = useState(true);
+  const [isNotepadExpanded, setIsNotepadExpanded] = useState(true);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -58,6 +60,15 @@ export default function TeamPlanPage() {
     }
   };
 
+  const handleToggleNotepad = () => {
+    setIsNotepadExpanded(!isNotepadExpanded);
+  };
+
+  const handleOpenBacklog = () => {
+    // Future functionality placeholder
+    console.log('Backlog functionality coming soon...');
+  };
+
   if (isLoading) {
     return (
       <div className="h-screen bg-slate-50/30 overflow-hidden flex items-center justify-center">
@@ -71,7 +82,16 @@ export default function TeamPlanPage() {
 
   return (
     <div className="h-screen bg-slate-50/30 overflow-hidden flex">
-      <NotePad className="flex-shrink-0" />
+      <VerticalNavigation 
+        isNotepadExpanded={isNotepadExpanded}
+        onToggleNotepad={handleToggleNotepad}
+        onOpenBacklog={handleOpenBacklog}
+      />
+      <NotePad 
+        className="flex-shrink-0" 
+        isExpanded={isNotepadExpanded}
+        onToggle={handleToggleNotepad}
+      />
       <div className="flex-1 overflow-hidden">
         <TeamPlanBoard 
           data={teamPlanData}

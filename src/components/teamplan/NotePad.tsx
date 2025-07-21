@@ -7,7 +7,6 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  ChevronLeftIcon, 
   ChevronRightIcon 
 } from '@heroicons/react/24/outline';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
@@ -22,9 +21,10 @@ export default function NotePad({
   onError,
   maxWidth = NOTEPAD_CONSTANTS.MAX_WIDTH,
   minWidth = NOTEPAD_CONSTANTS.MIN_WIDTH,
-  defaultWidth = NOTEPAD_CONSTANTS.DEFAULT_WIDTH
+  defaultWidth = NOTEPAD_CONSTANTS.DEFAULT_WIDTH,
+  isExpanded = true,
+  onToggle
 }: NotePadProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [hasAnimated, setHasAnimated] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -193,9 +193,9 @@ export default function NotePad({
     };
   }, [editor]);
 
-  const toggleExpanded = () => {
+  const handleToggle = () => {
     setHasAnimated(true);
-    setIsExpanded(!isExpanded);
+    onToggle?.();
   };
 
   if (isLoading) {
@@ -232,20 +232,9 @@ export default function NotePad({
             }`}
           >
             <div className="h-full flex flex-col">
-              {/* Header with collapse button */}
-              <div className="flex items-center justify-between px-6 pt-4 pb-2">
-                <div className="flex-1" />
-                <button
-                  onClick={toggleExpanded}
-                  className="w-8 h-8 bg-white hover:bg-slate-100 border border-slate-200 rounded-md flex items-center justify-center transition-colors duration-200 group"
-                  aria-label="Collapse notes"
-                >
-                  <ChevronLeftIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
-                </button>
-              </div>
 
               {/* Title Input */}
-              <div className="px-4 sm:px-6 pb-4">
+              <div className="pt-8 px-4 sm:px-6 pb-4 bg-linear-to-bottom from-white to-transparent">
                 <input
                   type="text"
                   value={title}
@@ -304,16 +293,6 @@ export default function NotePad({
         )}
       </AnimatePresence>
 
-      {/* Expand Button when collapsed */}
-      {!isExpanded && (
-        <button
-          onClick={toggleExpanded}
-          className="w-8 h-8 m-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md flex items-center justify-center transition-colors duration-200 group"
-          aria-label="Expand notes"
-        >
-          <ChevronRightIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
-        </button>
-      )}
     </div>
   );
 }
