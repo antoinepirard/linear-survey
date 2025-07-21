@@ -309,7 +309,7 @@ export default function TeamPlanBoard({
                   return (
                     <motion.div
                       key={`${person.id}-${timeSlot.id}`}
-                      className="min-h-20 p-3 pt-4 pb-4 border-b border-dashed border-slate-200 transition-all duration-20 relative overflow-visible group"
+                      className="min-h-16 p-2 pt-3 pb-3 border-b border-dashed border-slate-200 transition-all duration-20 relative overflow-visible group"
                       data-drop-zone
                       data-person-id={person.id}
                       data-timeslot-id={timeSlot.id}
@@ -323,7 +323,7 @@ export default function TeamPlanBoard({
                           : ''
                       }`} />
                       
-                      <div className="space-y-2 relative">
+                      <div className="space-y-1.5 relative">
                           {/* Fixed insertion placeholder at the top */}
                           <div className="h-1 flex items-center justify-center">
                             <div
@@ -377,7 +377,7 @@ export default function TeamPlanBoard({
                           id={`add-project-${person.id}-${timeSlot.id}`}
                           variant="ghost"
                           onClick={() => handleAddProject(person.id, timeSlot.id)}
-                          className="w-full p-3 rounded-lg text-xs text-slate-600 hover:text-slate-800 font-medium bg-transparent hover:bg-transparent border border-dashed border-slate-200 hover:border-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-200 min-h-[3.25rem] flex items-center justify-center select-none"
+                          className="w-full p-2 rounded-lg text-xs text-slate-600 hover:text-slate-800 font-medium bg-transparent hover:bg-transparent border border-dashed border-slate-200 hover:border-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-200 min-h-[2.5rem] flex items-center justify-center select-none"
                         >
                           <PlusIcon className="w-3 h-3 mr-1" />
                           Add Project
@@ -388,7 +388,7 @@ export default function TeamPlanBoard({
                 })}
                 
                 {/* Empty cell for the add column */}
-                <div className="min-h-20 border-b border-dashed border-slate-200" />
+                <div className="min-h-16 border-b border-dashed border-slate-200" />
               </div>
             ))}
             
@@ -396,11 +396,11 @@ export default function TeamPlanBoard({
             <div className="grid gap-0" style={{ gridTemplateColumns: `200px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
               <AddPersonCell onAddPerson={handleAddPerson} />
               {boardData.timeSlots.map(timeSlot => (
-                <div key={`add-person-${timeSlot.id}`} className=" min-h-16" />
+                <div key={`add-person-${timeSlot.id}`} className=" min-h-12" />
               ))}
               
               {/* Empty cell for the add column */}
-              <div className="min-h-16" />
+              <div className="min-h-12" />
             </div>
           </div>
         </div>

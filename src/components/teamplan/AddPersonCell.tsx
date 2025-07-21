@@ -37,7 +37,7 @@ export default function AddPersonCell({ onAddPerson }: AddPersonCellProps) {
   };
 
   return (
-    <div className="p-3 flex items-center justify-center min-h-16">
+    <div className="p-2 flex items-center justify-center min-h-12">
       {isAdding ? (
         <div className="w-full space-y-2">
           <input

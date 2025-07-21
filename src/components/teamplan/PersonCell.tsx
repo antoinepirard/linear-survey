@@ -47,7 +47,7 @@ export default function PersonCell({
   };
 
   return (
-    <div className="border-b border-dashed border-slate-200 p-3 flex items-start justify-between group min-h-20">
+    <div className="border-b border-dashed border-slate-200 p-2 pt-3 pb-3 flex items-start justify-between group min-h-16">
       {isEditing ? (
         <div className="flex-1">
           <input
@@ -57,7 +57,7 @@ export default function PersonCell({
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
             placeholder="Name"
-            className="w-full text-sm font-medium bg-gray-100 border-0 outline-none px-2 py-1 rounded transition-colors"
+            className="w-full text-sm font-medium bg-gray-100 border-0 outline-none px-2 py-0.5 rounded transition-colors"
             autoFocus
           />
         </div>
@@ -67,7 +67,7 @@ export default function PersonCell({
             className="flex-1 cursor-pointer"
             onClick={() => setIsEditing(true)}
           >
-            <h4 className="text-sm font-medium text-slate-900 px-2 py-1 rounded transition-colors">{person.name}</h4>
+            <h4 className="text-sm font-medium text-slate-900 px-2 py-0.5 rounded transition-colors">{person.name}</h4>
           </div>
           
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

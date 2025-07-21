@@ -244,7 +244,7 @@ export default function ProjectCard({
       {isDragging && (
         <div
           className={`
-            absolute inset-0 p-3 rounded-lg ring-1 font-regular text-sm
+            absolute inset-0 p-2 py-2.5 rounded-lg ring-1 font-regular text-sm
             shadow-sm opacity-30 pointer-events-none
             ${project.color}
             ring-slate-300/50
@@ -298,8 +298,8 @@ export default function ProjectCard({
         data-project-card
         data-project-id={project.id}
         className={`
-          relative cursor-move p-3 rounded-lg ring-1 font-regular text-sm
-          shadow-sm hover:shadow-md transition-shadow duration-200
+          relative cursor-move p-2 py-2.5 rounded-lg ring-1 font-regular text-sm
+          shadow-none hover:shadow-md transition-shadow duration-200
           ${project.color}
           ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-200/65'}
         `}
@@ -319,7 +319,7 @@ export default function ProjectCard({
                 onKeyDown={handleKeyDown}
                 onBlur={handleSave}
                 placeholder="Project title"
-                className="w-full font-medium leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit h-6"
+                className="w-full font-medium leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit h-5"
                 autoFocus
               />
               {showAutocomplete && availableGroups.length > 0 && (
@@ -354,7 +354,7 @@ export default function ProjectCard({
             </div>
           ) : (
             <h4 
-              className="font-medium leading-snug truncate cursor-pointer hover:after:opacity-100 transition-all h-6 flex items-center relative after:content-[''] after:absolute after:left-0 after:top-full after:mt-1 after:h-px after:w-full after:bg-slate-300 after:opacity-0 after:transition-opacity flex-1"
+              className="font-medium leading-snug truncate cursor-pointer hover:after:opacity-100 transition-all h-5 flex items-center relative after:content-[''] after:absolute after:left-0 after:top-full after:mt-1 after:h-px after:w-full after:bg-slate-300 after:opacity-0 after:transition-opacity flex-1"
               onClick={startEditing}
               title="Click to edit project title"
             >
@@ -383,7 +383,7 @@ export default function ProjectCard({
                   title="Delete project"
                   variant="ghost"
                   size="sm"
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 h-6 w-6 p-1"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 h-5 w-5 p-0.5"
                 >
                   <TrashIcon />
                 </Button>
