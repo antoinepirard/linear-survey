@@ -80,6 +80,7 @@ export default function AddPersonCell({
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={handleKeyDown}
+              onBlur={handleCancel}
               placeholder="Person name"
               className="text-sm bg-transparent border-none outline-none placeholder-slate-400 text-slate-700 px-1"
               autoFocus
