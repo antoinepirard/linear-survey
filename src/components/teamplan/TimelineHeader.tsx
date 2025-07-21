@@ -68,7 +68,7 @@ export default function TimelineHeader({
       {timeSlots.map((timeSlot) => (
         <motion.div
           key={timeSlot.id}
-          className="bg-slate-50 mx-1 p-2 group relative rounded-t-lg"
+          className="p-2 group relative"
         >
           <div className="flex items-center justify-between">
             {editingSlot === timeSlot.id ? (
@@ -107,7 +107,7 @@ export default function TimelineHeader({
       ))}
       
       {/* Add Time Slot Column */}
-      <div className="bg-slate-50 mx-1 flex items-center justify-center rounded-t-lg">
+      <div className="flex items-center justify-center">
         <Button
           onClick={handleAddSlot}
           variant="secondary"
