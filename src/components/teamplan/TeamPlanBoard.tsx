@@ -21,6 +21,7 @@ export default function TeamPlanBoard({
 }: TeamPlanBoardProps) {
   const [boardData, setBoardData] = useState<TeamPlanData>(data);
   const [draggedProject, setDraggedProject] = useState<string | null>(null);
+  const [isDuplicating, setIsDuplicating] = useState(false);
   const [dragOverCell, setDragOverCell] = useState<{ personId: string; timeSlotId: string; insertIndex: number } | null>(null);
   const [newProjectId, setNewProjectId] = useState<string | null>(null);
   const [draggedProjectData, setDraggedProjectData] = useState<Project | null>(null);
@@ -35,7 +36,7 @@ export default function TeamPlanBoard({
   // Get all unique groups from existing projects
   const getAvailableGroups = () => getAllGroups(boardData.projects);
 
-  const handleDragStart = (projectId: string) => {
+  const handleDragStart = (projectId: string, isDuplicate: boolean) => {
     const project = boardData.projects.find(p => p.id === projectId);
     if (!project) {
       console.warn(`Project with id ${projectId} not found`);
@@ -43,6 +44,7 @@ export default function TeamPlanBoard({
     }
     setDraggedProject(projectId);
     setDraggedProjectData(project);
+    setIsDuplicating(isDuplicate);
   };
 
   const handleDragEnd = () => {
@@ -55,24 +57,39 @@ export default function TeamPlanBoard({
     if (currentDragOverCell && currentDraggedProjectData) {
       const { personId, timeSlotId } = currentDragOverCell;
       console.log('🚚 TeamPlanBoard: Moving project', currentDraggedProjectData.id, 'to', personId, timeSlotId);
-      
-      // Only allow drops to different cells (no reordering within same cell)
-      if (personId !== currentDraggedProjectData.personId || timeSlotId !== currentDraggedProjectData.timeSlotId) {
-        // Create updated project with new position
-        const updatedProject = { ...currentDraggedProjectData, personId, timeSlotId };
-        
-        // Update the projects array
+
+      if (isDuplicating) {
+        const newProject = {
+          ...currentDraggedProjectData,
+          id: generateId(),
+          personId,
+          timeSlotId,
+        };
         const newData = {
           ...boardData,
-          projects: boardData.projects.map(p => 
-            p.id === currentDraggedProjectData.id ? updatedProject : p
-          )
+          projects: [...boardData.projects, newProject],
         };
         setBoardData(newData);
-        console.log('📤 TeamPlanBoard: Calling onChange with updated data (drag end)');
         onChange?.(newData);
       } else {
-        console.log('🚫 TeamPlanBoard: No position change detected, skipping onChange');
+        // Only allow drops to different cells (no reordering within same cell)
+        if (personId !== currentDraggedProjectData.personId || timeSlotId !== currentDraggedProjectData.timeSlotId) {
+          // Create updated project with new position
+          const updatedProject = { ...currentDraggedProjectData, personId, timeSlotId };
+          
+          // Update the projects array
+          const newData = {
+            ...boardData,
+            projects: boardData.projects.map(p => 
+              p.id === currentDraggedProjectData.id ? updatedProject : p
+            )
+          };
+          setBoardData(newData);
+          console.log('📤 TeamPlanBoard: Calling onChange with updated data (drag end)');
+          onChange?.(newData);
+        } else {
+          console.log('🚫 TeamPlanBoard: No position change detected, skipping onChange');
+        }
       }
     } else {
       console.log('🚫 TeamPlanBoard: No valid drop target, skipping onChange');
@@ -82,6 +99,7 @@ export default function TeamPlanBoard({
     setDraggedProject(null);
     setDraggedProjectData(null);
     setDragOverCell(null);
+    setIsDuplicating(false);
   };
 
   // Position-based drop detection for Framer Motion drag
@@ -351,6 +369,7 @@ export default function TeamPlanBoard({
                               <ProjectCard
                                 project={project}
                                 isDragging={draggedProject === project.id}
+                                isDuplicating={isDuplicating && draggedProject === project.id}
                                 isEditing={newProjectId === project.id}
                                 availableGroups={getAvailableGroups()}
                                 onEdit={handleEditProject}

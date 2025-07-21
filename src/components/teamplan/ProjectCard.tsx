@@ -2,18 +2,19 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { Project } from '@/data/teamplan';
 import { Button } from '@/components/ui/button';
 
 interface ProjectCardProps {
   project: Project;
   isDragging?: boolean;
+  isDuplicating?: boolean;
   isEditing?: boolean;
   availableGroups?: string[];
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
-  onDragStart?: (projectId: string) => void;
+  onDragStart?: (projectId: string, isDuplicating: boolean) => void;
   onDragEnd?: () => void;
   onDrag?: (element: HTMLElement) => void;
 }
@@ -21,6 +22,7 @@ interface ProjectCardProps {
 export default function ProjectCard({ 
   project, 
   isDragging = false,
+  isDuplicating = false,
   isEditing = false,
   availableGroups = [],
   onEdit,
@@ -219,10 +221,14 @@ export default function ProjectCard({
     setShowAutocomplete(false);
   };
 
-  const handleDragStart = () => {
+  const handleDragStart = (event: MouseEvent | TouchEvent | PointerEvent) => {
     setIsDraggingLocal(true);
     if (onDragStart) {
-      onDragStart(project.id);
+      let isAltPressed = false;
+      if (event instanceof MouseEvent || event instanceof PointerEvent) {
+        isAltPressed = event.altKey;
+      }
+      onDragStart(project.id, isAltPressed);
     }
   };
 
@@ -314,6 +320,11 @@ export default function ProjectCard({
         onTouchEnd={() => setIsHovered(false)}
         aria-label={`Project: ${project.title}`}
       >
+        {isDuplicating && (
+          <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full h-5 w-5 flex items-center justify-center shadow-md z-10 pointer-events-none">
+            <PlusIcon className="w-3 h-3" />
+          </div>
+        )}
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 min-w-0">
           {isEditingLocal ? (
