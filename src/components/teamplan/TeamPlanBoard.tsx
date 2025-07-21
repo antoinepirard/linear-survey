@@ -650,7 +650,7 @@ export default function TeamPlanBoard({
                 onDelete={() => handleRemovePerson(person.id)}
                 label={person.name}
               >
-                <div className="grid gap-0 bg-slate-50 rounded-lg my-1 p-1.5 group/row" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+                <div className="grid gap-0 bg-linear-to-r from-slate-100/60 to-slate-50 rounded-lg my-1 p-1.5 group/row" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
                   {/* Person Column with Inline Editing */}
                   <PersonCell
                     person={person}
