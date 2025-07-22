@@ -23,12 +23,12 @@
   }
 }
 
-.ProseMirror.is-empty::before {
+.ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  color: rgb(203 213 225) !important;
+  float: left;
+  color: #9ca3af;
   pointer-events: none;
-  position: absolute;
-  opacity: 0.6;
+  height: 0;
 }
 
 .ProseMirror h1 {

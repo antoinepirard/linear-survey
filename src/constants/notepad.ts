@@ -21,7 +21,7 @@ export const NOTEPAD_CONSTANTS = {
   
   // Editor configuration
   MIN_EDITOR_HEIGHT: 400,
-  PLACEHOLDER_TEXT: 'Start writing your notes here...',
+  PLACEHOLDER_TEXT: 'Start thinking, keep writing...',
   TITLE_PLACEHOLDER: 'Enter note title...',
   
   // Animation durations
