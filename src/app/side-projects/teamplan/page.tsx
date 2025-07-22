@@ -189,14 +189,14 @@ export default function TeamPlanPage() {
                   </PopoverTrigger>
                   <PopoverContent className="w-64 p-0" align="end">
                     <div className="px-4 py-3 border-b border-slate-100">
-                      <span className="text-sm font-medium text-slate-900">Settings</span>
+                      <span className="text-xs font-mono text-slate-900">Settings</span>
                     </div>
                     <div className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="text-sm font-medium text-slate-900">Color coding</span>
                           <p className="text-xs text-slate-500 mt-0.5">
-                            Show colored borders on cards with identical values
+                            Color code cards with identical values for easier reading.
                           </p>
                         </div>
                         <Switch
