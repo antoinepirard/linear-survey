@@ -7,6 +7,7 @@ import VerticalNavigation from '@/components/teamplan/VerticalNavigation';
 import PlanSelector from '@/components/teamplan/PlanSelector';
 import { usePlanStorage } from '@/hooks/usePlanStorage';
 import { TeamPlanData } from '@/data/teamplan';
+import { PuzzlePieceIcon } from '@heroicons/react/24/solid';
 
 export default function TeamPlanPage() {
   const [isNotepadExpanded, setIsNotepadExpanded] = useState(true);
@@ -69,7 +70,10 @@ export default function TeamPlanPage() {
       {/* Left Panel: Plan Header + Navigation + Notepad */}
       <div className="flex flex-col border-r border-slate-200/65">
         {/* Plan Selector Header */}
-        <div className="bg-white border-b border-slate-200/65 px-4 py-2 flex-shrink-0">
+        <div className="bg-white border-b border-slate-200/65 px-4 py-2 flex-shrink-0 flex items-center gap-3">
+          <div className="w-8 h-8 flex items-center justify-center">
+            <PuzzlePieceIcon className="w-5 h-5 text-slate-900" />
+          </div>
           <PlanSelector
             currentPlan={currentPlan}
             allPlans={allPlans}

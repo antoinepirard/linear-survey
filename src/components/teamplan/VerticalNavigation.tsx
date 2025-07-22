@@ -4,7 +4,6 @@ import {
   DocumentTextIcon,
   Squares2X2Icon
 } from '@heroicons/react/24/outline';
-import { PuzzlePieceIcon } from '@heroicons/react/24/solid';
 
 interface VerticalNavigationProps {
   isNotepadExpanded: boolean;
@@ -19,13 +18,6 @@ export default function VerticalNavigation({
 }: VerticalNavigationProps) {
   return (
     <div className="w-12 h-full bg-white border-r border-slate-200 flex flex-col items-center py-4">
-      {/* Logo */}
-      <div className="mb-6">
-        <div className="w-8 h-8 flex items-center justify-center">
-          <PuzzlePieceIcon className="w-5 h-5 text-slate-900" />
-        </div>
-      </div>
-
       {/* Navigation Items */}
       <div className="flex flex-col space-y-3">
         {/* Notepad Toggle */}
