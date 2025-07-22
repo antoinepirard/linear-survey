@@ -144,7 +144,7 @@ export default function TeamPlanPage() {
           {isSidebarExpanded && (
             <div
               onMouseDown={handleResizeStart}
-              className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-50"
+              className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-50 group"
               style={{ right: -8 }}
               role="separator"
               aria-label="Resize sidebar"
@@ -152,7 +152,7 @@ export default function TeamPlanPage() {
             >
               <div
                 className={`w-1.5 h-6 rounded-full transition-colors duration-150 ${
-                  isResizing ? 'bg-blue-500 shadow-sm' : 'bg-slate-300 hover:bg-blue-400 hover:shadow-sm'
+                  isResizing ? 'bg-blue-500 shadow-sm' : 'bg-slate-300 group-hover:bg-slate-400 group-hover:shadow-sm'
                 }`}
               />
             </div>
