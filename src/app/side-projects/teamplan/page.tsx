@@ -11,7 +11,6 @@ import { usePlanNotePadStorage } from '@/hooks/usePlanNotePadStorage';
 import { TeamPlanData } from '@/data/teamplan';
 import { PuzzlePieceIcon } from '@heroicons/react/24/solid';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
-import { motion, AnimatePresence } from 'motion/react';
 
 export default function TeamPlanPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -37,6 +36,7 @@ export default function TeamPlanPage() {
     minWidth: NOTEPAD_CONSTANTS.MIN_WIDTH,
     maxWidth: NOTEPAD_CONSTANTS.MAX_WIDTH,
   });
+
 
   // Sidebar resize functionality
   const { isResizing, handleResizeStart } = useResizable({
@@ -112,29 +112,13 @@ export default function TeamPlanPage() {
         </div>
 
         {/* Expandable content area */}
-        <AnimatePresence>
-          {isSidebarExpanded && (
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: sidebarWidth - 48 }} // Subtract navigation width
-              exit={{ width: 0 }}
-              transition={
-                isResizing 
-                  ? { 
-                      type: "tween",
-                      duration: 0.05,
-                      ease: "easeOut"
-                    } 
-                  : { 
-                      type: "spring", 
-                      stiffness: 300, 
-                      damping: 35
-                    }
-              }
-              className={`flex flex-col overflow-hidden ${
-                isResizing ? 'border-r border-blue-500' : 'border-r border-slate-200/65'
-              }`}
-            >
+        {isSidebarExpanded && (
+          <div
+            style={{ width: sidebarWidth - 48 }} // Subtract navigation width
+            className={`flex flex-col overflow-hidden ${
+              isResizing ? 'border-r border-blue-500' : 'border-r border-slate-200/65'
+            }`}
+          >
               {/* Plan Selector Header */}
               <div className="bg-white border-b border-slate-200/65 px-4 flex-shrink-0 flex items-center" style={{ paddingTop: '7px', paddingBottom: '7px' }}>
                 <PlanSelector
@@ -152,9 +136,8 @@ export default function TeamPlanPage() {
                 currentPlan={currentPlan}
                 onUpdatePlan={updateCurrentPlan}
               />
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </div>
+        )}
 
         {/* Resize Handle - Only show when sidebar is expanded */}
         {isSidebarExpanded && (
