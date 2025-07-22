@@ -5,6 +5,11 @@ import {
   RectangleGroupIcon,
   ChatBubbleBottomCenterTextIcon
 } from '@heroicons/react/24/outline';
+import { 
+  DocumentTextIcon as DocumentTextIconSolid,
+  RectangleGroupIcon as RectangleGroupIconSolid,
+  ChatBubbleBottomCenterTextIcon as ChatBubbleBottomCenterTextIconSolid
+} from '@heroicons/react/24/solid';
 
 interface VerticalNavigationProps {
   isSidebarExpanded: boolean;
@@ -30,7 +35,7 @@ export default function VerticalNavigation({
         {/* Sidebar Toggle */}
         <button
           onClick={onToggleSidebar}
-          className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 ${
+          className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 cursor-pointer ${
             isSidebarExpanded 
               ? 'bg-slate-100 text-slate-800' 
               : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
@@ -38,13 +43,17 @@ export default function VerticalNavigation({
           aria-label={isSidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
           title={isSidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
         >
-          <DocumentTextIcon className="w-5 h-5" />
+          {isSidebarExpanded ? (
+            <DocumentTextIconSolid className="w-5 h-5" />
+          ) : (
+            <DocumentTextIcon className="w-5 h-5" />
+          )}
         </button>
 
         {/* Backlog */}
         <button
           onClick={onToggleBacklog}
-          className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 ${
+          className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 cursor-pointer ${
             isBacklogExpanded 
               ? 'bg-slate-100 text-slate-800' 
               : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
@@ -52,12 +61,16 @@ export default function VerticalNavigation({
           aria-label={isBacklogExpanded ? "Close backlog" : "Open backlog"}
           title={isBacklogExpanded ? "Close backlog" : "Open backlog"}
         >
-          <RectangleGroupIcon className="w-5 h-5" />
+          {isBacklogExpanded ? (
+            <RectangleGroupIconSolid className="w-5 h-5" />
+          ) : (
+            <RectangleGroupIcon className="w-5 h-5" />
+          )}
         </button>
         {/* Comments */}
         <button
           onClick={onToggleComments}
-          className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 ${
+          className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 cursor-pointer ${
             isCommentsExpanded 
               ? 'bg-slate-100 text-slate-800' 
               : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
@@ -65,7 +78,11 @@ export default function VerticalNavigation({
           aria-label={isCommentsExpanded ? "Close comments" : "Open comments"}
           title={isCommentsExpanded ? "Close comments" : "Open comments"}
         >
-          <ChatBubbleBottomCenterTextIcon className="w-5 h-5" />
+          {isCommentsExpanded ? (
+            <ChatBubbleBottomCenterTextIconSolid className="w-5 h-5" />
+          ) : (
+            <ChatBubbleBottomCenterTextIcon className="w-5 h-5" />
+          )}
         </button>
       </div>
     </div>
