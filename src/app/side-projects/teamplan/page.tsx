@@ -94,7 +94,7 @@ export default function TeamPlanPage() {
     <div className="h-screen bg-slate-50/75 overflow-hidden flex">
       {/* Sidebar Container with Resize */}
       <div className="relative flex p-3">
-        <div className="relative flex bg-white rounded-md shadow-md ring-1 ring-slate-200/50 overflow-hidden">
+        <div className="relative flex bg-white rounded-md shadow-md ring-1 ring-slate-200/50 overflow-visible">
           {/* Always present navigation - no animation */}
           <div className="w-12 h-full bg-transparent border-r border-slate-200/65 flex flex-col flex-shrink-0">
             {/* Logo/Header Section */}
@@ -145,14 +145,14 @@ export default function TeamPlanPage() {
             <div
               onMouseDown={handleResizeStart}
               className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-50"
-              style={{ left: sidebarWidth }}
+              style={{ right: -8 }}
               role="separator"
               aria-label="Resize sidebar"
               aria-orientation="vertical"
             >
               <div
-                className={`w-1 h-6 rounded-full transition-colors duration-150 ${
-                  isResizing ? 'bg-blue-500' : 'bg-slate-200 hover:bg-blue-400 hover:shadow-blue-100'
+                className={`w-1.5 h-6 rounded-full transition-colors duration-150 ${
+                  isResizing ? 'bg-blue-500 shadow-sm' : 'bg-slate-300 hover:bg-blue-400 hover:shadow-sm'
                 }`}
               />
             </div>
