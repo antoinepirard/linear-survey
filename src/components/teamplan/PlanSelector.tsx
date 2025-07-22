@@ -37,8 +37,13 @@ const CreatePlanDialog: React.FC<CreatePlanDialogProps> = ({ onCreatePlan }) => 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="icon" className="gap-1">
-          <Plus className="h-3 w-3" />
+        <Button 
+          variant="secondary" 
+          size="icon" 
+          className="bg-white hover:bg-slate-50 ring-1 ring-slate-200/65 hover:ring-1 hover:ring-slate-300/50 size-7"
+          title="Create new plan"
+        >
+          <Plus className="size-3" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -141,7 +146,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
             {allPlans.map((plan) => (
               <div
                 key={plan.id}
-                className="px-3 py-2 hover:bg-accent hover:rounded-lg cursor-pointer flex items-center justify-between group transition-all duration-150"
+                className="px-3 py-2 hover:bg-slate-50 hover:rounded-lg cursor-pointer flex items-center justify-between group transition-all duration-150"
                 onClick={() => handleSelectPlan(plan.id)}
               >
                 <div className="flex-1 min-w-0">
