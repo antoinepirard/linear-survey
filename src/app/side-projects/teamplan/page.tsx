@@ -110,8 +110,8 @@ export default function TeamPlanPage() {
                       opacity: { duration: NOTEPAD_CONSTANTS.OPACITY_DURATION }
                     }
               }
-              className={`flex flex-col border-r border-slate-200/65 overflow-hidden ${
-                isResizing ? 'border-r-2 border-blue-500' : ''
+              className={`flex flex-col overflow-hidden ${
+                isResizing ? 'border-r border-blue-500' : 'border-r border-slate-200/65'
               }`}
             >
               {/* Plan Selector Header */}
@@ -175,8 +175,8 @@ export default function TeamPlanPage() {
             aria-orientation="vertical"
           >
             <div
-              className={`w-1 h-8 rounded-full transition-colors duration-150 shadow-sm ${
-                isResizing ? 'bg-blue-500 shadow-blue-200' : 'bg-slate-300 hover:bg-blue-400 hover:shadow-blue-100'
+              className={`w-1 h-6 rounded-full transition-colors duration-150 ${
+                isResizing ? 'bg-blue-500' : 'bg-slate-200 hover:bg-blue-400 hover:shadow-blue-100'
               }`}
             />
           </div>
