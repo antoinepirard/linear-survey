@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ChevronsUpDown, Plus, Trash2 } from 'lucide-react';
+import { ChevronsUpDown, Plus, Trash2, Check } from 'lucide-react';
 
 interface PlanSelectorProps {
   currentPlan: PlanMetadata | null;
@@ -37,9 +37,8 @@ const CreatePlanDialog: React.FC<CreatePlanDialogProps> = ({ onCreatePlan }) => 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1">
+        <Button variant="secondary" size="icon" className="gap-1">
           <Plus className="h-3 w-3" />
-          New
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -131,20 +130,18 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80 p-0" align="start">
-          <div className="p-3 border-b">
+          <div className="px-4 py-2 border-b border-slate-100">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Your Plans</span>
+              <span className="text-xs uppercase text-slate-500 font-mono">Your Plans</span>
               <CreatePlanDialog onCreatePlan={onCreatePlan} />
             </div>
           </div>
           
-          <div className="max-h-60 overflow-y-auto">
+          <div className="max-h-60 overflow-y-auto p-2">
             {allPlans.map((plan) => (
               <div
                 key={plan.id}
-                className={`px-3 py-2 hover:bg-accent cursor-pointer flex items-center justify-between group ${
-                  currentPlan?.id === plan.id ? 'bg-accent' : ''
-                }`}
+                className="px-3 py-2 hover:bg-accent hover:rounded-lg cursor-pointer flex items-center justify-between group transition-all duration-150"
                 onClick={() => handleSelectPlan(plan.id)}
               >
                 <div className="flex-1 min-w-0">
@@ -156,16 +153,21 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
                   </div>
                 </div>
                 
-                {allPlans.length > 1 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => handleDeleteClick(plan.id, e)}
-                    className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                )}
+                <div className="flex items-center gap-2">
+                  {currentPlan?.id === plan.id && (
+                    <Check className="h-4 w-4 text-primary" />
+                  )}
+                  {allPlans.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => handleDeleteClick(plan.id, e)}
+                      className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
