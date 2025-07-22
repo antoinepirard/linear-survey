@@ -26,8 +26,8 @@ export const NOTEPAD_CONSTANTS = {
   
   // Animation durations
   SPRING_CONFIG: {
-    stiffness: 300,
-    damping: 30,
+    stiffness: 400,
+    damping: 40,
   },
   OPACITY_DURATION: 0.2,
   MENU_ANIMATION_DURATION: 0.15,

@@ -102,7 +102,11 @@ export default function TeamPlanPage() {
               exit={{ width: 0, opacity: 0 }}
               transition={
                 isResizing 
-                  ? { duration: 0 } 
+                  ? { 
+                      type: "tween",
+                      duration: 0.05,
+                      ease: "easeOut"
+                    } 
                   : { 
                       type: "spring", 
                       stiffness: NOTEPAD_CONSTANTS.SPRING_CONFIG.stiffness, 
