@@ -2,19 +2,22 @@
 
 import { 
   DocumentTextIcon,
-  Squares2X2Icon
+  RectangleGroupIcon,
+  ChatBubbleBottomCenterTextIcon
 } from '@heroicons/react/24/outline';
 
 interface VerticalNavigationProps {
   isSidebarExpanded: boolean;
   onToggleSidebar: () => void;
   onOpenBacklog?: () => void;
+  onOpenComments?: () => void;
 }
 
 export default function VerticalNavigation({
   isSidebarExpanded,
   onToggleSidebar,
-  onOpenBacklog
+  onOpenBacklog,
+  onOpenComments
 }: VerticalNavigationProps) {
   return (
     <div className="w-12 h-full bg-white border-r border-slate-200 flex flex-col items-center py-4">
@@ -42,7 +45,17 @@ export default function VerticalNavigation({
           title="Backlog (coming soon)"
           disabled
         >
-          <Squares2X2Icon className="w-5 h-5" />
+          <RectangleGroupIcon className="w-5 h-5" />
+        </button>
+        {/* Backlog (Future functionality) */}
+        <button
+        onClick={onOpenComments}
+        className="w-8 h-8 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors duration-200 cursor-not-allowed"
+        aria-label="Open comments (coming soon)"
+        title="Comments (coming soon)"
+        disabled
+        >
+          <ChatBubbleBottomCenterTextIcon className="w-5 h-5" />
         </button>
       </div>
     </div>
