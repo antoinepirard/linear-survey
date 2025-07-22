@@ -192,7 +192,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
                     />
                   ) : (
                     <div 
-                      className="font-medium text-sm truncate hover:bg-slate-100 px-1 py-0.5 rounded cursor-text"
+                      className="font-medium text-sm truncate hover:bg-slate-100 px-1 py-0.5 rounded cursor-text inline-block"
                       onClick={(e) => handleRenameClick(plan, e)}
                     >
                       {plan.name}
