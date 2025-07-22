@@ -13,7 +13,7 @@ export default function CommentsPanel({ width }: CommentsPanelProps) {
       style={{ width }}
     >
       {/* Empty State */}
-      <div className="flex-1 flex flex-col items-center justify-center p-24 text-center">
+      <div className="flex-1 flex flex-col items-center justify-start p-24 text-center">
         <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4">
           <ChatBubbleLeftIcon className="w-8 h-8 text-slate-950" />
         </div>
