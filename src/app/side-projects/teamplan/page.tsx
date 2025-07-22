@@ -9,7 +9,7 @@ import { usePlanStorage } from '@/hooks/usePlanStorage';
 import { useResizable } from '@/hooks/useResizable';
 import { usePlanNotePadStorage } from '@/hooks/usePlanNotePadStorage';
 import { TeamPlanData } from '@/data/teamplan';
-import { PuzzlePieceIcon } from '@heroicons/react/24/solid';
+import { CubeIcon } from '@heroicons/react/24/solid';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 
 export default function TeamPlanPage() {
@@ -93,34 +93,35 @@ export default function TeamPlanPage() {
   return (
     <div className="h-screen bg-slate-50/75 overflow-hidden flex">
       {/* Sidebar Container with Resize */}
-      <div className="relative flex">
-        {/* Always present navigation - no animation */}
-        <div className="w-12 h-full bg-white border-r border-slate-200/65 flex flex-col flex-shrink-0">
-          {/* Logo/Header Section */}
-          <div className="bg-white border-b border-slate-200/65 px-2 py-2 flex-shrink-0 flex items-center justify-center">
+      <div className="relative flex p-3">
+        <div className="relative flex bg-white rounded-md shadow-md ring-1 ring-slate-200/50 overflow-hidden">
+          {/* Always present navigation - no animation */}
+          <div className="w-12 h-full bg-transparent border-r border-slate-200/65 flex flex-col flex-shrink-0">
+            {/* Logo/Header Section */}
+            <div className="bg-transparent px-2 py-2 flex-shrink-0 flex items-center justify-center">
             <div className="w-8 h-8 flex items-center justify-center">
-              <PuzzlePieceIcon className="w-5 h-5 text-slate-900" />
+              <CubeIcon className="w-5 h-5 text-slate-900" />
             </div>
+            </div>
+            
+            {/* Navigation */}
+            <VerticalNavigation 
+              isSidebarExpanded={isSidebarExpanded}
+              onToggleSidebar={handleToggleSidebar}
+              onOpenBacklog={handleOpenBacklog}
+            />
           </div>
-          
-          {/* Navigation */}
-          <VerticalNavigation 
-            isSidebarExpanded={isSidebarExpanded}
-            onToggleSidebar={handleToggleSidebar}
-            onOpenBacklog={handleOpenBacklog}
-          />
-        </div>
 
-        {/* Expandable content area */}
-        {isSidebarExpanded && (
-          <div
-            style={{ width: sidebarWidth - 48 }} // Subtract navigation width
-            className={`flex flex-col overflow-hidden ${
-              isResizing ? 'border-r border-blue-500' : 'border-r border-slate-200/65'
-            }`}
-          >
-              {/* Plan Selector Header */}
-              <div className="bg-white border-b border-slate-200/65 px-4 flex-shrink-0 flex items-center" style={{ paddingTop: '7px', paddingBottom: '7px' }}>
+          {/* Expandable content area */}
+          {isSidebarExpanded && (
+            <div
+              style={{ width: sidebarWidth - 48 }} // Subtract navigation width
+              className={`flex flex-col overflow-hidden ${
+                isResizing ? 'border-r border-blue-500' : 'border-r border-transparent'
+              }`}
+            >
+                {/* Plan Selector Header */}
+                <div className="bg-transparent border-b border-slate-200/65 px-4 flex-shrink-0 flex items-center" style={{ paddingTop: '7px', paddingBottom: '7px' }}>
                 <PlanSelector
                   currentPlan={currentPlan}
                   allPlans={allPlans}
@@ -130,32 +131,33 @@ export default function TeamPlanPage() {
                 />
               </div>
               
-              {/* Notepad */}
-              <NotePad 
-                width={sidebarWidth - 48} // Subtract navigation width (48px = 12px width + borders)
-                currentPlan={currentPlan}
-                onUpdatePlan={updateCurrentPlan}
-              />
-          </div>
-        )}
+                {/* Notepad */}
+                <NotePad 
+                  width={sidebarWidth - 48} // Subtract navigation width (48px = 12px width + borders)
+                  currentPlan={currentPlan}
+                  onUpdatePlan={updateCurrentPlan}
+                />
+            </div>
+          )}
 
-        {/* Resize Handle - Only show when sidebar is expanded */}
-        {isSidebarExpanded && (
-          <div
-            onMouseDown={handleResizeStart}
-            className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-50"
-            style={{ left: sidebarWidth }}
-            role="separator"
-            aria-label="Resize sidebar"
-            aria-orientation="vertical"
-          >
+          {/* Resize Handle - Only show when sidebar is expanded */}
+          {isSidebarExpanded && (
             <div
-              className={`w-1 h-6 rounded-full transition-colors duration-150 ${
-                isResizing ? 'bg-blue-500' : 'bg-slate-200 hover:bg-blue-400 hover:shadow-blue-100'
-              }`}
-            />
-          </div>
-        )}
+              onMouseDown={handleResizeStart}
+              className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-50"
+              style={{ left: sidebarWidth }}
+              role="separator"
+              aria-label="Resize sidebar"
+              aria-orientation="vertical"
+            >
+              <div
+                className={`w-1 h-6 rounded-full transition-colors duration-150 ${
+                  isResizing ? 'bg-blue-500' : 'bg-slate-200 hover:bg-blue-400 hover:shadow-blue-100'
+                }`}
+              />
+            </div>
+          )}
+        </div>
       </div>
       
       {/* Team Plan Board */}
