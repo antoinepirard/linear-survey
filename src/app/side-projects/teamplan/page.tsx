@@ -98,7 +98,7 @@ export default function TeamPlanPage() {
           {/* Always present navigation - no animation */}
           <div className="w-12 h-full bg-transparent border-r border-slate-200/65 flex flex-col flex-shrink-0">
             {/* Logo/Header Section */}
-            <div className="bg-transparent px-2 py-2 flex-shrink-0 flex items-center justify-center">
+            <div className="bg-transparent px-2 py-3 flex-shrink-0 flex items-center justify-center">
             <div className="w-8 h-8 flex items-center justify-center">
               <CubeIcon className="w-5 h-5 text-slate-900" />
             </div>
