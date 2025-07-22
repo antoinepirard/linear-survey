@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
 import NotePad from '@/components/teamplan/NotePad';
 import BacklogPanel from '@/components/teamplan/BacklogPanel';
@@ -198,15 +199,33 @@ export default function TeamPlanPage() {
               </div>
               
                 {/* Panel Content */}
-                {activePanel === 'notepad' ? (
-                  <NotePad 
-                    width={sidebarWidth - 48} // Subtract navigation width (48px = 12px width + borders)
-                    currentPlan={currentPlan}
-                    onUpdatePlan={updateCurrentPlan}
-                  />
-                ) : (
-                  <BacklogPanel width={sidebarWidth - 48} />
-                )}
+                <AnimatePresence mode="wait">
+                  {activePanel === 'notepad' ? (
+                    <motion.div
+                      key="notepad"
+                      initial={{ opacity: 0, x: -3 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 3 }}
+                      transition={{ duration: 0.1, ease: "easeOut" }}
+                    >
+                      <NotePad 
+                        width={sidebarWidth - 48} // Subtract navigation width (48px = 12px width + borders)
+                        currentPlan={currentPlan}
+                        onUpdatePlan={updateCurrentPlan}
+                      />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="backlog"
+                      initial={{ opacity: 0, x: -3 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 3 }}
+                      transition={{ duration: 0.1, ease: "easeOut" }}
+                    >
+                      <BacklogPanel width={sidebarWidth - 48} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
             </div>
           )}
 
