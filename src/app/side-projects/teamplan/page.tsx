@@ -116,9 +116,7 @@ export default function TeamPlanPage() {
           {isSidebarExpanded && (
             <div
               style={{ width: sidebarWidth - 48 }} // Subtract navigation width
-              className={`flex flex-col overflow-hidden ${
-                isResizing ? 'border-r border-blue-500' : 'border-r border-transparent'
-              }`}
+              className="flex flex-col overflow-hidden"
             >
                 {/* Plan Selector Header */}
                 <div className="bg-transparent border-b border-slate-200/65 px-4 flex-shrink-0 flex items-center" style={{ paddingTop: '7px', paddingBottom: '7px' }}>
@@ -144,7 +142,7 @@ export default function TeamPlanPage() {
           {isSidebarExpanded && (
             <div
               onMouseDown={handleResizeStart}
-              className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-50 group"
+              className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-50"
               style={{ right: -8 }}
               role="separator"
               aria-label="Resize sidebar"
@@ -152,7 +150,7 @@ export default function TeamPlanPage() {
             >
               <div
                 className={`w-1.5 h-6 rounded-full transition-colors duration-150 ${
-                  isResizing ? 'bg-blue-500 shadow-sm' : 'bg-slate-300 group-hover:bg-slate-400 group-hover:shadow-sm'
+                  isResizing ? 'bg-blue-500 shadow-sm' : 'bg-slate-300 hover:bg-blue-400 hover:shadow-sm'
                 }`}
               />
             </div>

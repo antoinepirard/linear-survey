@@ -195,7 +195,7 @@ export default function NotePad({
 
   return (
     <div 
-      className={`bg-white notepad-container ${className}`} 
+      className={`bg-transparent notepad-container ${className}`} 
       style={{ width, height: '100%', display: 'flex', flexDirection: 'column' }}
     >
       {/* Editor Container - This is the scroll container */}
