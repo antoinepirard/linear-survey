@@ -23,8 +23,7 @@ export default function BacklogPanel({ width }: BacklogPanelProps) {
         </h3>
         
         <p className="text-sm text-slate-500 max-w-xs leading-relaxed">
-          Start adding tasks and ideas to organize your project backlog. 
-          Items added here can be prioritized and moved to active sprints.
+          This is for projects you haven't planned yet. Extract projects from your notes with one click, let AI automatically detect projects from your notepad, or sync your Linear projects here. Once added, projects stay in your backlog until you're ready to plan them.
         </p>
       </div>
     </div>
