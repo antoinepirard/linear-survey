@@ -163,6 +163,22 @@ export default function NotePad({
     containerRef: editorRef,
   });
 
+  // Update editor content when plan changes
+  useEffect(() => {
+    if (editor && currentPlan) {
+      const savedContent = loadContent();
+      if (savedContent !== null) {
+        // Only update if the content is actually different to avoid unnecessary re-renders
+        if (editor.getHTML() !== savedContent) {
+          editor.commands.setContent(savedContent);
+        }
+      } else {
+        // Clear editor if no content
+        editor.commands.clearContent();
+      }
+    }
+  }, [editor, currentPlan?.id, currentPlan, loadContent]);
+
   // Click-outside handling is now managed by the useTextSelection hook
 
   // Cleanup on unmount
