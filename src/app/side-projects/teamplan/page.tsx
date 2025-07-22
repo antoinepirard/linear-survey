@@ -21,7 +21,8 @@ export default function TeamPlanPage() {
     createPlan,
     deletePlan,
     switchToPlan,
-    updateCurrentPlan
+    updateCurrentPlan,
+    renamePlan
   } = usePlanStorage();
 
   // Sidebar width management
@@ -126,6 +127,7 @@ export default function TeamPlanPage() {
                   onSelectPlan={switchToPlan}
                   onCreatePlan={createPlan}
                   onDeletePlan={deletePlan}
+                  onRenamePlan={renamePlan}
                 />
               </div>
               

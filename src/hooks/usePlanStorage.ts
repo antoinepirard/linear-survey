@@ -201,6 +201,28 @@ export const usePlanStorage = () => {
     savePlanStorage(newStorage);
   }, [currentPlan, planStorage, savePlanStorage]);
 
+  const renamePlan = useCallback((planId: string, newName: string) => {
+    const plan = planStorage.plans[planId];
+    if (!plan) return;
+    
+    const updatedPlan = {
+      ...plan,
+      name: newName,
+      updatedAt: new Date()
+    };
+    
+    const newStorage = {
+      ...planStorage,
+      plans: {
+        ...planStorage.plans,
+        [planId]: updatedPlan
+      }
+    };
+    
+    setPlanStorage(newStorage);
+    savePlanStorage(newStorage);
+  }, [planStorage, savePlanStorage]);
+
   const getAllPlans = useCallback((): PlanMetadata[] => {
     return Object.values(planStorage.plans).map(plan => ({
       id: plan.id,
@@ -217,6 +239,7 @@ export const usePlanStorage = () => {
     createPlan,
     deletePlan,
     switchToPlan,
-    updateCurrentPlan
+    updateCurrentPlan,
+    renamePlan
   };
 };

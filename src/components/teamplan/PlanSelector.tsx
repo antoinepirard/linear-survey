@@ -85,9 +85,12 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
   onSelectPlan,
   onCreatePlan,
   onDeletePlan,
+  onRenamePlan,
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
 
   const handleSelectPlan = (planId: string) => {
     onSelectPlan(planId);
@@ -106,6 +109,33 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
     if (deleteConfirmId) {
       onDeletePlan(deleteConfirmId);
       setDeleteConfirmId(null);
+    }
+  };
+
+  const handleRenameClick = (plan: PlanMetadata, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingPlanId(plan.id);
+    setEditName(plan.name);
+  };
+
+  const handleRenameSave = () => {
+    if (editingPlanId && editName.trim() && onRenamePlan) {
+      onRenamePlan(editingPlanId, editName.trim());
+    }
+    setEditingPlanId(null);
+    setEditName('');
+  };
+
+  const handleRenameCancel = () => {
+    setEditingPlanId(null);
+    setEditName('');
+  };
+
+  const handleRenameKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleRenameSave();
+    } else if (e.key === 'Escape') {
+      handleRenameCancel();
     }
   };
 
@@ -147,13 +177,28 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
               <div
                 key={plan.id}
                 className="px-3 py-2 hover:bg-slate-50 hover:rounded-lg cursor-pointer flex items-center justify-between group transition-all duration-150"
-                onClick={() => handleSelectPlan(plan.id)}
+                onClick={() => editingPlanId !== plan.id && handleSelectPlan(plan.id)}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm truncate">
-                    {plan.name}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
+                  {editingPlanId === plan.id ? (
+                    <Input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onKeyDown={handleRenameKeyDown}
+                      onBlur={handleRenameSave}
+                      className="h-6 text-sm font-medium px-1 py-0"
+                      maxLength={50}
+                      autoFocus
+                    />
+                  ) : (
+                    <div 
+                      className="font-medium text-sm truncate hover:bg-slate-100 px-1 py-0.5 rounded cursor-text"
+                      onClick={(e) => handleRenameClick(plan, e)}
+                    >
+                      {plan.name}
+                    </div>
+                  )}
+                  <div className="text-xs text-muted-foreground px-1">
                     Updated {formatDate(plan.updatedAt)}
                   </div>
                 </div>
