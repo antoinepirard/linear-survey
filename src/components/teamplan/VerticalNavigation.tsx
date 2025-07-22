@@ -6,30 +6,30 @@ import {
 } from '@heroicons/react/24/outline';
 
 interface VerticalNavigationProps {
-  isNotepadExpanded: boolean;
-  onToggleNotepad: () => void;
+  isSidebarExpanded: boolean;
+  onToggleSidebar: () => void;
   onOpenBacklog?: () => void;
 }
 
 export default function VerticalNavigation({
-  isNotepadExpanded,
-  onToggleNotepad,
+  isSidebarExpanded,
+  onToggleSidebar,
   onOpenBacklog
 }: VerticalNavigationProps) {
   return (
     <div className="w-12 h-full bg-white border-r border-slate-200 flex flex-col items-center py-4">
       {/* Navigation Items */}
       <div className="flex flex-col space-y-3">
-        {/* Notepad Toggle */}
+        {/* Sidebar Toggle */}
         <button
-          onClick={onToggleNotepad}
+          onClick={onToggleSidebar}
           className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 ${
-            isNotepadExpanded 
+            isSidebarExpanded 
               ? 'bg-slate-100 text-slate-800' 
               : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
           }`}
-          aria-label={isNotepadExpanded ? "Collapse notepad" : "Expand notepad"}
-          title={isNotepadExpanded ? "Collapse notepad" : "Expand notepad"}
+          aria-label={isSidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+          title={isSidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
         >
           <DocumentTextIcon className="w-5 h-5" />
         </button>

@@ -13,11 +13,7 @@ export interface Position {
 export interface NotePadProps {
   className?: string;
   onError?: (error: Error) => void;
-  maxWidth?: number;
-  minWidth?: number;
-  defaultWidth?: number;
-  isExpanded?: boolean;
-  onToggle?: () => void;
+  width?: number;
   currentPlan?: Plan | null;
   onUpdatePlan?: (updates: Partial<Pick<Plan, 'notepadData'>>) => void;
 }
