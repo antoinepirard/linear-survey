@@ -131,7 +131,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
             <span className="text-sm truncate max-w-[200px]">
               {currentPlan?.name || 'No Plan Selected'}
             </span>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className="ml-0 size-3.5 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80 p-0" align="start">
@@ -158,18 +158,18 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
+                <div className="relative flex items-center justify-end w-6 h-6">
                   {currentPlan?.id === plan.id && (
-                    <Check className="h-4 w-4 text-primary" />
+                    <Check className="h-3.5 w-3.5 text-primary/70 group-hover:opacity-0 transition-opacity" />
                   )}
                   {allPlans.length > 1 && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={(e) => handleDeleteClick(plan.id, e)}
-                      className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0"
+                      className="absolute opacity-0 group-hover:opacity-100 h-5 w-5 p-0"
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2 className="size-3.5" />
                     </Button>
                   )}
                 </div>
