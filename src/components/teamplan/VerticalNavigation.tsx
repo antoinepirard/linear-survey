@@ -9,17 +9,19 @@ import {
 interface VerticalNavigationProps {
   isSidebarExpanded: boolean;
   isBacklogExpanded: boolean;
+  isCommentsExpanded: boolean;
   onToggleSidebar: () => void;
   onToggleBacklog: () => void;
-  onOpenComments?: () => void;
+  onToggleComments: () => void;
 }
 
 export default function VerticalNavigation({
   isSidebarExpanded,
   isBacklogExpanded,
+  isCommentsExpanded,
   onToggleSidebar,
   onToggleBacklog,
-  onOpenComments
+  onToggleComments
 }: VerticalNavigationProps) {
   return (
     <div className="flex flex-col items-center py-4 flex-shrink-0">
@@ -52,13 +54,16 @@ export default function VerticalNavigation({
         >
           <RectangleGroupIcon className="w-5 h-5" />
         </button>
-        {/* Backlog (Future functionality) */}
+        {/* Comments */}
         <button
-        onClick={onOpenComments}
-        className="w-8 h-8 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors duration-200 cursor-not-allowed"
-        aria-label="Open comments (coming soon)"
-        title="Comments (coming soon)"
-        disabled
+          onClick={onToggleComments}
+          className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 ${
+            isCommentsExpanded 
+              ? 'bg-slate-100 text-slate-800' 
+              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
+          }`}
+          aria-label={isCommentsExpanded ? "Close comments" : "Open comments"}
+          title={isCommentsExpanded ? "Close comments" : "Open comments"}
         >
           <ChatBubbleBottomCenterTextIcon className="w-5 h-5" />
         </button>

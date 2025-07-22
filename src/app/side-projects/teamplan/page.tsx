@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
 import NotePad from '@/components/teamplan/NotePad';
 import BacklogPanel from '@/components/teamplan/BacklogPanel';
+import CommentsPanel from '@/components/teamplan/CommentsPanel';
 import VerticalNavigation from '@/components/teamplan/VerticalNavigation';
 import PlanSelector from '@/components/teamplan/PlanSelector';
 import { usePlanStorage } from '@/hooks/usePlanStorage';
@@ -20,7 +21,7 @@ import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 
 export default function TeamPlanPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const [activePanel, setActivePanel] = useState<'notepad' | 'backlog'>('notepad');
+  const [activePanel, setActivePanel] = useState<'notepad' | 'backlog' | 'comments'>('notepad');
   const [isColorCodingEnabled, setIsColorCodingEnabled] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -96,6 +97,15 @@ export default function TeamPlanPage() {
     }
   };
 
+  const handleToggleComments = () => {
+    if (activePanel === 'comments') {
+      setIsSidebarExpanded(false);
+    } else {
+      setActivePanel('comments');
+      setIsSidebarExpanded(true);
+    }
+  };
+
   if (isLoading || isStorageLoading) {
     return (
       <div className="h-screen bg-slate-50/30 overflow-hidden flex items-center justify-center">
@@ -141,8 +151,10 @@ export default function TeamPlanPage() {
             <VerticalNavigation 
               isSidebarExpanded={isSidebarExpanded && activePanel === 'notepad'}
               isBacklogExpanded={isSidebarExpanded && activePanel === 'backlog'}
+              isCommentsExpanded={isSidebarExpanded && activePanel === 'comments'}
               onToggleSidebar={handleToggleSidebar}
               onToggleBacklog={handleToggleBacklog}
+              onToggleComments={handleToggleComments}
             />
           </div>
 
@@ -214,7 +226,7 @@ export default function TeamPlanPage() {
                         onUpdatePlan={updateCurrentPlan}
                       />
                     </motion.div>
-                  ) : (
+                  ) : activePanel === 'backlog' ? (
                     <motion.div
                       key="backlog"
                       initial={{ opacity: 0, x: -3 }}
@@ -223,6 +235,16 @@ export default function TeamPlanPage() {
                       transition={{ duration: 0.1, ease: "easeOut" }}
                     >
                       <BacklogPanel width={sidebarWidth - 48} />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="comments"
+                      initial={{ opacity: 0, x: -3 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 3 }}
+                      transition={{ duration: 0.1, ease: "easeOut" }}
+                    >
+                      <CommentsPanel width={sidebarWidth - 48} />
                     </motion.div>
                   )}
                 </AnimatePresence>
