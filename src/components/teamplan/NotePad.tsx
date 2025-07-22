@@ -72,7 +72,7 @@ export default function NotePad({
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: `focus:outline-none px-6 pb-4 min-h-[${NOTEPAD_CONSTANTS.MIN_EDITOR_HEIGHT}px]`,
+        class: 'focus:outline-none px-6 py-4',
         'aria-label': 'Note editor',
         role: 'textbox',
         'aria-multiline': 'true',
@@ -178,33 +178,38 @@ export default function NotePad({
 
 
   return (
-    <div className={`bg-white overflow-hidden h-full relative notepad-container ${className}`} style={{ width }}>
-      <div className="h-full flex flex-col">
-        {/* Editor */}
-        <div ref={editorRef} className="flex-1 overflow-y-auto relative notepad-editor">
-          <EditorContent 
-            editor={editor} 
-            className="h-full"
-          />
-          
-          {/* Text Selection Menu */}
-          {editor && showSelectionMenu && (
-            <div
-              className="absolute z-50"
-              style={{
-                left: menuPosition.x,
-                top: menuPosition.y,
-                transform: 'translateX(-50%)',
-              }}
-            >
-              <TextSelectionMenu 
-                key={menuUpdateKey} 
-                editor={editor}
-                onClose={() => setShowSelectionMenu(false)}
-              />
-            </div>
-          )}
-        </div>
+    <div 
+      className={`bg-white notepad-container ${className}`} 
+      style={{ width, height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
+      {/* Editor Container - This is the scroll container */}
+      <div 
+        ref={editorRef} 
+        className="flex-1 overflow-y-auto relative notepad-editor"
+        style={{ minHeight: 0 }} // This allows flex child to shrink below content size
+      >
+        <EditorContent 
+          editor={editor} 
+          className="w-full"
+        />
+        
+        {/* Text Selection Menu */}
+        {editor && showSelectionMenu && (
+          <div
+            className="absolute z-50"
+            style={{
+              left: menuPosition.x,
+              top: menuPosition.y,
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <TextSelectionMenu 
+              key={menuUpdateKey} 
+              editor={editor}
+              onClose={() => setShowSelectionMenu(false)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

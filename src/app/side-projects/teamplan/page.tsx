@@ -129,14 +129,13 @@ export default function TeamPlanPage() {
               </div>
               
               {/* Navigation + Notepad */}
-              <div className="flex flex-1">
+              <div className="flex flex-1 min-h-0">
                 <VerticalNavigation 
                   isSidebarExpanded={isSidebarExpanded}
                   onToggleSidebar={handleToggleSidebar}
                   onOpenBacklog={handleOpenBacklog}
                 />
                 <NotePad 
-                  className="flex-1" 
                   width={sidebarWidth - 48} // Subtract navigation width (48px = 12px width + borders)
                   currentPlan={currentPlan}
                   onUpdatePlan={updateCurrentPlan}
