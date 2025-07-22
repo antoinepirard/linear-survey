@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 interface TeamPlanBoardProps {
   data?: TeamPlanData;
   onChange?: (data: TeamPlanData) => void;
+  isColorCodingEnabled?: boolean;
 }
 
 // Utility functions for time slot sequence management
@@ -111,7 +112,8 @@ const generateSequenceLabels = (startLabel: string, count: number): string[] => 
 
 export default function TeamPlanBoard({ 
   data = DEFAULT_TEAMPLAN_DATA, 
-  onChange 
+  onChange,
+  isColorCodingEnabled = true
 }: TeamPlanBoardProps) {
   const [boardData, setBoardData] = useState<TeamPlanData>(data);
   const [draggedProject, setDraggedProject] = useState<string | null>(null);
@@ -722,6 +724,8 @@ export default function TeamPlanBoard({
                                 isDuplicating={isDuplicating && draggedProject === project.id}
                                 isEditing={newProjectId === project.id}
                                 availableGroups={getAvailableGroups()}
+                                allProjects={boardData.projects}
+                                isColorCodingEnabled={isColorCodingEnabled}
                                 onEdit={handleEditProject}
                                 onDelete={handleDeleteProject}
                                 onDuplicate={handleDuplicateProject}

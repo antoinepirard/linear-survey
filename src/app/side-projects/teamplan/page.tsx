@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
 import NotePad from '@/components/teamplan/NotePad';
 import VerticalNavigation from '@/components/teamplan/VerticalNavigation';
@@ -10,10 +10,30 @@ import { useResizable } from '@/hooks/useResizable';
 import { usePlanNotePadStorage } from '@/hooks/usePlanNotePadStorage';
 import { TeamPlanData } from '@/data/teamplan';
 import { CubeIcon } from '@heroicons/react/24/solid';
+import { Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 
 export default function TeamPlanPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isColorCodingEnabled, setIsColorCodingEnabled] = useState(true);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Load color coding preference from localStorage on mount
+  useEffect(() => {
+    const savedColorCoding = localStorage.getItem('teamplan-color-coding-enabled');
+    if (savedColorCoding !== null) {
+      setIsColorCodingEnabled(JSON.parse(savedColorCoding));
+    }
+  }, []);
+
+  // Save color coding preference to localStorage when it changes
+  const handleColorCodingToggle = () => {
+    const newValue = !isColorCodingEnabled;
+    setIsColorCodingEnabled(newValue);
+    localStorage.setItem('teamplan-color-coding-enabled', JSON.stringify(newValue));
+  };
   const {
     isLoading,
     currentPlan,
@@ -120,7 +140,7 @@ export default function TeamPlanPage() {
               className="flex flex-col overflow-hidden"
             >
                 {/* Plan Selector Header */}
-                <div className="bg-transparent border-b border-slate-200/65 px-4 flex-shrink-0 flex items-center" style={{ paddingTop: '7px', paddingBottom: '7px' }}>
+                <div className="bg-transparent border-b border-slate-200/65 px-4 flex-shrink-0 flex items-center justify-between" style={{ paddingTop: '7px', paddingBottom: '7px' }}>
                 <PlanSelector
                   currentPlan={currentPlan}
                   allPlans={allPlans}
@@ -129,6 +149,43 @@ export default function TeamPlanPage() {
                   onDeletePlan={deletePlan}
                   onRenamePlan={renamePlan}
                 />
+                
+                {/* Settings Button */}
+                <Popover open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                      title="Settings"
+                    >
+                      <Cog6ToothIcon className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-0" align="end">
+                    <div className="px-4 py-3 border-b border-slate-100">
+                      <span className="text-sm font-medium text-slate-900">Settings</span>
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-sm font-medium text-slate-900">Color coding</span>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            Show colored borders on cards with same group
+                          </p>
+                        </div>
+                        <Button
+                          variant={isColorCodingEnabled ? "default" : "outline"}
+                          size="sm"
+                          onClick={handleColorCodingToggle}
+                          className="ml-3 h-8 text-xs px-3"
+                        >
+                          {isColorCodingEnabled ? "ON" : "OFF"}
+                        </Button>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
               
                 {/* Notepad */}
@@ -165,6 +222,7 @@ export default function TeamPlanPage() {
         <TeamPlanBoard 
           data={currentPlan.teamPlanData}
           onChange={handleDataChange}
+          isColorCodingEnabled={isColorCodingEnabled}
         />
       </div>
     </div>
