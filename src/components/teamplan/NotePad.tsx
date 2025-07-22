@@ -1,18 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
-import { motion, AnimatePresence } from 'motion/react';
-import { 
-  ChevronLeftIcon, 
-  ChevronRightIcon 
-} from '@heroicons/react/24/outline';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
-import { useNotePadStorage } from '@/hooks/useNotePadStorage';
-import { useResizable } from '@/hooks/useResizable';
 import { useTextSelection } from '@/hooks/useTextSelection';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { NotePadProps, NotePadError } from '@/types/notepad';
@@ -20,38 +13,27 @@ import { NotePadProps, NotePadError } from '@/types/notepad';
 export default function NotePad({ 
   className = '',
   onError,
-  maxWidth = NOTEPAD_CONSTANTS.MAX_WIDTH,
-  minWidth = NOTEPAD_CONSTANTS.MIN_WIDTH,
-  defaultWidth = NOTEPAD_CONSTANTS.DEFAULT_WIDTH
+  width,
+  currentPlan = null,
+  onUpdatePlan,
 }: NotePadProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [hasAnimated, setHasAnimated] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
-  // Custom hooks for separated concerns
-  const {
-    title,
-    width,
-    isLoading,
-    setTitle,
-    setWidth,
-    loadContent,
-    saveContent,
-  } = useNotePadStorage({
-    contentKey: NOTEPAD_CONSTANTS.STORAGE_KEY,
-    titleKey: NOTEPAD_CONSTANTS.TITLE_STORAGE_KEY,
-    widthKey: NOTEPAD_CONSTANTS.WIDTH_STORAGE_KEY,
-    defaultWidth,
-    minWidth,
-    maxWidth,
-  });
+  // Content management helper
+  const loadContent = useCallback((): string | null => {
+    return currentPlan?.notepadData.content || null;
+  }, [currentPlan]);
 
-  const { isResizing, handleResizeStart } = useResizable({
-    initialWidth: width,
-    minWidth,
-    maxWidth,
-    onWidthChange: setWidth,
-  });
+  const saveContent = useCallback((content: string) => {
+    if (currentPlan && onUpdatePlan) {
+      onUpdatePlan({
+        notepadData: {
+          ...currentPlan.notepadData,
+          content
+        }
+      });
+    }
+  }, [currentPlan, onUpdatePlan]);
 
   // Error handling helper
   const handleError = (error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
@@ -90,7 +72,7 @@ export default function NotePad({
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: `focus:outline-none px-6 pb-4 min-h-[${NOTEPAD_CONSTANTS.MIN_EDITOR_HEIGHT}px]`,
+        class: 'focus:outline-none px-6 py-4',
         'aria-label': 'Note editor',
         role: 'textbox',
         'aria-multiline': 'true',
@@ -181,6 +163,22 @@ export default function NotePad({
     containerRef: editorRef,
   });
 
+  // Update editor content when plan changes
+  useEffect(() => {
+    if (editor && currentPlan) {
+      const savedContent = loadContent();
+      if (savedContent !== null) {
+        // Only update if the content is actually different to avoid unnecessary re-renders
+        if (editor.getHTML() !== savedContent) {
+          editor.commands.setContent(savedContent);
+        }
+      } else {
+        // Clear editor if no content
+        editor.commands.clearContent();
+      }
+    }
+  }, [editor, currentPlan?.id, currentPlan, loadContent]);
+
   // Click-outside handling is now managed by the useTextSelection hook
 
   // Cleanup on unmount
@@ -193,127 +191,42 @@ export default function NotePad({
     };
   }, [editor]);
 
-  const toggleExpanded = () => {
-    setHasAnimated(true);
-    setIsExpanded(!isExpanded);
-  };
 
-  if (isLoading) {
-    return (
-      <div className={`relative ${className}`}>
-        <div className="w-12 h-full bg-slate-50 border-r border-slate-200 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-slate-400"></div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className={`relative h-full flex ${className}`}>
-      {/* Expandable Content */}
-      <AnimatePresence mode="wait">
-        {isExpanded && (
-          <>
-          <motion.div
-            initial={hasAnimated ? { width: 0, opacity: 0 } : { width, opacity: 1 }}
-            animate={{ width, opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
-            transition={isResizing ? { duration: 0 } : hasAnimated ? { 
-              type: "spring", 
-              stiffness: NOTEPAD_CONSTANTS.SPRING_CONFIG.stiffness, 
-              damping: NOTEPAD_CONSTANTS.SPRING_CONFIG.damping,
-              opacity: { duration: NOTEPAD_CONSTANTS.OPACITY_DURATION }
-            } : { duration: 0 }}
-            className={`bg-white overflow-hidden h-full relative notepad-container ${
-              isExpanded ? `border-r ${isResizing ? 'border-blue-500' : 'border-slate-200'}` : ''
-            } ${
-              // Mobile responsive classes
-              width < 500 ? 'min-w-[280px]' : ''
-            }`}
-          >
-            <div className="h-full flex flex-col">
-              {/* Header with collapse button */}
-              <div className="flex items-center justify-between px-6 pt-4 pb-2">
-                <div className="flex-1" />
-                <button
-                  onClick={toggleExpanded}
-                  className="w-8 h-8 bg-white hover:bg-slate-100 border border-slate-200 rounded-md flex items-center justify-center transition-colors duration-200 group"
-                  aria-label="Collapse notes"
-                >
-                  <ChevronLeftIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
-                </button>
-              </div>
-
-              {/* Title Input */}
-              <div className="px-4 sm:px-6 pb-4">
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder={NOTEPAD_CONSTANTS.TITLE_PLACEHOLDER}
-                  className="w-full text-xl sm:text-2xl font-semibold text-slate-800 bg-transparent border-none outline-none placeholder:text-slate-300"
-                  aria-label="Note title"
-                />
-              </div>
-
-              {/* Editor */}
-              <div ref={editorRef} className="flex-1 overflow-y-auto relative notepad-editor">
-                <EditorContent 
-                  editor={editor} 
-                  className="h-full"
-                />
-                
-                {/* Text Selection Menu */}
-                {editor && showSelectionMenu && (
-                  <div
-                    className="absolute z-50"
-                    style={{
-                      left: menuPosition.x,
-                      top: menuPosition.y,
-                      transform: 'translateX(-50%)',
-                    }}
-                  >
-                    <TextSelectionMenu 
-                      key={menuUpdateKey} 
-                      editor={editor}
-                      onClose={() => setShowSelectionMenu(false)}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-          </motion.div>
-          
-          {/* Resize Handle - positioned outside the notepad */}
+    <div 
+      className={`bg-white notepad-container ${className}`} 
+      style={{ width, height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
+      {/* Editor Container - This is the scroll container */}
+      <div 
+        ref={editorRef} 
+        className="flex-1 overflow-y-auto relative notepad-editor"
+        style={{ minHeight: 0 }} // This allows flex child to shrink below content size
+      >
+        <EditorContent 
+          editor={editor} 
+          className="w-full"
+        />
+        
+        {/* Text Selection Menu */}
+        {editor && showSelectionMenu && (
           <div
-            onMouseDown={handleResizeStart}
-            className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-10"
-            style={{ left: width }}
-            role="separator"
-            aria-label="Resize notepad"
-            aria-orientation="vertical"
+            className="absolute z-50"
+            style={{
+              left: menuPosition.x,
+              top: menuPosition.y,
+              transform: 'translateX(-50%)',
+            }}
           >
-            <div
-              className={`w-1 h-6 rounded-full transition-colors duration-150 ${
-                isResizing ? 'bg-blue-500' : 'bg-slate-200 hover:bg-slate-400'
-              }`}
+            <TextSelectionMenu 
+              key={menuUpdateKey} 
+              editor={editor}
+              onClose={() => setShowSelectionMenu(false)}
             />
           </div>
-          </>
         )}
-      </AnimatePresence>
-
-      {/* Expand Button when collapsed */}
-      {!isExpanded && (
-        <button
-          onClick={toggleExpanded}
-          className="w-8 h-8 m-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md flex items-center justify-center transition-colors duration-200 group"
-          aria-label="Expand notes"
-        >
-          <ChevronRightIcon className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
-        </button>
-      )}
+      </div>
     </div>
   );
 }

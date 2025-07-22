@@ -29,7 +29,11 @@ export const NOTEPAD_CONSTANTS = {
     stiffness: 300,
     damping: 30,
   },
-  OPACITY_DURATION: 0.2,
+  COLLAPSE_SPRING_CONFIG: {
+    stiffness: 250,
+    damping: 28,
+  },
+  OPACITY_DURATION: 0.3,
   MENU_ANIMATION_DURATION: 0.15,
 } as const;
 
