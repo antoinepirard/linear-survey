@@ -12,6 +12,7 @@ import { TeamPlanData } from '@/data/teamplan';
 import { CubeIcon } from '@heroicons/react/24/solid';
 import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 
@@ -29,10 +30,9 @@ export default function TeamPlanPage() {
   }, []);
 
   // Save color coding preference to localStorage when it changes
-  const handleColorCodingToggle = () => {
-    const newValue = !isColorCodingEnabled;
-    setIsColorCodingEnabled(newValue);
-    localStorage.setItem('teamplan-color-coding-enabled', JSON.stringify(newValue));
+  const handleColorCodingChange = (checked: boolean) => {
+    setIsColorCodingEnabled(checked);
+    localStorage.setItem('teamplan-color-coding-enabled', JSON.stringify(checked));
   };
   const {
     isLoading,
@@ -171,17 +171,14 @@ export default function TeamPlanPage() {
                         <div>
                           <span className="text-sm font-medium text-slate-900">Color coding</span>
                           <p className="text-xs text-slate-500 mt-0.5">
-                            Show colored borders on cards with same group
+                            Show colored borders on cards with identical values
                           </p>
                         </div>
-                        <Button
-                          variant={isColorCodingEnabled ? "default" : "outline"}
-                          size="sm"
-                          onClick={handleColorCodingToggle}
-                          className="ml-3 h-8 text-xs px-3"
-                        >
-                          {isColorCodingEnabled ? "ON" : "OFF"}
-                        </Button>
+                        <Switch
+                          checked={isColorCodingEnabled}
+                          onCheckedChange={handleColorCodingChange}
+                          className="ml-3"
+                        />
                       </div>
                     </div>
                   </PopoverContent>
