@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { useEffect, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { ChevronLeftIcon as ChevronLeftIconSolid } from '@heroicons/react/24/solid';
 import Navigation from './Navigation';
 
