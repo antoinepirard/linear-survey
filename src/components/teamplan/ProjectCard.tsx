@@ -80,6 +80,23 @@ export default function ProjectCard({
     }
   }, [isEditing, project.title, project.group]);
 
+  // Position cursor correctly when entering edit mode
+  useEffect(() => {
+    if (isEditingLocal && inputRef.current) {
+      const input = inputRef.current;
+      const value = input.value;
+      const slashIndex = value.indexOf('/');
+      
+      if (slashIndex !== -1) {
+        // Position cursor before the slash to edit the text, not the tag
+        input.setSelectionRange(slashIndex, slashIndex);
+      } else {
+        // No slash found, position at the end
+        input.setSelectionRange(value.length, value.length);
+      }
+    }
+  }, [isEditingLocal]);
+
 
   const parseValue = (value: string) => {
     const slashIndex = value.indexOf('/');

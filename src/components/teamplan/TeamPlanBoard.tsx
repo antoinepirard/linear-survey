@@ -436,6 +436,7 @@ export default function TeamPlanBoard({
       projects: [...boardData.projects, duplicatedProject]
     };
     setBoardData(newData);
+    setNewProjectId(duplicatedProject.id); // Trigger editing mode for duplicated card
     onChange?.(newData);
   };
 
