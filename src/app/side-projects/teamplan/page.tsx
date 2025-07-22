@@ -219,6 +219,7 @@ export default function TeamPlanPage() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 3 }}
                       transition={{ duration: 0.1, ease: "easeOut" }}
+                      className="flex-1 min-h-0"
                     >
                       <NotePad 
                         width={sidebarWidth - 48} // Subtract navigation width (48px = 12px width + borders)
@@ -233,6 +234,7 @@ export default function TeamPlanPage() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 3 }}
                       transition={{ duration: 0.1, ease: "easeOut" }}
+                      className="flex-1 min-h-0"
                     >
                       <BacklogPanel width={sidebarWidth - 48} />
                     </motion.div>
@@ -243,6 +245,7 @@ export default function TeamPlanPage() {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 3 }}
                       transition={{ duration: 0.1, ease: "easeOut" }}
+                      className="flex-1 min-h-0"
                     >
                       <CommentsPanel width={sidebarWidth - 48} />
                     </motion.div>
