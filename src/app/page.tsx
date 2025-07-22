@@ -109,7 +109,7 @@ export default function Home() {
 
               <AnimationWrapper delay="200ms">
               <p className="text-base leading-relaxed text-slate-600">
-                I&apos;ve spent the last decade working at startups and collaborating with brillant engineers.
+                I&apos;ve spent the last decade working at early stage startups and collaborating with brillant engineers.
                 I enjoy finding my way through the chaos to figure out the most valuable problems to solve, from first principles. I&apos;m the type of person who wakes up thinking about new angles to solve a problem.
               </p>
               </AnimationWrapper>
