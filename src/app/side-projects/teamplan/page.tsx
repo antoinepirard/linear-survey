@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
 import NotePad from '@/components/teamplan/NotePad';
+import BacklogPanel from '@/components/teamplan/BacklogPanel';
 import VerticalNavigation from '@/components/teamplan/VerticalNavigation';
 import PlanSelector from '@/components/teamplan/PlanSelector';
 import { usePlanStorage } from '@/hooks/usePlanStorage';
@@ -18,6 +19,7 @@ import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 
 export default function TeamPlanPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [activePanel, setActivePanel] = useState<'notepad' | 'backlog'>('notepad');
   const [isColorCodingEnabled, setIsColorCodingEnabled] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -76,12 +78,21 @@ export default function TeamPlanPage() {
   };
 
   const handleToggleSidebar = () => {
-    setIsSidebarExpanded(!isSidebarExpanded);
+    if (activePanel === 'notepad' && isSidebarExpanded) {
+      setIsSidebarExpanded(false);
+    } else {
+      setActivePanel('notepad');
+      setIsSidebarExpanded(true);
+    }
   };
 
-  const handleOpenBacklog = () => {
-    // Future functionality placeholder
-    console.log('Backlog functionality coming soon...');
+  const handleToggleBacklog = () => {
+    if (activePanel === 'backlog') {
+      setIsSidebarExpanded(false);
+    } else {
+      setActivePanel('backlog');
+      setIsSidebarExpanded(true);
+    }
   };
 
   if (isLoading || isStorageLoading) {
@@ -127,9 +138,10 @@ export default function TeamPlanPage() {
             
             {/* Navigation */}
             <VerticalNavigation 
-              isSidebarExpanded={isSidebarExpanded}
+              isSidebarExpanded={isSidebarExpanded && activePanel === 'notepad'}
+              isBacklogExpanded={isSidebarExpanded && activePanel === 'backlog'}
               onToggleSidebar={handleToggleSidebar}
-              onOpenBacklog={handleOpenBacklog}
+              onToggleBacklog={handleToggleBacklog}
             />
           </div>
 
@@ -185,12 +197,16 @@ export default function TeamPlanPage() {
                 </Popover>
               </div>
               
-                {/* Notepad */}
-                <NotePad 
-                  width={sidebarWidth - 48} // Subtract navigation width (48px = 12px width + borders)
-                  currentPlan={currentPlan}
-                  onUpdatePlan={updateCurrentPlan}
-                />
+                {/* Panel Content */}
+                {activePanel === 'notepad' ? (
+                  <NotePad 
+                    width={sidebarWidth - 48} // Subtract navigation width (48px = 12px width + borders)
+                    currentPlan={currentPlan}
+                    onUpdatePlan={updateCurrentPlan}
+                  />
+                ) : (
+                  <BacklogPanel width={sidebarWidth - 48} />
+                )}
             </div>
           )}
 

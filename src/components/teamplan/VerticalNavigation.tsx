@@ -8,15 +8,17 @@ import {
 
 interface VerticalNavigationProps {
   isSidebarExpanded: boolean;
+  isBacklogExpanded: boolean;
   onToggleSidebar: () => void;
-  onOpenBacklog?: () => void;
+  onToggleBacklog: () => void;
   onOpenComments?: () => void;
 }
 
 export default function VerticalNavigation({
   isSidebarExpanded,
+  isBacklogExpanded,
   onToggleSidebar,
-  onOpenBacklog,
+  onToggleBacklog,
   onOpenComments
 }: VerticalNavigationProps) {
   return (
@@ -37,13 +39,16 @@ export default function VerticalNavigation({
           <DocumentTextIcon className="w-5 h-5" />
         </button>
 
-        {/* Backlog (Future functionality) */}
+        {/* Backlog */}
         <button
-          onClick={onOpenBacklog}
-          className="w-8 h-8 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors duration-200 cursor-not-allowed"
-          aria-label="Open backlog (coming soon)"
-          title="Backlog (coming soon)"
-          disabled
+          onClick={onToggleBacklog}
+          className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 ${
+            isBacklogExpanded 
+              ? 'bg-slate-100 text-slate-800' 
+              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-800'
+          }`}
+          aria-label={isBacklogExpanded ? "Close backlog" : "Open backlog"}
+          title={isBacklogExpanded ? "Close backlog" : "Open backlog"}
         >
           <RectangleGroupIcon className="w-5 h-5" />
         </button>
