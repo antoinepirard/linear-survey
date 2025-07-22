@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/sonner";
+import ClientWrapper from "@/components/ClientWrapper";
 import "./globals.css";
 
 
@@ -47,7 +48,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} font-sans antialiased`}
       >
-        {children}
+        <ClientWrapper>
+          {children}
+        </ClientWrapper>
         <Analytics />
         <SpeedInsights />
         <Toaster />

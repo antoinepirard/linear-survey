@@ -79,6 +79,20 @@ html, body {
   animation: shimmer 1.5s infinite;
 }
 
+/* Fade-out animation for page loader */
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.animate-fade-out {
+  animation: fade-out 300ms ease-out forwards;
+}
+
 /* Performance optimization for animations */
 .gpu-accelerated {
   transform: translateZ(0);
