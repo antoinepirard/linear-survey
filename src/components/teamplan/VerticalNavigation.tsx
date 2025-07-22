@@ -20,7 +20,7 @@ export default function VerticalNavigation({
   onOpenComments
 }: VerticalNavigationProps) {
   return (
-    <div className="w-12 h-full bg-white border-r border-slate-200 flex flex-col items-center py-4">
+    <div className="w-12 h-full bg-white border-r border-slate-200 flex flex-col items-center py-4 flex-shrink-0">
       {/* Navigation Items */}
       <div className="flex flex-col space-y-3">
         {/* Sidebar Toggle */}
