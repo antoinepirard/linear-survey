@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import PageLoader from '@/components/PageLoader';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
 import NotePad from '@/components/teamplan/NotePad';
 import BacklogPanel from '@/components/teamplan/BacklogPanel';
@@ -24,6 +25,7 @@ export default function TeamPlanPage() {
   const [activePanel, setActivePanel] = useState<'notepad' | 'backlog' | 'comments'>('notepad');
   const [isColorCodingEnabled, setIsColorCodingEnabled] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   // Load color coding preference from localStorage on mount
   useEffect(() => {
@@ -37,6 +39,10 @@ export default function TeamPlanPage() {
   const handleColorCodingChange = (checked: boolean) => {
     setIsColorCodingEnabled(checked);
     localStorage.setItem('teamplan-color-coding-enabled', JSON.stringify(checked));
+  };
+
+  const handlePageLoadingComplete = () => {
+    setIsPageLoading(false);
   };
   const {
     isLoading,
@@ -106,35 +112,18 @@ export default function TeamPlanPage() {
     }
   };
 
-  if (isLoading || isStorageLoading) {
-    return (
-      <div className="h-screen bg-slate-50/30 overflow-hidden flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
-          <p className="text-slate-600 text-sm">Loading your plan...</p>
-        </div>
-      </div>
-    );
-  }
 
-  if (!currentPlan) {
-    return (
-      <div className="h-screen bg-slate-50/75 overflow-hidden flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-slate-600 mb-4">No plan found</p>
-          <button
-            onClick={() => createPlan('My First Plan')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Create Your First Plan
-          </button>
-        </div>
-      </div>
-    );
+  if (!currentPlan || isLoading || isStorageLoading) {
+    return null;
   }
 
   return (
-    <div className="h-screen bg-slate-50/75 overflow-hidden flex">
+    <>
+      {isPageLoading && <PageLoader onComplete={handlePageLoadingComplete} />}
+      <div 
+        className="h-screen bg-slate-50/75 overflow-hidden flex"
+        style={{ display: isPageLoading ? 'none' : 'flex' }}
+      >
       {/* Sidebar Container with Resize */}
       <div className="relative flex p-3">
         <div className="relative flex bg-white rounded-md shadow-md ring-1 ring-slate-200/50 overflow-visible">
@@ -283,5 +272,6 @@ export default function TeamPlanPage() {
         />
       </div>
     </div>
+    </>
   );
 }
