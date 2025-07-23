@@ -3,10 +3,6 @@ import { Plan, PlanStorage, PlanMetadata } from '@/types/plan';
 import { DEFAULT_TEAMPLAN_DATA } from '@/data/teamplan';
 
 const PLAN_STORAGE_KEY = 'folio-plans';
-const LEGACY_TEAMPLAN_KEY = 'teamplan-data';
-const LEGACY_NOTEPAD_CONTENT_KEY = 'notepad-content';
-const LEGACY_NOTEPAD_TITLE_KEY = 'notepad-title';
-const LEGACY_NOTEPAD_WIDTH_KEY = 'notepad-width';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -23,64 +19,6 @@ const createDefaultPlan = (name: string = 'Monthly Plan'): Plan => ({
   }
 });
 
-const migrateExistingData = (): PlanStorage => {
-  if (typeof window === 'undefined') {
-    return { currentPlanId: null, plans: {} };
-  }
-
-  // Check for legacy data
-  const legacyTeamPlanData = localStorage.getItem(LEGACY_TEAMPLAN_KEY);
-  const legacyNotepadContent = localStorage.getItem(LEGACY_NOTEPAD_CONTENT_KEY);
-  const legacyNotepadTitle = localStorage.getItem(LEGACY_NOTEPAD_TITLE_KEY);
-  const legacyNotepadWidth = localStorage.getItem(LEGACY_NOTEPAD_WIDTH_KEY);
-
-  const hasLegacyData = legacyTeamPlanData || legacyNotepadContent || legacyNotepadTitle || legacyNotepadWidth;
-
-  if (hasLegacyData) {
-    console.log('🔄 Migrating existing data to new plan structure...');
-    
-    const plan = createDefaultPlan('Untitled Plan');
-    
-    // Migrate team plan data
-    if (legacyTeamPlanData) {
-      try {
-        plan.teamPlanData = JSON.parse(legacyTeamPlanData);
-      } catch (error) {
-        console.error('Failed to parse legacy team plan data:', error);
-      }
-    }
-    
-    // Migrate notepad data
-    plan.notepadData.content = legacyNotepadContent || '';
-    plan.notepadData.title = legacyNotepadTitle || 'Notes';
-    plan.notepadData.width = legacyNotepadWidth ? parseInt(legacyNotepadWidth, 10) : 320;
-    
-    const planStorage: PlanStorage = {
-      currentPlanId: plan.id,
-      plans: { [plan.id]: plan }
-    };
-    
-    // Save migrated data
-    localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(planStorage));
-    
-    // Clean up legacy data
-    localStorage.removeItem(LEGACY_TEAMPLAN_KEY);
-    localStorage.removeItem(LEGACY_NOTEPAD_CONTENT_KEY);
-    localStorage.removeItem(LEGACY_NOTEPAD_TITLE_KEY);
-    localStorage.removeItem(LEGACY_NOTEPAD_WIDTH_KEY);
-    
-    console.log('✅ Migration complete');
-    return planStorage;
-  }
-
-  // No legacy data, create default
-  const defaultPlan = createDefaultPlan();
-  return {
-    currentPlanId: defaultPlan.id,
-    plans: { [defaultPlan.id]: defaultPlan }
-  };
-};
-
 export const usePlanStorage = () => {
   const [planStorage, setPlanStorage] = useState<PlanStorage>({ currentPlanId: null, plans: {} });
   const [isLoading, setIsLoading] = useState(true);
@@ -88,6 +26,14 @@ export const usePlanStorage = () => {
   // Load plans from localStorage on mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    const createNewDefaultStorage = () => {
+        const defaultPlan = createDefaultPlan();
+        return {
+            currentPlanId: defaultPlan.id,
+            plans: { [defaultPlan.id]: defaultPlan }
+        };
+    };
 
     const stored = localStorage.getItem(PLAN_STORAGE_KEY);
     let storage: PlanStorage;
@@ -100,12 +46,19 @@ export const usePlanStorage = () => {
           plan.createdAt = new Date(plan.createdAt);
           plan.updatedAt = new Date(plan.updatedAt);
         });
+        
+        // Ensure there's at least one plan and a valid currentPlanId
+        const planIds = Object.keys(storage.plans);
+        if (planIds.length === 0 || !storage.currentPlanId || !storage.plans[storage.currentPlanId]) {
+            storage = createNewDefaultStorage();
+        }
+
       } catch (error) {
-        console.error('Failed to parse plan storage:', error);
-        storage = migrateExistingData();
+        console.error('Failed to parse plan storage, creating new default:', error);
+        storage = createNewDefaultStorage();
       }
     } else {
-      storage = migrateExistingData();
+        storage = createNewDefaultStorage();
     }
 
     setPlanStorage(storage);
