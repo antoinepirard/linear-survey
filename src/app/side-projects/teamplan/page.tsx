@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLoader from '@/components/PageLoader';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
@@ -44,6 +44,7 @@ export default function TeamPlanPage() {
   const handlePageLoadingComplete = () => {
     setIsPageLoading(false);
   };
+  
   const {
     isLoading,
     currentPlan,
@@ -54,6 +55,29 @@ export default function TeamPlanPage() {
     updateCurrentPlan,
     renamePlan
   } = usePlanStorage();
+
+  // Keyboard shortcuts for plan switching
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    // Only handle shortcuts if Shift is pressed with number keys
+    if (event.shiftKey && event.key >= '1' && event.key <= '9') {
+      event.preventDefault();
+      const planIndex = parseInt(event.key) - 1;
+      if (planIndex < allPlans.length) {
+        const targetPlan = allPlans[planIndex];
+        if (targetPlan && targetPlan.id !== currentPlan?.id) {
+          switchToPlan(targetPlan.id);
+        }
+      }
+    }
+  }, [allPlans, currentPlan?.id, switchToPlan]);
+
+  // Add and remove keyboard event listeners
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
 
   // Sidebar width management
   const {

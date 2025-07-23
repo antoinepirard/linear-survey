@@ -173,7 +173,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
           </div>
           
           <div className="max-h-60 overflow-y-auto p-2">
-            {allPlans.map((plan) => (
+            {allPlans.map((plan, index) => (
               <div
                 key={plan.id}
                 className="px-3 py-2 hover:bg-slate-50 hover:rounded-lg cursor-pointer flex items-center justify-between group transition-all duration-150"
@@ -203,20 +203,29 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
                   </div>
                 </div>
                 
-                <div className="relative flex items-center justify-end w-6 h-6">
-                  {currentPlan?.id === plan.id && (
-                    <Check className="h-3.5 w-3.5 text-primary/70 group-hover:opacity-0 transition-opacity" />
+                <div className="relative flex items-center justify-end gap-2">
+                  {/* Keyboard shortcut indicator */}
+                  {index < 9 && (
+                    <div className="hidden group-hover:flex items-center bg-white px-1.5 py-0.5 rounded text-xs font-mono text-slate-600 border">
+                      ⇧{index + 1}
+                    </div>
                   )}
-                  {allPlans.length > 1 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => handleDeleteClick(plan.id, e)}
-                      className="absolute opacity-0 group-hover:opacity-100 h-5 w-5 p-0"
-                    >
-                      <Trash2 className="size-3.5" />
-                    </Button>
-                  )}
+                  
+                  <div className="relative flex items-center justify-end w-6 h-6">
+                    {currentPlan?.id === plan.id && (
+                      <Check className="h-3.5 w-3.5 text-primary/70 group-hover:opacity-0 transition-opacity" />
+                    )}
+                    {allPlans.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => handleDeleteClick(plan.id, e)}
+                        className="absolute opacity-0 group-hover:opacity-100 h-5 w-5 p-0"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
