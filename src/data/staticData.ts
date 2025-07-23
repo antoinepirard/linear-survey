@@ -1,6 +1,6 @@
 export const staticHighlights = [
   {
-    title: "Plannr",
+    title: "Ravell.io (Coming Soon)",
     description: "Thinking and planning goes hand in hand.",
     category: "SIDE PROJECT",
     href: "/side-projects/teamplan"
