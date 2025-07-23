@@ -10,7 +10,7 @@ const LEGACY_NOTEPAD_WIDTH_KEY = 'notepad-width';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-const createDefaultPlan = (name: string = 'My First Plan'): Plan => ({
+const createDefaultPlan = (name: string = 'Monthly Plan'): Plan => ({
   id: generateId(),
   name,
   createdAt: new Date(),
@@ -39,7 +39,7 @@ const migrateExistingData = (): PlanStorage => {
   if (hasLegacyData) {
     console.log('🔄 Migrating existing data to new plan structure...');
     
-    const plan = createDefaultPlan('November_2025');
+    const plan = createDefaultPlan('Untitled Plan');
     
     // Migrate team plan data
     if (legacyTeamPlanData) {
