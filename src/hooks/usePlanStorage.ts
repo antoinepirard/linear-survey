@@ -39,7 +39,7 @@ const migrateExistingData = (): PlanStorage => {
   if (hasLegacyData) {
     console.log('🔄 Migrating existing data to new plan structure...');
     
-    const plan = createDefaultPlan('Migrated Plan');
+    const plan = createDefaultPlan('November_2021');
     
     // Migrate team plan data
     if (legacyTeamPlanData) {
