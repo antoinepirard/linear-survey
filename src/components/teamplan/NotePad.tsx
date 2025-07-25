@@ -79,6 +79,10 @@ function NotePad({
         bulletList: false, // Disable StarterKit's BulletList
         orderedList: false, // Disable StarterKit's OrderedList
         listItem: false, // Disable StarterKit's ListItem
+        codeBlock: {
+          exitOnTripleEnter: true,
+          exitOnArrowDown: true,
+        },
       }),
       ListItem,
       BulletList.configure({
@@ -103,7 +107,7 @@ function NotePad({
       }),
       Typography,
       SlashCommand,
-      EmptyLinePlaceholder,
+      // EmptyLinePlaceholder, // Temporarily disabled to test code block typing
     ],
     content: '',
     immediatelyRender: false,
