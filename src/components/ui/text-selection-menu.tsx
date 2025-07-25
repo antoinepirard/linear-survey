@@ -41,8 +41,8 @@ function MenuButton({ isActive, onClick, children, title }: MenuButtonProps) {
       onClick={onClick}
       title={title}
       className={cn(
-        "h-7 w-7 p-0 text-slate-400 hover:bg-slate-800 hover:text-white",
-        isActive && "text-white hover:bg-slate-500"
+        "h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+        isActive && "text-gray-900 bg-gray-100"
       )}
     >
       {children}
@@ -182,7 +182,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
         exit={{ opacity: 0, scale: 0.95, y: 5 }}
         transition={{ duration: 0.15, ease: "easeOut" }}
         className={cn(
-          "flex items-center gap-0.5 bg-slate-900 border border-slate-700 rounded-lg p-1",
+          "flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1 shadow-lg",
           className
         )}
       >
@@ -201,7 +201,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
         </div>
 
         {/* Separator */}
-        <div className="w-px h-4 bg-slate-700 mx-1" />
+        <div className="w-px h-4 bg-gray-300 mx-1" />
 
         {/* Structural elements trigger */}
         <div className="relative">
@@ -213,8 +213,8 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
             onMouseLeave={handleSubmenuLeave}
             title="Headings & Lists"
             className={cn(
-              "h-7 px-2 text-slate-400 hover:bg-slate-800 hover:text-white relative flex items-center gap-1",
-              hasActiveStructural && "text-white hover:bg-slate-500"
+              "h-7 px-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 relative flex items-center gap-1",
+              hasActiveStructural && "text-gray-900 bg-gray-100"
             )}
           >
             {submenuIcon}
@@ -229,7 +229,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -5 }}
                 transition={{ duration: 0.12, ease: "easeOut" }}
-                className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-slate-900 rounded-lg p-1 flex items-center gap-0.5 whitespace-nowrap"
+                className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 rounded-lg p-1 flex items-center gap-0.5 whitespace-nowrap shadow-lg"
                 onMouseEnter={handleSubmenuEnter}
                 onMouseLeave={handleSubmenuLeave}
               >

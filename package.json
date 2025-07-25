@@ -17,10 +17,12 @@
     "@radix-ui/react-switch": "^1.2.5",
     "@tiptap/extension-bubble-menu": "^3.0.7",
     "@tiptap/extension-link": "^3.0.7",
+    "@tiptap/extension-mention": "^3.0.7",
     "@tiptap/extension-placeholder": "^3.0.7",
     "@tiptap/pm": "^3.0.7",
     "@tiptap/react": "^3.0.7",
     "@tiptap/starter-kit": "^3.0.7",
+    "@tiptap/suggestion": "^3.0.7",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
     "class-variance-authority": "^0.7.1",
@@ -33,9 +35,11 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-feather": "^2.0.10",
+    "react-hotkeys-hook": "^5.1.0",
     "recharts": "^3.0.2",
     "sonner": "^2.0.6",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "tippy.js": "^6.3.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
