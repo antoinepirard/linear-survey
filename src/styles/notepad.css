@@ -342,3 +342,51 @@
 .notepad-container:hover .notepad-editor {
   scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
 }
+
+/* Slash Menu Custom Scrollbar Styles */
+.slash-menu-scrollbar {
+  /* Always reserve space for scrollbar to prevent content shifting */
+  scrollbar-width: thin; /* Firefox - always show space */
+  scrollbar-gutter: stable; /* Reserve space for scrollbar */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Always reserve 8px width for scrollbar area (smaller than notepad) */
+.slash-menu-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+.slash-menu-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 6px;
+}
+
+/* Scrollbar thumb - hidden by default */
+.slash-menu-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Show scrollbar thumb on menu hover */
+.slash-menu-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  background-clip: content-box;
+}
+
+.slash-menu-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+  background-clip: content-box;
+}
+
+/* Custom scrollbar for Firefox */
+.slash-menu-scrollbar {
+  scrollbar-color: transparent transparent; /* Hidden by default */
+}
+
+.slash-menu-scrollbar:hover {
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}

@@ -99,7 +99,7 @@ const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(({ items, command }, 
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 5 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
-      className="bg-white border border-gray-200 rounded-lg shadow-lg p-1 min-w-[280px] max-h-[400px] overflow-y-auto z-50"
+      className="bg-white ring-1 ring-slate-300/30 rounded-lg shadow-lg p-1 min-w-[280px] max-h-[400px] overflow-y-auto z-50 slash-menu-scrollbar"
     >
       {items.length ? (
         items.map((item, index) => (
