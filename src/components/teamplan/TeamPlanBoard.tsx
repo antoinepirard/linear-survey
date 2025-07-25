@@ -178,17 +178,17 @@ export default function TeamPlanBoard({
   };
 
   const handleDragEnd = () => {
-    console.log('🎯 TeamPlanBoard: handleDragEnd called');
+    const originalData = boardData;
     // Keep a reference to the drag state to use after clearing
     const currentDragOverCell = dragOverCell;
     const currentDraggedProjectData = draggedProjectData;
     const currentDragOverAddPerson = dragOverAddPerson;
+
+    let newData = null;
+    let newProjectForFocus: Project | null = null;
     
     // Check if dropped on add person area
     if (currentDragOverAddPerson && currentDraggedProjectData) {
-      console.log('🚚 TeamPlanBoard: Creating new person from dropped project');
-      
-      // Create new person with "Unknown" name
       const newPersonId = generateId();
       const newPerson: Person = {
         id: newPersonId,
@@ -202,7 +202,6 @@ export default function TeamPlanBoard({
         let newProjects: Project[];
         
         if (isDuplicating) {
-          // Create a duplicate project assigned to the new person
           const duplicateProjectId = generateId();
           updatedProject = {
             ...currentDraggedProjectData,
@@ -210,36 +209,29 @@ export default function TeamPlanBoard({
             personId: newPersonId,
             timeSlotId: firstTimeSlot.id,
           };
-          newProjects = [...boardData.projects, updatedProject];
+          newProjects = [...originalData.projects, updatedProject];
+          newProjectForFocus = updatedProject;
         } else {
-          // Move the existing project to the new person
           updatedProject = {
             ...currentDraggedProjectData,
             personId: newPersonId,
             timeSlotId: firstTimeSlot.id,
           };
-          newProjects = boardData.projects.map(p => 
+          newProjects = originalData.projects.map(p => 
             p.id === currentDraggedProjectData.id ? updatedProject : p
           );
         }
         
-        const newData = {
-          ...boardData,
-          people: [...boardData.people, newPerson],
+        newData = {
+          ...originalData,
+          people: [...originalData.people, newPerson],
           projects: newProjects
         };
-        setBoardData(newData);
-        onChange?.(newData);
-        
-        if (isDuplicating) {
-          setNewProjectId(updatedProject.id);
-        }
       }
     }
     // Check if we have a valid drop target and dragged project data
     else if (currentDragOverCell && currentDraggedProjectData) {
       const { personId, timeSlotId } = currentDragOverCell;
-      console.log('🚚 TeamPlanBoard: Moving project', currentDraggedProjectData.id, 'to', personId, timeSlotId);
 
       if (isDuplicating) {
         const newProjectId = generateId();
@@ -249,37 +241,39 @@ export default function TeamPlanBoard({
           personId,
           timeSlotId,
         };
-        const newData = {
-          ...boardData,
-          projects: [...boardData.projects, newProject],
+        newData = {
+          ...originalData,
+          projects: [...originalData.projects, newProject],
         };
-        setBoardData(newData);
-        onChange?.(newData);
-        
-        // Set focus on the newly created project
-        setNewProjectId(newProjectId);
+        newProjectForFocus = newProject;
       } else {
-        // Only allow drops to different cells (no reordering within same cell)
         if (personId !== currentDraggedProjectData.personId || timeSlotId !== currentDraggedProjectData.timeSlotId) {
-          // Create updated project with new position
           const updatedProject = { ...currentDraggedProjectData, personId, timeSlotId };
-          
-          // Update the projects array
-          const newData = {
-            ...boardData,
-            projects: boardData.projects.map(p => 
+          newData = {
+            ...originalData,
+            projects: originalData.projects.map(p => 
               p.id === currentDraggedProjectData.id ? updatedProject : p
             )
           };
-          setBoardData(newData);
-          console.log('📤 TeamPlanBoard: Calling onChange with updated data (drag end)');
-          onChange?.(newData);
-        } else {
-          console.log('🚫 TeamPlanBoard: No position change detected, skipping onChange');
         }
       }
-    } else {
-      console.log('🚫 TeamPlanBoard: No valid drop target, skipping onChange');
+    }
+
+    if (newData) {
+      setBoardData(newData);
+      if (newProjectForFocus) {
+        setNewProjectId(newProjectForFocus.id);
+      }
+
+      try {
+        onChange?.(newData);
+      } catch (error) {
+        console.error("Failed to update after drag and drop:", error);
+        setBoardData(originalData);
+        if (newProjectForFocus) {
+          setNewProjectId(null);
+        }
+      }
     }
     
     // Clear drag state after data updates to prevent animation glitches
@@ -366,7 +360,7 @@ export default function TeamPlanBoard({
   };
 
   const handleAddProject = (personId: string, timeSlotId: string) => {
-    console.log('➕ TeamPlanBoard: handleAddProject called for person:', personId, 'timeSlot:', timeSlotId);
+    const originalData = boardData;
     const projectId = generateId();
     const newProject: Project = {
       id: projectId,
@@ -377,31 +371,41 @@ export default function TeamPlanBoard({
     };
     
     const newData = {
-      ...boardData,
-      projects: [...boardData.projects, newProject]
+      ...originalData,
+      projects: [...originalData.projects, newProject]
     };
+
     setBoardData(newData);
-    console.log('📤 TeamPlanBoard: Calling onChange with updated data (add project)');
-    onChange?.(newData);
-    
-    // Set this project as the one being edited
     setNewProjectId(projectId);
+
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to add project:", error);
+      setBoardData(originalData); // Rollback on failure
+    }
   };
 
   const handleDeleteProject = (projectId: string) => {
+    const originalData = boardData;
     const newData = {
-      ...boardData,
-      projects: boardData.projects.filter(p => p.id !== projectId)
+      ...originalData,
+      projects: originalData.projects.filter(p => p.id !== projectId)
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleEditProject = (updatedProject: Project) => {
-    console.log('🎯 TeamPlanBoard: handleEditProject called for project:', updatedProject.id, updatedProject.title);
+    const originalData = boardData;
     const newData = {
-      ...boardData,
-      projects: boardData.projects.map(p => 
+      ...originalData,
+      projects: originalData.projects.map(p => 
         p.id === updatedProject.id ? updatedProject : p
       )
     };
@@ -419,12 +423,17 @@ export default function TeamPlanBoard({
     }
     
     setNewProjectId(null);
-    console.log('📤 TeamPlanBoard: Calling onChange with updated data (edit project)');
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to edit project:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleDuplicateProject = (projectId: string) => {
-    const originalProject = boardData.projects.find(p => p.id === projectId);
+    const originalData = boardData;
+    const originalProject = originalData.projects.find(p => p.id === projectId);
     if (!originalProject) return;
 
     const duplicatedProject: Project = {
@@ -434,29 +443,41 @@ export default function TeamPlanBoard({
     };
 
     const newData = {
-      ...boardData,
-      projects: [...boardData.projects, duplicatedProject]
+      ...originalData,
+      projects: [...originalData.projects, duplicatedProject]
     };
     setBoardData(newData);
     setNewProjectId(duplicatedProject.id); // Trigger editing mode for duplicated card
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to duplicate project:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleAddTimeSlot = (timeSlot: TimeSlot) => {
+    const originalData = boardData;
     const newData = {
-      ...boardData,
-      timeSlots: [...boardData.timeSlots, timeSlot]
+      ...originalData,
+      timeSlots: [...originalData.timeSlots, timeSlot]
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to add time slot:", error);
+      setBoardData(originalData);
+    }
   };
 
 
   const handleUpdateTimeSlot = (updatedTimeSlot: TimeSlot) => {
-    const timeSlotIndex = boardData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
+    const originalData = boardData;
+    const timeSlotIndex = originalData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
     if (timeSlotIndex === -1) return;
 
-    const updatedTimeSlots = [...boardData.timeSlots];
+    const updatedTimeSlots = [...originalData.timeSlots];
     const originalLabel = updatedTimeSlots[timeSlotIndex].label;
     updatedTimeSlots[timeSlotIndex] = updatedTimeSlot;
 
@@ -476,111 +497,164 @@ export default function TeamPlanBoard({
     }
 
     const newData = {
-      ...boardData,
+      ...originalData,
       timeSlots: updatedTimeSlots
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to update time slot:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleAddPerson = (person: Person) => {
+    const originalData = boardData;
     const newData = {
-      ...boardData,
-      people: [...boardData.people, person]
+      ...originalData,
+      people: [...originalData.people, person]
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to add person:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleRemovePerson = (personId: string) => {
+    const originalData = boardData;
     const newData = {
-      ...boardData,
-      people: boardData.people.filter(p => p.id !== personId),
-      projects: boardData.projects.filter(p => p.personId !== personId)
+      ...originalData,
+      people: originalData.people.filter(p => p.id !== personId),
+      projects: originalData.projects.filter(p => p.personId !== personId)
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to remove person:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleUpdatePerson = (updatedPerson: Person) => {
+    const originalData = boardData;
     const newData = {
-      ...boardData,
-      people: boardData.people.map(p => 
+      ...originalData,
+      people: originalData.people.map(p => 
         p.id === updatedPerson.id ? updatedPerson : p
       )
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to update person:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleMovePersonUp = (personId: string) => {
-    const currentIndex = boardData.people.findIndex(p => p.id === personId);
+    const originalData = boardData;
+    const currentIndex = originalData.people.findIndex(p => p.id === personId);
     if (currentIndex <= 0) return;
 
-    const newPeople = [...boardData.people];
+    const newPeople = [...originalData.people];
     [newPeople[currentIndex - 1], newPeople[currentIndex]] = [newPeople[currentIndex], newPeople[currentIndex - 1]];
 
     const newData = {
-      ...boardData,
+      ...originalData,
       people: newPeople
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to move person up:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleMovePersonDown = (personId: string) => {
-    const currentIndex = boardData.people.findIndex(p => p.id === personId);
-    if (currentIndex >= boardData.people.length - 1) return;
+    const originalData = boardData;
+    const currentIndex = originalData.people.findIndex(p => p.id === personId);
+    if (currentIndex >= originalData.people.length - 1) return;
 
-    const newPeople = [...boardData.people];
+    const newPeople = [...originalData.people];
     [newPeople[currentIndex], newPeople[currentIndex + 1]] = [newPeople[currentIndex + 1], newPeople[currentIndex]];
 
     const newData = {
-      ...boardData,
+      ...originalData,
       people: newPeople
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to move person down:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleMoveTimeSlotLeft = (timeSlotId: string) => {
-    const currentIndex = boardData.timeSlots.findIndex(t => t.id === timeSlotId);
+    const originalData = boardData;
+    const currentIndex = originalData.timeSlots.findIndex(t => t.id === timeSlotId);
     if (currentIndex <= 0) return;
 
-    const newTimeSlots = [...boardData.timeSlots];
+    const newTimeSlots = [...originalData.timeSlots];
     [newTimeSlots[currentIndex - 1], newTimeSlots[currentIndex]] = [newTimeSlots[currentIndex], newTimeSlots[currentIndex - 1]];
 
     const newData = {
-      ...boardData,
+      ...originalData,
       timeSlots: newTimeSlots
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to move time slot left:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleMoveTimeSlotRight = (timeSlotId: string) => {
-    const currentIndex = boardData.timeSlots.findIndex(t => t.id === timeSlotId);
-    if (currentIndex >= boardData.timeSlots.length - 1) return;
+    const originalData = boardData;
+    const currentIndex = originalData.timeSlots.findIndex(t => t.id === timeSlotId);
+    if (currentIndex >= originalData.timeSlots.length - 1) return;
 
-    const newTimeSlots = [...boardData.timeSlots];
+    const newTimeSlots = [...originalData.timeSlots];
     [newTimeSlots[currentIndex], newTimeSlots[currentIndex + 1]] = [newTimeSlots[currentIndex + 1], newTimeSlots[currentIndex]];
 
     const newData = {
-      ...boardData,
+      ...originalData,
       timeSlots: newTimeSlots
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to move time slot right:", error);
+      setBoardData(originalData);
+    }
   };
 
   const handleDeleteTimeSlot = (timeSlotId: string) => {
+    const originalData = boardData;
     const newData = {
-      ...boardData,
-      timeSlots: boardData.timeSlots.filter(t => t.id !== timeSlotId),
-      projects: boardData.projects.filter(p => p.timeSlotId !== timeSlotId)
+      ...originalData,
+      timeSlots: originalData.timeSlots.filter(t => t.id !== timeSlotId),
+      projects: originalData.projects.filter(p => p.timeSlotId !== timeSlotId)
     };
     setBoardData(newData);
-    onChange?.(newData);
+    try {
+      onChange?.(newData);
+    } catch (error) {
+      console.error("Failed to delete time slot:", error);
+      setBoardData(originalData);
+    }
   };
 
   const isDropTarget = (personId: string, timeSlotId: string) => {
