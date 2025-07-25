@@ -143,6 +143,35 @@ export const SlashCommand = Extension.create({
           let popup: HTMLDivElement | null = null;
           let filterIndicator: HTMLDivElement | null = null;
 
+          const positionMenu = (rect: DOMRect) => {
+            if (!popup || !filterIndicator) return;
+
+            const menuHeight = 400; // max-h-[400px] from SlashMenu component
+            const spacing = 8;
+            const viewportHeight = window.innerHeight;
+            const scrollY = window.scrollY;
+
+            // Calculate available space below and above
+            const spaceBelow = viewportHeight - (rect.bottom - scrollY);
+            const spaceAbove = rect.top - scrollY;
+
+            // Decide whether to show above or below
+            const showAbove =
+              spaceBelow < menuHeight + spacing && spaceAbove > spaceBelow;
+
+            // Position filter indicator
+            filterIndicator.style.left = `${rect.left - 8}px`;
+            filterIndicator.style.top = `${rect.top - 2}px`;
+
+            // Position menu
+            popup.style.left = `${rect.left}px`;
+            if (showAbove) {
+              popup.style.top = `${rect.top - menuHeight - spacing}px`;
+            } else {
+              popup.style.top = `${rect.bottom + spacing}px`;
+            }
+          };
+
           return {
             onStart: (props: SuggestionProps) => {
               component = new ReactRenderer(SlashMenu, {
@@ -192,12 +221,9 @@ export const SlashCommand = Extension.create({
               popup.appendChild(component.element);
               document.body.appendChild(popup);
 
-              // Position elements
+              // Position elements using the new positioning logic
               const rect = props.clientRect();
-              filterIndicator.style.left = `${rect.left - 8}px`;
-              filterIndicator.style.top = `${rect.top - 2}px`;
-              popup.style.left = `${rect.left}px`;
-              popup.style.top = `${rect.bottom + 8}px`;
+              positionMenu(rect);
             },
 
             onUpdate(props: SuggestionProps) {
@@ -236,14 +262,9 @@ export const SlashCommand = Extension.create({
                 }
               }
 
-              // Update positions
+              // Update positions using the new positioning logic
               const rect = props.clientRect();
-              if (filterIndicator) {
-                filterIndicator.style.left = `${rect.left - 8}px`;
-                filterIndicator.style.top = `${rect.top - 2}px`;
-              }
-              popup.style.left = `${rect.left}px`;
-              popup.style.top = `${rect.bottom + 8}px`;
+              positionMenu(rect);
             },
 
             onKeyDown(props: SuggestionKeyProps) {

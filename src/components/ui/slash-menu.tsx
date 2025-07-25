@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { Editor } from '@tiptap/react';
@@ -34,6 +34,8 @@ export interface SlashMenuRef {
 
 const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(({ items, command }, ref) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const selectedItemRef = useRef<HTMLButtonElement>(null);
 
   const iconMap: Record<string, React.ReactNode> = {
     'Text': <DocumentTextIcon className="h-4 w-4" />,
@@ -54,6 +56,16 @@ const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(({ items, command }, 
       command(item);
     }
   };
+
+  // Scroll selected item into view when selectedIndex changes
+  useEffect(() => {
+    if (selectedItemRef.current && menuRef.current) {
+      selectedItemRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }, [selectedIndex]);
 
   useImperativeHandle(ref, () => ({
     onKeyDown: (event: KeyboardEvent) => {
@@ -82,6 +94,7 @@ const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(({ items, command }, 
 
   return (
     <motion.div
+      ref={menuRef}
       initial={{ opacity: 0, scale: 0.95, y: 5 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 5 }}
@@ -92,10 +105,11 @@ const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(({ items, command }, 
         items.map((item, index) => (
           <button
             key={index}
+            ref={selectedIndex === index ? selectedItemRef : null}
             className={cn(
               "w-full flex items-center gap-3 px-3 py-2 text-left rounded-md transition-colors",
-              "hover:bg-gray-50 focus:bg-gray-50 focus:outline-none",
-              selectedIndex === index && "bg-gray-50"
+              "hover:bg-gray-50 focus:bg-gray-100 focus:outline-none",
+              selectedIndex === index && "bg-gray-100"
             )}
             onClick={() => executeCommand(index)}
             onMouseEnter={() => setSelectedIndex(index)}
