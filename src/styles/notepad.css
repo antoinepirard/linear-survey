@@ -252,6 +252,24 @@
   font-size: 0.8125rem !important; /* 13px - slightly smaller than body */
 }
 
+.ProseMirror hr {
+  border: none !important;
+  height: 1px !important;
+  background-color: rgb(203 213 225) !important; /* slate-300 */  
+  margin: 2rem 0 !important; /* 32px top/bottom for extra space */
+  width: 100% !important;
+  display: block !important;
+  clear: both !important;
+}
+
+.ProseMirror hr + * {
+  margin-top: 2rem !important; /* Ensure space after the hr */
+}
+
+.ProseMirror * + hr {
+  margin-top: 2rem !important; /* Ensure space before the hr */
+}
+
 /* Custom Scrollbar Styles */
 .notepad-editor {
   /* Always reserve space for scrollbar to prevent text repositioning */
