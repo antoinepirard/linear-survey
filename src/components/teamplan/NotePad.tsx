@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, memo } from 'react';
 import '@/styles/notepad.css';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -19,7 +19,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { NotePadProps, NotePadError } from '@/types/notepad';
 
-export default function NotePad({ 
+function NotePad({
   className = '',
   onError,
   width,
@@ -263,3 +263,5 @@ export default function NotePad({
     </div>
   );
 }
+
+export default memo(NotePad);
