@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import '@/styles/notepad.css';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -15,6 +15,7 @@ import TaskItem from '@tiptap/extension-task-item';
 import ListKeymap from '@tiptap/extension-list-keymap';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
 import { useTextSelection } from '@/hooks/useTextSelection';
+import { useDebounce } from '@/hooks/useDebounce';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { NotePadProps, NotePadError } from '@/types/notepad';
 
@@ -26,22 +27,36 @@ export default function NotePad({
   onUpdatePlan,
 }: NotePadProps) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const [content, setContent] = useState<string>(
+    currentPlan?.notepadData?.content || ''
+  );
+  const debouncedContent = useDebounce(content, 500);
 
   // Content management helper
   const loadContent = useCallback((): string | null => {
     return currentPlan?.notepadData.content || null;
   }, [currentPlan]);
 
-  const saveContent = useCallback((content: string) => {
-    if (currentPlan && onUpdatePlan) {
-      onUpdatePlan({
-        notepadData: {
-          ...currentPlan.notepadData,
-          content
-        }
-      });
+  const saveContent = useCallback(
+    (newContent: string) => {
+      if (currentPlan && onUpdatePlan) {
+        onUpdatePlan({
+          notepadData: {
+            ...currentPlan.notepadData,
+            content: newContent,
+          },
+        });
+      }
+    },
+    [currentPlan, onUpdatePlan]
+  );
+
+  useEffect(() => {
+    if (debouncedContent !== currentPlan?.notepadData?.content) {
+      saveContent(debouncedContent);
     }
-  }, [currentPlan, onUpdatePlan]);
+  }, [debouncedContent, currentPlan?.notepadData?.content, saveContent]);
+
 
   // Error handling helper
   const handleError = (error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
@@ -85,7 +100,7 @@ export default function NotePad({
       SlashCommand,
       EmptyLinePlaceholder,
     ],
-    content: '',
+    content: content,
     immediatelyRender: false,
     editorProps: {
       attributes: {
@@ -134,8 +149,7 @@ export default function NotePad({
     },
     onUpdate: ({ editor }) => {
       try {
-        const content = editor.getHTML();
-        saveContent(content);
+        setContent(editor.getHTML());
       } catch (error) {
         handleError(error as Error, 'EDITOR_ERROR', { action: 'save_content' });
       }
@@ -187,11 +201,13 @@ export default function NotePad({
       if (savedContent !== null) {
         // Only update if the content is actually different to avoid unnecessary re-renders
         if (editor.getHTML() !== savedContent) {
-          editor.commands.setContent(savedContent);
+          editor.commands.setContent(savedContent, { emitUpdate: false }); // don't emit update
+          setContent(savedContent); // update local state
         }
       } else {
         // Clear editor if no content
         editor.commands.clearContent();
+        setContent('');
       }
     }
   }, [editor, currentPlan?.id, currentPlan, loadContent]);
