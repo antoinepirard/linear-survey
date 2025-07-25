@@ -254,6 +254,29 @@
   font-size: 0.8125rem !important; /* 13px - slightly smaller than body */
 }
 
+.ProseMirror pre {
+  background-color: rgb(241 245 249) !important; /* slate-100 */
+  border: 1px solid rgb(226 232 240) !important; /* slate-200 */
+  border-radius: 0.5rem !important;
+  padding: 1rem !important;
+  margin: 1.5rem 0 !important; /* 24px top/bottom */
+  overflow-x: auto !important;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  font-size: 0.8125rem !important; /* 13px */
+  line-height: 1.5 !important;
+  color: rgb(30 41 59) !important; /* slate-800 */
+  white-space: pre !important;
+  cursor: text !important;
+}
+
+.ProseMirror pre code {
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+}
+
 .ProseMirror hr {
   border: none !important;
   height: 1px !important;
