@@ -8,7 +8,7 @@ export const NOTEPAD_CONSTANTS = {
   // Dimensions
   MIN_WIDTH: 300,
   MAX_WIDTH: 800,
-  DEFAULT_WIDTH: 400,
+  DEFAULT_WIDTH: typeof window !== 'undefined' ? Math.max(300, Math.min(800, Math.round(window.innerWidth * 0.35))) : 400,
   
   // Menu positioning
   MENU_WIDTH: 200,

@@ -6,18 +6,26 @@ const PLAN_STORAGE_KEY = 'folio-plans';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-const createDefaultPlan = (name: string = 'Monthly Plan'): Plan => ({
-  id: generateId(),
-  name,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  teamPlanData: DEFAULT_TEAMPLAN_DATA,
-  notepadData: {
-    content: '',
-    title: 'Notes',
-    width: 320
-  }
-});
+const createDefaultPlan = (name: string = 'Monthly Plan'): Plan => {
+  // Calculate 35% of viewport width, clamped between 300-800px
+  const calculateDefaultWidth = () => {
+    if (typeof window === 'undefined') return 400; // SSR fallback
+    return Math.max(300, Math.min(800, Math.round(window.innerWidth * 0.35)));
+  };
+
+  return {
+    id: generateId(),
+    name,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    teamPlanData: DEFAULT_TEAMPLAN_DATA,
+    notepadData: {
+      content: '',
+      title: 'Notes',
+      width: calculateDefaultWidth()
+    }
+  };
+};
 
 export const usePlanStorage = () => {
   const [planStorage, setPlanStorage] = useState<PlanStorage>({ currentPlanId: null, plans: {} });
