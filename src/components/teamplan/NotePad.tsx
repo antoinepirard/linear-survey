@@ -9,7 +9,10 @@ import Link from '@tiptap/extension-link';
 import Typography from '@tiptap/extension-typography';
 import { SlashCommand } from '@/extensions/slash-command';
 import { EmptyLinePlaceholder } from '@/extensions/empty-line-placeholder';
-import { CustomListItem } from '@/extensions/custom-list-item';
+import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
+import ListKeymap from '@tiptap/extension-list-keymap';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
 import { useTextSelection } from '@/hooks/useTextSelection';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
@@ -53,17 +56,22 @@ export default function NotePad({
         heading: {
           levels: [1, 2, 3],
         },
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-        listItem: false, // Disable default ListItem
+        bulletList: false, // Disable StarterKit's BulletList
+        orderedList: false, // Disable StarterKit's OrderedList
+        listItem: false, // Disable StarterKit's ListItem
       }),
-      CustomListItem, // Use our custom ListItem
+      ListItem,
+      BulletList.configure({
+        keepMarks: true,
+        keepAttributes: false,
+      }),
+      OrderedList.configure({
+        keepMarks: true,
+        keepAttributes: false,
+      }),
+      TaskList,
+      TaskItem,
+      ListKeymap,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {

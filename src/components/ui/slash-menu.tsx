@@ -12,9 +12,10 @@ import {
   NumberedListIcon,
   ChatBubbleLeftIcon,
   CodeBracketIcon,
-  MinusIcon
+  MinusIcon,
+  CheckIcon,
+  ListBulletIcon
 } from '@heroicons/react/24/outline';
-import { List } from 'react-feather';
 
 interface SlashCommandItem {
   title: string;
@@ -39,8 +40,9 @@ const SlashMenu = forwardRef<SlashMenuRef, SlashMenuProps>(({ items, command }, 
     'Heading 1': <H1Icon className="h-4 w-4" />,
     'Heading 2': <H2Icon className="h-4 w-4" />,
     'Heading 3': <H3Icon className="h-4 w-4" />,
-    'Bullet List': <List size={16} />,
+    'Bullet List': <ListBulletIcon className="h-4 w-4" />,
     'Numbered List': <NumberedListIcon className="h-4 w-4" />,
+    'Task List': <CheckIcon className="h-4 w-4" />,
     'Quote': <ChatBubbleLeftIcon className="h-4 w-4" />,
     'Code Block': <CodeBracketIcon className="h-4 w-4" />,
     'Divider': <MinusIcon className="h-4 w-4" />,

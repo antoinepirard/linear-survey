@@ -72,29 +72,167 @@
   font-style: italic !important;
 }
 
-.ProseMirror ul {
+/* Bullet Lists - Support both specific and fallback selectors */
+.ProseMirror ul[data-type="bulletList"],
+.ProseMirror ul:not([data-type]) {
   list-style-type: disc !important;
   margin-left: 1.5rem !important;
   margin-bottom: 1.25rem !important; /* 20px */
   margin-top: 0 !important;
+  padding-left: 0 !important;
 }
 
-.ProseMirror ol {
+.ProseMirror ul[data-type="bulletList"] ul[data-type="bulletList"],
+.ProseMirror ul ul {
+  list-style-type: circle !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.ProseMirror ul[data-type="bulletList"] ul[data-type="bulletList"] ul[data-type="bulletList"],
+.ProseMirror ul ul ul {
+  list-style-type: square !important;
+}
+
+/* Ordered Lists - Support both specific and fallback selectors */
+.ProseMirror ol[data-type="orderedList"],
+.ProseMirror ol:not([data-type]) {
   list-style-type: decimal !important;
   margin-left: 1.5rem !important;
   margin-bottom: 1.25rem !important; /* 20px */
   margin-top: 0 !important;
+  padding-left: 0 !important;
 }
 
-.ProseMirror li {
+.ProseMirror ol[data-type="orderedList"] ol[data-type="orderedList"],
+.ProseMirror ol ol {
+  list-style-type: lower-alpha !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.ProseMirror ol[data-type="orderedList"] ol[data-type="orderedList"] ol[data-type="orderedList"],
+.ProseMirror ol ol ol {
+  list-style-type: lower-roman !important;
+}
+
+/* Task Lists */
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none !important;
+  margin-left: 0 !important;
+  margin-bottom: 1.25rem !important; /* 20px */
+  margin-top: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Regular List Items - Support both specific and fallback selectors */
+.ProseMirror li[data-type="listItem"],
+.ProseMirror li:not([data-type]) {
   margin-bottom: 0.25rem !important; /* 4px */
   line-height: 1.5 !important;
   padding: 0 !important;
 }
 
+/* Task Items */
+.ProseMirror li[data-type="taskItem"] {
+  display: flex !important;
+  align-items: flex-start !important;
+  margin-bottom: 0.25rem !important;
+  line-height: 1.5 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+.ProseMirror li[data-type="taskItem"] > label {
+  flex-shrink: 0 !important;
+  margin-right: 0.5rem !important;
+  margin-top: 0.125rem !important; /* Align checkbox with first line of text */
+  user-select: none !important;
+}
+
+.ProseMirror li[data-type="taskItem"] > label > input[type="checkbox"] {
+  width: 1rem !important;
+  height: 1rem !important;
+  border: 1.5px solid rgb(156 163 175) !important; /* gray-400 */
+  border-radius: 0.25rem !important;
+  background-color: white !important;
+  cursor: pointer !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  position: relative !important;
+}
+
+.ProseMirror li[data-type="taskItem"] > label > input[type="checkbox"]:checked {
+  background-color: rgb(59 130 246) !important; /* blue-500 */
+  border-color: rgb(59 130 246) !important;
+}
+
+.ProseMirror li[data-type="taskItem"] > label > input[type="checkbox"]:checked::before {
+  content: "✓" !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  color: white !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+.ProseMirror li[data-type="taskItem"] > div {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+/* Completed task styling */
+.ProseMirror li[data-type="taskItem"][data-checked="true"] > div {
+  color: rgb(107 114 128) !important; /* gray-500 */
+  text-decoration: line-through !important;
+}
+
+/* Fallback task item styling for any task items */
+.ProseMirror input[type="checkbox"] {
+  width: 1rem !important;
+  height: 1rem !important;
+  border: 1.5px solid rgb(156 163 175) !important;
+  border-radius: 0.25rem !important;
+  background-color: white !important;
+  cursor: pointer !important;
+  margin-right: 0.5rem !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  position: relative !important;
+}
+
+.ProseMirror input[type="checkbox"]:checked {
+  background-color: rgb(59 130 246) !important;
+  border-color: rgb(59 130 246) !important;
+}
+
+.ProseMirror input[type="checkbox"]:checked::before {
+  content: "✓" !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  color: white !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
 /* Ensure no extra spacing from any nested elements */
 .ProseMirror li * {
   margin: 0 !important;
+}
+
+/* Nested task lists */
+.ProseMirror ul[data-type="taskList"] ul[data-type="taskList"] {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+  margin-left: 1rem !important;
 }
 
 .ProseMirror blockquote {
