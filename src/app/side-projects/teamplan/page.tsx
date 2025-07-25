@@ -19,7 +19,6 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
-import SyncStatusIndicator from '@/components/teamplan/SyncStatusIndicator';
 import { teamPlanLogger as logger } from '@/utils/logger';
 
 export default function TeamPlanPage() {
@@ -56,9 +55,6 @@ export default function TeamPlanPage() {
     switchToPlan,
     updateCurrentPlan,
     renamePlan,
-    syncState,
-    syncError,
-    rollbackToLastSyncedState
   } = usePlanStorage();
 
   // Keyboard shortcuts for plan switching
@@ -219,13 +215,6 @@ export default function TeamPlanPage() {
                     onCreatePlan={createPlan}
                     onDeletePlan={deletePlan}
                     onRenamePlan={renamePlan}
-                  />
-                  
-                  {/* Sync Status Indicator */}
-                  <SyncStatusIndicator
-                    syncState={syncState}
-                    syncError={syncError}
-                    onRetry={rollbackToLastSyncedState}
                   />
                 </div>
                 
