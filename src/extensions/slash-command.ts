@@ -119,10 +119,9 @@ export const SlashCommand = Extension.create({
               filterIndicator.style.position = 'absolute';
               filterIndicator.style.zIndex = '40';
               filterIndicator.style.padding = '2px 6px';
-              filterIndicator.style.fontSize = '14px';
+              filterIndicator.style.fontSize = '16px'; // Match editor font size
               filterIndicator.style.color = '#9ca3af'; // text-gray-400
               filterIndicator.style.backgroundColor = '#f8fafc'; // bg-slate-50
-              filterIndicator.style.border = '1px solid #e2e8f0';
               filterIndicator.style.borderRadius = '4px';
               filterIndicator.style.fontFamily = 'ui-sans-serif, system-ui, -apple-system, sans-serif';
               filterIndicator.style.display = 'flex';
@@ -169,8 +168,8 @@ export const SlashCommand = Extension.create({
 
               // Update filter indicator content based on query
               if (filterIndicator) {
-                const slashSpan = filterIndicator.querySelector('span:first-child');
-                const filterSpan = filterIndicator.querySelector('.filter-placeholder');
+                const slashSpan = filterIndicator.querySelector('span:first-child') as HTMLSpanElement;
+                const filterSpan = filterIndicator.querySelector('.filter-placeholder') as HTMLSpanElement;
                 
                 if (props.query && props.query.length > 0) {
                   // Show "/" + typed text
@@ -212,7 +211,7 @@ export const SlashCommand = Extension.create({
                 return true;
               }
 
-              return component?.ref?.onKeyDown?.(props.event) || false;
+              return (component?.ref as any)?.onKeyDown?.(props.event) || false;
             },
 
             onExit() {
