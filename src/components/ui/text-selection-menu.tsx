@@ -185,7 +185,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
         exit={{ opacity: 0, scale: 0.95, y: 5 }}
         transition={{ duration: 0.15, ease: "easeOut" }}
         className={cn(
-          "flex items-center gap-0.5 bg-white border border-gray-200 rounded-lg p-1 shadow-lg",
+          "flex items-center gap-0.5 bg-white ring-1 ring-gray-300/30 rounded-lg p-1 shadow-lg",
           className
         )}
       >
@@ -232,7 +232,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -5 }}
                 transition={{ duration: 0.12, ease: "easeOut" }}
-                className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 rounded-lg p-1 flex items-center gap-0.5 whitespace-nowrap shadow-lg"
+                className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-white ring-1 ring-gray-300/30 rounded-lg p-1 flex items-center gap-0.5 whitespace-nowrap shadow-lg"
                 onMouseEnter={handleSubmenuEnter}
                 onMouseLeave={handleSubmenuLeave}
               >
