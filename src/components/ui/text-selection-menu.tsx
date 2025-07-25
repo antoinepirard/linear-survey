@@ -4,7 +4,7 @@ import { Editor } from '@tiptap/react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { 
   ChevronDown,
   Bold,
@@ -56,26 +56,62 @@ function MenuButton({ isActive, onMouseDown, children, title }: MenuButtonProps)
 export default function TextSelectionMenu({ editor, className, onClose }: TextSelectionMenuProps) {
   const [showSubmenu, setShowSubmenu] = useState(false);
   const [submenuTimeout, setSubmenuTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [openTimeout, setOpenTimeout] = useState<NodeJS.Timeout | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Memoize handlers to prevent unnecessary re-renders
-  const clearSubmenuTimeout = useCallback(() => {
+  // Clear all timeouts helper
+  const clearAllTimeouts = useCallback(() => {
     if (submenuTimeout) {
       clearTimeout(submenuTimeout);
       setSubmenuTimeout(null);
     }
-  }, [submenuTimeout]);
+    if (openTimeout) {
+      clearTimeout(openTimeout);
+      setOpenTimeout(null);
+    }
+  }, [submenuTimeout, openTimeout]);
 
   const handleSubmenuEnter = useCallback(() => {
-    clearSubmenuTimeout();
-    setShowSubmenu(true);
-  }, [clearSubmenuTimeout]);
+    clearAllTimeouts();
+    
+    // Add 300ms delay before showing submenu
+    const timeout = setTimeout(() => {
+      setShowSubmenu(true);
+    }, 300);
+    setOpenTimeout(timeout);
+  }, [clearAllTimeouts]);
 
   const handleSubmenuLeave = useCallback(() => {
+    clearAllTimeouts();
+    
+    // Longer delay to give time to reach submenu
     const timeout = setTimeout(() => {
       setShowSubmenu(false);
-    }, 150); // Small delay to allow moving to submenu
+    }, 500);
     setSubmenuTimeout(timeout);
-  }, []);
+  }, [clearAllTimeouts]);
+
+  // Submenu-specific hover handlers
+  const handleSubmenuContainerEnter = useCallback(() => {
+    clearAllTimeouts(); // Keep submenu open when hovering over it
+  }, [clearAllTimeouts]);
+
+  const handleSubmenuContainerLeave = useCallback(() => {
+    clearAllTimeouts();
+    
+    // Standard delay when leaving submenu
+    const timeout = setTimeout(() => {
+      setShowSubmenu(false);
+    }, 150);
+    setSubmenuTimeout(timeout);
+  }, [clearAllTimeouts]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      clearAllTimeouts();
+    };
+  }, [clearAllTimeouts]);
 
   // Memoize actions to prevent recreation on every render
   const formatActions = useMemo(() => [
@@ -219,6 +255,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
               "h-7 px-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 relative flex items-center gap-1",
               hasActiveStructural && "text-gray-900 bg-gray-100"
             )}
+            ref={triggerRef}
           >
             {submenuIcon}
             <ChevronDown size={12} />
@@ -232,9 +269,9 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -5 }}
                 transition={{ duration: 0.12, ease: "easeOut" }}
-                className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-white ring-1 ring-gray-300/30 rounded-lg p-1 flex items-center gap-0.5 whitespace-nowrap shadow-lg"
-                onMouseEnter={handleSubmenuEnter}
-                onMouseLeave={handleSubmenuLeave}
+                className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-white ring-1 ring-gray-300/30 rounded-lg p-1 flex items-center gap-0.5 whitespace-nowrap shadow-lg submenu-container"
+                onMouseEnter={handleSubmenuContainerEnter}
+                onMouseLeave={handleSubmenuContainerLeave}
               >
                 {structuralActions.map((action, index) => (
                   <MenuButton
