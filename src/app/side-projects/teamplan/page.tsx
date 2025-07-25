@@ -58,6 +58,19 @@ export default function TeamPlanPage() {
 
   // Keyboard shortcuts for plan switching
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    // Check if user is currently typing in an input field or contenteditable element
+    const activeElement = document.activeElement;
+    const isTyping = activeElement && (
+      activeElement.tagName === 'INPUT' ||
+      activeElement.tagName === 'TEXTAREA' ||
+      activeElement.getAttribute('contenteditable') === 'true'
+    );
+
+    // Skip shortcuts if user is typing
+    if (isTyping) {
+      return;
+    }
+
     // Only handle shortcuts if Shift is pressed with number keys
     if (event.shiftKey && event.key >= '1' && event.key <= '9') {
       event.preventDefault();
