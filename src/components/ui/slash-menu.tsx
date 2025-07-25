@@ -3,6 +3,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
+import { Editor } from '@tiptap/react';
 import { 
   DocumentTextIcon,
   H1Icon,
@@ -15,9 +16,15 @@ import {
 } from '@heroicons/react/24/outline';
 import { List } from 'react-feather';
 
+interface SlashCommandItem {
+  title: string;
+  description: string;
+  command: (params: { editor: Editor; range: { from: number; to: number } }) => void;
+}
+
 interface SlashMenuProps {
-  items: any[];
-  command: (item: any) => void;
+  items: SlashCommandItem[];
+  command: (item: SlashCommandItem) => void;
 }
 
 export interface SlashMenuRef {
