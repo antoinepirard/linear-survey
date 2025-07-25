@@ -107,7 +107,7 @@ function NotePad({
       }),
       Typography,
       SlashCommand,
-      // EmptyLinePlaceholder, // Temporarily disabled to test code block typing
+      EmptyLinePlaceholder,
     ],
     content: '',
     immediatelyRender: false,
