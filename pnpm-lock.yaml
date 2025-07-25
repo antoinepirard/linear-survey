@@ -38,6 +38,9 @@ importers:
       '@tiptap/extension-placeholder':
         specifier: ^3.0.7
         version: 3.0.7(@tiptap/extensions@3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))(@tiptap/pm@3.0.7))
+      '@tiptap/extension-typography':
+        specifier: ^3.0.7
+        version: 3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))
       '@tiptap/pm':
         specifier: ^3.0.7
         version: 3.0.7
@@ -1020,6 +1023,11 @@ packages:
 
   '@tiptap/extension-text@3.0.7':
     resolution: {integrity: sha512-yf5dNcPLB5SbQ0cQq8qyjiMj9khx4Y4EJoyrDSAok/9zYM3ULqwTPkTSZ2eW6VX/grJeyBVleeBHk1PjJ7NiVw==}
+    peerDependencies:
+      '@tiptap/core': ^3.0.7
+
+  '@tiptap/extension-typography@3.0.7':
+    resolution: {integrity: sha512-Oz0EIkq8TDd15aupMYcH2L6izdI/LEO0e7+K+OhljTK5g/sGApLxCDdTlmX2szB9EXbTbOpwLKIEz2bPc3HvBA==}
     peerDependencies:
       '@tiptap/core': ^3.0.7
 
@@ -3678,6 +3686,10 @@ snapshots:
       '@tiptap/core': 3.0.7(@tiptap/pm@3.0.7)
 
   '@tiptap/extension-text@3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))':
+    dependencies:
+      '@tiptap/core': 3.0.7(@tiptap/pm@3.0.7)
+
+  '@tiptap/extension-typography@3.0.7(@tiptap/core@3.0.7(@tiptap/pm@3.0.7))':
     dependencies:
       '@tiptap/core': 3.0.7(@tiptap/pm@3.0.7)
 

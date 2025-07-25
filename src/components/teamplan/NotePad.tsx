@@ -6,6 +6,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
+import Typography from '@tiptap/extension-typography';
 import { SlashCommand } from '@/extensions/slash-command';
 import { EmptyLinePlaceholder } from '@/extensions/empty-line-placeholder';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
@@ -69,6 +70,7 @@ export default function NotePad({
       Placeholder.configure({
         placeholder: NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT,
       }),
+      Typography,
       SlashCommand,
       EmptyLinePlaceholder,
     ],
