@@ -8,14 +8,6 @@ export enum LogLevel {
   OFF = 4
 }
 
-interface LogEntry {
-  level: LogLevel;
-  message: string;
-  data?: any;
-  timestamp: Date;
-  context?: string;
-}
-
 class Logger {
   private currentLevel: LogLevel = LogLevel.INFO;
   private context?: string;
@@ -34,7 +26,7 @@ class Logger {
     return level >= this.currentLevel;
   }
 
-  private formatMessage(level: LogLevel, message: string, data?: any): void {
+  private formatMessage(level: LogLevel, message: string, data?: unknown): void {
     if (!this.shouldLog(level)) return;
 
     const timestamp = new Date().toISOString();
@@ -59,19 +51,19 @@ class Logger {
     }
   }
 
-  debug(message: string, data?: any): void {
+  debug(message: string, data?: unknown): void {
     this.formatMessage(LogLevel.DEBUG, message, data);
   }
 
-  info(message: string, data?: any): void {
+  info(message: string, data?: unknown): void {
     this.formatMessage(LogLevel.INFO, message, data);
   }
 
-  warn(message: string, data?: any): void {
+  warn(message: string, data?: unknown): void {
     this.formatMessage(LogLevel.WARN, message, data);
   }
 
-  error(message: string, data?: any): void {
+  error(message: string, data?: unknown): void {
     this.formatMessage(LogLevel.ERROR, message, data);
   }
 

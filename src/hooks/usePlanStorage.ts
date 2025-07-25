@@ -3,7 +3,7 @@ import { Plan, PlanStorage, PlanMetadata } from '@/types/plan';
 import { DEFAULT_TEAMPLAN_DATA } from '@/data/teamplan';
 import { useDebounce } from './useDebounce';
 import { SyncOperation } from '@/types/api';
-import { validatePlanStorage, sanitizePlanStorage } from '@/utils/dataValidation';
+import { basicValidatePlanStorage } from '@/utils/dataValidation';
 import { planStorageLogger as logger, syncLogger } from '@/utils/logger';
 
 const PLAN_STORAGE_KEY = 'folio-plans';
@@ -93,6 +93,17 @@ export const usePlanStorage = () => {
     setIsLoading(false);
   }, []);
 
+  // Process queued operations when coming back online
+  const processOperationQueue = useCallback(async () => {
+    if (operationQueue.length === 0) return;
+
+    syncLogger.info('Processing queued operations', { queueLength: operationQueue.length });
+    
+    // TODO: When Jonny adds the backend, implement actual API calls for queued operations
+    // For now, just clear the queue since we're using localStorage
+    setOperationQueue([]);
+  }, [operationQueue]);
+
   // Monitor online/offline status
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -116,18 +127,7 @@ export const usePlanStorage = () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [operationQueue]);
-
-  // Process queued operations when coming back online
-  const processOperationQueue = useCallback(async () => {
-    if (operationQueue.length === 0) return;
-
-    syncLogger.info('Processing queued operations', { queueLength: operationQueue.length });
-    
-    // TODO: When Jonny adds the backend, implement actual API calls for queued operations
-    // For now, just clear the queue since we're using localStorage
-    setOperationQueue([]);
-  }, [operationQueue]);
+  }, [operationQueue, processOperationQueue]);
 
   // Add operation to queue for offline scenarios
   const queueOperation = useCallback((operation: SyncOperation) => {
@@ -144,33 +144,26 @@ export const usePlanStorage = () => {
       return;
     }
     
-    // Validate data before sync
-    const validation = validatePlanStorage(storage);
+    // Basic validation to prevent crashes
+    const validation = basicValidatePlanStorage(storage);
     if (!validation.isValid) {
-      // Temporarily log detailed validation errors to understand the issue
-      console.error('Detailed validation errors:', JSON.stringify(validation.errors, null, 2));
-      syncLogger.warn('Data validation failed, proceeding anyway for debugging', validation.errors);
-      
-      // TODO: Re-enable this once validation is fixed
-      // setSyncState('error');
-      // setSyncError(new Error(`Data validation failed: ${validation.errors.map(e => e.message).join(', ')}`));
-      // return;
+      syncLogger.error('Critical data validation failed', validation.errors);
+      setSyncState('error');
+      setSyncError(new Error(`Data validation failed: ${validation.errors.map(e => e.message).join(', ')}`));
+      return;
     }
-    
-    // Sanitize data before sync
-    const sanitizedStorage = sanitizePlanStorage(storage);
     
     setSyncState('syncing');
     setSyncError(null);
     
     try {
       // TODO: When Jonny adds the backend, replace this with API calls
-      localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(sanitizedStorage));
+      localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(storage));
       
       // Simulate API delay for testing purposes (remove when backend is integrated)
       // await new Promise(resolve => setTimeout(resolve, 100));
       
-      lastSyncedStateRef.current = sanitizedStorage;
+      lastSyncedStateRef.current = storage;
       setSyncState('synced');
       
       // Auto-clear synced state after 2 seconds
@@ -193,9 +186,9 @@ export const usePlanStorage = () => {
   // Handle debounced save operations
   useEffect(() => {
     if (debouncedSaveOperation && debouncedSaveOperation !== lastSyncedStateRef.current) {
-      const operation = (debouncedSaveOperation as any).__operation;
+      const operation = (debouncedSaveOperation as unknown as Record<string, unknown>).__operation as SyncOperation | undefined;
       // Clean up the temporary operation property
-      delete (debouncedSaveOperation as any).__operation;
+      delete (debouncedSaveOperation as unknown as Record<string, unknown>).__operation;
       performSyncOperation(debouncedSaveOperation, operation);
     }
   }, [debouncedSaveOperation, performSyncOperation]);
@@ -215,7 +208,7 @@ export const usePlanStorage = () => {
     // Store the operation for when the debounced save actually happens
     if (operation) {
       // We'll pass this through when the debounced operation executes
-      (storage as any).__operation = operation;
+      (storage as unknown as Record<string, unknown>).__operation = operation;
     }
   }, []);
 

@@ -252,7 +252,44 @@ const validateNotepadData = (data: { content: string; title: string; width: numb
   };
 };
 
-// Validate entire plan storage before sync
+// Basic validation to prevent critical errors
+export const basicValidatePlanStorage = (storage: PlanStorage): ValidationResult => {
+  const errors: ValidationError[] = [];
+
+  // Only check for critical data structure issues that would cause crashes
+  if (!storage || typeof storage !== 'object') {
+    errors.push({
+      field: 'storage',
+      message: 'Storage must be an object',
+      code: 'INVALID_STORAGE'
+    });
+    return { isValid: false, errors };
+  }
+
+  if (!storage.plans || typeof storage.plans !== 'object') {
+    errors.push({
+      field: 'plans',
+      message: 'Plans must be an object',
+      code: 'INVALID_PLANS'
+    });
+  }
+
+  // Ensure currentPlanId references an existing plan if it's set
+  if (storage.currentPlanId && storage.plans && !storage.plans[storage.currentPlanId]) {
+    errors.push({
+      field: 'currentPlanId',
+      message: 'Current plan ID must reference an existing plan',
+      code: 'CURRENT_PLAN_NOT_FOUND'
+    });
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
+// Keep the original validation for when Jonny needs more strict validation
 export const validatePlanStorage = (storage: PlanStorage): ValidationResult => {
   const errors: ValidationError[] = [];
 
@@ -262,6 +299,7 @@ export const validatePlanStorage = (storage: PlanStorage): ValidationResult => {
       message: 'Plans must be an object',
       code: 'INVALID_PLANS'
     });
+    return { isValid: false, errors };
   }
 
   if (storage.currentPlanId && typeof storage.currentPlanId !== 'string') {

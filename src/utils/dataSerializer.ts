@@ -2,12 +2,14 @@ import { Plan, PlanStorage } from '@/types/plan';
 
 // Helper functions for consistent data serialization before API calls
 
+import { TeamPlanData } from '@/data/teamplan';
+
 export interface SerializedPlan {
   id: string;
   name: string;
   createdAt: string; // ISO string
   updatedAt: string; // ISO string
-  teamPlanData: any;
+  teamPlanData: TeamPlanData;
   notepadData: {
     content: string;
     title: string;
@@ -95,7 +97,7 @@ export const createPlanMetadata = (plan: Plan) => {
 
 // Helper to prepare partial updates for API calls
 export const serializePartialUpdate = (updates: Partial<Pick<Plan, 'teamPlanData' | 'notepadData' | 'name'>>) => {
-  const serialized: any = {};
+  const serialized: Record<string, unknown> = {};
   
   if (updates.name !== undefined) {
     serialized.name = updates.name;

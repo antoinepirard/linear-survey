@@ -3,7 +3,7 @@
 export interface ApiError extends Error {
   status?: number;
   code?: string;
-  details?: any;
+  details?: unknown;
 }
 
 export interface ApiResponse<T> {
@@ -15,19 +15,19 @@ export interface ApiResponse<T> {
 export interface SyncOperation {
   type: 'create' | 'update' | 'delete';
   planId: string;
-  data?: any;
+  data?: unknown;
   timestamp: Date;
 }
 
 // Conflict resolution types for when multiple users edit the same plan
 export interface ConflictResolution {
   strategy: 'local' | 'remote' | 'merge';
-  resolvedData: any;
+  resolvedData: unknown;
 }
 
 export interface SyncConflict {
-  localData: any;
-  remoteData: any;
+  localData: unknown;
+  remoteData: unknown;
   conflictType: 'concurrent_edit' | 'version_mismatch';
   timestamp: Date;
 }
