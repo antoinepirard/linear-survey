@@ -16,7 +16,7 @@ import TaskItem from '@tiptap/extension-task-item';
 import ListKeymap from '@tiptap/extension-list-keymap';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
 import { useTextSelection } from '@/hooks/useTextSelection';
-import { useDebounce } from '@/hooks/useDebounce';
+import { usePlanNotePadStorage } from '@/hooks/usePlanNotePadStorage';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { NotePadProps, NotePadError } from '@/types/notepad';
 
@@ -28,11 +28,19 @@ function NotePad({
   onUpdatePlan,
 }: NotePadProps) {
   const editorRef = useRef<HTMLDivElement>(null);
-  const [content, setContent] = useState<string>(
-    currentPlan?.notepadData?.content || ''
-  );
-  const debouncedContent = useDebounce(content, 500);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  
+  // Use the plan-specific notepad storage hook
+  const {
+    loadContent,
+    saveContent: saveContentToStorage,
+  } = usePlanNotePadStorage({
+    currentPlan,
+    onUpdatePlan,
+    defaultWidth: width || NOTEPAD_CONSTANTS.DEFAULT_WIDTH,
+    minWidth: NOTEPAD_CONSTANTS.MIN_WIDTH,
+    maxWidth: NOTEPAD_CONSTANTS.MAX_WIDTH,
+  });
 
   // Error handling helper
   const handleError = useCallback((error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
@@ -41,22 +49,13 @@ function NotePad({
     onError?.(notePadError);
   }, [onError]);
 
-  // Content management helper
-  const loadContent = useCallback((): string | null => {
-    return currentPlan?.notepadData.content || null;
-  }, [currentPlan]);
-
+  // Content save with status handling
   const saveContent = useCallback(
     async (newContent: string) => {
       if (currentPlan && onUpdatePlan) {
         setSaveStatus('saving');
         try {
-          await onUpdatePlan({
-            notepadData: {
-              ...currentPlan.notepadData,
-              content: newContent,
-            },
-          });
+          saveContentToStorage(newContent);
           setSaveStatus('saved');
           // Clear 'saved' status after 2 seconds
           setTimeout(() => setSaveStatus('idle'), 2000);
@@ -68,14 +67,8 @@ function NotePad({
         }
       }
     },
-    [currentPlan, onUpdatePlan, handleError]
+    [currentPlan, onUpdatePlan, saveContentToStorage, handleError]
   );
-
-  useEffect(() => {
-    if (debouncedContent !== currentPlan?.notepadData?.content) {
-      saveContent(debouncedContent);
-    }
-  }, [debouncedContent, currentPlan?.notepadData?.content, saveContent]);
 
   const editor = useEditor({
     extensions: [
@@ -112,7 +105,7 @@ function NotePad({
       SlashCommand,
       EmptyLinePlaceholder,
     ],
-    content: content,
+    content: '',
     immediatelyRender: false,
     editorProps: {
       attributes: {
@@ -162,7 +155,7 @@ function NotePad({
     onUpdate: ({ editor }) => {
       try {
         const newContent = editor.getHTML();
-        setContent(newContent);
+        saveContent(newContent);
         // Reset save status when user starts typing
         if (saveStatus !== 'idle') {
           setSaveStatus('idle');
@@ -219,15 +212,13 @@ function NotePad({
         // Only update if the content is actually different to avoid unnecessary re-renders
         if (editor.getHTML() !== savedContent) {
           editor.commands.setContent(savedContent, { emitUpdate: false }); // don't emit update
-          setContent(savedContent); // update local state
         }
       } else {
         // Clear editor if no content
         editor.commands.clearContent();
-        setContent('');
       }
     }
-  }, [editor, currentPlan?.id, currentPlan, loadContent]);
+  }, [editor, currentPlan, loadContent]);
 
   // Click-outside handling is now managed by the useTextSelection hook
 

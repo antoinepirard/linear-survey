@@ -11,7 +11,7 @@ import VerticalNavigation from '@/components/teamplan/VerticalNavigation';
 import PlanSelector from '@/components/teamplan/PlanSelector';
 import { usePlanStorage } from '@/hooks/usePlanStorage';
 import { useResizable } from '@/hooks/useResizable';
-import { usePlanNotePadStorage } from '@/hooks/usePlanNotePadStorage';
+import { useNotePadStorage } from '@/hooks/useNotePadStorage';
 import { TeamPlanData } from '@/data/teamplan';
 import { CubeIcon } from '@heroicons/react/24/solid';
 import { Cog6ToothIcon } from '@heroicons/react/24/outline';
@@ -102,9 +102,10 @@ export default function TeamPlanPage() {
     width: sidebarWidth,
     setWidth: setSidebarWidth,
     isLoading: isStorageLoading,
-  } = usePlanNotePadStorage({
-    currentPlan,
-    onUpdatePlan: updateCurrentPlan,
+  } = useNotePadStorage({
+    contentKey: 'teamplan-sidebar-content', // Not used but required
+    titleKey: 'teamplan-sidebar-title', // Not used but required
+    widthKey: 'teamplan-sidebar-width',
     defaultWidth: NOTEPAD_CONSTANTS.DEFAULT_WIDTH,
     minWidth: NOTEPAD_CONSTANTS.MIN_WIDTH,
     maxWidth: NOTEPAD_CONSTANTS.MAX_WIDTH,
