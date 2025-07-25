@@ -98,6 +98,7 @@ export const SlashCommand = Extension.create({
         render: () => {
           let component: ReactRenderer;
           let popup: HTMLDivElement | null = null;
+          let filterIndicator: HTMLDivElement | null = null;
 
           return {
             onStart: (props: any) => {
@@ -113,6 +114,34 @@ export const SlashCommand = Extension.create({
                 return;
               }
 
+              // Create filter indicator
+              filterIndicator = document.createElement('div');
+              filterIndicator.style.position = 'absolute';
+              filterIndicator.style.zIndex = '40';
+              filterIndicator.style.padding = '2px 6px';
+              filterIndicator.style.fontSize = '14px';
+              filterIndicator.style.color = '#9ca3af'; // text-gray-400
+              filterIndicator.style.backgroundColor = '#f8fafc'; // bg-slate-50
+              filterIndicator.style.border = '1px solid #e2e8f0';
+              filterIndicator.style.borderRadius = '4px';
+              filterIndicator.style.fontFamily = 'ui-sans-serif, system-ui, -apple-system, sans-serif';
+              filterIndicator.style.display = 'flex';
+              filterIndicator.style.alignItems = 'center';
+              
+              // Create the content: "/" + "filter" placeholder
+              const slashSpan = document.createElement('span');
+              slashSpan.style.color = '#000';
+              slashSpan.textContent = '/';
+              
+              const filterSpan = document.createElement('span');
+              filterSpan.style.color = '#9ca3af'; // placeholder color
+              filterSpan.textContent = 'filter';
+              filterSpan.className = 'filter-placeholder';
+              
+              filterIndicator.appendChild(slashSpan);
+              filterIndicator.appendChild(filterSpan);
+              document.body.appendChild(filterIndicator);
+
               // Create popup element
               popup = document.createElement('div');
               popup.style.position = 'absolute';
@@ -120,8 +149,10 @@ export const SlashCommand = Extension.create({
               popup.appendChild(component.element);
               document.body.appendChild(popup);
 
-              // Position popup
+              // Position elements
               const rect = props.clientRect();
+              filterIndicator.style.left = `${rect.left - 8}px`;
+              filterIndicator.style.top = `${rect.top - 2}px`;
               popup.style.left = `${rect.left}px`;
               popup.style.top = `${rect.bottom + 8}px`;
             },
@@ -136,8 +167,34 @@ export const SlashCommand = Extension.create({
                 return;
               }
 
-              // Update position
+              // Update filter indicator content based on query
+              if (filterIndicator) {
+                const slashSpan = filterIndicator.querySelector('span:first-child');
+                const filterSpan = filterIndicator.querySelector('.filter-placeholder');
+                
+                if (props.query && props.query.length > 0) {
+                  // Show "/" + typed text
+                  if (slashSpan) slashSpan.textContent = '/';
+                  if (filterSpan) {
+                    filterSpan.textContent = props.query;
+                    filterSpan.style.color = '#000'; // Make typed text black
+                  }
+                } else {
+                  // Show "/" + "filter" placeholder
+                  if (slashSpan) slashSpan.textContent = '/';
+                  if (filterSpan) {
+                    filterSpan.textContent = 'filter';
+                    filterSpan.style.color = '#9ca3af'; // Keep placeholder gray
+                  }
+                }
+              }
+
+              // Update positions
               const rect = props.clientRect();
+              if (filterIndicator) {
+                filterIndicator.style.left = `${rect.left - 8}px`;
+                filterIndicator.style.top = `${rect.top - 2}px`;
+              }
               popup.style.left = `${rect.left}px`;
               popup.style.top = `${rect.bottom + 8}px`;
             },
@@ -147,6 +204,10 @@ export const SlashCommand = Extension.create({
                 if (popup) {
                   document.body.removeChild(popup);
                   popup = null;
+                }
+                if (filterIndicator) {
+                  document.body.removeChild(filterIndicator);
+                  filterIndicator = null;
                 }
                 return true;
               }
@@ -158,6 +219,10 @@ export const SlashCommand = Extension.create({
               if (popup) {
                 document.body.removeChild(popup);
                 popup = null;
+              }
+              if (filterIndicator) {
+                document.body.removeChild(filterIndicator);
+                filterIndicator = null;
               }
               component?.destroy();
             },

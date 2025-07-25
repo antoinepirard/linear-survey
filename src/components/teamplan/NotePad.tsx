@@ -7,6 +7,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import { SlashCommand } from '@/extensions/slash-command';
+import { EmptyLinePlaceholder } from '@/extensions/empty-line-placeholder';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
 import { useTextSelection } from '@/hooks/useTextSelection';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
@@ -69,6 +70,7 @@ export default function NotePad({
         placeholder: NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT,
       }),
       SlashCommand,
+      EmptyLinePlaceholder,
     ],
     content: '',
     immediatelyRender: false,
