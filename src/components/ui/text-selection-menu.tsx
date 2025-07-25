@@ -155,6 +155,7 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
         editor.chain().focus().toggleStrike().run();
       },
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   ], [editor, updateTrigger]);
 
   const structuralActions = useMemo(() => [
@@ -203,6 +204,7 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
         setShowSubmenu(false);
       },
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   ], [editor, updateTrigger]);
 
   // Memoize computed values
