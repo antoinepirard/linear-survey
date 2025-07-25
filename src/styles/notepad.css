@@ -354,44 +354,44 @@
 /* Always reserve 8px width for scrollbar area (smaller than notepad) */
 .slash-menu-scrollbar::-webkit-scrollbar {
   width: 8px;
-  background: #f8fafc; /* slate-50 */
+  background: transparent; /* Keep transparent to not overflow container */
 }
 
 .slash-menu-scrollbar::-webkit-scrollbar-track {
-  background: #f8fafc; /* slate-50 */
-  border-radius: 6px;
+  background: transparent; /* Keep transparent to respect container boundaries */
+  border-radius: 0; /* Remove border radius to prevent overflow */
 }
 
-/* Scrollbar thumb - hidden by default */
+/* Scrollbar thumb - with slate-100 bg and slate-100 left border */
 .slash-menu-scrollbar::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 6px;
+  background: #f1f5f9; /* slate-100 */
+  border-radius: 4px;
   border-left: 2px solid #f1f5f9; /* slate-100 left border */
   border-right: 1px solid transparent;
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
   background-clip: content-box;
-  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Show scrollbar thumb on menu hover */
 .slash-menu-scrollbar:hover::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
+  background: #f1f5f9; /* slate-100 */
   background-clip: content-box;
   border-left: 2px solid #f1f5f9; /* slate-100 left border */
 }
 
 .slash-menu-scrollbar:hover::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.6);
+  background: rgba(148, 163, 184, 0.4); /* Slightly more visible on thumb hover */
   background-clip: content-box;
   border-left: 2px solid #f1f5f9; /* slate-100 left border */
 }
 
 /* Custom scrollbar for Firefox */
 .slash-menu-scrollbar {
-  scrollbar-color: #f1f5f9 #f8fafc; /* slate-100 thumb, slate-50 track */
+  scrollbar-color: #f1f5f9 transparent; /* slate-100 thumb, transparent track */
 }
 
 .slash-menu-scrollbar:hover {
-  scrollbar-color: rgba(148, 163, 184, 0.3) #f8fafc; /* Keep slate-50 track */
+  scrollbar-color: rgba(148, 163, 184, 0.4) transparent; /* Hover thumb, transparent track */
 }
