@@ -42,8 +42,10 @@ export function useTextSelection({
       const menuHeight = 40;
       const gap = 20;
 
+      // Account for scroll position within the container
       let x = (start.left + end.left) / 2 - containerRect.left;
-      let y = start.top - containerRect.top - menuHeight - gap;
+      let y =
+        start.top - containerRect.top - menuHeight - gap + container.scrollTop;
 
       // Horizontal bounds checking
       const containerWidth = containerRect.width;
@@ -56,8 +58,9 @@ export function useTextSelection({
       }
 
       // Vertical bounds checking - position below if would go above container
-      if (y < 0) {
-        y = end.top - containerRect.top + gap + 10;
+      // Also account for scroll position in vertical bounds checking
+      if (y < container.scrollTop) {
+        y = end.top - containerRect.top + gap + 10 + container.scrollTop;
       }
 
       return { x, y };
