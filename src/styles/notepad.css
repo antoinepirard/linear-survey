@@ -76,17 +76,25 @@
   list-style-type: disc !important;
   margin-left: 1.5rem !important;
   margin-bottom: 1.25rem !important; /* 20px */
+  margin-top: 0 !important;
 }
 
 .ProseMirror ol {
   list-style-type: decimal !important;
   margin-left: 1.5rem !important;
   margin-bottom: 1.25rem !important; /* 20px */
+  margin-top: 0 !important;
 }
 
 .ProseMirror li {
-  margin-bottom: 0 !important;
-  line-height: 1.4 !important;
+  margin-bottom: 0.25rem !important; /* 4px */
+  line-height: 1.5 !important;
+  padding: 0 !important;
+}
+
+/* Ensure no extra spacing from any nested elements */
+.ProseMirror li * {
+  margin: 0 !important;
 }
 
 .ProseMirror blockquote {

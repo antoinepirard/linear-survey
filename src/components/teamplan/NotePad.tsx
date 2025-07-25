@@ -9,6 +9,7 @@ import Link from '@tiptap/extension-link';
 import Typography from '@tiptap/extension-typography';
 import { SlashCommand } from '@/extensions/slash-command';
 import { EmptyLinePlaceholder } from '@/extensions/empty-line-placeholder';
+import { CustomListItem } from '@/extensions/custom-list-item';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
 import { useTextSelection } from '@/hooks/useTextSelection';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
@@ -60,7 +61,9 @@ export default function NotePad({
           keepMarks: true,
           keepAttributes: false,
         },
+        listItem: false, // Disable default ListItem
       }),
+      CustomListItem, // Use our custom ListItem
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
