@@ -27,9 +27,13 @@ const createDefaultPlan = (name: string = 'Monthly Plan'): Plan => {
   };
 };
 
+export type SyncState = 'idle' | 'syncing' | 'synced' | 'error';
+
 export const usePlanStorage = () => {
   const [planStorage, setPlanStorage] = useState<PlanStorage>({ currentPlanId: null, plans: {} });
   const [isLoading, setIsLoading] = useState(true);
+  const [syncState, setSyncState] = useState<SyncState>('idle');
+  const [syncError, setSyncError] = useState<Error | null>(null);
 
   // Load plans from localStorage on mount
   useEffect(() => {
@@ -201,6 +205,8 @@ export const usePlanStorage = () => {
     deletePlan,
     switchToPlan,
     updateCurrentPlan,
-    renamePlan
+    renamePlan,
+    syncState,
+    syncError
   };
 };

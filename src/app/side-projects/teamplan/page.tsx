@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
+import SyncStatusIndicator from '@/components/teamplan/SyncStatusIndicator';
 
 export default function TeamPlanPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -53,7 +54,9 @@ export default function TeamPlanPage() {
     deletePlan,
     switchToPlan,
     updateCurrentPlan,
-    renamePlan
+    renamePlan,
+    syncState,
+    syncError
   } = usePlanStorage();
 
   // Keyboard shortcuts for plan switching
@@ -120,6 +123,15 @@ export default function TeamPlanPage() {
     console.log('🔄 TeamPlanPage: New data:', newData);
     
     updateCurrentPlan({ teamPlanData: newData });
+  };
+
+  const handleDataSyncError = (originalData: TeamPlanData, errorData: TeamPlanData, error: Error) => {
+    console.error('🚨 TeamPlanPage: Data sync error occurred:', error);
+    console.log('Original data:', originalData);
+    console.log('Error data:', errorData);
+    
+    // TODO: When Jonny adds async operations, this will handle real sync errors
+    // For now, this is a placeholder that demonstrates the error handling structure
   };
 
   const handleToggleSidebar = () => {
@@ -192,14 +204,26 @@ export default function TeamPlanPage() {
             >
                 {/* Plan Selector Header */}
                 <div className="bg-transparent border-b border-slate-200/65 px-4 flex-shrink-0 flex items-center justify-between" style={{ paddingTop: '7px', paddingBottom: '7px' }}>
-                <PlanSelector
-                  currentPlan={currentPlan}
-                  allPlans={allPlans}
-                  onSelectPlan={switchToPlan}
-                  onCreatePlan={createPlan}
-                  onDeletePlan={deletePlan}
-                  onRenamePlan={renamePlan}
-                />
+                <div className="flex items-center gap-3">
+                  <PlanSelector
+                    currentPlan={currentPlan}
+                    allPlans={allPlans}
+                    onSelectPlan={switchToPlan}
+                    onCreatePlan={createPlan}
+                    onDeletePlan={deletePlan}
+                    onRenamePlan={renamePlan}
+                  />
+                  
+                  {/* Sync Status Indicator */}
+                  <SyncStatusIndicator
+                    syncState={syncState}
+                    syncError={syncError}
+                    onRetry={() => {
+                      // TODO: Implement retry logic when Jonny adds the async operations
+                      console.log('Retry sync operation');
+                    }}
+                  />
+                </div>
                 
                 {/* Settings Button */}
                 <Popover open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
@@ -305,6 +329,7 @@ export default function TeamPlanPage() {
         <TeamPlanBoard 
           data={currentPlan.teamPlanData}
           onChange={handleDataChange}
+          onDataSyncError={handleDataSyncError}
           isColorCodingEnabled={isColorCodingEnabled}
         />
       </div>
