@@ -28,17 +28,20 @@ interface TextSelectionMenuProps {
 
 interface MenuButtonProps {
   isActive?: boolean;
-  onClick: () => void;
+  onMouseDown: () => void;
   children: React.ReactNode;
   title: string;
 }
 
-function MenuButton({ isActive, onClick, children, title }: MenuButtonProps) {
+function MenuButton({ isActive, onMouseDown, children, title }: MenuButtonProps) {
   return (
     <Button
       variant="ghost"
       size="sm"
-      onClick={onClick}
+      onMouseDown={(e) => {
+        e.preventDefault(); // Prevent blur event
+        onMouseDown();
+      }}
       title={title}
       className={cn(
         "h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 hover:text-gray-900",
@@ -80,7 +83,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       icon: <Bold size={16} />,
       title: "Bold",
       isActive: editor.isActive('bold'),
-      onClick: () => {
+      onMouseDown: () => {
         editor.chain().focus().toggleBold().run();
         onClose?.();
       },
@@ -89,7 +92,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       icon: <Italic size={16} />,
       title: "Italic", 
       isActive: editor.isActive('italic'),
-      onClick: () => {
+      onMouseDown: () => {
         editor.chain().focus().toggleItalic().run();
         onClose?.();
       },
@@ -98,7 +101,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       icon: <StrikethroughIcon className="h-4 w-4" />,
       title: "Strikethrough",
       isActive: editor.isActive('strike'),
-      onClick: () => {
+      onMouseDown: () => {
         editor.chain().focus().toggleStrike().run();
         onClose?.();
       },
@@ -110,7 +113,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       icon: <H1Icon className="h-4 w-4" />,
       title: "Heading 1",
       isActive: editor.isActive('heading', { level: 1 }),
-      onClick: () => {
+      onMouseDown: () => {
         editor.chain().focus().toggleHeading({ level: 1 }).run();
         setShowSubmenu(false);
         onClose?.();
@@ -120,7 +123,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       icon: <H2Icon className="h-4 w-4" />,
       title: "Heading 2",
       isActive: editor.isActive('heading', { level: 2 }),
-      onClick: () => {
+      onMouseDown: () => {
         editor.chain().focus().toggleHeading({ level: 2 }).run();
         setShowSubmenu(false);
         onClose?.();
@@ -130,7 +133,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       icon: <H3Icon className="h-4 w-4" />,
       title: "Heading 3",
       isActive: editor.isActive('heading', { level: 3 }),
-      onClick: () => {
+      onMouseDown: () => {
         editor.chain().focus().toggleHeading({ level: 3 }).run();
         setShowSubmenu(false);
         onClose?.();
@@ -140,7 +143,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       icon: <List size={16} />,
       title: "Bullet List",
       isActive: editor.isActive('bulletList'),
-      onClick: () => {
+      onMouseDown: () => {
         editor.chain().focus().toggleBulletList().run();
         setShowSubmenu(false);
         onClose?.();
@@ -150,7 +153,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       icon: <NumberedListIcon className="h-4 w-4" />,
       title: "Numbered List", 
       isActive: editor.isActive('orderedList'),
-      onClick: () => {
+      onMouseDown: () => {
         editor.chain().focus().toggleOrderedList().run();
         setShowSubmenu(false);
         onClose?.();
@@ -192,7 +195,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
             <MenuButton
               key={index}
               isActive={action.isActive}
-              onClick={action.onClick}
+              onMouseDown={action.onMouseDown}
               title={action.title}
             >
               {action.icon}
@@ -237,10 +240,7 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
                   <MenuButton
                     key={index}
                     isActive={action.isActive}
-                    onClick={() => {
-                      action.onClick();
-                      setShowSubmenu(false);
-                    }}
+                    onMouseDown={action.onMouseDown}
                     title={action.title}
                   >
                     {action.icon}
