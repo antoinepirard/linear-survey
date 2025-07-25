@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState, memo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import '@/styles/notepad.css';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -275,38 +276,51 @@ function NotePad({
             />
           </div>
         )}
-      </div>
-      
-      {/* Save Status Indicator */}
-      <div className="flex justify-end p-2 border-t border-slate-100">
-        <div className="text-xs text-slate-500 flex items-center gap-1">
-          {saveStatus === 'saving' && (
-            <>
-              <div className="animate-spin rounded-full h-3 w-3 border border-slate-300 border-t-slate-600"></div>
-              <span>Saving...</span>
-            </>
-          )}
-          {saveStatus === 'saved' && (
-            <>
-              <div className="h-3 w-3 rounded-full bg-green-500 flex items-center justify-center">
-                <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
+
+        {/* Save Status Indicator */}
+        <AnimatePresence>
+          {saveStatus !== 'idle' && (
+            <motion.div 
+              className="absolute bottom-4 right-4 z-40"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ 
+                duration: 0.2,
+                ease: "easeOut"
+              }}
+            >
+              <div className="text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded-md flex items-center gap-1.5">
+              {saveStatus === 'saving' && (
+                <>
+                  <div className="animate-spin rounded-full h-3 w-3 border border-slate-300 border-t-slate-600"></div>
+                  <span>Saving...</span>
+                </>
+              )}
+              {saveStatus === 'saved' && (
+                <>
+                  <div className="h-3 w-3 rounded-full bg-green-500 flex items-center justify-center">
+                    <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span>All changes saved</span>
+                </>
+              )}
+              {saveStatus === 'error' && (
+                <>
+                  <div className="h-3 w-3 rounded-full bg-red-500 flex items-center justify-center">
+                    <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <span>Failed to save</span>
+                </>
+              )}
               </div>
-              <span>All changes saved</span>
-            </>
+            </motion.div>
           )}
-          {saveStatus === 'error' && (
-            <>
-              <div className="h-3 w-3 rounded-full bg-red-500 flex items-center justify-center">
-                <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <span>Failed to save</span>
-            </>
-          )}
-        </div>
+        </AnimatePresence>
       </div>
     </div>
   );
