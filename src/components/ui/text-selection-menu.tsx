@@ -56,7 +56,24 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
   const [showSubmenu, setShowSubmenu] = useState(false);
   const [submenuTimeout, setSubmenuTimeout] = useState<NodeJS.Timeout | null>(null);
   const [openTimeout, setOpenTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
   const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // Force update when editor state changes
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleUpdate = () => {
+      setUpdateTrigger(prev => prev + 1);
+    };
+
+    // Listen to editor transactions to update active states
+    editor.on('transaction', handleUpdate);
+    
+    return () => {
+      editor.off('transaction', handleUpdate);
+    };
+  }, [editor]);
 
   // Clear all timeouts helper
   const clearAllTimeouts = useCallback(() => {
@@ -138,7 +155,7 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
         editor.chain().focus().toggleStrike().run();
       },
     },
-  ], [editor]);
+  ], [editor, updateTrigger]);
 
   const structuralActions = useMemo(() => [
     {
@@ -186,7 +203,7 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
         setShowSubmenu(false);
       },
     },
-  ], [editor]);
+  ], [editor, updateTrigger]);
 
   // Memoize computed values
   const { hasActiveStructural, submenuIcon } = useMemo(() => {
