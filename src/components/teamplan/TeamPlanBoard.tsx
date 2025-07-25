@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { motion } from 'motion/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { TeamPlanData, Project, TimeSlot, Person, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor, getAllGroups } from '@/data/teamplan';
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 interface TeamPlanBoardProps {
   data?: TeamPlanData;
   onChange?: (data: TeamPlanData) => void;
+  onDataSyncError?: (originalData: TeamPlanData, errorData: TeamPlanData, error: Error) => void;
   isColorCodingEnabled?: boolean;
 }
 
@@ -110,9 +111,10 @@ const generateSequenceLabels = (startLabel: string, count: number): string[] => 
   return labels;
 };
 
-export default function TeamPlanBoard({ 
+function TeamPlanBoard({ 
   data = DEFAULT_TEAMPLAN_DATA, 
   onChange,
+  onDataSyncError,
   isColorCodingEnabled = true
 }: TeamPlanBoardProps) {
   const [boardData, setBoardData] = useState<TeamPlanData>(data);
@@ -125,6 +127,12 @@ export default function TeamPlanBoard({
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const cachedDropZones = useRef<Array<{
+    element: HTMLElement;
+    rect: DOMRect;
+    personId: string;
+    timeSlotId: string;
+  }>>([]);
 
   // Sync internal state with prop changes (e.g., when data is loaded from localStorage)
   useEffect(() => {
@@ -166,6 +174,21 @@ export default function TeamPlanBoard({
   // Get all unique groups from existing projects
   const getAvailableGroups = () => getAllGroups(boardData.projects);
 
+  // Helper function for optimistic updates with error handling
+  const performOptimisticUpdate = async (newData: TeamPlanData, operation: string) => {
+    const originalData = boardData;
+    setBoardData(newData);
+    
+    try {
+      await onChange?.(newData);
+    } catch (error) {
+      console.error(`Failed to ${operation}:`, error);
+      setBoardData(originalData);
+      onDataSyncError?.(originalData, newData, error as Error);
+      throw error;
+    }
+  };
+
   const handleDragStart = (projectId: string, isDuplicate: boolean) => {
     const project = boardData.projects.find(p => p.id === projectId);
     if (!project) {
@@ -175,9 +198,21 @@ export default function TeamPlanBoard({
     setDraggedProject(projectId);
     setDraggedProjectData(project);
     setIsDuplicating(isDuplicate);
+    
+    // Cache drop zone positions for better drag performance
+    const dropZones = document.querySelectorAll('[data-drop-zone]');
+    cachedDropZones.current = Array.from(dropZones).map(element => {
+      const htmlElement = element as HTMLElement;
+      return {
+        element: htmlElement,
+        rect: htmlElement.getBoundingClientRect(),
+        personId: htmlElement.getAttribute('data-person-id') || '',
+        timeSlotId: htmlElement.getAttribute('data-timeslot-id') || ''
+      };
+    });
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = async () => {
     const originalData = boardData;
     // Keep a reference to the drag state to use after clearing
     const currentDragOverCell = dragOverCell;
@@ -260,16 +295,14 @@ export default function TeamPlanBoard({
     }
 
     if (newData) {
-      setBoardData(newData);
       if (newProjectForFocus) {
         setNewProjectId(newProjectForFocus.id);
       }
 
       try {
-        onChange?.(newData);
-      } catch (error) {
-        console.error("Failed to update after drag and drop:", error);
-        setBoardData(originalData);
+        await performOptimisticUpdate(newData, 'drag and drop');
+      } catch {
+        // performOptimisticUpdate already handles rollback and error reporting
         if (newProjectForFocus) {
           setNewProjectId(null);
         }
@@ -282,9 +315,11 @@ export default function TeamPlanBoard({
     setDragOverCell(null);
     setDragOverAddPerson(false);
     setIsDuplicating(false);
+    // Clear cached drop zones
+    cachedDropZones.current = [];
   };
 
-  // Position-based drop detection for Framer Motion drag
+  // Position-based drop detection for Framer Motion drag with cached layout data
   const updateDropTarget = (draggedElement: HTMLElement) => {
     if (!draggedProject || !draggedElement) return;
 
@@ -295,7 +330,7 @@ export default function TeamPlanBoard({
         y: draggedRect.top + draggedRect.height / 2
       };
 
-      // Check if dragging over add person zone first
+      // Check if dragging over add person zone first (still need to query this dynamically)
       const addPersonZone = document.querySelector('[data-add-person-zone]');
       if (addPersonZone) {
         const addPersonRect = addPersonZone.getBoundingClientRect();
@@ -314,25 +349,18 @@ export default function TeamPlanBoard({
       // Clear add person drag over state if not over add person zone
       setDragOverAddPerson(false);
 
-      // Find all drop zone cells
-      const cells = document.querySelectorAll('[data-drop-zone]');
+      // Use cached drop zone data for better performance
       let bestMatch: { personId: string; timeSlotId: string; insertIndex: number } | null = null;
       let bestDistance = Infinity;
 
-      cells.forEach(cell => {
-        const cellElement = cell as HTMLElement;
-        const cellRect = cellElement.getBoundingClientRect();
-        
-        // Check if drag center is over this cell
+      cachedDropZones.current.forEach(({ rect, personId, timeSlotId }) => {
+        // Check if drag center is over this cell using cached rect data
         if (
-          draggedCenter.x >= cellRect.left &&
-          draggedCenter.x <= cellRect.right &&
-          draggedCenter.y >= cellRect.top &&
-          draggedCenter.y <= cellRect.bottom
+          draggedCenter.x >= rect.left &&
+          draggedCenter.x <= rect.right &&
+          draggedCenter.y >= rect.top &&
+          draggedCenter.y <= rect.bottom
         ) {
-          const personId = cellElement.getAttribute('data-person-id');
-          const timeSlotId = cellElement.getAttribute('data-timeslot-id');
-          
           if (!personId || !timeSlotId) {
             console.warn('Drop zone missing required data attributes');
             return;
@@ -343,7 +371,7 @@ export default function TeamPlanBoard({
           
           // Only allow drops to different cells
           if (draggedProjectData && (personId !== draggedProjectData.personId || timeSlotId !== draggedProjectData.timeSlotId)) {
-            const distance = Math.abs(draggedCenter.y - (cellRect.top + cellRect.height / 2));
+            const distance = Math.abs(draggedCenter.y - (rect.top + rect.height / 2));
             if (distance < bestDistance) {
               bestDistance = distance;
               // For cross-cell drops, always append to the end
@@ -359,8 +387,7 @@ export default function TeamPlanBoard({
     }
   };
 
-  const handleAddProject = (personId: string, timeSlotId: string) => {
-    const originalData = boardData;
+  const handleAddProject = async (personId: string, timeSlotId: string) => {
     const projectId = generateId();
     const newProject: Project = {
       id: projectId,
@@ -371,45 +398,40 @@ export default function TeamPlanBoard({
     };
     
     const newData = {
-      ...originalData,
-      projects: [...originalData.projects, newProject]
+      ...boardData,
+      projects: [...boardData.projects, newProject]
     };
 
-    setBoardData(newData);
     setNewProjectId(projectId);
 
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to add project:", error);
-      setBoardData(originalData); // Rollback on failure
+      await performOptimisticUpdate(newData, 'add project');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
+      setNewProjectId(null);
     }
   };
 
-  const handleDeleteProject = (projectId: string) => {
-    const originalData = boardData;
+  const handleDeleteProject = async (projectId: string) => {
     const newData = {
-      ...originalData,
-      projects: originalData.projects.filter(p => p.id !== projectId)
+      ...boardData,
+      projects: boardData.projects.filter(p => p.id !== projectId)
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to delete project:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'delete project');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
-  const handleEditProject = (updatedProject: Project) => {
-    const originalData = boardData;
+  const handleEditProject = async (updatedProject: Project) => {
     const newData = {
-      ...originalData,
-      projects: originalData.projects.map(p => 
+      ...boardData,
+      projects: boardData.projects.map(p => 
         p.id === updatedProject.id ? updatedProject : p
       )
     };
-    setBoardData(newData);
     
     // If this was a newly created project, focus the Add Project button
     if (newProjectId === updatedProject.id) {
@@ -423,17 +445,16 @@ export default function TeamPlanBoard({
     }
     
     setNewProjectId(null);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to edit project:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'edit project');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
-  const handleDuplicateProject = (projectId: string) => {
-    const originalData = boardData;
-    const originalProject = originalData.projects.find(p => p.id === projectId);
+  const handleDuplicateProject = async (projectId: string) => {
+    const originalProject = boardData.projects.find(p => p.id === projectId);
     if (!originalProject) return;
 
     const duplicatedProject: Project = {
@@ -443,41 +464,39 @@ export default function TeamPlanBoard({
     };
 
     const newData = {
-      ...originalData,
-      projects: [...originalData.projects, duplicatedProject]
+      ...boardData,
+      projects: [...boardData.projects, duplicatedProject]
     };
-    setBoardData(newData);
+    
     setNewProjectId(duplicatedProject.id); // Trigger editing mode for duplicated card
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to duplicate project:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'duplicate project');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
+      setNewProjectId(null);
     }
   };
 
-  const handleAddTimeSlot = (timeSlot: TimeSlot) => {
-    const originalData = boardData;
+  const handleAddTimeSlot = async (timeSlot: TimeSlot) => {
     const newData = {
-      ...originalData,
-      timeSlots: [...originalData.timeSlots, timeSlot]
+      ...boardData,
+      timeSlots: [...boardData.timeSlots, timeSlot]
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to add time slot:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'add time slot');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
 
-  const handleUpdateTimeSlot = (updatedTimeSlot: TimeSlot) => {
-    const originalData = boardData;
-    const timeSlotIndex = originalData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
+  const handleUpdateTimeSlot = async (updatedTimeSlot: TimeSlot) => {
+    const timeSlotIndex = boardData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
     if (timeSlotIndex === -1) return;
 
-    const updatedTimeSlots = [...originalData.timeSlots];
+    const updatedTimeSlots = [...boardData.timeSlots];
     const originalLabel = updatedTimeSlots[timeSlotIndex].label;
     updatedTimeSlots[timeSlotIndex] = updatedTimeSlot;
 
@@ -497,163 +516,146 @@ export default function TeamPlanBoard({
     }
 
     const newData = {
-      ...originalData,
+      ...boardData,
       timeSlots: updatedTimeSlots
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to update time slot:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'update time slot');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
-  const handleAddPerson = (person: Person) => {
-    const originalData = boardData;
+  const handleAddPerson = async (person: Person) => {
     const newData = {
-      ...originalData,
-      people: [...originalData.people, person]
+      ...boardData,
+      people: [...boardData.people, person]
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to add person:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'add person');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
-  const handleRemovePerson = (personId: string) => {
-    const originalData = boardData;
+  const handleRemovePerson = async (personId: string) => {
     const newData = {
-      ...originalData,
-      people: originalData.people.filter(p => p.id !== personId),
-      projects: originalData.projects.filter(p => p.personId !== personId)
+      ...boardData,
+      people: boardData.people.filter(p => p.id !== personId),
+      projects: boardData.projects.filter(p => p.personId !== personId)
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to remove person:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'remove person');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
-  const handleUpdatePerson = (updatedPerson: Person) => {
-    const originalData = boardData;
+  const handleUpdatePerson = async (updatedPerson: Person) => {
     const newData = {
-      ...originalData,
-      people: originalData.people.map(p => 
+      ...boardData,
+      people: boardData.people.map(p => 
         p.id === updatedPerson.id ? updatedPerson : p
       )
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to update person:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'update person');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
-  const handleMovePersonUp = (personId: string) => {
-    const originalData = boardData;
-    const currentIndex = originalData.people.findIndex(p => p.id === personId);
+  const handleMovePersonUp = async (personId: string) => {
+    const currentIndex = boardData.people.findIndex(p => p.id === personId);
     if (currentIndex <= 0) return;
 
-    const newPeople = [...originalData.people];
+    const newPeople = [...boardData.people];
     [newPeople[currentIndex - 1], newPeople[currentIndex]] = [newPeople[currentIndex], newPeople[currentIndex - 1]];
 
     const newData = {
-      ...originalData,
+      ...boardData,
       people: newPeople
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to move person up:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'move person up');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
-  const handleMovePersonDown = (personId: string) => {
-    const originalData = boardData;
-    const currentIndex = originalData.people.findIndex(p => p.id === personId);
-    if (currentIndex >= originalData.people.length - 1) return;
+  const handleMovePersonDown = async (personId: string) => {
+    const currentIndex = boardData.people.findIndex(p => p.id === personId);
+    if (currentIndex >= boardData.people.length - 1) return;
 
-    const newPeople = [...originalData.people];
+    const newPeople = [...boardData.people];
     [newPeople[currentIndex], newPeople[currentIndex + 1]] = [newPeople[currentIndex + 1], newPeople[currentIndex]];
 
     const newData = {
-      ...originalData,
+      ...boardData,
       people: newPeople
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to move person down:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'move person down');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
-  const handleMoveTimeSlotLeft = (timeSlotId: string) => {
-    const originalData = boardData;
-    const currentIndex = originalData.timeSlots.findIndex(t => t.id === timeSlotId);
+  const handleMoveTimeSlotLeft = async (timeSlotId: string) => {
+    const currentIndex = boardData.timeSlots.findIndex(t => t.id === timeSlotId);
     if (currentIndex <= 0) return;
 
-    const newTimeSlots = [...originalData.timeSlots];
+    const newTimeSlots = [...boardData.timeSlots];
     [newTimeSlots[currentIndex - 1], newTimeSlots[currentIndex]] = [newTimeSlots[currentIndex], newTimeSlots[currentIndex - 1]];
 
     const newData = {
-      ...originalData,
+      ...boardData,
       timeSlots: newTimeSlots
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to move time slot left:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'move time slot left');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
-  const handleMoveTimeSlotRight = (timeSlotId: string) => {
-    const originalData = boardData;
-    const currentIndex = originalData.timeSlots.findIndex(t => t.id === timeSlotId);
-    if (currentIndex >= originalData.timeSlots.length - 1) return;
+  const handleMoveTimeSlotRight = async (timeSlotId: string) => {
+    const currentIndex = boardData.timeSlots.findIndex(t => t.id === timeSlotId);
+    if (currentIndex >= boardData.timeSlots.length - 1) return;
 
-    const newTimeSlots = [...originalData.timeSlots];
+    const newTimeSlots = [...boardData.timeSlots];
     [newTimeSlots[currentIndex], newTimeSlots[currentIndex + 1]] = [newTimeSlots[currentIndex + 1], newTimeSlots[currentIndex]];
 
     const newData = {
-      ...originalData,
+      ...boardData,
       timeSlots: newTimeSlots
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to move time slot right:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'move time slot right');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
-  const handleDeleteTimeSlot = (timeSlotId: string) => {
-    const originalData = boardData;
+  const handleDeleteTimeSlot = async (timeSlotId: string) => {
     const newData = {
-      ...originalData,
-      timeSlots: originalData.timeSlots.filter(t => t.id !== timeSlotId),
-      projects: originalData.projects.filter(p => p.timeSlotId !== timeSlotId)
+      ...boardData,
+      timeSlots: boardData.timeSlots.filter(t => t.id !== timeSlotId),
+      projects: boardData.projects.filter(p => p.timeSlotId !== timeSlotId)
     };
-    setBoardData(newData);
+    
     try {
-      onChange?.(newData);
-    } catch (error) {
-      console.error("Failed to delete time slot:", error);
-      setBoardData(originalData);
+      await performOptimisticUpdate(newData, 'delete time slot');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
     }
   };
 
@@ -870,3 +872,20 @@ export default function TeamPlanBoard({
     </div>
   );
 }
+
+// Custom comparison function to prevent unnecessary re-renders
+const arePropsEqual = (prevProps: TeamPlanBoardProps, nextProps: TeamPlanBoardProps) => {
+  // Check if data reference changed
+  if (prevProps.data !== nextProps.data) return false;
+  
+  // Check if callback functions changed
+  if (prevProps.onChange !== nextProps.onChange) return false;
+  if (prevProps.onDataSyncError !== nextProps.onDataSyncError) return false;
+  
+  // Check if color coding setting changed
+  if (prevProps.isColorCodingEnabled !== nextProps.isColorCodingEnabled) return false;
+  
+  return true;
+};
+
+export default memo(TeamPlanBoard, arePropsEqual);

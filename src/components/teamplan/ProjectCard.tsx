@@ -1,11 +1,62 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { motion } from 'motion/react';
 import { TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { Project } from '@/data/teamplan';
 import { Button } from '@/components/ui/button';
 import TeamPlanContextMenu from './TeamPlanContextMenu';
+
+// Moved outside the component to prevent re-creation on every render
+const colorGroups = [
+  { name: 'red', shades: ['border-l-red-200', 'border-l-red-300', 'border-l-red-400', 'border-l-red-500'] },
+  { name: 'orange', shades: ['border-l-orange-200', 'border-l-orange-300', 'border-l-orange-400', 'border-l-orange-500'] },
+  { name: 'amber', shades: ['border-l-amber-200', 'border-l-amber-300', 'border-l-amber-400', 'border-l-amber-500'] },
+  { name: 'yellow', shades: ['border-l-yellow-200', 'border-l-yellow-300', 'border-l-yellow-400', 'border-l-yellow-500'] },
+  { name: 'lime', shades: ['border-l-lime-200', 'border-l-lime-300', 'border-l-lime-400', 'border-l-lime-500'] },
+  { name: 'green', shades: ['border-l-green-200', 'border-l-green-300', 'border-l-green-400', 'border-l-green-500'] },
+  { name: 'emerald', shades: ['border-l-emerald-200', 'border-l-emerald-300', 'border-l-emerald-400', 'border-l-emerald-500'] },
+  { name: 'teal', shades: ['border-l-teal-200', 'border-l-teal-300', 'border-l-teal-400', 'border-l-teal-500'] },
+  { name: 'cyan', shades: ['border-l-cyan-200', 'border-l-cyan-300', 'border-l-cyan-400', 'border-l-cyan-500'] },
+  { name: 'sky', shades: ['border-l-sky-200', 'border-l-sky-300', 'border-l-sky-400', 'border-l-sky-500'] },
+  { name: 'blue', shades: ['border-l-blue-200', 'border-l-blue-300', 'border-l-blue-400', 'border-l-blue-500'] },
+  { name: 'indigo', shades: ['border-l-indigo-200', 'border-l-indigo-300', 'border-l-indigo-400', 'border-l-indigo-500'] },
+  { name: 'violet', shades: ['border-l-violet-200', 'border-l-violet-300', 'border-l-violet-400', 'border-l-violet-500'] },
+  { name: 'purple', shades: ['border-l-purple-200', 'border-l-purple-300', 'border-l-purple-400', 'border-l-purple-500'] },
+  { name: 'fuchsia', shades: ['border-l-fuchsia-200', 'border-l-fuchsia-300', 'border-l-fuchsia-400', 'border-l-fuchsia-500'] },
+  { name: 'pink', shades: ['border-l-pink-200', 'border-l-pink-300', 'border-l-pink-400', 'border-l-pink-500'] },
+  { name: 'rose', shades: ['border-l-rose-200', 'border-l-rose-300', 'border-l-rose-400', 'border-l-rose-500'] }
+];
+
+// Legacy function for group colors (keeping for tag display)
+const getGroupColor = (group: string) => {
+  const colors = [
+    { bg: 'bg-red-100', text: 'text-red-800', border: 'border-l-red-400' },
+    { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-l-orange-400' },
+    { bg: 'bg-amber-100', text: 'text-amber-800', border: 'border-l-amber-400' },
+    { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-l-yellow-400' },
+    { bg: 'bg-lime-100', text: 'text-lime-800', border: 'border-l-lime-400' },
+    { bg: 'bg-green-100', text: 'text-green-800', border: 'border-l-green-400' },
+    { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-l-emerald-400' },
+    { bg: 'bg-teal-100', text: 'text-teal-800', border: 'border-l-teal-400' },
+    { bg: 'bg-cyan-100', text: 'text-cyan-800', border: 'border-l-cyan-400' },
+    { bg: 'bg-sky-100', text: 'text-sky-800', border: 'border-l-sky-400' },
+    { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-l-blue-400' },
+    { bg: 'bg-indigo-100', text: 'text-indigo-800', border: 'border-l-indigo-400' },
+    { bg: 'bg-violet-100', text: 'text-violet-800', border: 'border-l-violet-400' },
+    { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-l-purple-400' },
+    { bg: 'bg-fuchsia-100', text: 'text-fuchsia-800', border: 'border-l-fuchsia-400' },
+    { bg: 'bg-pink-100', text: 'text-pink-800', border: 'border-l-pink-400' },
+    { bg: 'bg-rose-100', text: 'text-rose-800', border: 'border-l-rose-400' },
+  ];
+  
+  // Simple hash function to get consistent color for same group
+  let hash = 0;
+  for (let i = 0; i < group.length; i++) {
+    hash = ((hash << 5) - hash + group.charCodeAt(i)) & 0xffffffff;
+  }
+  return colors[Math.abs(hash) % colors.length];
+};
 
 interface ProjectCardProps {
   project: Project;
@@ -23,7 +74,7 @@ interface ProjectCardProps {
   onDrag?: (element: HTMLElement) => void;
 }
 
-export default function ProjectCard({ 
+const ProjectCard = ({ 
   project, 
   isDragging = false,
   isDuplicating = false,
@@ -37,7 +88,7 @@ export default function ProjectCard({
   onDragStart,
   onDragEnd,
   onDrag
-}: ProjectCardProps) {
+}: ProjectCardProps) => {
   const [isEditingLocal, setIsEditingLocal] = useState(isEditing);
   const [editValue, setEditValue] = useState(project.title + (project.group ? `/${project.group}` : ''));
   const [showAutocomplete, setShowAutocomplete] = useState(false);
@@ -47,40 +98,15 @@ export default function ProjectCard({
   const dragRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Available color groups with subtle shades for distinction
-  const colorGroups = [
-    { name: 'red', shades: ['border-l-red-200', 'border-l-red-300', 'border-l-red-400', 'border-l-red-500'] },
-    { name: 'orange', shades: ['border-l-orange-200', 'border-l-orange-300', 'border-l-orange-400', 'border-l-orange-500'] },
-    { name: 'amber', shades: ['border-l-amber-200', 'border-l-amber-300', 'border-l-amber-400', 'border-l-amber-500'] },
-    { name: 'yellow', shades: ['border-l-yellow-200', 'border-l-yellow-300', 'border-l-yellow-400', 'border-l-yellow-500'] },
-    { name: 'lime', shades: ['border-l-lime-200', 'border-l-lime-300', 'border-l-lime-400', 'border-l-lime-500'] },
-    { name: 'green', shades: ['border-l-green-200', 'border-l-green-300', 'border-l-green-400', 'border-l-green-500'] },
-    { name: 'emerald', shades: ['border-l-emerald-200', 'border-l-emerald-300', 'border-l-emerald-400', 'border-l-emerald-500'] },
-    { name: 'teal', shades: ['border-l-teal-200', 'border-l-teal-300', 'border-l-teal-400', 'border-l-teal-500'] },
-    { name: 'cyan', shades: ['border-l-cyan-200', 'border-l-cyan-300', 'border-l-cyan-400', 'border-l-cyan-500'] },
-    { name: 'sky', shades: ['border-l-sky-200', 'border-l-sky-300', 'border-l-sky-400', 'border-l-sky-500'] },
-    { name: 'blue', shades: ['border-l-blue-200', 'border-l-blue-300', 'border-l-blue-400', 'border-l-blue-500'] },
-    { name: 'indigo', shades: ['border-l-indigo-200', 'border-l-indigo-300', 'border-l-indigo-400', 'border-l-indigo-500'] },
-    { name: 'violet', shades: ['border-l-violet-200', 'border-l-violet-300', 'border-l-violet-400', 'border-l-violet-500'] },
-    { name: 'purple', shades: ['border-l-purple-200', 'border-l-purple-300', 'border-l-purple-400', 'border-l-purple-500'] },
-    { name: 'fuchsia', shades: ['border-l-fuchsia-200', 'border-l-fuchsia-300', 'border-l-fuchsia-400', 'border-l-fuchsia-500'] },
-    { name: 'pink', shades: ['border-l-pink-200', 'border-l-pink-300', 'border-l-pink-400', 'border-l-pink-500'] },
-    { name: 'rose', shades: ['border-l-rose-200', 'border-l-rose-300', 'border-l-rose-400', 'border-l-rose-500'] }
-  ];
-
-  // Check if this card's content/value appears more than once
-  const shouldShowColorCoding = () => {
-    if (!isColorCodingEnabled || !project.title.trim()) return false;
+  const cardColor = useMemo(() => {
+    if (!isColorCodingEnabled || !project.title.trim()) return 'border-l-slate-200';
+  
     const sameValueCount = allProjects.filter(p => 
       p.title.trim().toLowerCase() === project.title.trim().toLowerCase()
     ).length;
-    return sameValueCount >= 2;
-  };
-
-  // Get color for duplicate values - respects group colors but uses different shades
-  const getColorForDuplicateValue = () => {
-    if (!shouldShowColorCoding()) return 'border-l-slate-200';
     
+    if (sameValueCount < 2) return 'border-l-slate-200';
+
     // Get all unique duplicate values (titles that appear 2+ times)
     const duplicateValues = allProjects
       .filter(p => p.title.trim())
@@ -102,13 +128,11 @@ export default function ProjectCard({
     // If project has a group, use that group's color family
     if (project.group) {
       const groupColorData = getGroupColor(project.group);
-      // Extract color name from the border class (e.g., "border-l-red-400" -> "red")
       const colorMatch = groupColorData.border.match(/border-l-(\w+)-/);
       if (colorMatch) {
         const colorName = colorMatch[1];
         const colorGroup = colorGroups.find(cg => cg.name === colorName);
         if (colorGroup) {
-          // Use different shades within the same color family for distinction
           const shadeIndex = duplicateIndex % colorGroup.shades.length;
           return colorGroup.shades[shadeIndex];
         }
@@ -118,38 +142,8 @@ export default function ProjectCard({
     // Fallback: use different color groups if no group or color not found
     const colorGroupIndex = duplicateIndex % colorGroups.length;
     const selectedColorGroup = colorGroups[colorGroupIndex];
-    return selectedColorGroup.shades[0]; // Use first shade (200)
-  };
-
-  // Legacy function for group colors (keeping for tag display)
-  const getGroupColor = (group: string) => {
-    const colors = [
-      { bg: 'bg-red-100', text: 'text-red-800', border: 'border-l-red-400' },
-      { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-l-orange-400' },
-      { bg: 'bg-amber-100', text: 'text-amber-800', border: 'border-l-amber-400' },
-      { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-l-yellow-400' },
-      { bg: 'bg-lime-100', text: 'text-lime-800', border: 'border-l-lime-400' },
-      { bg: 'bg-green-100', text: 'text-green-800', border: 'border-l-green-400' },
-      { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-l-emerald-400' },
-      { bg: 'bg-teal-100', text: 'text-teal-800', border: 'border-l-teal-400' },
-      { bg: 'bg-cyan-100', text: 'text-cyan-800', border: 'border-l-cyan-400' },
-      { bg: 'bg-sky-100', text: 'text-sky-800', border: 'border-l-sky-400' },
-      { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-l-blue-400' },
-      { bg: 'bg-indigo-100', text: 'text-indigo-800', border: 'border-l-indigo-400' },
-      { bg: 'bg-violet-100', text: 'text-violet-800', border: 'border-l-violet-400' },
-      { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-l-purple-400' },
-      { bg: 'bg-fuchsia-100', text: 'text-fuchsia-800', border: 'border-l-fuchsia-400' },
-      { bg: 'bg-pink-100', text: 'text-pink-800', border: 'border-l-pink-400' },
-      { bg: 'bg-rose-100', text: 'text-rose-800', border: 'border-l-rose-400' },
-    ];
-    
-    // Simple hash function to get consistent color for same group
-    let hash = 0;
-    for (let i = 0; i < group.length; i++) {
-      hash = ((hash << 5) - hash + group.charCodeAt(i)) & 0xffffffff;
-    }
-    return colors[Math.abs(hash) % colors.length];
-  };
+    return selectedColorGroup.shades[0];
+  }, [project.title, project.group, allProjects, isColorCodingEnabled]);
 
   useEffect(() => {
     if (isEditing) {
@@ -356,7 +350,7 @@ export default function ProjectCard({
             shadow-sm opacity-30 pointer-events-none
             ${project.color}
             ring-slate-300/50
-            ${isColorCodingEnabled ? `border-l-2 ${getColorForDuplicateValue()}` : ''}
+            ${isColorCodingEnabled ? `border-l-2 ${cardColor}` : ''}
           `}
           aria-hidden="true"
         >
@@ -419,7 +413,7 @@ export default function ProjectCard({
           ${isDraggingLocal ? '' : isHovered ? 'shadow-md' : 'shadow-none'}
           ${project.color}
           ${isEditingLocal ? 'ring-blue-400' : 'ring-slate-200/65'}
-          ${isColorCodingEnabled ? `border-l-2 ${getColorForDuplicateValue()}` : ''}
+          ${isColorCodingEnabled ? `border-l-2 ${cardColor}` : ''}
         `}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -522,3 +516,5 @@ export default function ProjectCard({
     </div>
   );
 }
+
+export default memo(ProjectCard);

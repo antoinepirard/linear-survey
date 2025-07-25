@@ -31,6 +31,14 @@ function NotePad({
     currentPlan?.notepadData?.content || ''
   );
   const debouncedContent = useDebounce(content, 500);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  // Error handling helper
+  const handleError = useCallback((error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
+    const notePadError: NotePadError = Object.assign(error, { code, details });
+    console.error(`NotePad ${code}:`, error, details);
+    onError?.(notePadError);
+  }, [onError]);
 
   // Content management helper
   const loadContent = useCallback((): string | null => {
@@ -38,17 +46,28 @@ function NotePad({
   }, [currentPlan]);
 
   const saveContent = useCallback(
-    (newContent: string) => {
+    async (newContent: string) => {
       if (currentPlan && onUpdatePlan) {
-        onUpdatePlan({
-          notepadData: {
-            ...currentPlan.notepadData,
-            content: newContent,
-          },
-        });
+        setSaveStatus('saving');
+        try {
+          await onUpdatePlan({
+            notepadData: {
+              ...currentPlan.notepadData,
+              content: newContent,
+            },
+          });
+          setSaveStatus('saved');
+          // Clear 'saved' status after 2 seconds
+          setTimeout(() => setSaveStatus('idle'), 2000);
+        } catch (error) {
+          setSaveStatus('error');
+          handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
+          // Clear error status after 5 seconds
+          setTimeout(() => setSaveStatus('idle'), 5000);
+        }
       }
     },
-    [currentPlan, onUpdatePlan]
+    [currentPlan, onUpdatePlan, handleError]
   );
 
   useEffect(() => {
@@ -56,14 +75,6 @@ function NotePad({
       saveContent(debouncedContent);
     }
   }, [debouncedContent, currentPlan?.notepadData?.content, saveContent]);
-
-
-  // Error handling helper
-  const handleError = (error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
-    const notePadError: NotePadError = Object.assign(error, { code, details });
-    console.error(`NotePad ${code}:`, error, details);
-    onError?.(notePadError);
-  };
 
   const editor = useEditor({
     extensions: [
@@ -149,7 +160,12 @@ function NotePad({
     },
     onUpdate: ({ editor }) => {
       try {
-        setContent(editor.getHTML());
+        const newContent = editor.getHTML();
+        setContent(newContent);
+        // Reset save status when user starts typing
+        if (saveStatus !== 'idle') {
+          setSaveStatus('idle');
+        }
       } catch (error) {
         handleError(error as Error, 'EDITOR_ERROR', { action: 'save_content' });
       }
@@ -259,6 +275,38 @@ function NotePad({
             />
           </div>
         )}
+      </div>
+      
+      {/* Save Status Indicator */}
+      <div className="flex justify-end p-2 border-t border-slate-100">
+        <div className="text-xs text-slate-500 flex items-center gap-1">
+          {saveStatus === 'saving' && (
+            <>
+              <div className="animate-spin rounded-full h-3 w-3 border border-slate-300 border-t-slate-600"></div>
+              <span>Saving...</span>
+            </>
+          )}
+          {saveStatus === 'saved' && (
+            <>
+              <div className="h-3 w-3 rounded-full bg-green-500 flex items-center justify-center">
+                <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <span>All changes saved</span>
+            </>
+          )}
+          {saveStatus === 'error' && (
+            <>
+              <div className="h-3 w-3 rounded-full bg-red-500 flex items-center justify-center">
+                <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <span>Failed to save</span>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

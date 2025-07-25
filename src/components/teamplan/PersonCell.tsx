@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Person } from '@/data/teamplan';
 
 interface PersonCellProps {
@@ -8,10 +8,10 @@ interface PersonCellProps {
   onUpdatePerson: (person: Person) => void;
 }
 
-export default function PersonCell({
+const PersonCell = ({
   person,
   onUpdatePerson,
-}: PersonCellProps) {
+}: PersonCellProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(person.name);
 
@@ -68,3 +68,5 @@ export default function PersonCell({
     </div>
   );
 }
+
+export default memo(PersonCell);
