@@ -20,6 +20,7 @@ import { Switch } from '@/components/ui/switch';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import SyncStatusIndicator from '@/components/teamplan/SyncStatusIndicator';
+import { teamPlanLogger as logger } from '@/utils/logger';
 
 export default function TeamPlanPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
@@ -56,7 +57,8 @@ export default function TeamPlanPage() {
     updateCurrentPlan,
     renamePlan,
     syncState,
-    syncError
+    syncError,
+    rollbackToLastSyncedState
   } = usePlanStorage();
 
   // Keyboard shortcuts for plan switching
@@ -118,17 +120,21 @@ export default function TeamPlanPage() {
   });
 
   const handleDataChange = (newData: TeamPlanData) => {
-    console.log('🔄 TeamPlanPage: handleDataChange called');
-    console.log('🔄 TeamPlanPage: New data projects count:', newData.projects?.length || 0);
-    console.log('🔄 TeamPlanPage: New data:', newData);
+    logger.debug('handleDataChange called', { 
+      projectsCount: newData.projects?.length || 0,
+      timeSlots: newData.timeSlots?.length || 0,
+      people: newData.people?.length || 0
+    });
     
     updateCurrentPlan({ teamPlanData: newData });
   };
 
   const handleDataSyncError = (originalData: TeamPlanData, errorData: TeamPlanData, error: Error) => {
-    console.error('🚨 TeamPlanPage: Data sync error occurred:', error);
-    console.log('Original data:', originalData);
-    console.log('Error data:', errorData);
+    logger.error('Data sync error occurred', { 
+      error: error.message,
+      originalProjectsCount: originalData.projects?.length || 0,
+      errorProjectsCount: errorData.projects?.length || 0
+    });
     
     // TODO: When Jonny adds async operations, this will handle real sync errors
     // For now, this is a placeholder that demonstrates the error handling structure
@@ -218,10 +224,7 @@ export default function TeamPlanPage() {
                   <SyncStatusIndicator
                     syncState={syncState}
                     syncError={syncError}
-                    onRetry={() => {
-                      // TODO: Implement retry logic when Jonny adds the async operations
-                      console.log('Retry sync operation');
-                    }}
+                    onRetry={rollbackToLastSyncedState}
                   />
                 </div>
                 
