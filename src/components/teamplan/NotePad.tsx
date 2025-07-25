@@ -194,7 +194,6 @@ function NotePad({
   const {
     showSelectionMenu,
     menuPosition,
-    setShowSelectionMenu,
     handleSelectionUpdate,
     handleTransaction,
     handleMouseUp,
@@ -261,7 +260,6 @@ function NotePad({
           >
             <TextSelectionMenu 
               editor={editor}
-              onClose={() => setShowSelectionMenu(false)}
             />
           </div>
         )}

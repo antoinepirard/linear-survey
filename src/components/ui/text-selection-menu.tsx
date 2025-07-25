@@ -23,7 +23,6 @@ import {
 interface TextSelectionMenuProps {
   editor: Editor;
   className?: string;
-  onClose?: () => void;
 }
 
 interface MenuButtonProps {
@@ -53,7 +52,7 @@ function MenuButton({ isActive, onMouseDown, children, title }: MenuButtonProps)
   );
 }
 
-export default function TextSelectionMenu({ editor, className, onClose }: TextSelectionMenuProps) {
+export default function TextSelectionMenu({ editor, className }: TextSelectionMenuProps) {
   const [showSubmenu, setShowSubmenu] = useState(false);
   const [submenuTimeout, setSubmenuTimeout] = useState<NodeJS.Timeout | null>(null);
   const [openTimeout, setOpenTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -121,7 +120,6 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       isActive: editor.isActive('bold'),
       onMouseDown: () => {
         editor.chain().focus().toggleBold().run();
-        onClose?.();
       },
     },
     {
@@ -130,7 +128,6 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       isActive: editor.isActive('italic'),
       onMouseDown: () => {
         editor.chain().focus().toggleItalic().run();
-        onClose?.();
       },
     },
     {
@@ -139,10 +136,9 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       isActive: editor.isActive('strike'),
       onMouseDown: () => {
         editor.chain().focus().toggleStrike().run();
-        onClose?.();
       },
     },
-  ], [editor, onClose]);
+  ], [editor]);
 
   const structuralActions = useMemo(() => [
     {
@@ -152,7 +148,6 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       onMouseDown: () => {
         editor.chain().focus().toggleHeading({ level: 1 }).run();
         setShowSubmenu(false);
-        onClose?.();
       },
     },
     {
@@ -162,7 +157,6 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       onMouseDown: () => {
         editor.chain().focus().toggleHeading({ level: 2 }).run();
         setShowSubmenu(false);
-        onClose?.();
       },
     },
     {
@@ -172,7 +166,6 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       onMouseDown: () => {
         editor.chain().focus().toggleHeading({ level: 3 }).run();
         setShowSubmenu(false);
-        onClose?.();
       },
     },
     {
@@ -182,7 +175,6 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       onMouseDown: () => {
         editor.chain().focus().toggleBulletList().run();
         setShowSubmenu(false);
-        onClose?.();
       },
     },
     {
@@ -192,10 +184,9 @@ export default function TextSelectionMenu({ editor, className, onClose }: TextSe
       onMouseDown: () => {
         editor.chain().focus().toggleOrderedList().run();
         setShowSubmenu(false);
-        onClose?.();
       },
     },
-  ], [editor, onClose]);
+  ], [editor]);
 
   // Memoize computed values
   const { hasActiveStructural, submenuIcon } = useMemo(() => {

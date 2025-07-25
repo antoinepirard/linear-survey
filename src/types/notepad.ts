@@ -1,5 +1,5 @@
-import { Editor } from '@tiptap/react';
-import { Plan } from '@/types/plan';
+import { Editor } from "@tiptap/react";
+import { Plan } from "@/types/plan";
 
 // Type for TipTap editor instance
 export type TipTapEditor = Editor;
@@ -15,7 +15,7 @@ export interface NotePadProps {
   onError?: (error: Error) => void;
   width?: number;
   currentPlan?: Plan | null;
-  onUpdatePlan?: (updates: Partial<Pick<Plan, 'notepadData'>>) => void;
+  onUpdatePlan?: (updates: Partial<Pick<Plan, "notepadData">>) => void;
 }
 
 // Storage related interfaces
@@ -44,7 +44,6 @@ export interface EditorConfig {
 export interface TextSelectionState {
   showSelectionMenu: boolean;
   menuPosition: Position;
-  menuUpdateKey: number;
 }
 
 // Menu related interfaces
@@ -59,7 +58,6 @@ export interface MenuButtonProps {
 export interface TextSelectionMenuProps {
   editor: Editor;
   className?: string;
-  onClose?: () => void;
 }
 
 // Hook interfaces
@@ -86,7 +84,7 @@ export interface UseTextSelectionOptions {
 
 // Error types
 export interface NotePadError extends Error {
-  code: 'STORAGE_ERROR' | 'EDITOR_ERROR' | 'RENDER_ERROR';
+  code: "STORAGE_ERROR" | "EDITOR_ERROR" | "RENDER_ERROR";
   details?: Record<string, unknown>;
 }
 
