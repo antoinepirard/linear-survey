@@ -2,69 +2,89 @@ import { Extension } from '@tiptap/core';
 import { PluginKey } from '@tiptap/pm/state';
 import Suggestion from '@tiptap/suggestion';
 import { ReactRenderer } from '@tiptap/react';
+import { Editor } from '@tiptap/react';
 import SlashMenu from '@/components/ui/slash-menu';
 
-const slashMenuItems = [
+interface SlashCommandItem {
+  title: string;
+  description: string;
+  command: (params: { editor: Editor; range: { from: number; to: number } }) => void;
+}
+
+interface SuggestionProps {
+  editor: Editor;
+  range: { from: number; to: number };
+  query: string;
+  items: SlashCommandItem[];
+  command: (item: SlashCommandItem) => void;
+  clientRect?: () => DOMRect;
+}
+
+interface SuggestionKeyProps {
+  event: KeyboardEvent;
+}
+
+const slashMenuItems: SlashCommandItem[] = [
   {
     title: 'Text',
     description: 'Just start typing with plain text',
-    command: ({ editor, range }: any) => {
+    command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).run();
     },
   },
   {
     title: 'Heading 1',
     description: 'Big section heading',
-    command: ({ editor, range }: any) => {
+    command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).setHeading({ level: 1 }).run();
     },
   },
   {
     title: 'Heading 2',
     description: 'Medium section heading',
-    command: ({ editor, range }: any) => {
+    command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).setHeading({ level: 2 }).run();
     },
   },
   {
     title: 'Heading 3',
     description: 'Small section heading',
-    command: ({ editor, range }: any) => {
+    command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).setHeading({ level: 3 }).run();
     },
   },
   {
     title: 'Bullet List',
     description: 'Create a simple bullet list',
-    command: ({ editor, range }: any) => {
+    command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).toggleBulletList().run();
     },
   },
   {
     title: 'Numbered List',
     description: 'Create a list with numbering',
-    command: ({ editor, range }: any) => {
+    command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).toggleOrderedList().run();
     },
   },
   {
     title: 'Quote',
     description: 'Capture a quote',
-    command: ({ editor, range }: any) => {
+    command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).toggleBlockquote().run();
     },
   },
   {
     title: 'Code Block',
     description: 'Capture a code snippet',
-    command: ({ editor, range }: any) => {
+    command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
     },
   },
   {
     title: 'Divider',
     description: 'Visually divide blocks',
-    command: ({ editor, range }: any) => {
+    command: ({ editor, range }) => {
       editor.chain().focus().deleteRange(range).setHorizontalRule().run();
     },
   },
@@ -77,7 +97,7 @@ export const SlashCommand = Extension.create({
     return {
       suggestion: {
         char: '/',
-        command: ({ editor, range, props }: any) => {
+        command: ({ editor, range, props }: { editor: Editor; range: { from: number; to: number }; props: SlashCommandItem }) => {
           props.command({ editor, range });
         },
       },
@@ -101,7 +121,7 @@ export const SlashCommand = Extension.create({
           let filterIndicator: HTMLDivElement | null = null;
 
           return {
-            onStart: (props: any) => {
+            onStart: (props: SuggestionProps) => {
               component = new ReactRenderer(SlashMenu, {
                 props: {
                   items: props.items,
@@ -156,7 +176,7 @@ export const SlashCommand = Extension.create({
               popup.style.top = `${rect.bottom + 8}px`;
             },
 
-            onUpdate(props: any) {
+            onUpdate(props: SuggestionProps) {
               component?.updateProps({
                 items: props.items,
                 command: props.command,
@@ -198,7 +218,7 @@ export const SlashCommand = Extension.create({
               popup.style.top = `${rect.bottom + 8}px`;
             },
 
-            onKeyDown(props: any) {
+            onKeyDown(props: SuggestionKeyProps) {
               if (props.event.key === 'Escape') {
                 if (popup) {
                   document.body.removeChild(popup);
@@ -211,7 +231,7 @@ export const SlashCommand = Extension.create({
                 return true;
               }
 
-              return (component?.ref as any)?.onKeyDown?.(props.event) || false;
+              return (component?.ref as { onKeyDown?: (event: KeyboardEvent) => boolean })?.onKeyDown?.(props.event) || false;
             },
 
             onExit() {
