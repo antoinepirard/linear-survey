@@ -6,6 +6,8 @@
   line-height: 1.5;
   letter-spacing: 0.01em; /* Subtle letter spacing for better readability */
   min-height: 400px;
+  padding-left: 2rem !important; /* 32px */
+  padding-right: 2rem !important; /* 32px */
 }
 
 /* Responsive adjustments */
