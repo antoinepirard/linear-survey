@@ -34,6 +34,12 @@ export const EmptyLinePlaceholder = Extension.create<EmptyLinePlaceholderOptions
               return DecorationSet.empty;
             }
 
+            // Don't show empty line placeholder if the entire editor is empty
+            // (to avoid overlapping with the main editor placeholder)
+            if (this.editor.isEmpty) {
+              return DecorationSet.empty;
+            }
+
             // Check if we should show placeholder
             const currentLineStart = $from.start();
             const currentLineEnd = $from.end();
@@ -41,6 +47,27 @@ export const EmptyLinePlaceholder = Extension.create<EmptyLinePlaceholderOptions
 
             // Show placeholder on empty lines
             if (currentLineText.trim() === '' && selection.empty) {
+              // Get contextual placeholder text based on current node type
+              const getContextualPlaceholder = () => {
+                const currentNode = $from.parent;
+                
+                if (currentNode.type.name === 'heading') {
+                  const level = currentNode.attrs.level;
+                  return `Heading ${level}`;
+                } else if (currentNode.type.name === 'codeBlock') {
+                  return 'Add code';
+                } else if (currentNode.type.name === 'blockquote') {
+                  return 'Quote';
+                } else if (currentNode.type.name === 'listItem') {
+                  return 'List item';
+                } else if (currentNode.type.name === 'taskItem') {
+                  return 'Task';
+                } else {
+                  // Default for paragraph and other node types
+                  return this.options.placeholder;
+                }
+              };
+
               const decoration = Decoration.widget(
                 $from.pos,
                 () => {
@@ -49,7 +76,7 @@ export const EmptyLinePlaceholder = Extension.create<EmptyLinePlaceholderOptions
                   placeholder.style.color = '#9ca3af'; // text-gray-400
                   placeholder.style.pointerEvents = 'none';
                   placeholder.style.userSelect = 'none';
-                  placeholder.textContent = this.options.placeholder;
+                  placeholder.textContent = getContextualPlaceholder();
                   return placeholder;
                 },
                 {
