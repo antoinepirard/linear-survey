@@ -47,6 +47,24 @@ export default function TeamPlanPage() {
     setIsPageLoading(false);
   };
   
+  const {
+    isLoading,
+    currentPlan,
+    currentDocument,
+    allPlans,
+    allDocuments,
+    createPlan,
+    deletePlan,
+    switchToPlan,
+    updateCurrentPlan,
+    renamePlan,
+    createDocument,
+    switchToDocument,
+    renameDocument,
+    deleteDocument,
+    updateDocumentContent,
+  } = usePlanStorage();
+
   // Document management functions with error handling
   const handleCreateDocument = useCallback(async (title: string) => {
     try {
@@ -95,24 +113,6 @@ export default function TeamPlanPage() {
       // Could show error toast here in the future
     }
   }, [updateDocumentContent]);
-
-  const {
-    isLoading,
-    currentPlan,
-    currentDocument,
-    allPlans,
-    allDocuments,
-    createPlan,
-    deletePlan,
-    switchToPlan,
-    updateCurrentPlan,
-    renamePlan,
-    createDocument,
-    switchToDocument,
-    renameDocument,
-    deleteDocument,
-    updateDocumentContent,
-  } = usePlanStorage();
 
   // Keyboard shortcuts for plan and document switching
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
