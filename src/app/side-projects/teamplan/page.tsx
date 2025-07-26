@@ -47,6 +47,55 @@ export default function TeamPlanPage() {
     setIsPageLoading(false);
   };
   
+  // Document management functions with error handling
+  const handleCreateDocument = useCallback(async (title: string) => {
+    try {
+      const newDoc = createDocument(title);
+      // Could show success toast here in the future
+      return newDoc;
+    } catch (error) {
+      console.error('Failed to create document:', error);
+      // Could show error toast here in the future
+      throw error;
+    }
+  }, [createDocument]);
+
+  const handleSwitchToDocument = useCallback(async (documentId: string) => {
+    try {
+      switchToDocument(documentId);
+    } catch (error) {
+      console.error('Failed to switch document:', error);
+      // Could show error toast here in the future
+    }
+  }, [switchToDocument]);
+
+  const handleRenameDocument = useCallback(async (documentId: string, newTitle: string) => {
+    try {
+      renameDocument(documentId, newTitle);
+    } catch (error) {
+      console.error('Failed to rename document:', error);
+      // Could show error toast here in the future
+    }
+  }, [renameDocument]);
+
+  const handleDeleteDocument = useCallback(async (documentId: string) => {
+    try {
+      deleteDocument(documentId);
+    } catch (error) {
+      console.error('Failed to delete document:', error);
+      // Could show error toast here in the future
+    }
+  }, [deleteDocument]);
+
+  const handleUpdateDocumentContent = useCallback(async (documentId: string, content: string) => {
+    try {
+      updateDocumentContent(documentId, content);
+    } catch (error) {
+      console.error('Failed to update document:', error);
+      // Could show error toast here in the future
+    }
+  }, [updateDocumentContent]);
+
   const {
     isLoading,
     currentPlan,
@@ -253,10 +302,10 @@ export default function TeamPlanPage() {
                   <DocumentSelector
                     currentDocument={currentDocument}
                     allDocuments={allDocuments}
-                    onSelectDocument={switchToDocument}
-                    onCreateDocument={createDocument}
-                    onDeleteDocument={deleteDocument}
-                    onRenameDocument={renameDocument}
+                    onSelectDocument={handleSwitchToDocument}
+                    onCreateDocument={handleCreateDocument}
+                    onDeleteDocument={handleDeleteDocument}
+                    onRenameDocument={handleRenameDocument}
                   />
                 </div>
                 
@@ -311,9 +360,9 @@ export default function TeamPlanPage() {
                         currentPlan={currentPlan}
                         currentDocument={currentDocument}
                         allDocuments={allDocuments}
-                        onCreateDocument={createDocument}
-                        onSwitchToDocument={switchToDocument}
-                        onUpdateDocumentContent={updateDocumentContent}
+                        onCreateDocument={handleCreateDocument}
+                        onSwitchToDocument={handleSwitchToDocument}
+                        onUpdateDocumentContent={handleUpdateDocumentContent}
                       />
                     </motion.div>
                   ) : activePanel === 'backlog' ? (
