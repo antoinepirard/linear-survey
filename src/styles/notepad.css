@@ -1,5 +1,23 @@
 /* Tiptap NotePad Editor Styles */
 
+/* Tailwind Preflight Override - Surgical approach to preserve indentation */
+.ProseMirror ul, 
+.ProseMirror ol {
+  margin-top: revert;    /* Allow natural top spacing */
+  margin-bottom: revert; /* Allow natural bottom spacing */
+  /* DON'T revert margin-left - preserve our custom indentation */
+}
+
+.ProseMirror li {
+  margin: revert;  /* Li elements can safely revert */
+  padding: revert; /* Li padding is fine to revert */
+}
+
+/* Ensure ProseMirror styles take precedence over Tailwind base layer */
+.ProseMirror * {
+  box-sizing: border-box;
+}
+
 /* 8px Grid Spacing System - World-Class Design Standards */
 :root {
   --spacing-xs: 0.25rem;    /* 4px - tight spacing for related elements */
@@ -87,81 +105,86 @@
 }
 
 /* Bullet Lists - Support both specific and fallback selectors */
-.ProseMirror ul[data-type="bulletList"],
-.ProseMirror ul:not([data-type]) {
-  list-style-type: disc !important;
+.ProseMirror.ProseMirror ul[data-type="bulletList"],
+.ProseMirror.ProseMirror ul:not([data-type]) {
+  list-style-type: disc;
   margin-left: var(--spacing-2xl) !important; /* 24px */
   margin-bottom: var(--spacing-xl) !important; /* 20px */
   margin-top: 0 !important;
   padding-left: 0 !important;
 }
 
-.ProseMirror ul[data-type="bulletList"] ul[data-type="bulletList"],
-.ProseMirror ul ul {
-  list-style-type: circle !important;
+.ProseMirror.ProseMirror ul[data-type="bulletList"] ul[data-type="bulletList"],
+.ProseMirror.ProseMirror ul ul {
+  list-style-type: circle;
   margin-top: var(--spacing-xs) !important; /* 4px */
   margin-bottom: var(--spacing-xs) !important; /* 4px */
+  margin-left: var(--spacing-2xl) !important; /* 24px - CRITICAL: restore indentation */
 }
 
-.ProseMirror ul[data-type="bulletList"] ul[data-type="bulletList"] ul[data-type="bulletList"],
-.ProseMirror ul ul ul {
-  list-style-type: square !important;
+.ProseMirror.ProseMirror ul[data-type="bulletList"] ul[data-type="bulletList"] ul[data-type="bulletList"],
+.ProseMirror.ProseMirror ul ul ul {
+  list-style-type: square;
+  margin-left: var(--spacing-2xl); /* 24px - third level indentation */
 }
 
 /* Ordered Lists - Support both specific and fallback selectors */
-.ProseMirror ol[data-type="orderedList"],
-.ProseMirror ol:not([data-type]) {
-  list-style-type: decimal !important;
+.ProseMirror.ProseMirror ol[data-type="orderedList"],
+.ProseMirror.ProseMirror ol:not([data-type]) {
+  list-style-type: decimal;
   margin-left: var(--spacing-2xl) !important; /* 24px */
   margin-bottom: var(--spacing-xl) !important; /* 20px */
   margin-top: 0 !important;
   padding-left: 0 !important;
 }
 
-.ProseMirror ol[data-type="orderedList"] ol[data-type="orderedList"],
-.ProseMirror ol ol {
-  list-style-type: lower-alpha !important;
+.ProseMirror.ProseMirror ol[data-type="orderedList"] ol[data-type="orderedList"],
+.ProseMirror.ProseMirror ol ol {
+  list-style-type: lower-alpha;
   margin-top: var(--spacing-xs) !important; /* 4px */
   margin-bottom: var(--spacing-xs) !important; /* 4px */
+  margin-left: var(--spacing-2xl) !important; /* 24px - CRITICAL: restore ordered list indentation */
 }
 
-.ProseMirror ol[data-type="orderedList"] ol[data-type="orderedList"] ol[data-type="orderedList"],
-.ProseMirror ol ol ol {
-  list-style-type: lower-roman !important;
+.ProseMirror.ProseMirror ol[data-type="orderedList"] ol[data-type="orderedList"] ol[data-type="orderedList"],
+.ProseMirror.ProseMirror ol ol ol {
+  list-style-type: lower-roman;
+  margin-left: var(--spacing-2xl); /* 24px - third level ordered indentation */
 }
 
 /* Task Lists */
-.ProseMirror ul[data-type="taskList"] {
-  list-style: none !important;
-  margin-left: 0 !important;
-  margin-bottom: var(--spacing-xl) !important; /* 20px */
-  margin-top: 0 !important;
-  padding-left: 0 !important;
+.ProseMirror.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  margin-left: 0;
+  margin-bottom: var(--spacing-xl); /* 20px */
+  margin-top: 0;
+  padding-left: 0;
 }
 
 /* Regular List Items - Support both specific and fallback selectors */
-.ProseMirror li[data-type="listItem"],
-.ProseMirror li:not([data-type]) {
-  margin-bottom: var(--spacing-sm) !important; /* 8px - world-class spacing */
-  line-height: 1.5 !important;
-  padding: 0 !important;
+/* Higher specificity without !important for better maintainability */
+.ProseMirror.ProseMirror li[data-type="listItem"],
+.ProseMirror.ProseMirror li:not([data-type]) {
+  margin-bottom: var(--spacing-sm); /* 8px - world-class spacing */
+  line-height: 1.5;
+  padding: 0;
 }
 
 /* Task Items */
-.ProseMirror li[data-type="taskItem"] {
-  display: flex !important;
-  align-items: flex-start !important;
-  margin-bottom: var(--spacing-sm) !important; /* 8px - consistent with other list items */
-  line-height: 1.5 !important;
-  padding: 0 !important;
-  list-style: none !important;
+.ProseMirror.ProseMirror li[data-type="taskItem"] {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-sm); /* 8px - consistent with other list items */
+  line-height: 1.5;
+  padding: 0;
+  list-style: none;
 }
 
-.ProseMirror li[data-type="taskItem"] > label {
-  flex-shrink: 0 !important;
-  margin-right: var(--spacing-sm) !important; /* 8px */
-  margin-top: 0.125rem !important; /* Align checkbox with first line of text */
-  user-select: none !important;
+.ProseMirror.ProseMirror li[data-type="taskItem"] > label {
+  flex-shrink: 0;
+  margin-right: var(--spacing-sm); /* 8px */
+  margin-top: 0.125rem; /* Align checkbox with first line of text */
+  user-select: none;
 }
 
 .ProseMirror li[data-type="taskItem"] > label > input[type="checkbox"] {
@@ -237,60 +260,99 @@
   line-height: 1 !important;
 }
 
-/* Content-aware spacing for different list item complexity */
-/* Simple list items (text only) - maintain standard spacing */
-.ProseMirror li[data-type="listItem"]:has(> p:only-child:not(:has(*))) {
-  margin-bottom: var(--spacing-sm) !important; /* 8px for simple items */
+/* Content-aware spacing - Cross-browser compatible approach */
+/* Complex list items (with nested lists) - more breathing room */
+.ProseMirror.ProseMirror li[data-type="listItem"] ul,
+.ProseMirror.ProseMirror li[data-type="listItem"] ol {
+  margin-top: var(--spacing-xs); /* 4px - tight spacing for nested content */
 }
 
-/* Complex list items (with nested lists or multiple paragraphs) - more breathing room */
-.ProseMirror li[data-type="listItem"]:has(> ul, > ol, > p + p) {
-  margin-bottom: var(--spacing-md) !important; /* 12px for complex items */
+.ProseMirror.ProseMirror li[data-type="listItem"]:has(ul),
+.ProseMirror.ProseMirror li[data-type="listItem"]:has(ol) {
+  margin-bottom: var(--spacing-md); /* 12px for items with sublists */
 }
 
 /* Task items with nested content - consistent with other complex items */
-.ProseMirror li[data-type="taskItem"]:has(ul, ol) {
-  margin-bottom: var(--spacing-md) !important; /* 12px for task items with sublists */
+.ProseMirror.ProseMirror li[data-type="taskItem"]:has(ul),
+.ProseMirror.ProseMirror li[data-type="taskItem"]:has(ol) {
+  margin-bottom: var(--spacing-md); /* 12px for task items with sublists */
 }
 
-/* Ensure no extra spacing from any nested elements */
-.ProseMirror li * {
+/* DEBUG: Visual verification of spacing (remove after testing) */
+.ProseMirror.ProseMirror li[data-type="listItem"] {
+  background-color: rgba(59, 130, 246, 0.1); /* Light blue background */
+  border-left: 2px solid #3b82f6; /* Blue left border */
+  border-radius: 2px;
+}
+
+.ProseMirror.ProseMirror li[data-type="taskItem"] {
+  background-color: rgba(34, 197, 94, 0.1); /* Light green background */
+  border-left: 2px solid #22c55e; /* Green left border */
+  border-radius: 2px;
+}
+
+/* Show spacing visually */
+.ProseMirror.ProseMirror li[data-type="listItem"]::after,
+.ProseMirror.ProseMirror li[data-type="taskItem"]::after {
+  content: "8px margin";
+  font-size: 10px;
+  color: #6b7280;
+  position: absolute;
+  right: 8px;
+  background: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  border: 1px solid #e5e7eb;
+}
+
+/* SURGICAL FIX: Remove margins from text elements but preserve list indentation */
+.ProseMirror li p,
+.ProseMirror li span,
+.ProseMirror li strong,
+.ProseMirror li em,
+.ProseMirror li code {
   margin: 0 !important;
 }
 
+/* PRESERVE list margins for proper indentation */
+.ProseMirror li ul,
+.ProseMirror li ol {
+  margin: revert !important; /* Let nested lists keep their indentation */
+}
+
 /* Nested task lists */
-.ProseMirror ul[data-type="taskList"] ul[data-type="taskList"] {
-  margin-top: var(--spacing-xs) !important; /* 4px */
-  margin-bottom: var(--spacing-xs) !important; /* 4px */
-  margin-left: var(--spacing-lg) !important; /* 16px - consistent nesting */
+.ProseMirror.ProseMirror ul[data-type="taskList"] ul[data-type="taskList"] {
+  margin-top: var(--spacing-xs); /* 4px */
+  margin-bottom: var(--spacing-xs); /* 4px */
+  margin-left: var(--spacing-lg); /* 16px - consistent nesting */
 }
 
 /* Smart spacing: Reduce gap when lists immediately follow text elements */
-.ProseMirror p + ul[data-type="bulletList"],
-.ProseMirror p + ul:not([data-type]),
-.ProseMirror p + ol[data-type="orderedList"], 
-.ProseMirror p + ol:not([data-type]),
-.ProseMirror p + ul[data-type="taskList"] {
-  margin-top: calc(-1 * var(--spacing-sm)) !important; /* -8px: reduces 20px gap to 12px */
+.ProseMirror.ProseMirror p + ul[data-type="bulletList"],
+.ProseMirror.ProseMirror p + ul:not([data-type]),
+.ProseMirror.ProseMirror p + ol[data-type="orderedList"], 
+.ProseMirror.ProseMirror p + ol:not([data-type]),
+.ProseMirror.ProseMirror p + ul[data-type="taskList"] {
+  margin-top: calc(-1 * var(--spacing-sm)); /* -8px: reduces 20px gap to 12px */
 }
 
 /* Also apply to headings followed by lists */
-.ProseMirror h1 + ul[data-type="bulletList"],
-.ProseMirror h1 + ul:not([data-type]),
-.ProseMirror h1 + ol[data-type="orderedList"],
-.ProseMirror h1 + ol:not([data-type]),
-.ProseMirror h1 + ul[data-type="taskList"],
-.ProseMirror h2 + ul[data-type="bulletList"],
-.ProseMirror h2 + ul:not([data-type]),
-.ProseMirror h2 + ol[data-type="orderedList"],
-.ProseMirror h2 + ol:not([data-type]),
-.ProseMirror h2 + ul[data-type="taskList"],
-.ProseMirror h3 + ul[data-type="bulletList"],
-.ProseMirror h3 + ul:not([data-type]),
-.ProseMirror h3 + ol[data-type="orderedList"],
-.ProseMirror h3 + ol:not([data-type]),
-.ProseMirror h3 + ul[data-type="taskList"] {
-  margin-top: calc(-1 * var(--spacing-xs)) !important; /* -4px: smaller reduction for headings */
+.ProseMirror.ProseMirror h1 + ul[data-type="bulletList"],
+.ProseMirror.ProseMirror h1 + ul:not([data-type]),
+.ProseMirror.ProseMirror h1 + ol[data-type="orderedList"],
+.ProseMirror.ProseMirror h1 + ol:not([data-type]),
+.ProseMirror.ProseMirror h1 + ul[data-type="taskList"],
+.ProseMirror.ProseMirror h2 + ul[data-type="bulletList"],
+.ProseMirror.ProseMirror h2 + ul:not([data-type]),
+.ProseMirror.ProseMirror h2 + ol[data-type="orderedList"],
+.ProseMirror.ProseMirror h2 + ol:not([data-type]),
+.ProseMirror.ProseMirror h2 + ul[data-type="taskList"],
+.ProseMirror.ProseMirror h3 + ul[data-type="bulletList"],
+.ProseMirror.ProseMirror h3 + ul:not([data-type]),
+.ProseMirror.ProseMirror h3 + ol[data-type="orderedList"],
+.ProseMirror.ProseMirror h3 + ol:not([data-type]),
+.ProseMirror.ProseMirror h3 + ul[data-type="taskList"] {
+  margin-top: calc(-1 * var(--spacing-xs)); /* -4px: smaller reduction for headings */
 }
 
 .ProseMirror blockquote {
