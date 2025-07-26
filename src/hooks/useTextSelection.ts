@@ -30,8 +30,9 @@ export function useTextSelection({
 
   const calculateMenuPosition = useCallback(
     (editor: Editor, container: HTMLDivElement | null): Position => {
-      if (!container || !editor?.view || editor.isDestroyed) return { x: 0, y: 0 };
-      
+      if (!container || !editor?.view || editor.isDestroyed)
+        return { x: 0, y: 0 };
+
       const { selection } = editor.state;
       const { from, to } = selection;
 
@@ -47,7 +48,11 @@ export function useTextSelection({
         // Account for scroll position within the container
         let x = (start.left + end.left) / 2 - containerRect.left;
         let y =
-          start.top - containerRect.top - menuHeight - gap + container.scrollTop;
+          start.top -
+          containerRect.top -
+          menuHeight -
+          gap +
+          container.scrollTop;
 
         // Horizontal bounds checking
         const containerWidth = containerRect.width;
@@ -67,7 +72,7 @@ export function useTextSelection({
 
         return { x, y };
       } catch (error) {
-        console.warn('Failed to calculate menu position:', error);
+        console.warn("Failed to calculate menu position:", error);
         return { x: 0, y: 0 };
       }
     },
@@ -99,7 +104,8 @@ export function useTextSelection({
   );
 
   const handleTransaction = useCallback(() => {
-    if (!editor || !showSelectionMenu || !editor?.state || editor.isDestroyed) return;
+    if (!editor || !showSelectionMenu || !editor?.state || editor.isDestroyed)
+      return;
 
     const { selection } = editor.state;
     const { empty } = selection;
@@ -112,16 +118,33 @@ export function useTextSelection({
 
   const handleMouseUp = useCallback(
     (editor: Editor) => {
+      console.log("🔍 handleMouseUp called", {
+        hasContainer: !!containerRef.current,
+        hasEditor: !!editor,
+        isDestroyed: editor?.isDestroyed,
+      });
+
       if (!containerRef.current || !editor?.state || editor.isDestroyed) return;
 
       const { selection } = editor.state;
       const { empty } = selection;
 
+      console.log("🔍 Selection state:", {
+        empty,
+        from: selection.from,
+        to: selection.to,
+        text: selection.empty
+          ? ""
+          : editor.state.doc.textBetween(selection.from, selection.to),
+      });
+
       // Only show menu if there's a non-empty selection after mouseup
       if (!empty) {
         const position = calculateMenuPosition(editor, containerRef.current);
+        console.log("🔍 Setting menu position:", position);
         setMenuPosition(position);
         setShowSelectionMenu(true);
+        console.log("🔍 Menu should now be visible");
       }
     },
     [containerRef, calculateMenuPosition]
@@ -130,10 +153,13 @@ export function useTextSelection({
   // Handle clicks outside to hide menu
   useEffect(() => {
     if (!showSelectionMenu) return;
-    
+
     const currentContainer = containerRef.current; // Capture current value
     const handleClickOutside = (event: MouseEvent) => {
-      if (currentContainer && !currentContainer.contains(event.target as Node)) {
+      if (
+        currentContainer &&
+        !currentContainer.contains(event.target as Node)
+      ) {
         setShowSelectionMenu(false);
       }
     };

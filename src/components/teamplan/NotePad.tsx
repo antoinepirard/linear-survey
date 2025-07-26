@@ -311,13 +311,6 @@ function NotePad({
         return false;
       },
       handleDOMEvents: {
-        mouseup: () => {
-          if (editor) {
-            handleMouseUp(editor);
-          }
-          return false;
-        },
-
         compositionstart: () => {
           setIsComposing(true);
           return false;
@@ -381,6 +374,26 @@ function NotePad({
     editor,
     containerRef: editorRef,
   });
+
+  // Connect mouseup handler after useTextSelection is set up
+  useEffect(() => {
+    if (!editor) return;
+
+    const handleMouseUpEvent = () => {
+      console.log('🔍 NotePad mouseup handler called via useEffect');
+      if (editor) {
+        handleMouseUp(editor);
+      }
+    };
+
+    // Get the editor DOM element
+    const editorElement = editor.view.dom;
+    editorElement.addEventListener('mouseup', handleMouseUpEvent);
+
+    return () => {
+      editorElement.removeEventListener('mouseup', handleMouseUpEvent);
+    };
+  }, [editor, handleMouseUp]);
 
   // Handle title input key events
   const handleTitleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
