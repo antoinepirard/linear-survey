@@ -17,33 +17,47 @@ import ListKeymap from '@tiptap/extension-list-keymap';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
 import { NotePadErrorBoundary } from '@/components/ui/NotePadErrorBoundary';
 import { useTextSelection } from '@/hooks/useTextSelection';
-import { usePlanNotePadStorage } from '@/hooks/usePlanNotePadStorage';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { NotePadProps, NotePadError } from '@/types/notepad';
+import { isLegacyNotepadData } from '@/types/plan';
 
 function NotePad({
   className = '',
   onError,
   width,
   currentPlan = null,
-  onUpdatePlan,
+  currentDocument = null,
+  allDocuments = [],
+  onCreateDocument,
+  onSwitchToDocument,
+  onUpdateDocumentContent,
 }: NotePadProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isComposing, setIsComposing] = useState(false);
-  
-  // Use the plan-specific notepad storage hook
-  const {
-    loadContent,
-    saveContent: saveContentToStorage,
-  } = usePlanNotePadStorage({
-    currentPlan,
-    onUpdatePlan,
-    defaultWidth: width || NOTEPAD_CONSTANTS.DEFAULT_WIDTH,
-    minWidth: NOTEPAD_CONSTANTS.MIN_WIDTH,
-    maxWidth: NOTEPAD_CONSTANTS.MAX_WIDTH,
-  });
+
+  // Content management helper
+  const loadContent = useCallback((): string | null => {
+    if (currentDocument) {
+      return currentDocument.content;
+    }
+    // Fallback to legacy plan-based content (for backward compatibility)
+    const notepadData = currentPlan?.notepadData;
+    if (notepadData && isLegacyNotepadData(notepadData)) {
+      return notepadData.content;
+    }
+    return null;
+  }, [currentDocument, currentPlan]);
+
+  const saveContent = useCallback((content: string) => {
+    if (currentDocument && onUpdateDocumentContent) {
+      // Use document-based storage
+      onUpdateDocumentContent(currentDocument.id, content);
+    }
+    // Note: Legacy plans should be migrated to the new document structure
+    // so we don't need to handle legacy saving here
+  }, [currentDocument, onUpdateDocumentContent]);
 
   // Error handling helper
   const handleError = useCallback((error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
@@ -63,22 +77,15 @@ function NotePad({
 
   // Show save status when content is being saved
   const showSaveStatusForContent = useCallback((content: string) => {
-    if (currentPlan) {
-      try {
-        setSaveStatus('saving'); // Show saving immediately
-        saveContentToStorage(content, {
-          onSaveComplete: () => setSaveStatusWithTimeout('saved', 1500),
-          onSaveError: (error) => {
-            setSaveStatusWithTimeout('error', 5000);
-            handleError(error, 'STORAGE_ERROR', { action: 'save_content' });
-          }
-        });
-      } catch (error) {
-        setSaveStatusWithTimeout('error', 5000);
-        handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
-      }
+    try {
+      setSaveStatus('saving'); // Show saving immediately
+      saveContent(content);
+      setSaveStatusWithTimeout('saved', 1500);
+    } catch (error) {
+      setSaveStatusWithTimeout('error', 5000);
+      handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
     }
-  }, [currentPlan, saveContentToStorage, handleError, setSaveStatusWithTimeout]);
+  }, [saveContent, handleError, setSaveStatusWithTimeout]);
 
   // Memoize extensions to prevent editor recreation on every render
   const editorExtensions = useMemo(() => [
@@ -115,12 +122,12 @@ function NotePad({
       },
     }),
     Placeholder.configure({
-      placeholder: NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT,
+      placeholder: currentDocument?.title ? `Start writing in "${currentDocument.title}"...` : NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT,
     }),
     Typography,
     SlashCommand,
     EmptyLinePlaceholder,
-  ], []); // Empty dependency array - extensions never change
+  ], [currentDocument?.title]); // Update placeholder when document changes
 
   const editor = useEditor({
     extensions: editorExtensions,
@@ -171,6 +178,24 @@ function NotePad({
           const level = parseInt(event.key) as 1 | 2 | 3;
           editor?.chain().focus().toggleHeading({ level }).run();
           return true;
+        }
+
+        // Document switching shortcuts (Cmd/Ctrl + 1-9)
+        if (mod && !shift && !alt && /^[1-9]$/.test(event.key)) {
+          const index = parseInt(event.key) - 1;
+          const targetDoc = allDocuments[index];
+          if (targetDoc && onSwitchToDocument) {
+            onSwitchToDocument(targetDoc.id);
+            return true;
+          }
+        }
+
+        // New document shortcut (Cmd/Ctrl + T)
+        if (mod && !shift && !alt && event.key === 't') {
+          if (onCreateDocument) {
+            onCreateDocument('New Document');
+            return true;
+          }
         }
         
         return false;
@@ -254,48 +279,26 @@ function NotePad({
     containerRef: editorRef,
   });
 
-  // Memoize plan data to avoid unnecessary re-renders - only depend on plan ID to prevent feedback loop
-  const planData = useMemo(() => ({
-    id: currentPlan?.id
-  }), [currentPlan?.id]);
-
   // Add typing detection to prevent content loading during active typing
   const lastTypingTime = useRef<number>(0);
   const isActivelyTyping = useRef<boolean>(false);
 
-  // Update editor content when plan ID changes (not on every currentPlan object change)
+  // Update editor content when document changes
   useEffect(() => {
-    if (editor && planData.id) {
-      // Access content directly from currentPlan, not through memo to avoid feedback loop
-      let savedContent = currentPlan?.notepadData.content;
-      
-      // Check backup if no content in plan
-      if (!savedContent) {
-        try {
-          const backupKey = `plan-${planData.id}-notepad-backup`;
-          const backupData = localStorage.getItem(backupKey);
-          if (backupData) {
-            const backup = JSON.parse(backupData);
-            savedContent = backup.fullData?.content || backup.updates?.content;
-          }
-        } catch (error) {
-          console.error("Failed to load backup from localStorage:", error);
-        }
-      }
-      
-      const currentContent = editor.getHTML();
-      
-      if (savedContent) {
-        // Only update if content is different AND user isn't actively typing or composing
+    if (editor) {
+      const savedContent = loadContent();
+      if (savedContent !== null) {
+        // Only update if the content is actually different to avoid unnecessary re-renders
+        const currentContent = editor.getHTML();
         if (currentContent !== savedContent && !isComposing && !isActivelyTyping.current) {
           editor.commands.setContent(savedContent, { emitUpdate: false });
         }
-      } else if (currentContent !== '<p></p>' && !isActivelyTyping.current) {
-        // Clear editor if no content and editor is not already empty
+      } else {
+        // Clear editor if no content
         editor.commands.clearContent();
       }
     }
-  }, [editor, planData.id, isComposing, currentPlan?.notepadData.content]); // Include content dependency but protect with typing checks
+  }, [editor, currentDocument?.id, currentPlan?.id, loadContent]);
 
   // Click-outside handling is now managed by the useTextSelection hook
 
@@ -312,8 +315,6 @@ function NotePad({
       }
     };
   }, [editor]);
-
-
 
   return (
     <div 

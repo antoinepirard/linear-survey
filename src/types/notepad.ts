@@ -1,5 +1,5 @@
 import { Editor } from "@tiptap/react";
-import { Plan } from "@/types/plan";
+import { Plan, NotepadDocument } from "@/types/plan";
 
 // Type for TipTap editor instance
 export type TipTapEditor = Editor;
@@ -15,7 +15,14 @@ export interface NotePadProps {
   onError?: (error: Error) => void;
   width?: number;
   currentPlan?: Plan | null;
+  currentDocument?: NotepadDocument | null;
+  allDocuments?: NotepadDocument[];
   onUpdatePlan?: (updates: Partial<Pick<Plan, "notepadData">>) => void;
+  onCreateDocument?: (title: string) => void;
+  onSwitchToDocument?: (documentId: string) => void;
+  onRenameDocument?: (documentId: string, newTitle: string) => void;
+  onDeleteDocument?: (documentId: string) => void;
+  onUpdateDocumentContent?: (documentId: string, content: string) => void;
 }
 
 // Storage related interfaces

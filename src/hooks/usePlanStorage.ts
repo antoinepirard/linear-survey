@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Plan, PlanStorage, PlanMetadata } from '@/types/plan';
+import { Plan, PlanStorage, PlanMetadata, NotepadDocument, isLegacyNotepadData } from '@/types/plan';
 import { DEFAULT_TEAMPLAN_DATA } from '@/data/teamplan';
 import { useDebounce } from './useDebounce';
 import { SyncOperation } from '@/types/api';
@@ -10,6 +10,14 @@ const PLAN_STORAGE_KEY = 'folio-plans';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+const createDefaultDocument = (title: string = 'Document 1'): NotepadDocument => ({
+  id: generateId(),
+  title,
+  content: '',
+  createdAt: new Date(),
+  updatedAt: new Date()
+});
+
 const createDefaultPlan = (name: string = 'Monthly Plan'): Plan => {
   // Calculate 35% of viewport width, clamped between 300-800px
   const calculateDefaultWidth = () => {
@@ -17,6 +25,8 @@ const createDefaultPlan = (name: string = 'Monthly Plan'): Plan => {
     return Math.max(300, Math.min(800, Math.round(window.innerWidth * 0.35)));
   };
 
+  const defaultDoc = createDefaultDocument('Notes');
+  
   return {
     id: generateId(),
     name,
@@ -24,9 +34,37 @@ const createDefaultPlan = (name: string = 'Monthly Plan'): Plan => {
     updatedAt: new Date(),
     teamPlanData: DEFAULT_TEAMPLAN_DATA,
     notepadData: {
-      content: '',
-      title: 'Notes',
-      width: calculateDefaultWidth()
+      width: calculateDefaultWidth(),
+      currentDocumentId: defaultDoc.id,
+      documents: { [defaultDoc.id]: defaultDoc }
+    }
+  };
+};
+
+// Migration function for legacy notepad data
+const migratePlanToNewStructure = (plan: any): Plan => {
+  const notepadData = plan.notepadData;
+  
+  // Check if already migrated
+  if (notepadData.documents && typeof notepadData.currentDocumentId !== 'undefined') {
+    return plan as Plan;
+  }
+  
+  // Migrate from legacy format
+  const defaultDoc = createDefaultDocument(
+    (isLegacyNotepadData(notepadData) ? notepadData.title : null) || 'Notes'
+  );
+  
+  if (isLegacyNotepadData(notepadData)) {
+    defaultDoc.content = notepadData.content || '';
+  }
+  
+  return {
+    ...plan,
+    notepadData: {
+      width: notepadData.width || 400,
+      currentDocumentId: defaultDoc.id,
+      documents: { [defaultDoc.id]: defaultDoc }
     }
   };
 };
@@ -67,12 +105,27 @@ export const usePlanStorage = () => {
 
     if (stored) {
       try {
-        storage = JSON.parse(stored);
-        // Convert date strings back to Date objects
-        Object.values(storage.plans).forEach(plan => {
+        const parsedStorage = JSON.parse(stored);
+        
+        // Convert date strings back to Date objects and migrate plans if needed
+        Object.values(parsedStorage.plans).forEach((plan: any) => {
           plan.createdAt = new Date(plan.createdAt);
           plan.updatedAt = new Date(plan.updatedAt);
+          
+          // Migrate plan to new structure if needed
+          const migratedPlan = migratePlanToNewStructure(plan);
+          parsedStorage.plans[plan.id] = migratedPlan;
+          
+          // Convert document dates
+          if (migratedPlan.notepadData.documents) {
+            Object.values(migratedPlan.notepadData.documents).forEach(doc => {
+              doc.createdAt = new Date(doc.createdAt);
+              doc.updatedAt = new Date(doc.updatedAt);
+            });
+          }
         });
+        
+        storage = parsedStorage;
         
         // Ensure there's at least one plan and a valid currentPlanId
         const planIds = Object.keys(storage.plans);
@@ -339,6 +392,203 @@ export const usePlanStorage = () => {
     queueSaveOperation(newStorage, operation);
   }, [planStorage, queueSaveOperation]);
 
+  // Document management functions
+  const createDocument = useCallback((title: string = 'New Document') => {
+    if (!currentPlan) return null;
+    
+    const newDoc = createDefaultDocument(title.trim() || 'Untitled Document');
+    const updatedPlan = {
+      ...currentPlan,
+      notepadData: {
+        ...currentPlan.notepadData,
+        currentDocumentId: newDoc.id,
+        documents: {
+          ...currentPlan.notepadData.documents,
+          [newDoc.id]: newDoc
+        }
+      },
+      updatedAt: new Date()
+    };
+    
+    const newStorage = {
+      ...planStorage,
+      plans: {
+        ...planStorage.plans,
+        [currentPlan.id]: updatedPlan
+      }
+    };
+    
+    const operation: SyncOperation = {
+      type: 'update',
+      planId: currentPlan.id,
+      data: { notepadData: updatedPlan.notepadData },
+      timestamp: new Date()
+    };
+    
+    setPlanStorage(newStorage);
+    queueSaveOperation(newStorage, operation);
+    
+    return newDoc;
+  }, [currentPlan, planStorage, queueSaveOperation]);
+
+  const switchToDocument = useCallback((documentId: string) => {
+    if (!currentPlan) return;
+    
+    const updatedPlan = {
+      ...currentPlan,
+      notepadData: {
+        ...currentPlan.notepadData,
+        currentDocumentId: documentId
+      },
+      updatedAt: new Date()
+    };
+    
+    const newStorage = {
+      ...planStorage,
+      plans: {
+        ...planStorage.plans,
+        [currentPlan.id]: updatedPlan
+      }
+    };
+    
+    setPlanStorage(newStorage);
+    queueSaveOperation(newStorage);
+  }, [currentPlan, planStorage, queueSaveOperation]);
+
+  const renameDocument = useCallback((documentId: string, newTitle: string) => {
+    if (!currentPlan) return;
+    
+    const document = currentPlan.notepadData.documents[documentId];
+    if (!document) return;
+    
+    const updatedDocument = {
+      ...document,
+      title: newTitle.trim() || 'Untitled Document',
+      updatedAt: new Date()
+    };
+    
+    const updatedPlan = {
+      ...currentPlan,
+      notepadData: {
+        ...currentPlan.notepadData,
+        documents: {
+          ...currentPlan.notepadData.documents,
+          [documentId]: updatedDocument
+        }
+      },
+      updatedAt: new Date()
+    };
+    
+    const newStorage = {
+      ...planStorage,
+      plans: {
+        ...planStorage.plans,
+        [currentPlan.id]: updatedPlan
+      }
+    };
+    
+    const operation: SyncOperation = {
+      type: 'update',
+      planId: currentPlan.id,
+      data: { notepadData: updatedPlan.notepadData },
+      timestamp: new Date()
+    };
+    
+    setPlanStorage(newStorage);
+    queueSaveOperation(newStorage, operation);
+  }, [currentPlan, planStorage, queueSaveOperation]);
+
+  const updateDocumentContent = useCallback((documentId: string, content: string) => {
+    if (!currentPlan) return;
+    
+    const document = currentPlan.notepadData.documents[documentId];
+    if (!document) return;
+    
+    const updatedDocument = {
+      ...document,
+      content,
+      updatedAt: new Date()
+    };
+    
+    const updatedPlan = {
+      ...currentPlan,
+      notepadData: {
+        ...currentPlan.notepadData,
+        documents: {
+          ...currentPlan.notepadData.documents,
+          [documentId]: updatedDocument
+        }
+      },
+      updatedAt: new Date()
+    };
+    
+    const newStorage = {
+      ...planStorage,
+      plans: {
+        ...planStorage.plans,
+        [currentPlan.id]: updatedPlan
+      }
+    };
+    
+    const operation: SyncOperation = {
+      type: 'update',
+      planId: currentPlan.id,
+      data: { notepadData: updatedPlan.notepadData },
+      timestamp: new Date()
+    };
+    
+    setPlanStorage(newStorage);
+    queueSaveOperation(newStorage, operation);
+  }, [currentPlan, planStorage, queueSaveOperation]);
+
+  const deleteDocument = useCallback((documentId: string) => {
+    if (!currentPlan) return;
+    
+    const documents = currentPlan.notepadData.documents;
+    const documentIds = Object.keys(documents);
+    
+    // Don't allow deleting the last document
+    if (documentIds.length <= 1) return;
+    
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [documentId]: _deleted, ...remainingDocuments } = documents;
+    
+    // If deleting the current document, switch to another one
+    let newCurrentId = currentPlan.notepadData.currentDocumentId;
+    if (newCurrentId === documentId) {
+      const remainingIds = Object.keys(remainingDocuments);
+      newCurrentId = remainingIds[0] || null;
+    }
+    
+    const updatedPlan = {
+      ...currentPlan,
+      notepadData: {
+        ...currentPlan.notepadData,
+        currentDocumentId: newCurrentId,
+        documents: remainingDocuments
+      },
+      updatedAt: new Date()
+    };
+    
+    const newStorage = {
+      ...planStorage,
+      plans: {
+        ...planStorage.plans,
+        [currentPlan.id]: updatedPlan
+      }
+    };
+    
+    const operation: SyncOperation = {
+      type: 'update',
+      planId: currentPlan.id,
+      data: { notepadData: updatedPlan.notepadData },
+      timestamp: new Date()
+    };
+    
+    setPlanStorage(newStorage);
+    queueSaveOperation(newStorage, operation);
+  }, [currentPlan, planStorage, queueSaveOperation]);
+
   const getAllPlans = useCallback((): PlanMetadata[] => {
     return Object.values(planStorage.plans).map(plan => ({
       id: plan.id,
@@ -348,15 +598,31 @@ export const usePlanStorage = () => {
     }));
   }, [planStorage.plans]);
 
+  // Computed values for documents
+  const currentDocument = currentPlan?.notepadData.currentDocumentId 
+    ? currentPlan.notepadData.documents[currentPlan.notepadData.currentDocumentId] 
+    : null;
+
+  const allDocuments = currentPlan 
+    ? Object.values(currentPlan.notepadData.documents).sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    : [];
+
   return {
     isLoading,
     currentPlan,
+    currentDocument,
     allPlans: getAllPlans(),
+    allDocuments,
     createPlan,
     deletePlan,
     switchToPlan,
     updateCurrentPlan,
     renamePlan,
+    createDocument,
+    switchToDocument,
+    renameDocument,
+    updateDocumentContent,
+    deleteDocument,
     syncState,
     syncError,
     rollbackToLastSyncedState,

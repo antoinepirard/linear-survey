@@ -9,6 +9,7 @@ import BacklogPanel from '@/components/teamplan/BacklogPanel';
 import CommentsPanel from '@/components/teamplan/CommentsPanel';
 import VerticalNavigation from '@/components/teamplan/VerticalNavigation';
 import PlanSelector from '@/components/teamplan/PlanSelector';
+import DocumentSelector from '@/components/teamplan/DocumentSelector';
 import { usePlanStorage } from '@/hooks/usePlanStorage';
 import { useResizable } from '@/hooks/useResizable';
 import { useNotePadStorage } from '@/hooks/useNotePadStorage';
@@ -49,15 +50,22 @@ export default function TeamPlanPage() {
   const {
     isLoading,
     currentPlan,
+    currentDocument,
     allPlans,
+    allDocuments,
     createPlan,
     deletePlan,
     switchToPlan,
     updateCurrentPlan,
     renamePlan,
+    createDocument,
+    switchToDocument,
+    renameDocument,
+    deleteDocument,
+    updateDocumentContent,
   } = usePlanStorage();
 
-  // Keyboard shortcuts for plan switching
+  // Keyboard shortcuts for plan and document switching
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     // Check if user is currently typing in an input field or contenteditable element
     const activeElement = document.activeElement;
@@ -72,8 +80,11 @@ export default function TeamPlanPage() {
       return;
     }
 
-    // Only handle shortcuts if Shift is pressed with number keys
-    if (event.shiftKey && event.key >= '1' && event.key <= '9') {
+    const mod = event.metaKey || event.ctrlKey;
+    const shift = event.shiftKey;
+
+    // Plan switching with Shift + number keys
+    if (shift && !mod && event.key >= '1' && event.key <= '9') {
       event.preventDefault();
       const planIndex = parseInt(event.key) - 1;
       if (planIndex < allPlans.length) {
@@ -83,7 +94,25 @@ export default function TeamPlanPage() {
         }
       }
     }
-  }, [allPlans, currentPlan?.id, switchToPlan]);
+
+    // Document switching with Cmd/Ctrl + number keys
+    if (mod && !shift && event.key >= '1' && event.key <= '9') {
+      event.preventDefault();
+      const docIndex = parseInt(event.key) - 1;
+      if (docIndex < allDocuments.length) {
+        const targetDoc = allDocuments[docIndex];
+        if (targetDoc && targetDoc.id !== currentDocument?.id) {
+          switchToDocument(targetDoc.id);
+        }
+      }
+    }
+
+    // New document with Cmd/Ctrl + T
+    if (mod && !shift && event.key === 't') {
+      event.preventDefault();
+      createDocument('New Document');
+    }
+  }, [allPlans, currentPlan?.id, switchToPlan, allDocuments, currentDocument?.id, switchToDocument, createDocument]);
 
   // Add and remove keyboard event listeners
   useEffect(() => {
@@ -205,7 +234,7 @@ export default function TeamPlanPage() {
               style={{ width: sidebarWidth - 48 }} // Subtract navigation width
               className="flex flex-col overflow-hidden"
             >
-                {/* Plan Selector Header */}
+                {/* Plan and Document Selector Header */}
                 <div className="bg-transparent border-b border-slate-200/65 px-4 flex-shrink-0 flex items-center justify-between" style={{ paddingTop: '7px', paddingBottom: '7px' }}>
                 <div className="flex items-center gap-3">
                   <PlanSelector
@@ -215,6 +244,19 @@ export default function TeamPlanPage() {
                     onCreatePlan={createPlan}
                     onDeletePlan={deletePlan}
                     onRenamePlan={renamePlan}
+                  />
+                  
+                  {/* Separator */}
+                  <div className="h-4 w-px bg-slate-200/65" />
+                  
+                  {/* Document Selector */}
+                  <DocumentSelector
+                    currentDocument={currentDocument}
+                    allDocuments={allDocuments}
+                    onSelectDocument={switchToDocument}
+                    onCreateDocument={createDocument}
+                    onDeleteDocument={deleteDocument}
+                    onRenameDocument={renameDocument}
                   />
                 </div>
                 
@@ -267,7 +309,11 @@ export default function TeamPlanPage() {
                       <NotePad 
                         width={sidebarWidth - 48} // Subtract navigation width (48px = 12px width + borders)
                         currentPlan={currentPlan}
-                        onUpdatePlan={updateCurrentPlan}
+                        currentDocument={currentDocument}
+                        allDocuments={allDocuments}
+                        onCreateDocument={createDocument}
+                        onSwitchToDocument={switchToDocument}
+                        onUpdateDocumentContent={updateDocumentContent}
                       />
                     </motion.div>
                   ) : activePanel === 'backlog' ? (
