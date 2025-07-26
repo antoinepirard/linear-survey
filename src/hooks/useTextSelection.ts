@@ -30,47 +30,53 @@ export function useTextSelection({
 
   const calculateMenuPosition = useCallback(
     (editor: Editor, container: HTMLDivElement | null): Position => {
-      if (!container) return { x: 0, y: 0 };
+      if (!container || !editor?.view || editor.isDestroyed) return { x: 0, y: 0 };
+      
       const { selection } = editor.state;
       const { from, to } = selection;
 
-      const start = editor.view.coordsAtPos(from);
-      const end = editor.view.coordsAtPos(to);
-      const containerRect = container.getBoundingClientRect();
+      try {
+        const start = editor.view.coordsAtPos(from);
+        const end = editor.view.coordsAtPos(to);
+        const containerRect = container.getBoundingClientRect();
 
-      const menuWidth = 200;
-      const menuHeight = 40;
-      const gap = 20;
+        const menuWidth = 200;
+        const menuHeight = 40;
+        const gap = 20;
 
-      // Account for scroll position within the container
-      let x = (start.left + end.left) / 2 - containerRect.left;
-      let y =
-        start.top - containerRect.top - menuHeight - gap + container.scrollTop;
+        // Account for scroll position within the container
+        let x = (start.left + end.left) / 2 - containerRect.left;
+        let y =
+          start.top - containerRect.top - menuHeight - gap + container.scrollTop;
 
-      // Horizontal bounds checking
-      const containerWidth = containerRect.width;
-      const halfMenuWidth = menuWidth / 2;
+        // Horizontal bounds checking
+        const containerWidth = containerRect.width;
+        const halfMenuWidth = menuWidth / 2;
 
-      if (x - halfMenuWidth < 0) {
-        x = halfMenuWidth;
-      } else if (x + halfMenuWidth > containerWidth) {
-        x = containerWidth - halfMenuWidth;
+        if (x - halfMenuWidth < 0) {
+          x = halfMenuWidth;
+        } else if (x + halfMenuWidth > containerWidth) {
+          x = containerWidth - halfMenuWidth;
+        }
+
+        // Vertical bounds checking - position below if would go above container
+        // Also account for scroll position in vertical bounds checking
+        if (y < container.scrollTop) {
+          y = end.top - containerRect.top + gap + 10 + container.scrollTop;
+        }
+
+        return { x, y };
+      } catch (error) {
+        console.warn('Failed to calculate menu position:', error);
+        return { x: 0, y: 0 };
       }
-
-      // Vertical bounds checking - position below if would go above container
-      // Also account for scroll position in vertical bounds checking
-      if (y < container.scrollTop) {
-        y = end.top - containerRect.top + gap + 10 + container.scrollTop;
-      }
-
-      return { x, y };
     },
     []
   );
 
   const handleSelectionUpdate = useCallback(
     (editor: Editor) => {
-      if (!containerRef.current) return;
+      if (!containerRef.current || !editor?.state || editor.isDestroyed) return;
 
       const { selection } = editor.state;
       const { empty } = selection;
@@ -93,7 +99,7 @@ export function useTextSelection({
   );
 
   const handleTransaction = useCallback(() => {
-    if (!editor || !showSelectionMenu) return;
+    if (!editor || !showSelectionMenu || !editor?.state || editor.isDestroyed) return;
 
     const { selection } = editor.state;
     const { empty } = selection;
@@ -106,7 +112,7 @@ export function useTextSelection({
 
   const handleMouseUp = useCallback(
     (editor: Editor) => {
-      if (!containerRef.current) return;
+      if (!containerRef.current || !editor?.state || editor.isDestroyed) return;
 
       const { selection } = editor.state;
       const { empty } = selection;
@@ -143,6 +149,7 @@ export function useTextSelection({
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
   }, []);

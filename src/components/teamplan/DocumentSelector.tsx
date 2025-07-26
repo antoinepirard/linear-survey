@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ChevronsUpDown, Plus, Trash2, Check, FileText } from 'lucide-react';
+import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 
 interface DocumentSelectorProps {
   currentDocument: NotepadDocument | null;
@@ -176,7 +177,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
                       onKeyDown={handleRenameKeyDown}
                       onBlur={handleRenameSave}
                       className="h-6 text-sm font-medium px-1 py-0"
-                      maxLength={50}
+                      maxLength={NOTEPAD_CONSTANTS.DOCUMENT_TITLE_MAX_LENGTH}
                       autoFocus
                     />
                   ) : (

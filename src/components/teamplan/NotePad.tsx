@@ -42,8 +42,10 @@ function NotePad({
   
   // Title management
   const [titleValue, setTitleValue] = useState('');
+  const [pendingTitleChange, setPendingTitleChange] = useState<string | null>(null);
   const titleSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const titleChangeAbortController = useRef<AbortController | null>(null);
 
   // Content management helper
   const loadContent = useCallback((): string | null => {
@@ -58,25 +60,41 @@ function NotePad({
     return null;
   }, [currentDocument, currentPlan]);
 
-  // Title management helper
+  // Title management helper with race condition protection
   const debouncedSaveTitle = useCallback((newTitle: string) => {
     if (!currentDocument || !onRenameDocument) return;
+    
+    // Cancel any pending title change
+    if (titleChangeAbortController.current) {
+      titleChangeAbortController.current.abort();
+    }
     
     // Clear existing timeout
     if (titleSaveTimeoutRef.current) {
       clearTimeout(titleSaveTimeoutRef.current);
+      titleSaveTimeoutRef.current = null;
     }
     
+    const controller = new AbortController();
+    titleChangeAbortController.current = controller;
+    setPendingTitleChange(newTitle);
+    
     titleSaveTimeoutRef.current = setTimeout(() => {
-      try {
-        const trimmedTitle = newTitle.trim() || 'New Document';
-        if (trimmedTitle !== currentDocument.title) {
-          onRenameDocument(currentDocument.id, trimmedTitle);
+      if (!controller.signal.aborted) {
+        try {
+          const trimmedTitle = newTitle.trim() || 'New Document';
+          if (trimmedTitle !== currentDocument.title) {
+            onRenameDocument(currentDocument.id, trimmedTitle);
+          }
+        } catch (error) {
+          console.error('Failed to rename document:', error);
+          // Reset title on error
+          setTitleValue(currentDocument.title);
+        } finally {
+          setPendingTitleChange(null);
+          titleChangeAbortController.current = null;
+          titleSaveTimeoutRef.current = null;
         }
-      } catch (error) {
-        console.error('Failed to rename document:', error);
-        // Reset title on error
-        setTitleValue(currentDocument.title);
       }
     }, 500); // 500ms debounce for title changes
   }, [currentDocument, onRenameDocument]);
@@ -89,19 +107,19 @@ function NotePad({
   }, [debouncedSaveTitle]);
 
 
-  // Sync title when document changes
+  // Sync title when document changes (with pending change protection)
   useEffect(() => {
-    if (currentDocument) {
+    if (currentDocument && !pendingTitleChange) {
       setTitleValue(currentDocument.title);
       // Auto-focus title if it's a new document
       if (currentDocument.title === 'New Document' && titleInputRef.current) {
         titleInputRef.current.focus();
         titleInputRef.current.select();
       }
-    } else {
+    } else if (!currentDocument) {
       setTitleValue('');
     }
-  }, [currentDocument]);
+  }, [currentDocument, pendingTitleChange]);
 
   // Error handling helper
   const handleError = useCallback((error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
@@ -114,9 +132,13 @@ function NotePad({
   const setSaveStatusWithTimeout = useCallback((status: 'saved' | 'error', delay: number) => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
     }
     setSaveStatus(status);
-    saveTimeoutRef.current = setTimeout(() => setSaveStatus('idle'), delay);
+    saveTimeoutRef.current = setTimeout(() => {
+      setSaveStatus('idle');
+      saveTimeoutRef.current = null;
+    }, delay);
   }, []);
 
     // Debounced save function with improved race condition handling
@@ -129,6 +151,7 @@ function NotePad({
     // Clear existing timeout
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
+      debounceTimeoutRef.current = undefined;
     }
     
     // Add to save queue with timestamp for ordering
@@ -185,6 +208,7 @@ function NotePad({
       } finally {
         saveInProgressRef.current = false;
         pendingSaveRef.current = null;
+        debounceTimeoutRef.current = undefined;
       }
     }, 300); // 300ms debounce
   }, [currentDocument, onUpdateDocumentContent, handleError, setSaveStatusWithTimeout]);
@@ -406,6 +430,7 @@ function NotePad({
     // Clear existing timeout
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
     }
     
     // Set a longer timeout to be more forgiving with typing detection
@@ -414,6 +439,7 @@ function NotePad({
       if (Date.now() - lastTypingTime.current >= 500) {
         isActivelyTyping.current = false;
       }
+      typingTimeoutRef.current = null;
     }, 500); // Increased from 150ms to 500ms for better user experience
   }, []);
   
@@ -461,15 +487,23 @@ function NotePad({
       // Clean up timeouts
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
+        saveTimeoutRef.current = null;
       }
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current);
+        debounceTimeoutRef.current = undefined;
       }
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
       }
       if (titleSaveTimeoutRef.current) {
         clearTimeout(titleSaveTimeoutRef.current);
+        titleSaveTimeoutRef.current = null;
+      }
+      if (titleChangeAbortController.current) {
+        titleChangeAbortController.current.abort();
+        titleChangeAbortController.current = null;
       }
       // Reset save state
       saveInProgressRef.current = false;
@@ -505,7 +539,7 @@ function NotePad({
                 onKeyDown={handleTitleKeyDown}
                 placeholder="New Document"
                 className="w-full text-2xl font-bold text-slate-900 bg-transparent border-none outline-none resize-none placeholder:text-slate-400 mb-2"
-                maxLength={100}
+                maxLength={NOTEPAD_CONSTANTS.DOCUMENT_TITLE_MAX_LENGTH}
               />
             </div>
           )}

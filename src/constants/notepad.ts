@@ -24,6 +24,9 @@ export const NOTEPAD_CONSTANTS = {
   PLACEHOLDER_TEXT: 'Start thinking, keep writing...',
   TITLE_PLACEHOLDER: 'Enter note title...',
   
+  // Validation
+  DOCUMENT_TITLE_MAX_LENGTH: 100,
+  
   // Animation durations
   SPRING_CONFIG: {
     stiffness: 300,
