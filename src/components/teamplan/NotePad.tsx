@@ -154,7 +154,7 @@ function NotePad({
     Typography,
     SlashCommand,
     EmptyLinePlaceholder,
-  ], []); // Stable extensions - placeholder will be updated via editor commands
+  ], [currentDocument?.title]); // Update extensions when document title changes
 
   const editor = useEditor({
     extensions: editorExtensions,
