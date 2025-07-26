@@ -17,11 +17,105 @@ import { CubeIcon } from '@heroicons/react/24/solid';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { teamPlanLogger as logger } from '@/utils/logger';
 
+// Utility functions for time slot sequence management
+const shouldShiftSubsequentSlots = (originalLabel: string, newLabel: string): boolean => {
+  // Only shift if both labels follow a recognizable sequence pattern
+  return isSequencePattern(originalLabel) && isSequencePattern(newLabel);
+};
+
+const isSequencePattern = (label: string): boolean => {
+  const patterns = [
+    /^q(\d+)$/i,                    // Q1, Q2, etc.
+    /^(quarter)\s+(\d+)$/i,         // Quarter 1, Quarter 2
+    /^(week)\s+(\d+)$/i,            // Week 1, Week 2
+    /^(month)\s+(\d+)$/i,           // Month 1, Month 2
+    /^(\d{4})$/,                    // 2024, 2025
+    /^(year)\s+(\d+)$/i,            // Year 2023, Year 2024
+    /^([a-zA-Z]+)\s+(\d+)$/i        // Phase 1, Sprint 2, etc.
+  ];
+  
+  return patterns.some(pattern => pattern.test(label.trim()));
+};
+
+const generateSequenceLabels = (startLabel: string, count: number): string[] => {
+  const labels = [startLabel];
+  
+  if (count <= 0) return labels;
+  
+  // Handle different sequence patterns
+  const quarterMatch = startLabel.match(/^q(\d+)$/i);
+  if (quarterMatch) {
+    const startNumber = parseInt(quarterMatch[1]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`Q${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const quarterFullMatch = startLabel.match(/^(quarter)\s+(\d+)$/i);
+  if (quarterFullMatch) {
+    const startNumber = parseInt(quarterFullMatch[2]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`Quarter ${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const weekMatch = startLabel.match(/^(week)\s+(\d+)$/i);
+  if (weekMatch) {
+    const startNumber = parseInt(weekMatch[2]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`Week ${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const monthMatch = startLabel.match(/^(month)\s+(\d+)$/i);
+  if (monthMatch) {
+    const startNumber = parseInt(monthMatch[2]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`Month ${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const yearMatch = startLabel.match(/^(\d{4})$/);
+  if (yearMatch) {
+    const startNumber = parseInt(yearMatch[1]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const yearFullMatch = startLabel.match(/^(year)\s+(\d+)$/i);
+  if (yearFullMatch) {
+    const startNumber = parseInt(yearFullMatch[2]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`Year ${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const genericMatch = startLabel.match(/^([a-zA-Z]+)\s+(\d+)$/i);
+  if (genericMatch) {
+    const prefix = genericMatch[1];
+    const startNumber = parseInt(genericMatch[2]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`${prefix} ${startNumber + i}`);
+    }
+    return labels;
+  }
+  
+  return labels;
+};
+
 export default function TeamPlanPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [activePanel, setActivePanel] = useState<'notepad' | 'backlog' | 'comments'>('notepad');
   const [isColorCodingEnabled, setIsColorCodingEnabled] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
 
   // Load color coding preference from localStorage on mount
   useEffect(() => {
@@ -241,7 +335,7 @@ export default function TeamPlanPage() {
       >
       {/* Sidebar Container with Resize */}
       <div className="relative flex">
-        <div className="flex flex-col bg-white overflow-visible ring-1 ring-slate-300/30 shadow-md" style={{ width: isSidebarExpanded ? sidebarWidth : 48 }}>
+        <div className="flex flex-col bg-white overflow-visible ring-1 ring-slate-300/30 shadow-md z-20" style={{ width: isSidebarExpanded ? sidebarWidth : 48 }}>
           
           {/* SidebarHeader - spans full width when expanded */}
           {isSidebarExpanded && (
@@ -363,6 +457,77 @@ export default function TeamPlanPage() {
           onChange={handleDataChange}
           onDataSyncError={handleDataSyncError}
           isColorCodingEnabled={isColorCodingEnabled}
+          hoveredColumn={hoveredColumn}
+          onColumnMouseEnter={setHoveredColumn}
+          onColumnMouseLeave={() => setHoveredColumn(null)}
+          headerTitle="Team Plan"
+          headerSubtitle="Manage projects and timelines across your team"
+          onAddTimeSlot={(timeSlot) => {
+            const newData = {
+              ...currentPlan.teamPlanData,
+              timeSlots: [...currentPlan.teamPlanData.timeSlots, timeSlot]
+            };
+            updateCurrentPlan({ teamPlanData: newData });
+          }}
+          onRemoveTimeSlot={(timeSlotId) => {
+            const newData = {
+              ...currentPlan.teamPlanData,
+              timeSlots: currentPlan.teamPlanData.timeSlots.filter(t => t.id !== timeSlotId),
+              projects: currentPlan.teamPlanData.projects.filter(p => p.timeSlotId !== timeSlotId)
+            };
+            updateCurrentPlan({ teamPlanData: newData });
+          }}
+          onUpdateTimeSlot={(updatedTimeSlot) => {
+            const timeSlotIndex = currentPlan.teamPlanData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
+            if (timeSlotIndex === -1) return;
+
+            const updatedTimeSlots = [...currentPlan.teamPlanData.timeSlots];
+            const originalLabel = updatedTimeSlots[timeSlotIndex].label;
+            updatedTimeSlots[timeSlotIndex] = updatedTimeSlot;
+
+            // Auto-shift subsequent time slots if the pattern changed
+            const shouldShift = shouldShiftSubsequentSlots(originalLabel, updatedTimeSlot.label);
+            if (shouldShift) {
+              const nextSequenceLabels = generateSequenceLabels(updatedTimeSlot.label, updatedTimeSlots.length - timeSlotIndex - 1);
+              for (let i = 1; i < nextSequenceLabels.length; i++) {
+                const targetIndex = timeSlotIndex + i;
+                if (targetIndex < updatedTimeSlots.length) {
+                  updatedTimeSlots[targetIndex] = {
+                    ...updatedTimeSlots[targetIndex],
+                    label: nextSequenceLabels[i]
+                  };
+                }
+              }
+            }
+
+            const newData = {
+              ...currentPlan.teamPlanData,
+              timeSlots: updatedTimeSlots
+            };
+            updateCurrentPlan({ teamPlanData: newData });
+          }}
+          onMoveTimeSlotLeft={(timeSlotId) => {
+            const currentIndex = currentPlan.teamPlanData.timeSlots.findIndex(t => t.id === timeSlotId);
+            if (currentIndex <= 0) return;
+            const newTimeSlots = [...currentPlan.teamPlanData.timeSlots];
+            [newTimeSlots[currentIndex - 1], newTimeSlots[currentIndex]] = [newTimeSlots[currentIndex], newTimeSlots[currentIndex - 1]];
+            const newData = {
+              ...currentPlan.teamPlanData,
+              timeSlots: newTimeSlots
+            };
+            updateCurrentPlan({ teamPlanData: newData });
+          }}
+          onMoveTimeSlotRight={(timeSlotId) => {
+            const currentIndex = currentPlan.teamPlanData.timeSlots.findIndex(t => t.id === timeSlotId);
+            if (currentIndex >= currentPlan.teamPlanData.timeSlots.length - 1) return;
+            const newTimeSlots = [...currentPlan.teamPlanData.timeSlots];
+            [newTimeSlots[currentIndex], newTimeSlots[currentIndex + 1]] = [newTimeSlots[currentIndex + 1], newTimeSlots[currentIndex]];
+            const newData = {
+              ...currentPlan.teamPlanData,
+              timeSlots: newTimeSlots
+            };
+            updateCurrentPlan({ teamPlanData: newData });
+          }}
         />
       </div>
     </div>

@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef, memo } from 'react';
 import { motion } from 'motion/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
-import { TeamPlanData, Project, TimeSlot, Person, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor, getAllGroups } from '@/data/teamplan';
+import { TeamPlanData, Project, Person, TimeSlot, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor, getAllGroups } from '@/data/teamplan';
 import ProjectCard from './ProjectCard';
-import TimelineHeader from './TimelineHeader';
 import PersonCell from './PersonCell';
 import AddPersonCell from './AddPersonCell';
 import TeamPlanContextMenu from './TeamPlanContextMenu';
+import TeamPlanHeader from './TeamPlanHeader';
 import { Button } from '@/components/ui/button';
 
 interface TeamPlanBoardProps {
@@ -16,106 +16,36 @@ interface TeamPlanBoardProps {
   onChange?: (data: TeamPlanData) => void;
   onDataSyncError?: (originalData: TeamPlanData, errorData: TeamPlanData, error: Error) => void;
   isColorCodingEnabled?: boolean;
+  hoveredColumn?: string | null;
+  onColumnMouseEnter?: (timeSlotId: string) => void;
+  onColumnMouseLeave?: () => void;
+  // Header props
+  headerTitle?: string;
+  headerSubtitle?: string;
+  onAddTimeSlot?: (timeSlot: TimeSlot) => void;
+  onRemoveTimeSlot?: (timeSlotId: string) => void;
+  onUpdateTimeSlot?: (timeSlot: TimeSlot) => void;
+  onMoveTimeSlotLeft?: (timeSlotId: string) => void;
+  onMoveTimeSlotRight?: (timeSlotId: string) => void;
 }
 
-// Utility functions for time slot sequence management
-const shouldShiftSubsequentSlots = (originalLabel: string, newLabel: string): boolean => {
-  // Only shift if both labels follow a recognizable sequence pattern
-  return isSequencePattern(originalLabel) && isSequencePattern(newLabel);
-};
-
-const isSequencePattern = (label: string): boolean => {
-  const patterns = [
-    /^q(\d+)$/i,                    // Q1, Q2, etc.
-    /^(quarter)\s+(\d+)$/i,         // Quarter 1, Quarter 2
-    /^(week)\s+(\d+)$/i,            // Week 1, Week 2
-    /^(month)\s+(\d+)$/i,           // Month 1, Month 2
-    /^(\d{4})$/,                    // 2024, 2025
-    /^(year)\s+(\d+)$/i,            // Year 2023, Year 2024
-    /^([a-zA-Z]+)\s+(\d+)$/i        // Phase 1, Sprint 2, etc.
-  ];
-  
-  return patterns.some(pattern => pattern.test(label.trim()));
-};
-
-const generateSequenceLabels = (startLabel: string, count: number): string[] => {
-  const labels = [startLabel];
-  
-  if (count <= 0) return labels;
-  
-  // Handle different sequence patterns
-  const quarterMatch = startLabel.match(/^q(\d+)$/i);
-  if (quarterMatch) {
-    const startNumber = parseInt(quarterMatch[1]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`Q${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const quarterFullMatch = startLabel.match(/^(quarter)\s+(\d+)$/i);
-  if (quarterFullMatch) {
-    const startNumber = parseInt(quarterFullMatch[2]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`Quarter ${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const weekMatch = startLabel.match(/^(week)\s+(\d+)$/i);
-  if (weekMatch) {
-    const startNumber = parseInt(weekMatch[2]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`Week ${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const monthMatch = startLabel.match(/^(month)\s+(\d+)$/i);
-  if (monthMatch) {
-    const startNumber = parseInt(monthMatch[2]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`Month ${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const yearMatch = startLabel.match(/^(\d{4})$/);
-  if (yearMatch) {
-    const startNumber = parseInt(yearMatch[1]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const yearFullMatch = startLabel.match(/^(year)\s+(\d+)$/i);
-  if (yearFullMatch) {
-    const startNumber = parseInt(yearFullMatch[2]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`Year ${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const genericMatch = startLabel.match(/^([a-zA-Z]+)\s+(\d+)$/i);
-  if (genericMatch) {
-    const prefix = genericMatch[1];
-    const startNumber = parseInt(genericMatch[2]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`${prefix} ${startNumber + i}`);
-    }
-    return labels;
-  }
-  
-  return labels;
-};
 
 function TeamPlanBoard({ 
   data = DEFAULT_TEAMPLAN_DATA, 
   onChange,
   onDataSyncError,
-  isColorCodingEnabled = true
+  isColorCodingEnabled = true,
+  hoveredColumn: externalHoveredColumn,
+  onColumnMouseEnter: externalOnColumnMouseEnter,
+  onColumnMouseLeave: externalOnColumnMouseLeave,
+  // Header props
+  headerTitle = "Team Plan",
+  headerSubtitle = "Manage projects and timelines across your team",
+  onAddTimeSlot,
+  onRemoveTimeSlot,
+  onUpdateTimeSlot,
+  onMoveTimeSlotLeft,
+  onMoveTimeSlotRight
 }: TeamPlanBoardProps) {
   const [boardData, setBoardData] = useState<TeamPlanData>(data);
   const [draggedProject, setDraggedProject] = useState<string | null>(null);
@@ -126,6 +56,7 @@ function TeamPlanBoard({
   const [draggedProjectData, setDraggedProjectData] = useState<Project | null>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
+  const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const cachedDropZones = useRef<Array<{
     element: HTMLElement;
@@ -170,6 +101,26 @@ function TeamPlanBoard({
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  // Use external hover state if provided, otherwise use internal state
+  const currentHoveredColumn = externalHoveredColumn !== undefined ? externalHoveredColumn : hoveredColumn;
+  
+  // Column hover handlers
+  const handleColumnMouseEnter = (timeSlotId: string) => {
+    if (externalOnColumnMouseEnter) {
+      externalOnColumnMouseEnter(timeSlotId);
+    } else {
+      setHoveredColumn(timeSlotId);
+    }
+  };
+
+  const handleColumnMouseLeave = () => {
+    if (externalOnColumnMouseLeave) {
+      externalOnColumnMouseLeave();
+    } else {
+      setHoveredColumn(null);
+    }
+  };
 
   // Get all unique groups from existing projects
   const getAvailableGroups = () => getAllGroups(boardData.projects);
@@ -478,54 +429,6 @@ function TeamPlanBoard({
     }
   };
 
-  const handleAddTimeSlot = async (timeSlot: TimeSlot) => {
-    const newData = {
-      ...boardData,
-      timeSlots: [...boardData.timeSlots, timeSlot]
-    };
-    
-    try {
-      await performOptimisticUpdate(newData, 'add time slot');
-    } catch {
-      // performOptimisticUpdate already handles rollback and error reporting
-    }
-  };
-
-
-  const handleUpdateTimeSlot = async (updatedTimeSlot: TimeSlot) => {
-    const timeSlotIndex = boardData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
-    if (timeSlotIndex === -1) return;
-
-    const updatedTimeSlots = [...boardData.timeSlots];
-    const originalLabel = updatedTimeSlots[timeSlotIndex].label;
-    updatedTimeSlots[timeSlotIndex] = updatedTimeSlot;
-
-    // Auto-shift subsequent time slots if the pattern changed
-    const shouldShift = shouldShiftSubsequentSlots(originalLabel, updatedTimeSlot.label);
-    if (shouldShift) {
-      const nextSequenceLabels = generateSequenceLabels(updatedTimeSlot.label, updatedTimeSlots.length - timeSlotIndex - 1);
-      for (let i = 1; i < nextSequenceLabels.length; i++) {
-        const targetIndex = timeSlotIndex + i;
-        if (targetIndex < updatedTimeSlots.length) {
-          updatedTimeSlots[targetIndex] = {
-            ...updatedTimeSlots[targetIndex],
-            label: nextSequenceLabels[i]
-          };
-        }
-      }
-    }
-
-    const newData = {
-      ...boardData,
-      timeSlots: updatedTimeSlots
-    };
-    
-    try {
-      await performOptimisticUpdate(newData, 'update time slot');
-    } catch {
-      // performOptimisticUpdate already handles rollback and error reporting
-    }
-  };
 
   const handleAddPerson = async (person: Person) => {
     const newData = {
@@ -607,57 +510,6 @@ function TeamPlanBoard({
     }
   };
 
-  const handleMoveTimeSlotLeft = async (timeSlotId: string) => {
-    const currentIndex = boardData.timeSlots.findIndex(t => t.id === timeSlotId);
-    if (currentIndex <= 0) return;
-
-    const newTimeSlots = [...boardData.timeSlots];
-    [newTimeSlots[currentIndex - 1], newTimeSlots[currentIndex]] = [newTimeSlots[currentIndex], newTimeSlots[currentIndex - 1]];
-
-    const newData = {
-      ...boardData,
-      timeSlots: newTimeSlots
-    };
-    
-    try {
-      await performOptimisticUpdate(newData, 'move time slot left');
-    } catch {
-      // performOptimisticUpdate already handles rollback and error reporting
-    }
-  };
-
-  const handleMoveTimeSlotRight = async (timeSlotId: string) => {
-    const currentIndex = boardData.timeSlots.findIndex(t => t.id === timeSlotId);
-    if (currentIndex >= boardData.timeSlots.length - 1) return;
-
-    const newTimeSlots = [...boardData.timeSlots];
-    [newTimeSlots[currentIndex], newTimeSlots[currentIndex + 1]] = [newTimeSlots[currentIndex + 1], newTimeSlots[currentIndex]];
-
-    const newData = {
-      ...boardData,
-      timeSlots: newTimeSlots
-    };
-    
-    try {
-      await performOptimisticUpdate(newData, 'move time slot right');
-    } catch {
-      // performOptimisticUpdate already handles rollback and error reporting
-    }
-  };
-
-  const handleDeleteTimeSlot = async (timeSlotId: string) => {
-    const newData = {
-      ...boardData,
-      timeSlots: boardData.timeSlots.filter(t => t.id !== timeSlotId),
-      projects: boardData.projects.filter(p => p.timeSlotId !== timeSlotId)
-    };
-    
-    try {
-      await performOptimisticUpdate(newData, 'delete time slot');
-    } catch {
-      // performOptimisticUpdate already handles rollback and error reporting
-    }
-  };
 
   const isDropTarget = (personId: string, timeSlotId: string) => {
     if (!draggedProject || !dragOverCell) return false;
@@ -703,20 +555,25 @@ function TeamPlanBoard({
       
       <div 
         ref={scrollContainerRef}
-        className="flex-1 overflow-auto p-6">
+        className="flex-1 overflow-auto">
         <div className="min-w-fit h-full">
-          {/* Header */}
-          <TimelineHeader
+          {/* Header - now inside scroll container */}
+          <TeamPlanHeader
+            title={headerTitle}
+            subtitle={headerSubtitle}
             timeSlots={boardData.timeSlots}
-            onAddTimeSlot={handleAddTimeSlot}
-            onRemoveTimeSlot={handleDeleteTimeSlot}
-            onUpdateTimeSlot={handleUpdateTimeSlot}
-            onMoveTimeSlotLeft={handleMoveTimeSlotLeft}
-            onMoveTimeSlotRight={handleMoveTimeSlotRight}
+            onAddTimeSlot={onAddTimeSlot}
+            onRemoveTimeSlot={onRemoveTimeSlot}
+            onUpdateTimeSlot={onUpdateTimeSlot}
+            onMoveTimeSlotLeft={onMoveTimeSlotLeft}
+            onMoveTimeSlotRight={onMoveTimeSlotRight}
+            hoveredColumn={currentHoveredColumn}
+            onColumnMouseEnter={handleColumnMouseEnter}
+            onColumnMouseLeave={handleColumnMouseLeave}
           />
-
+          
           {/* Board Grid */}
-          <div className="space-y-0">
+          <div className="space-y-0 px-6 pb-6">
             {boardData.people.map((person, personIndex) => (
               <TeamPlanContextMenu
                 key={person.id}
@@ -729,7 +586,7 @@ function TeamPlanBoard({
                 onDelete={() => handleRemovePerson(person.id)}
                 label={person.name}
               >
-                <div className="grid gap-0 bg-slate-100/60 rounded-lg my-1 p-1.5 group/row" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+                <div className="grid gap-0 my-1" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
                   {/* Person Column with Inline Editing */}
                   <PersonCell
                     person={person}
@@ -755,12 +612,17 @@ function TeamPlanBoard({
                       personName={person.name}
                     >
                       <motion.div
-                        className="min-h-12 p-1.5 pt-2 pb-2 transition-all duration-20 relative overflow-visible group"
+                        className={`min-h-12 p-1.5 pt-2 pb-2 transition-all duration-200 relative overflow-visible group ${
+                          currentHoveredColumn === timeSlot.id ? 'bg-slate-100/70' : ''
+                        }`}
                         data-drop-zone
                         data-person-id={person.id}
                         data-timeslot-id={timeSlot.id}
+                        data-column-id={timeSlot.id}
                         role="region"
                         aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
+                        onMouseEnter={() => handleColumnMouseEnter(timeSlot.id)}
+                        onMouseLeave={handleColumnMouseLeave}
                       >
                       {/* Inner drop target with glow effect */}
                       <div className={`absolute inset-2 rounded-lg transition-all duration-200 pointer-events-none ${
@@ -845,7 +707,7 @@ function TeamPlanBoard({
                       onClick={() => handleRemovePerson(person.id)}
                       variant="ghost"
                       size="icon"
-                      className="opacity-0 group-hover/row:opacity-100 transition-opacity size-7"
+                      className="opacity-0 hover:opacity-100 transition-opacity size-7"
                       title="Remove person"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-slate-500 hover:text-red-500">

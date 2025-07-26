@@ -14,6 +14,9 @@ interface TimelineHeaderProps {
   onUpdateTimeSlot: (timeSlot: TimeSlot) => void;
   onMoveTimeSlotLeft: (timeSlotId: string) => void;
   onMoveTimeSlotRight: (timeSlotId: string) => void;
+  hoveredColumn?: string | null;
+  onColumnMouseEnter?: (timeSlotId: string) => void;
+  onColumnMouseLeave?: () => void;
 }
 
 export default function TimelineHeader({
@@ -22,7 +25,10 @@ export default function TimelineHeader({
   onRemoveTimeSlot,
   onUpdateTimeSlot,
   onMoveTimeSlotLeft,
-  onMoveTimeSlotRight
+  onMoveTimeSlotRight,
+  hoveredColumn,
+  onColumnMouseEnter,
+  onColumnMouseLeave
 }: TimelineHeaderProps) {
   const [editingSlot, setEditingSlot] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
@@ -119,7 +125,7 @@ export default function TimelineHeader({
   };
 
   return (
-    <div className="grid gap-0 mb-0" style={{ gridTemplateColumns: `130px repeat(${timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+    <div className="grid gap-0 mb-0 group/timeline" style={{ gridTemplateColumns: `130px repeat(${timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
       {/* Team Header */}
       <div className="bg-transparent rounded-l-md p-2 flex items-center justify-between">
       </div>
@@ -138,7 +144,12 @@ export default function TimelineHeader({
           label={timeSlot.label}
         >
           <motion.div
-            className="p-2 group relative"
+            className={`p-2 group relative transition-colors duration-200 ${
+              hoveredColumn === timeSlot.id ? 'bg-slate-100/70' : 'hover:bg-slate-50/60'
+            }`}
+            data-column-id={timeSlot.id}
+            onMouseEnter={() => onColumnMouseEnter?.(timeSlot.id)}
+            onMouseLeave={() => onColumnMouseLeave?.()}
           >
             <div className="flex items-center justify-between">
               {editingSlot === timeSlot.id ? (
