@@ -23,8 +23,8 @@ interface CreateDocumentButtonProps {
 
 const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({ onCreateDocument }) => {
   const handleClick = () => {
-    // Create a new untitled document directly without modal
-    onCreateDocument('Untitled');
+    // Create a new document directly without modal
+    onCreateDocument('New Document');
   };
 
   return (

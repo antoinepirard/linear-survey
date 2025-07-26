@@ -462,12 +462,12 @@ export const usePlanStorage = () => {
 
   // Document management functions
   const createDocument = useCallback(
-    (title: string = "Untitled") => {
+    (title: string = "New Document") => {
       if (!currentPlan) {
         throw new Error("No current plan selected");
       }
 
-      const trimmedTitle = title.trim() || "Untitled";
+      const trimmedTitle = title.trim() || "New Document";
 
       // Validate title
       if (trimmedTitle.length > 100) {

@@ -69,7 +69,7 @@ function NotePad({
     
     titleSaveTimeoutRef.current = setTimeout(() => {
       try {
-        const trimmedTitle = newTitle.trim() || 'Untitled';
+        const trimmedTitle = newTitle.trim() || 'New Document';
         if (trimmedTitle !== currentDocument.title) {
           onRenameDocument(currentDocument.id, trimmedTitle);
         }
@@ -93,8 +93,8 @@ function NotePad({
   useEffect(() => {
     if (currentDocument) {
       setTitleValue(currentDocument.title);
-      // Auto-focus title if it's a new untitled document
-      if (currentDocument.title === 'Untitled' && titleInputRef.current) {
+      // Auto-focus title if it's a new document
+      if (currentDocument.title === 'New Document' && titleInputRef.current) {
         titleInputRef.current.focus();
         titleInputRef.current.select();
       }
@@ -503,7 +503,7 @@ function NotePad({
                 value={titleValue}
                 onChange={handleTitleChange}
                 onKeyDown={handleTitleKeyDown}
-                placeholder="Untitled Document"
+                placeholder="New Document"
                 className="w-full text-2xl font-bold text-slate-900 bg-transparent border-none outline-none resize-none placeholder:text-slate-400 mb-2"
                 maxLength={100}
               />
