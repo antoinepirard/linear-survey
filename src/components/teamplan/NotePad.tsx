@@ -70,41 +70,72 @@ function NotePad({
     saveTimeoutRef.current = setTimeout(() => setSaveStatus('idle'), delay);
   }, []);
 
-    // Debounced save function for better performance
+    // Debounced save function with improved race condition handling
   const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const saveQueueRef = useRef<{ content: string; documentId: string; timestamp: number }[]>([]);
   
   const debouncedSaveContent = useCallback((content: string) => {
+    if (!currentDocument) return;
+    
+    // Clear existing timeout
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
     
-    // Store pending content for potential race conditions
+    // Add to save queue with timestamp for ordering
+    const saveItem = {
+      content,
+      documentId: currentDocument.id,
+      timestamp: Date.now()
+    };
+    saveQueueRef.current.push(saveItem);
+    
+    // Store the most recent content for immediate access
     pendingSaveRef.current = content;
     setSaveStatus('saving');
     
     debounceTimeoutRef.current = setTimeout(async () => {
-      // Prevent concurrent saves
+      // Get the most recent save item for the current document
+      const relevantSaves = saveQueueRef.current.filter(item => item.documentId === currentDocument?.id);
+      if (relevantSaves.length === 0) {
+        setSaveStatus('idle');
+        return;
+      }
+      
+      // Get the latest save request
+      const latestSave = relevantSaves[relevantSaves.length - 1];
+      
+      // Clear processed items from queue
+      saveQueueRef.current = saveQueueRef.current.filter(item => 
+        item.documentId !== currentDocument?.id || item.timestamp > latestSave.timestamp
+      );
+      
+      // Prevent concurrent saves with atomic check-and-set
       if (saveInProgressRef.current) {
+        // Re-queue this save if another is in progress
+        saveQueueRef.current.unshift(latestSave);
+        debounceTimeoutRef.current = setTimeout(() => {
+          debouncedSaveContent(latestSave.content);
+        }, 100); // Retry in 100ms
         return;
       }
       
       try {
-        if (currentDocument && onUpdateDocumentContent && pendingSaveRef.current !== null) {
-          saveInProgressRef.current = true;
-          
-          // Use the most recent content
-          const contentToSave = pendingSaveRef.current;
-          pendingSaveRef.current = null;
-          
-                     // Save content (version tracking handled internally by storage hook)
-           onUpdateDocumentContent(currentDocument.id, contentToSave);
-          setSaveStatusWithTimeout('saved', 1500);
+        saveInProgressRef.current = true;
+        
+        if (currentDocument && onUpdateDocumentContent) {
+          // Double-check document hasn't changed during debounce
+          if (latestSave.documentId === currentDocument.id) {
+            onUpdateDocumentContent(currentDocument.id, latestSave.content);
+            setSaveStatusWithTimeout('saved', 1500);
+          }
         }
       } catch (error) {
         setSaveStatusWithTimeout('error', 5000);
         handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
       } finally {
         saveInProgressRef.current = false;
+        pendingSaveRef.current = null;
       }
     }, 300); // 300ms debounce
   }, [currentDocument, onUpdateDocumentContent, handleError, setSaveStatusWithTimeout]);
@@ -149,12 +180,12 @@ function NotePad({
       },
     }),
     Placeholder.configure({
-      placeholder: currentDocument?.title ? `Start writing in "${currentDocument.title}"...` : NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT,
+      placeholder: NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT,
     }),
     Typography,
     SlashCommand,
     EmptyLinePlaceholder,
-  ], [currentDocument?.title]); // Update extensions when document title changes
+  ], []); // Stable extensions - no dependencies to prevent unnecessary recreation
 
   const editor = useEditor({
     extensions: editorExtensions,
@@ -247,16 +278,8 @@ function NotePad({
     onUpdate: ({ editor }) => {
       if (isComposing) return; // Skip updates during IME composition
       
-      // Mark as actively typing
-      lastTypingTime.current = Date.now();
-      isActivelyTyping.current = true;
-      
-      // Clear typing flag after delay
-      setTimeout(() => {
-        if (Date.now() - lastTypingTime.current >= 100) {
-          isActivelyTyping.current = false;
-        }
-      }, 150);
+      // Mark as actively typing with enhanced detection
+      markAsTyping();
       
       try {
         const newContent = editor.getHTML();
@@ -292,7 +315,7 @@ function NotePad({
         handleError(error as Error, 'STORAGE_ERROR', { action: 'load_content' });
       }
     },
-  }, [currentDocument?.id]); // Recreate editor when document changes
+  }, [editorExtensions]); // markAsTyping is stable (no dependencies) so not needed in deps
 
   // Text selection hook
   const {
@@ -306,26 +329,69 @@ function NotePad({
     containerRef: editorRef,
   });
 
-  // Add typing detection to prevent content loading during active typing
+  // Enhanced typing detection to prevent content loading during active typing
   const lastTypingTime = useRef<number>(0);
   const isActivelyTyping = useRef<boolean>(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Track the last loaded document ID and content to prevent unnecessary updates
+  const lastLoadedDocumentId = useRef<string | null>(null);
+  const lastLoadedContent = useRef<string | null>(null);
+  
+  // Enhanced typing detection function
+  const markAsTyping = useCallback(() => {
+    lastTypingTime.current = Date.now();
+    isActivelyTyping.current = true;
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    
+    // Set a longer timeout to be more forgiving with typing detection
+    typingTimeoutRef.current = setTimeout(() => {
+      // Double-check timing to prevent race conditions
+      if (Date.now() - lastTypingTime.current >= 500) {
+        isActivelyTyping.current = false;
+      }
+    }, 500); // Increased from 150ms to 500ms for better user experience
+  }, []);
   
   // Update editor content when document changes
   useEffect(() => {
-    if (editor) {
-      const savedContent = loadContent();
-      if (savedContent !== null) {
-        // Only update if the content is actually different to avoid unnecessary re-renders
-        const currentContent = editor.getHTML();
-        if (currentContent !== savedContent && !isComposing && !isActivelyTyping.current) {
-          editor.commands.setContent(savedContent, { emitUpdate: false });
-        }
-      } else {
-        // Clear editor if no content
-        editor.commands.clearContent();
+    const documentId = currentDocument?.id;
+    const savedContent = currentDocument?.content;
+    
+    if (editor && documentId && savedContent !== undefined) {
+      // Skip if we're actively typing or composing
+      if (isComposing || isActivelyTyping.current) {
+        return;
       }
+      
+      // Skip if this is the same document and content we last loaded
+      if (
+        lastLoadedDocumentId.current === documentId && 
+        lastLoadedContent.current === savedContent
+      ) {
+        return;
+      }
+      
+      // Only update if the content is actually different from what's currently in the editor
+      const currentEditorContent = editor.getHTML();
+      if (currentEditorContent !== savedContent) {
+        editor.commands.setContent(savedContent || '', { emitUpdate: false });
+      }
+      
+      // Update cache
+      lastLoadedDocumentId.current = documentId;
+      lastLoadedContent.current = savedContent;
+    } else if (editor && !documentId) {
+      // Clear editor if no document
+      editor.commands.clearContent();
+      lastLoadedDocumentId.current = null;
+      lastLoadedContent.current = null;
     }
-  }, [editor, currentDocument?.id, currentPlan?.id, loadContent, isComposing]);
+  }, [editor, currentDocument?.id, currentDocument?.content, isComposing]);
 
   // Click-outside handling is now managed by the useTextSelection hook
 
@@ -339,18 +405,19 @@ function NotePad({
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current);
       }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
       // Reset save state
       saveInProgressRef.current = false;
       pendingSaveRef.current = null;
+      saveQueueRef.current = [];
+      // Reset typing state
+      isActivelyTyping.current = false;
       // Clean up editor - will be handled by useEditor destruction
     };
   }, []); // Only run on mount/unmount
   
-  // Handle editor destruction when document changes
-  useEffect(() => {
-    // Editor recreation is handled by useEditor dependency array
-    // No manual cleanup needed here as useEditor handles it
-  }, [editor]);
 
   return (
     <div 
@@ -424,9 +491,9 @@ function NotePad({
 
               {/* Text */}
               <span className="whitespace-nowrap">
-                {saveStatus === 'saving' && 'Saving...'}
-                {saveStatus === 'saved' && 'All changes saved'}
-                {saveStatus === 'error' && 'Failed to save'}
+                {saveStatus === 'saving' && `Saving ${currentDocument?.title || 'document'}...`}
+                {saveStatus === 'saved' && `${currentDocument?.title || 'Document'} saved`}
+                {saveStatus === 'error' && `Failed to save ${currentDocument?.title || 'document'}`}
               </span>
             </div>
           </motion.div>
