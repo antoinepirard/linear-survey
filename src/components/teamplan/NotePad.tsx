@@ -318,6 +318,9 @@ function NotePad({
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
       // Clean up editor
       if (editor) {
         editor.destroy();
