@@ -17,7 +17,6 @@ import ListKeymap from '@tiptap/extension-list-keymap';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
 import { useTextSelection } from '@/hooks/useTextSelection';
 import { usePlanNotePadStorage } from '@/hooks/usePlanNotePadStorage';
-import { useDebounce } from '@/hooks/useDebounce';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { NotePadProps, NotePadError } from '@/types/notepad';
 
