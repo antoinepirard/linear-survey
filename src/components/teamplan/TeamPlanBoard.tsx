@@ -567,7 +567,7 @@ function TeamPlanBoard({
                 onDelete={() => handleRemovePerson(person.id)}
                 label={person.name}
               >
-                <div className="my-1">
+                <div>
                   <PersonCell
                     person={person}
                     onUpdatePerson={handleUpdatePerson}
@@ -613,8 +613,8 @@ function TeamPlanBoard({
               {/* Project Cells Grid */}
               <div className="space-y-0 pb-6 px-6">
                 {boardData.people.map((person, personIndex) => (
-                  <div key={person.id} className="my-1">
-                    <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+                  <div key={person.id}>
+                    <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
                       {/* Project Cells */}
                       {boardData.timeSlots.map(timeSlot => {
                         const cellProjects = getProjectsForCell(boardData.projects, person.id, timeSlot.id);
@@ -634,17 +634,13 @@ function TeamPlanBoard({
                             personName={person.name}
                           >
                             <motion.div
-                              className={`min-h-12 p-1.5 pt-2 pb-2 transition-all duration-200 relative overflow-visible group ${
-                                currentHoveredColumn === timeSlot.id ? 'bg-slate-100/70' : ''
-                              }`}
+                              className="min-h-12 p-1 pt-1 pb-1 transition-all duration-200 relative overflow-visible group bg-slate-100"
                               data-drop-zone
                               data-person-id={person.id}
                               data-timeslot-id={timeSlot.id}
                               data-column-id={timeSlot.id}
                               role="region"
                               aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
-                              onMouseEnter={() => handleColumnMouseEnter(timeSlot.id)}
-                              onMouseLeave={handleColumnMouseLeave}
                             >
                             {/* Inner drop target with glow effect */}
                             <div className={`absolute inset-2 rounded-lg transition-all duration-200 pointer-events-none ${
