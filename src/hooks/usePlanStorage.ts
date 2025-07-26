@@ -658,7 +658,7 @@ export const usePlanStorage = () => {
         throw new DocumentNotFoundError(documentId);
       }
 
-      // Optimistic locking: check version if provided
+      // Simple version checking for localStorage (basic safety, not full conflict resolution)
       if (
         expectedVersion !== undefined &&
         document.version !== expectedVersion
@@ -690,7 +690,7 @@ export const usePlanStorage = () => {
       const updatedDocument = {
         ...document,
         content,
-        version: document.version + 1, // Increment version for optimistic locking
+        version: document.version + 1, // Increment version for basic change tracking
         updatedAt: new Date(),
       };
 
@@ -730,7 +730,6 @@ export const usePlanStorage = () => {
       try {
         setPlanStorage(newStorage);
         queueSaveOperation(newStorage, operation);
-        return updatedDocument; // Return the updated document with new version
       } catch (error) {
         console.error("Failed to update document content:", error);
         throw error;

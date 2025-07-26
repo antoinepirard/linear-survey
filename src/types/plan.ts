@@ -1,4 +1,4 @@
-import { TeamPlanData } from '@/data/teamplan';
+import { TeamPlanData } from "@/data/teamplan";
 
 export interface NotepadDocument {
   id: string;
@@ -43,59 +43,99 @@ export interface LegacyNotepadData {
 
 // Type guard to check if notepadData is legacy format
 export function isLegacyNotepadData(data: unknown): data is LegacyNotepadData {
-  if (data === null || typeof data !== 'object') return false;
+  if (data === null || typeof data !== "object") return false;
   const obj = data as Record<string, unknown>;
-  return typeof obj.content === 'string' && typeof obj.title === 'string' && typeof obj.width === 'number';
+  return (
+    typeof obj.content === "string" &&
+    typeof obj.title === "string" &&
+    typeof obj.width === "number"
+  );
 }
 
 // Error classes for document operations
 export class DocumentConflictError extends Error {
-  constructor(documentId: string, expectedVersion: number, actualVersion: number) {
-    super(`Document ${documentId} conflict: expected version ${expectedVersion}, got ${actualVersion}`);
-    this.name = 'DocumentConflictError';
+  public readonly documentId: string;
+  public readonly expectedVersion: number;
+  public readonly actualVersion: number;
+  public readonly localContent?: string;
+  public readonly remoteContent?: string;
+
+  constructor(
+    documentId: string,
+    expectedVersion: number,
+    actualVersion: number,
+    localContent?: string,
+    remoteContent?: string
+  ) {
+    super(
+      `Document ${documentId} conflict: expected version ${expectedVersion}, got ${actualVersion}`
+    );
+    this.name = "DocumentConflictError";
+    this.documentId = documentId;
+    this.expectedVersion = expectedVersion;
+    this.actualVersion = actualVersion;
+    this.localContent = localContent;
+    this.remoteContent = remoteContent;
   }
 }
 
 export class DocumentNotFoundError extends Error {
   constructor(documentId: string) {
     super(`Document ${documentId} not found`);
-    this.name = 'DocumentNotFoundError';
+    this.name = "DocumentNotFoundError";
   }
 }
 
 export class DocumentValidationError extends Error {
   constructor(message: string, field?: string) {
-    super(`Document validation failed: ${message}${field ? ` (field: ${field})` : ''}`);
-    this.name = 'DocumentValidationError';
+    super(
+      `Document validation failed: ${message}${
+        field ? ` (field: ${field})` : ""
+      }`
+    );
+    this.name = "DocumentValidationError";
   }
 }
 
+// Simple result type for basic error handling (conflict resolution will be added with backend)
+export interface DocumentUpdateResult {
+  success: boolean;
+  document?: NotepadDocument;
+  error?: Error;
+}
+
 // Validation functions
-export const validateDocument = (doc: Partial<NotepadDocument>): { isValid: boolean; errors: string[] } => {
+export const validateDocument = (
+  doc: Partial<NotepadDocument>
+): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
-  
-  if (!doc.id || typeof doc.id !== 'string' || doc.id.trim().length === 0) {
-    errors.push('Document ID is required and must be a non-empty string');
+
+  if (!doc.id || typeof doc.id !== "string" || doc.id.trim().length === 0) {
+    errors.push("Document ID is required and must be a non-empty string");
   }
-  
-  if (!doc.title || typeof doc.title !== 'string' || doc.title.trim().length === 0) {
-    errors.push('Document title is required and must be a non-empty string');
+
+  if (
+    !doc.title ||
+    typeof doc.title !== "string" ||
+    doc.title.trim().length === 0
+  ) {
+    errors.push("Document title is required and must be a non-empty string");
   }
-  
+
   if (doc.title && doc.title.length > 100) {
-    errors.push('Document title must be 100 characters or less');
+    errors.push("Document title must be 100 characters or less");
   }
-  
-  if (typeof doc.content !== 'string') {
-    errors.push('Document content must be a string');
+
+  if (typeof doc.content !== "string") {
+    errors.push("Document content must be a string");
   }
-  
-  if (typeof doc.version !== 'number' || doc.version < 0) {
-    errors.push('Document version must be a non-negative number');
+
+  if (typeof doc.version !== "number" || doc.version < 0) {
+    errors.push("Document version must be a non-negative number");
   }
-  
+
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };

@@ -36,6 +36,8 @@ function NotePad({
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isComposing, setIsComposing] = useState(false);
+  const saveInProgressRef = useRef<boolean>(false);
+  const pendingSaveRef = useRef<string | null>(null);
 
   // Content management helper
   const loadContent = useCallback((): string | null => {
@@ -75,18 +77,34 @@ function NotePad({
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
+    
+    // Store pending content for potential race conditions
+    pendingSaveRef.current = content;
     setSaveStatus('saving');
     
     debounceTimeoutRef.current = setTimeout(async () => {
+      // Prevent concurrent saves
+      if (saveInProgressRef.current) {
+        return;
+      }
+      
       try {
-        if (currentDocument && onUpdateDocumentContent) {
-          // Note: Version checking would be implemented here in the future
-          onUpdateDocumentContent(currentDocument.id, content);
+        if (currentDocument && onUpdateDocumentContent && pendingSaveRef.current !== null) {
+          saveInProgressRef.current = true;
+          
+          // Use the most recent content
+          const contentToSave = pendingSaveRef.current;
+          pendingSaveRef.current = null;
+          
+                     // Save content (version tracking handled internally by storage hook)
+           onUpdateDocumentContent(currentDocument.id, contentToSave);
           setSaveStatusWithTimeout('saved', 1500);
         }
       } catch (error) {
         setSaveStatusWithTimeout('error', 5000);
         handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
+      } finally {
+        saveInProgressRef.current = false;
       }
     }, 300); // 300ms debounce
   }, [currentDocument, onUpdateDocumentContent, handleError, setSaveStatusWithTimeout]);
@@ -136,7 +154,7 @@ function NotePad({
     Typography,
     SlashCommand,
     EmptyLinePlaceholder,
-  ], [currentDocument?.title]); // Update placeholder when document changes
+  ], []); // Stable extensions - placeholder will be updated via editor commands
 
   const editor = useEditor({
     extensions: editorExtensions,
@@ -274,7 +292,7 @@ function NotePad({
         handleError(error as Error, 'STORAGE_ERROR', { action: 'load_content' });
       }
     },
-  }, []); // Add empty dependency array to prevent editor recreation
+  }, [currentDocument?.id]); // Recreate editor when document changes
 
   // Text selection hook
   const {
@@ -291,6 +309,26 @@ function NotePad({
   // Add typing detection to prevent content loading during active typing
   const lastTypingTime = useRef<number>(0);
   const isActivelyTyping = useRef<boolean>(false);
+  
+  // Update placeholder when document changes without recreating extensions
+  useEffect(() => {
+    if (editor && !editor.isDestroyed) {
+      const placeholder = currentDocument?.title 
+        ? `Start writing in "${currentDocument.title}"...` 
+        : NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT;
+      
+      // Update placeholder via editor extension update method
+      try {
+        const placeholderExt = editor.extensionManager.extensions.find(ext => ext.name === 'placeholder');
+        if (placeholderExt && placeholderExt.options.update) {
+          placeholderExt.options.update({ placeholder });
+        }
+      } catch (error) {
+        // Silently handle placeholder update errors - not critical
+        console.debug('Could not update placeholder:', error);
+      }
+    }
+  }, [editor, currentDocument?.title]);
 
   // Update editor content when document changes
   useEffect(() => {
@@ -321,11 +359,17 @@ function NotePad({
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current);
       }
-      // Clean up editor
-      if (editor) {
-        editor.destroy();
-      }
+      // Reset save state
+      saveInProgressRef.current = false;
+      pendingSaveRef.current = null;
+      // Clean up editor - will be handled by useEditor destruction
     };
+  }, []); // Only run on mount/unmount
+  
+  // Handle editor destruction when document changes
+  useEffect(() => {
+    // Editor recreation is handled by useEditor dependency array
+    // No manual cleanup needed here as useEditor handles it
   }, [editor]);
 
   return (
