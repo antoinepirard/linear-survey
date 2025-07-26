@@ -240,8 +240,8 @@ export default function TeamPlanPage() {
         style={{ display: isPageLoading ? 'none' : 'flex' }}
       >
       {/* Sidebar Container with Resize */}
-      <div className="relative flex p-3">
-        <div className="flex flex-col bg-white rounded-md shadow-md ring-1 ring-slate-200/50 overflow-visible" style={{ width: isSidebarExpanded ? sidebarWidth : 48 }}>
+      <div className="relative flex">
+        <div className="flex flex-col bg-white overflow-visible ring-1 ring-slate-300/30 shadow-md" style={{ width: isSidebarExpanded ? sidebarWidth : 48 }}>
           
           {/* SidebarHeader - spans full width when expanded */}
           {isSidebarExpanded && (
