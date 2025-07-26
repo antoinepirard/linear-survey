@@ -5,7 +5,7 @@ import { NotepadDocument } from '@/types/plan';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ChevronsUpDown, Plus, Trash2, Check, FileText } from 'lucide-react';
 
 interface DocumentSelectorProps {
@@ -17,65 +17,26 @@ interface DocumentSelectorProps {
   onRenameDocument?: (documentId: string, newTitle: string) => void;
 }
 
-interface CreateDocumentDialogProps {
+interface CreateDocumentButtonProps {
   onCreateDocument: (title: string) => void;
 }
 
-const CreateDocumentDialog: React.FC<CreateDocumentDialogProps> = ({ onCreateDocument }) => {
-  const [documentTitle, setDocumentTitle] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (documentTitle.trim()) {
-      onCreateDocument(documentTitle.trim());
-      setDocumentTitle('');
-      setIsOpen(false);
-    }
+const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({ onCreateDocument }) => {
+  const handleClick = () => {
+    // Create a new untitled document directly without modal
+    onCreateDocument('Untitled');
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button 
-          variant="secondary" 
-          size="icon" 
-          className="bg-white hover:bg-slate-50 ring-1 ring-slate-200/65 hover:ring-1 hover:ring-slate-300/50 size-7"
-          title="Create new document"
-        >
-          <Plus className="size-3" />
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Create New Document</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            value={documentTitle}
-            onChange={(e) => setDocumentTitle(e.target.value)}
-            placeholder="Enter document title..."
-            maxLength={50}
-            autoFocus
-          />
-          <div className="flex justify-end space-x-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={!documentTitle.trim()}
-            >
-              Create Document
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <Button 
+      variant="secondary" 
+      size="icon" 
+      className="bg-white hover:bg-slate-50 ring-1 ring-slate-200/65 hover:ring-1 hover:ring-slate-300/50 size-7"
+      title="Create new document"
+      onClick={handleClick}
+    >
+      <Plus className="size-3" />
+    </Button>
   );
 };
 
@@ -196,7 +157,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
           <div className="px-4 py-2 border-b border-slate-100">
             <div className="flex items-center justify-between">
               <span className="text-xs uppercase text-slate-500 font-mono">Documents</span>
-              <CreateDocumentDialog onCreateDocument={onCreateDocument} />
+              <CreateDocumentButton onCreateDocument={onCreateDocument} />
             </div>
           </div>
           

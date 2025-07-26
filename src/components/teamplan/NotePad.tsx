@@ -31,6 +31,7 @@ function NotePad({
   onCreateDocument,
   onSwitchToDocument,
   onUpdateDocumentContent,
+  onAutoRenameFromContent,
 }: NotePadProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -127,6 +128,12 @@ function NotePad({
           // Double-check document hasn't changed during debounce
           if (latestSave.documentId === currentDocument.id) {
             onUpdateDocumentContent(currentDocument.id, latestSave.content);
+            
+            // Try to auto-rename the document based on H1 content
+            if (onAutoRenameFromContent) {
+              onAutoRenameFromContent(currentDocument.id, latestSave.content);
+            }
+            
             setSaveStatusWithTimeout('saved', 1500);
           }
         }
@@ -138,7 +145,7 @@ function NotePad({
         pendingSaveRef.current = null;
       }
     }, 300); // 300ms debounce
-  }, [currentDocument, onUpdateDocumentContent, handleError, setSaveStatusWithTimeout]);
+  }, [currentDocument, onUpdateDocumentContent, onAutoRenameFromContent, handleError, setSaveStatusWithTimeout]);
 
   // Show save status when content is being saved
   const showSaveStatusForContent = useCallback((content: string) => {

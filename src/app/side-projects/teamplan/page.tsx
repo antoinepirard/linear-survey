@@ -63,6 +63,7 @@ export default function TeamPlanPage() {
     renameDocument,
     deleteDocument,
     updateDocumentContent,
+    autoRenameDocumentFromContent,
   } = usePlanStorage();
 
   // Document management functions with error handling
@@ -363,6 +364,7 @@ export default function TeamPlanPage() {
                         onCreateDocument={handleCreateDocument}
                         onSwitchToDocument={handleSwitchToDocument}
                         onUpdateDocumentContent={handleUpdateDocumentContent}
+                        onAutoRenameFromContent={autoRenameDocumentFromContent}
                       />
                     </motion.div>
                   ) : activePanel === 'backlog' ? (
