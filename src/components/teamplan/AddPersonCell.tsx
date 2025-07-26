@@ -9,6 +9,8 @@ interface AddPersonCellProps {
   onDrop?: (e: React.DragEvent) => void;
   isDraggedOver?: boolean;
   numTimeSlots?: number;
+  showOnlyPersonColumn?: boolean;
+  showOnlyProjectCells?: boolean;
 }
 
 export default function AddPersonCell({ 
@@ -16,7 +18,9 @@ export default function AddPersonCell({
   onDragOver, 
   onDrop, 
   isDraggedOver = false, 
-  numTimeSlots = 3 
+  numTimeSlots = 3,
+  showOnlyPersonColumn = false,
+  showOnlyProjectCells = false
 }: AddPersonCellProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
@@ -56,6 +60,67 @@ export default function AddPersonCell({
     onDrop?.(e);
   };
 
+  // Only show person column
+  if (showOnlyPersonColumn) {
+    return (
+      <div 
+        className={`p-2 my-1 rounded-md transition-all duration-200 cursor-pointer relative ${
+          isDraggedOver 
+            ? 'bg-gradient-to-b from-blue-200/20 via-blue-100/10 to-transparent border-1 border-dashed border-blue-300' 
+            : isAdding 
+              ? 'bg-white border border-slate-200 cursor-default' 
+              : 'border border-transparent hover:border-slate-200/75'
+        }`}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        onClick={isAdding ? undefined : () => setIsAdding(true)}
+        data-add-person-zone="true"
+        style={{ width: '130px' }}
+      >
+        <div className="flex items-center justify-center min-h-8">
+          {isAdding ? (
+            <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={handleCancel}
+                placeholder="Person name"
+                className="text-sm bg-transparent border-none outline-none placeholder-slate-400 text-slate-700 px-1 w-full"
+                autoFocus
+              />
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500 transition-colors pointer-events-none">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span className={isDraggedOver ? 'text-blue-700' : ''}>
+                {isDraggedOver ? 'Drop to create person' : 'Add Person'}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Only show project cells
+  if (showOnlyProjectCells) {
+    return (
+      <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${numTimeSlots}, minmax(200px, 1fr)) 60px` }}>
+        {/* Empty cells for each time slot */}
+        {Array.from({ length: numTimeSlots }, (_, index) => (
+          <div key={index} className="min-h-12 p-1.5 pt-2 pb-2" />
+        ))}
+        {/* Empty cell for delete button column */}
+        <div className="min-h-12" />
+      </div>
+    );
+  }
+
+  // Original full-width layout
   return (
     <div 
       className={`col-span-full p-2 m-1 rounded-md transition-all duration-200 cursor-pointer relative ${

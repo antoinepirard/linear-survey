@@ -535,36 +535,26 @@ function TeamPlanBoard({
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden relative" onContextMenu={handleContextMenu}>
+    <div className="h-full flex flex-col relative" onContextMenu={handleContextMenu}>
       {/* Left fade overlay */}
-      <div className={`absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none transition-opacity duration-200 ${
+      <div className={`absolute left-32 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-50 to-transparent z-30 pointer-events-none transition-opacity duration-200 ${
         showLeftFade ? 'opacity-100' : 'opacity-0'
       }`} />
       
       {/* Right fade overlay */}
-      <div className={`absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none transition-opacity duration-200 ${
+      <div className={`absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-slate-50 to-transparent z-30 pointer-events-none transition-opacity duration-200 ${
         showRightFade ? 'opacity-100' : 'opacity-0'
       }`} />
       
-      <div 
-        ref={scrollContainerRef}
-        className="flex-1 overflow-auto">
-        <div className="min-w-fit h-full">
-          {/* Header - now inside scroll container */}
-          <TeamPlanHeader
-            timeSlots={boardData.timeSlots}
-            onAddTimeSlot={onAddTimeSlot}
-            onRemoveTimeSlot={onRemoveTimeSlot}
-            onUpdateTimeSlot={onUpdateTimeSlot}
-            onMoveTimeSlotLeft={onMoveTimeSlotLeft}
-            onMoveTimeSlotRight={onMoveTimeSlotRight}
-            hoveredColumn={currentHoveredColumn}
-            onColumnMouseEnter={handleColumnMouseEnter}
-            onColumnMouseLeave={handleColumnMouseLeave}
-          />
+      {/* Main Content Area with Unified Scrolling */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Sticky Person Column */}
+        <div className="sticky left-0 bg-transparent border-r border-slate-200/65 z-20 flex flex-col" style={{ width: '160px' }}>
+          {/* Person Header */}
+          <div className="h-10 bg-transparent"></div>
           
-          {/* Board Grid */}
-          <div className="space-y-0 px-6 pb-6">
+          {/* Person Names List */}
+          <div className="flex-1 space-y-0 px-6 pb-6 overflow-y-auto">
             {boardData.people.map((person, personIndex) => (
               <TeamPlanContextMenu
                 key={person.id}
@@ -577,147 +567,191 @@ function TeamPlanBoard({
                 onDelete={() => handleRemovePerson(person.id)}
                 label={person.name}
               >
-                <div className="grid gap-0 my-1" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
-                  {/* Person Column with Inline Editing */}
+                <div className="my-1">
                   <PersonCell
                     person={person}
                     onUpdatePerson={handleUpdatePerson}
                   />
-              
-                {/* Project Cells */}
-                {boardData.timeSlots.map(timeSlot => {
-                  const cellProjects = getProjectsForCell(boardData.projects, person.id, timeSlot.id);
-                  const isDropping = isDropTarget(person.id, timeSlot.id);
-                  
-                  return (
-                    <TeamPlanContextMenu
-                      key={`${person.id}-${timeSlot.id}`}
-                      type="cell"
-                      canMoveUp={personIndex > 0}
-                      canMoveDown={personIndex < boardData.people.length - 1}
-                      canDelete={boardData.people.length > 1}
-                      onMoveUp={() => handleMovePersonUp(person.id)}
-                      onMoveDown={() => handleMovePersonDown(person.id)}
-                      onDelete={() => handleRemovePerson(person.id)}
-                      onAddProject={() => handleAddProject(person.id, timeSlot.id)}
-                      personName={person.name}
-                    >
-                      <motion.div
-                        className={`min-h-12 p-1.5 pt-2 pb-2 transition-all duration-200 relative overflow-visible group ${
-                          currentHoveredColumn === timeSlot.id ? 'bg-slate-100/70' : ''
-                        }`}
-                        data-drop-zone
-                        data-person-id={person.id}
-                        data-timeslot-id={timeSlot.id}
-                        data-column-id={timeSlot.id}
-                        role="region"
-                        aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
-                        onMouseEnter={() => handleColumnMouseEnter(timeSlot.id)}
-                        onMouseLeave={handleColumnMouseLeave}
-                      >
-                      {/* Inner drop target with glow effect */}
-                      <div className={`absolute inset-2 rounded-lg transition-all duration-200 pointer-events-none ${
-                        isDropping 
-                          ? 'bg-gradient-to-b from-blue-200/20 via-blue-100/10 to-transparent transition-all duration-200' 
-                          : ''
-                      }`} />
-                      
-                      <div className="space-y-1.5 relative">
-                          {/* Fixed insertion placeholder at the top */}
-                          <div className="h-1 flex items-center justify-center">
-                            <div
-                              className={`w-8 h-0.5 bg-blue-400 rounded-full transition-all duration-150 ${
-                                isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 
-                                  ? 'opacity-70 scale-x-100' 
-                                  : 'opacity-0 scale-x-0'
-                              }`}
-                            />
-                          </div>
-                          
-                          {cellProjects.map((project, index) => (
-                            <motion.div 
-                              key={project.id}
-                              layout={!draggedProject}
-                              initial={{ opacity: 0.8, y: 2 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                type: "spring",
-                                stiffness: 600,
-                                damping: 50,
-                                duration: 0.05
-                              }}
-                            >
-                              <ProjectCard
-                                project={project}
-                                isDragging={draggedProject === project.id}
-                                isDuplicating={isDuplicating && draggedProject === project.id}
-                                isEditing={newProjectId === project.id}
-                                availableGroups={getAvailableGroups()}
-                                allProjects={boardData.projects}
-                                isColorCodingEnabled={isColorCodingEnabled}
-                                onEdit={handleEditProject}
-                                onDelete={handleDeleteProject}
-                                onDuplicate={handleDuplicateProject}
-                                onDragStart={handleDragStart}
-                                onDragEnd={handleDragEnd}
-                                onDrag={updateDropTarget}
-                              />
-                              
-                              {/* Fixed insertion placeholder after each card */}
-                              <div className="h-1 flex items-center justify-center">
-                                <div
-                                  className={`w-8 h-0.5 bg-blue-400 rounded-full transition-all duration-150 ${
-                                    isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1
-                                      ? 'opacity-70 scale-x-100'
-                                      : 'opacity-0 scale-x-0'
-                                  }`}
-                                />
-                              </div>
-                            </motion.div>
-                          ))}
-                        
-                        <Button
-                          id={`add-project-${person.id}-${timeSlot.id}`}
-                          variant="ghost"
-                          onClick={() => handleAddProject(person.id, timeSlot.id)}
-                          className="w-full p-2 rounded-lg text-xs text-slate-600 hover:text-slate-800 font-medium bg-transparent hover:bg-transparent border border-dashed border-slate-200 hover:border-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-200 min-h-[2.5rem] flex items-center justify-center select-none"
-                        >
-                          <PlusIcon className="w-3 h-3 mr-1" />
-                          Add Project
-                        </Button>
-                      </div>
-                      </motion.div>
-                    </TeamPlanContextMenu>
-                  );
-                })}
-                
-                {/* Delete Person Button */}
-                <div className="min-h-12 flex items-start justify-center pt-5">
-                  {boardData.people.length > 1 && (
-                    <Button
-                      onClick={() => handleRemovePerson(person.id)}
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 hover:opacity-100 transition-opacity size-7"
-                      title="Remove person"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-slate-500 hover:text-red-500">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244 2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.134H8.09c-1.18 0-2.09.954-2.09 2.134v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                      </svg>
-                    </Button>
-                  )}
-                </div>
                 </div>
               </TeamPlanContextMenu>
             ))}
             
-            {/* Add Person Row */}
-            <div className="grid gap-0" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+            {/* Add Person Row - Person Column */}
+            <div>
               <AddPersonCell 
                 onAddPerson={handleAddPerson}
                 isDraggedOver={dragOverAddPerson}
                 numTimeSlots={boardData.timeSlots.length}
+                showOnlyPersonColumn={true}
               />
+            </div>
+          </div>
+        </div>
+        
+        {/* Unified Scrollable Area for Header + Content */}
+        <div 
+          ref={scrollContainerRef}
+          className="flex-1 overflow-x-auto overflow-y-auto flex flex-col">
+          <div className="min-w-fit flex flex-col h-full">
+            {/* Timeslots Header */}
+            <div className="border-b border-slate-200/65 bg-white">
+              <TeamPlanHeader
+                timeSlots={boardData.timeSlots}
+                onAddTimeSlot={onAddTimeSlot}
+                onRemoveTimeSlot={onRemoveTimeSlot}
+                onUpdateTimeSlot={onUpdateTimeSlot}
+                onMoveTimeSlotLeft={onMoveTimeSlotLeft}
+                onMoveTimeSlotRight={onMoveTimeSlotRight}
+                hoveredColumn={currentHoveredColumn}
+                onColumnMouseEnter={handleColumnMouseEnter}
+                onColumnMouseLeave={handleColumnMouseLeave}
+              />
+            </div>
+            
+            {/* Project Content */}
+            <div className="flex-1">
+              {/* Project Cells Grid */}
+              <div className="space-y-0 pb-6 px-6">
+                {boardData.people.map((person, personIndex) => (
+                  <div key={person.id} className="my-1">
+                    <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+                      {/* Project Cells */}
+                      {boardData.timeSlots.map(timeSlot => {
+                        const cellProjects = getProjectsForCell(boardData.projects, person.id, timeSlot.id);
+                        const isDropping = isDropTarget(person.id, timeSlot.id);
+                        
+                        return (
+                          <TeamPlanContextMenu
+                            key={`${person.id}-${timeSlot.id}`}
+                            type="cell"
+                            canMoveUp={personIndex > 0}
+                            canMoveDown={personIndex < boardData.people.length - 1}
+                            canDelete={boardData.people.length > 1}
+                            onMoveUp={() => handleMovePersonUp(person.id)}
+                            onMoveDown={() => handleMovePersonDown(person.id)}
+                            onDelete={() => handleRemovePerson(person.id)}
+                            onAddProject={() => handleAddProject(person.id, timeSlot.id)}
+                            personName={person.name}
+                          >
+                            <motion.div
+                              className={`min-h-12 p-1.5 pt-2 pb-2 transition-all duration-200 relative overflow-visible group ${
+                                currentHoveredColumn === timeSlot.id ? 'bg-slate-100/70' : ''
+                              }`}
+                              data-drop-zone
+                              data-person-id={person.id}
+                              data-timeslot-id={timeSlot.id}
+                              data-column-id={timeSlot.id}
+                              role="region"
+                              aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
+                              onMouseEnter={() => handleColumnMouseEnter(timeSlot.id)}
+                              onMouseLeave={handleColumnMouseLeave}
+                            >
+                            {/* Inner drop target with glow effect */}
+                            <div className={`absolute inset-2 rounded-lg transition-all duration-200 pointer-events-none ${
+                              isDropping 
+                                ? 'bg-gradient-to-b from-blue-200/20 via-blue-100/10 to-transparent transition-all duration-200' 
+                                : ''
+                            }`} />
+                            
+                            <div className="space-y-1.5 relative">
+                                {/* Fixed insertion placeholder at the top */}
+                                <div className="h-1 flex items-center justify-center">
+                                  <div
+                                    className={`w-8 h-0.5 bg-blue-400 rounded-full transition-all duration-150 ${
+                                      isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 
+                                        ? 'opacity-70 scale-x-100' 
+                                        : 'opacity-0 scale-x-0'
+                                    }`}
+                                  />
+                                </div>
+                                
+                                {cellProjects.map((project, index) => (
+                                  <motion.div 
+                                    key={project.id}
+                                    layout={!draggedProject}
+                                    initial={{ opacity: 0.8, y: 2 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{
+                                      type: "spring",
+                                      stiffness: 600,
+                                      damping: 50,
+                                      duration: 0.05
+                                    }}
+                                  >
+                                    <ProjectCard
+                                      project={project}
+                                      isDragging={draggedProject === project.id}
+                                      isDuplicating={isDuplicating && draggedProject === project.id}
+                                      isEditing={newProjectId === project.id}
+                                      availableGroups={getAvailableGroups()}
+                                      allProjects={boardData.projects}
+                                      isColorCodingEnabled={isColorCodingEnabled}
+                                      onEdit={handleEditProject}
+                                      onDelete={handleDeleteProject}
+                                      onDuplicate={handleDuplicateProject}
+                                      onDragStart={handleDragStart}
+                                      onDragEnd={handleDragEnd}
+                                      onDrag={updateDropTarget}
+                                    />
+                                    
+                                    {/* Fixed insertion placeholder after each card */}
+                                    <div className="h-1 flex items-center justify-center">
+                                      <div
+                                        className={`w-8 h-0.5 bg-blue-400 rounded-full transition-all duration-150 ${
+                                          isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1
+                                            ? 'opacity-70 scale-x-100'
+                                            : 'opacity-0 scale-x-0'
+                                        }`}
+                                      />
+                                    </div>
+                                  </motion.div>
+                                ))}
+                              
+                              <Button
+                                id={`add-project-${person.id}-${timeSlot.id}`}
+                                variant="ghost"
+                                onClick={() => handleAddProject(person.id, timeSlot.id)}
+                                className="w-full p-2 rounded-lg text-xs text-slate-600 hover:text-slate-800 font-medium bg-transparent hover:bg-transparent border border-dashed border-slate-200 hover:border-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-200 min-h-[2.5rem] flex items-center justify-center select-none"
+                              >
+                                <PlusIcon className="w-3 h-3 mr-1" />
+                                Add Project
+                              </Button>
+                            </div>
+                            </motion.div>
+                          </TeamPlanContextMenu>
+                        );
+                      })}
+                      
+                      {/* Delete Person Button */}
+                      <div className="min-h-12 flex items-start justify-center pt-5">
+                        {boardData.people.length > 1 && (
+                          <Button
+                            onClick={() => handleRemovePerson(person.id)}
+                            variant="ghost"
+                            size="icon"
+                            className="opacity-0 hover:opacity-100 transition-opacity size-7"
+                            title="Remove person"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-slate-500 hover:text-red-500">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244 2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.134H8.09c-1.18 0-2.09.954-2.09 2.134v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                            </svg>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* Add Person Row - Project Cells */}
+                <div>
+                  <AddPersonCell 
+                    onAddPerson={handleAddPerson}
+                    isDraggedOver={dragOverAddPerson}
+                    numTimeSlots={boardData.timeSlots.length}
+                    showOnlyProjectCells={true}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

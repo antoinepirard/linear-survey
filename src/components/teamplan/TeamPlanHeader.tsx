@@ -129,13 +129,9 @@ const TeamPlanHeader = ({
 
   return (
     <div className={`w-full ${className}`}>
-      {/* Timeslots Section */}
+      {/* Timeslots Section - aligned with content grid */}
       <div className="px-6">
-        <div className="grid gap-0" style={{ gridTemplateColumns: `130px repeat(${timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
-          {/* Team Header */}
-          <div className="bg-transparent rounded-l-md p-2 flex items-center justify-between">
-          </div>
-
+        <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
           {/* Time Slot Headers */}
           {timeSlots.map((timeSlot, timeSlotIndex) => (
             <TeamPlanContextMenu
