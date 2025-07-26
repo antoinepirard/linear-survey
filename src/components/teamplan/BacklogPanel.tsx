@@ -3,14 +3,14 @@
 import { RectangleGroupIcon } from '@heroicons/react/24/solid';
 
 interface BacklogPanelProps {
-  width: number;
+  width?: number;
 }
 
 export default function BacklogPanel({ width }: BacklogPanelProps) {
   return (
     <div 
       className="flex flex-col h-full"
-      style={{ width }}
+      style={{ width: width || '100%' }}
     >
       {/* Empty State */}
       <div className="flex-1 flex flex-col items-center justify-start p-24 text-center">

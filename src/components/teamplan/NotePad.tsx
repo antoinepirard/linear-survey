@@ -20,23 +20,23 @@ import { useTextSelection } from '@/hooks/useTextSelection';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { NotePadProps, NotePadError } from '@/types/notepad';
 import { isLegacyNotepadData } from '@/types/plan';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown, Plus, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 function NotePad({
   className = '',
   onError,
-  width,
   currentPlan = null,
   currentDocument = null,
-  allDocuments: _allDocuments = [],
-  onCreateDocument: _onCreateDocument,
-  onSwitchToDocument: _onSwitchToDocument,
+  allDocuments = [],
+  onCreateDocument,
+  onSwitchToDocument,
   onUpdateDocumentContent,
   onRenameDocument,
+  onDeleteDocument,
+  showDocumentList = false,
 }: NotePadProps) {
-  // Mark intentionally unused props
-  void _allDocuments;
-  void _onSwitchToDocument;
-  void _onCreateDocument;
   
   const editorRef = useRef<HTMLDivElement>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -44,6 +44,7 @@ function NotePad({
   const [isComposing, setIsComposing] = useState(false);
   const saveInProgressRef = useRef<boolean>(false);
   const pendingSaveRef = useRef<string | null>(null);
+  const [showDocumentListCollapsed, setShowDocumentListCollapsed] = useState(true);
   
   // Title management
   const [titleValue, setTitleValue] = useState('');
@@ -515,8 +516,68 @@ function NotePad({
   return (
     <div 
       className={`bg-transparent notepad-container ${className}`} 
-      style={{ width, height: '100%', display: 'flex', flexDirection: 'column' }}
+      style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
     >
+      {/* Document List - Collapsible */}
+      {showDocumentList && currentDocument && allDocuments && allDocuments.length > 0 && (
+        <div className="border-b border-slate-200/65">
+          <Collapsible open={showDocumentListCollapsed} onOpenChange={setShowDocumentListCollapsed}>
+            <div className="px-4 py-2 flex items-center justify-between">
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="p-0 h-auto text-xs font-mono text-slate-600 hover:text-slate-900">
+                  <span>Documents ({allDocuments.length})</span>
+                  <ChevronDown className="ml-1 h-3 w-3" />
+                </Button>
+              </CollapsibleTrigger>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onCreateDocument?.('')}
+                className="h-6 w-6 p-0"
+              >
+                <Plus className="h-3 w-3" />
+              </Button>
+            </div>
+            
+            <CollapsibleContent>
+              <div className="px-4 pb-2 max-h-32 overflow-y-auto">
+                {allDocuments.map((doc, index) => (
+                  <div
+                    key={doc.id}
+                    className={`px-2 py-1 rounded text-sm cursor-pointer flex items-center justify-between group hover:bg-slate-50 ${
+                      doc.id === currentDocument.id ? 'bg-slate-100 text-slate-900' : 'text-slate-600'
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0" onClick={() => onSwitchToDocument?.(doc.id)}>
+                      <span className="truncate">{doc.title || 'Untitled'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {index < 9 && (
+                        <span className="text-xs font-mono text-slate-400">⌘{index + 1}</span>
+                      )}
+                      {allDocuments.length > 1 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteDocument?.(doc.id);
+                          }}
+                          className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-600"
+                          title="Delete document"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+      )}
+      
       {/* Editor Container - This is the scroll container */}
       <div 
         ref={editorRef} 
