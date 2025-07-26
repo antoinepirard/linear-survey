@@ -1,4 +1,16 @@
 /* Tiptap NotePad Editor Styles */
+
+/* 8px Grid Spacing System - World-Class Design Standards */
+:root {
+  --spacing-xs: 0.25rem;    /* 4px - tight spacing for related elements */
+  --spacing-sm: 0.5rem;     /* 8px - standard small spacing */
+  --spacing-md: 0.75rem;    /* 12px - medium spacing for separation */
+  --spacing-lg: 1rem;       /* 16px - large spacing for sections */
+  --spacing-xl: 1.25rem;    /* 20px - extra large spacing */
+  --spacing-2xl: 1.5rem;    /* 24px - section breaks */
+  --spacing-3xl: 2rem;      /* 32px - major sections */
+}
+
 .ProseMirror {
   outline: none !important;
   font-size: 0.875rem;
@@ -6,8 +18,8 @@
   line-height: 1.5;
   letter-spacing: 0.01em; /* Subtle letter spacing for better readability */
   min-height: 400px;
-  padding-left: 2rem !important; /* 32px */
-  padding-right: 2rem !important; /* 32px */
+  padding-left: var(--spacing-3xl) !important; /* 32px */
+  padding-right: var(--spacing-3xl) !important; /* 32px */
 }
 
 /* Responsive adjustments */
@@ -39,8 +51,8 @@
   font-weight: 700 !important;
   color: rgb(30 41 59) !important;
   line-height: 1.2 !important;
-  margin-bottom: 1rem !important;
-  margin-top: 2.5rem !important; /* 40px */
+  margin-bottom: var(--spacing-lg) !important; /* 16px */
+  margin-top: 2.5rem !important; /* 40px - keep for major section breaks */
 }
 
 .ProseMirror h2 {
@@ -48,8 +60,8 @@
   font-weight: 600 !important;
   color: rgb(30 41 59) !important;
   line-height: 1.25 !important;
-  margin-bottom: 0.75rem !important;
-  margin-top: 2rem !important; /* 32px */
+  margin-bottom: var(--spacing-md) !important; /* 12px */
+  margin-top: var(--spacing-3xl) !important; /* 32px */
 }
 
 .ProseMirror h3 {
@@ -57,12 +69,12 @@
   font-weight: 600 !important;
   color: rgb(30 41 59) !important;
   line-height: 1.3 !important;
-  margin-bottom: 0.5rem !important;
-  margin-top: 1.5rem !important; /* 24px */
+  margin-bottom: var(--spacing-sm) !important; /* 8px */
+  margin-top: var(--spacing-2xl) !important; /* 24px */
 }
 
 .ProseMirror p {
-  margin-bottom: 1.25rem !important; /* 20px */
+  margin-bottom: var(--spacing-xl) !important; /* 20px */
 }
 
 .ProseMirror strong {
@@ -78,8 +90,8 @@
 .ProseMirror ul[data-type="bulletList"],
 .ProseMirror ul:not([data-type]) {
   list-style-type: disc !important;
-  margin-left: 1.5rem !important;
-  margin-bottom: 1.25rem !important; /* 20px */
+  margin-left: var(--spacing-2xl) !important; /* 24px */
+  margin-bottom: var(--spacing-xl) !important; /* 20px */
   margin-top: 0 !important;
   padding-left: 0 !important;
 }
@@ -87,8 +99,8 @@
 .ProseMirror ul[data-type="bulletList"] ul[data-type="bulletList"],
 .ProseMirror ul ul {
   list-style-type: circle !important;
-  margin-top: 0.25rem !important;
-  margin-bottom: 0.25rem !important;
+  margin-top: var(--spacing-xs) !important; /* 4px */
+  margin-bottom: var(--spacing-xs) !important; /* 4px */
 }
 
 .ProseMirror ul[data-type="bulletList"] ul[data-type="bulletList"] ul[data-type="bulletList"],
@@ -100,8 +112,8 @@
 .ProseMirror ol[data-type="orderedList"],
 .ProseMirror ol:not([data-type]) {
   list-style-type: decimal !important;
-  margin-left: 1.5rem !important;
-  margin-bottom: 1.25rem !important; /* 20px */
+  margin-left: var(--spacing-2xl) !important; /* 24px */
+  margin-bottom: var(--spacing-xl) !important; /* 20px */
   margin-top: 0 !important;
   padding-left: 0 !important;
 }
@@ -109,8 +121,8 @@
 .ProseMirror ol[data-type="orderedList"] ol[data-type="orderedList"],
 .ProseMirror ol ol {
   list-style-type: lower-alpha !important;
-  margin-top: 0.25rem !important;
-  margin-bottom: 0.25rem !important;
+  margin-top: var(--spacing-xs) !important; /* 4px */
+  margin-bottom: var(--spacing-xs) !important; /* 4px */
 }
 
 .ProseMirror ol[data-type="orderedList"] ol[data-type="orderedList"] ol[data-type="orderedList"],
@@ -122,7 +134,7 @@
 .ProseMirror ul[data-type="taskList"] {
   list-style: none !important;
   margin-left: 0 !important;
-  margin-bottom: 1.25rem !important; /* 20px */
+  margin-bottom: var(--spacing-xl) !important; /* 20px */
   margin-top: 0 !important;
   padding-left: 0 !important;
 }
@@ -130,7 +142,7 @@
 /* Regular List Items - Support both specific and fallback selectors */
 .ProseMirror li[data-type="listItem"],
 .ProseMirror li:not([data-type]) {
-  margin-bottom: 0.25rem !important; /* 4px */
+  margin-bottom: var(--spacing-sm) !important; /* 8px - world-class spacing */
   line-height: 1.5 !important;
   padding: 0 !important;
 }
@@ -139,7 +151,7 @@
 .ProseMirror li[data-type="taskItem"] {
   display: flex !important;
   align-items: flex-start !important;
-  margin-bottom: 0.25rem !important;
+  margin-bottom: var(--spacing-sm) !important; /* 8px - consistent with other list items */
   line-height: 1.5 !important;
   padding: 0 !important;
   list-style: none !important;
@@ -147,7 +159,7 @@
 
 .ProseMirror li[data-type="taskItem"] > label {
   flex-shrink: 0 !important;
-  margin-right: 0.5rem !important;
+  margin-right: var(--spacing-sm) !important; /* 8px */
   margin-top: 0.125rem !important; /* Align checkbox with first line of text */
   user-select: none !important;
 }
@@ -225,6 +237,22 @@
   line-height: 1 !important;
 }
 
+/* Content-aware spacing for different list item complexity */
+/* Simple list items (text only) - maintain standard spacing */
+.ProseMirror li[data-type="listItem"]:has(> p:only-child:not(:has(*))) {
+  margin-bottom: var(--spacing-sm) !important; /* 8px for simple items */
+}
+
+/* Complex list items (with nested lists or multiple paragraphs) - more breathing room */
+.ProseMirror li[data-type="listItem"]:has(> ul, > ol, > p + p) {
+  margin-bottom: var(--spacing-md) !important; /* 12px for complex items */
+}
+
+/* Task items with nested content - consistent with other complex items */
+.ProseMirror li[data-type="taskItem"]:has(ul, ol) {
+  margin-bottom: var(--spacing-md) !important; /* 12px for task items with sublists */
+}
+
 /* Ensure no extra spacing from any nested elements */
 .ProseMirror li * {
   margin: 0 !important;
@@ -232,9 +260,9 @@
 
 /* Nested task lists */
 .ProseMirror ul[data-type="taskList"] ul[data-type="taskList"] {
-  margin-top: 0.25rem !important;
-  margin-bottom: 0.25rem !important;
-  margin-left: 1rem !important;
+  margin-top: var(--spacing-xs) !important; /* 4px */
+  margin-bottom: var(--spacing-xs) !important; /* 4px */
+  margin-left: var(--spacing-lg) !important; /* 16px - consistent nesting */
 }
 
 /* Smart spacing: Reduce gap when lists immediately follow text elements */
@@ -243,7 +271,7 @@
 .ProseMirror p + ol[data-type="orderedList"], 
 .ProseMirror p + ol:not([data-type]),
 .ProseMirror p + ul[data-type="taskList"] {
-  margin-top: -0.75rem !important; /* Reduces the 20px gap to ~8px */
+  margin-top: calc(-1 * var(--spacing-sm)) !important; /* -8px: reduces 20px gap to 12px */
 }
 
 /* Also apply to headings followed by lists */
@@ -262,7 +290,7 @@
 .ProseMirror h3 + ol[data-type="orderedList"],
 .ProseMirror h3 + ol:not([data-type]),
 .ProseMirror h3 + ul[data-type="taskList"] {
-  margin-top: -0.5rem !important; /* Smaller reduction for headings */
+  margin-top: calc(-1 * var(--spacing-xs)) !important; /* -4px: smaller reduction for headings */
 }
 
 .ProseMirror blockquote {
