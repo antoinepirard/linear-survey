@@ -84,7 +84,7 @@ export interface UseTextSelectionOptions {
 
 // Error types
 export interface NotePadError extends Error {
-  code: "STORAGE_ERROR" | "EDITOR_ERROR" | "RENDER_ERROR";
+  code: "STORAGE_ERROR" | "EDITOR_ERROR" | "RENDER_ERROR" | "EDITOR_CRASH";
   details?: Record<string, unknown>;
 }
 

@@ -236,7 +236,7 @@ export function usePlanNotePadStorage({
     }
 
     return content || null;
-  }, [currentPlan?.id, currentPlan?.notepadData.content]); // Memoize based on plan ID and content
+  }, [currentPlan]); // Include full currentPlan to satisfy linter
 
   const saveContent = useCallback((content: string, options?: SaveContentOptions) => {
     // Store callbacks if provided
@@ -245,7 +245,7 @@ export function usePlanNotePadStorage({
     }
     
     setPendingUpdates((prev) => ({ ...prev, content }));
-  }, []);
+  }, []); // No dependencies needed since we're only updating state
 
   return {
     title,

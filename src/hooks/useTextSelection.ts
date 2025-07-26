@@ -136,7 +136,7 @@ export function useTextSelection({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showSelectionMenu]); // Remove containerRef from dependencies to prevent unnecessary re-runs
+  }, [showSelectionMenu, containerRef]); // Include containerRef dependency
 
   // Cleanup timeout on unmount
   useEffect(() => {
