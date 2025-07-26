@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLoader from '@/components/PageLoader';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
+import TeamPlanTopControls from '@/components/teamplan/TeamPlanTopControls';
 import NotePad from '@/components/teamplan/NotePad';
 import BacklogPanel from '@/components/teamplan/BacklogPanel';
 import CommentsPanel from '@/components/teamplan/CommentsPanel';
@@ -451,8 +452,13 @@ export default function TeamPlanPage() {
       </div>
       
       {/* Team Plan Board */}
-      <div className="flex-1 overflow-hidden">
-        <TeamPlanBoard 
+      <div className="flex-1 overflow-hidden flex flex-col">
+        <TeamPlanTopControls 
+          title="Team Plan"
+          subtitle="Manage projects and timelines across your team"
+        />
+        <div className="flex-1 overflow-hidden">
+          <TeamPlanBoard 
           data={currentPlan.teamPlanData}
           onChange={handleDataChange}
           onDataSyncError={handleDataSyncError}
@@ -460,8 +466,6 @@ export default function TeamPlanPage() {
           hoveredColumn={hoveredColumn}
           onColumnMouseEnter={setHoveredColumn}
           onColumnMouseLeave={() => setHoveredColumn(null)}
-          headerTitle="Team Plan"
-          headerSubtitle="Manage projects and timelines across your team"
           onAddTimeSlot={(timeSlot) => {
             const newData = {
               ...currentPlan.teamPlanData,
@@ -529,6 +533,7 @@ export default function TeamPlanPage() {
             updateCurrentPlan({ teamPlanData: newData });
           }}
         />
+        </div>
       </div>
     </div>
     </>

@@ -8,23 +8,19 @@ import { Button } from '@/components/ui/button';
 import TeamPlanContextMenu from './TeamPlanContextMenu';
 
 interface TeamPlanHeaderProps {
-  title?: string;
-  subtitle?: string;
   className?: string;
   timeSlots: TimeSlot[];
-  onAddTimeSlot: (timeSlot: TimeSlot) => void;
-  onRemoveTimeSlot: (timeSlotId: string) => void;
-  onUpdateTimeSlot: (timeSlot: TimeSlot) => void;
-  onMoveTimeSlotLeft: (timeSlotId: string) => void;
-  onMoveTimeSlotRight: (timeSlotId: string) => void;
+  onAddTimeSlot?: (timeSlot: TimeSlot) => void;
+  onRemoveTimeSlot?: (timeSlotId: string) => void;
+  onUpdateTimeSlot?: (timeSlot: TimeSlot) => void;
+  onMoveTimeSlotLeft?: (timeSlotId: string) => void;
+  onMoveTimeSlotRight?: (timeSlotId: string) => void;
   hoveredColumn?: string | null;
   onColumnMouseEnter?: (timeSlotId: string) => void;
   onColumnMouseLeave?: () => void;
 }
 
 const TeamPlanHeader = ({ 
-  title = "Team Plan", 
-  subtitle = "Manage projects and timelines across your team",
   className = "",
   timeSlots,
   onAddTimeSlot,
@@ -94,6 +90,7 @@ const TeamPlanHeader = ({
   };
 
   const handleAddSlot = () => {
+    if (!onAddTimeSlot) return;
     const { label, type } = generateNextTimeSlotLabel();
     const newSlot: TimeSlot = {
       id: generateId(),
@@ -110,7 +107,7 @@ const TeamPlanHeader = ({
 
   const handleSaveEdit = (slotId: string) => {
     const slot = timeSlots.find(s => s.id === slotId);
-    if (slot && editValue.trim()) {
+    if (slot && editValue.trim() && onUpdateTimeSlot) {
       onUpdateTimeSlot({ ...slot, label: editValue.trim() });
     }
     setEditingSlot(null);
@@ -131,21 +128,8 @@ const TeamPlanHeader = ({
   };
 
   return (
-    <div className={`w-full bg-white border-b border-slate-200/65 ${className}`}>
-      {/* Top Controls Section */}
-      <div className="px-6 py-4 border-b border-slate-200/65">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
-            {subtitle && (
-              <p className="text-sm text-slate-600 mt-1">{subtitle}</p>
-            )}
-          </div>
-          {/* Future: Could add action buttons, filters, or other controls here */}
-        </div>
-      </div>
-
-      {/* Bottom Timeslots Section */}
+    <div className={`w-full ${className}`}>
+      {/* Timeslots Section */}
       <div className="px-6">
         <div className="grid gap-0" style={{ gridTemplateColumns: `130px repeat(${timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
           {/* Team Header */}
@@ -160,9 +144,9 @@ const TeamPlanHeader = ({
               canMoveUp={timeSlotIndex > 0}
               canMoveDown={timeSlotIndex < timeSlots.length - 1}
               canDelete={timeSlots.length > 1}
-              onMoveUp={() => onMoveTimeSlotLeft(timeSlot.id)}
-              onMoveDown={() => onMoveTimeSlotRight(timeSlot.id)}
-              onDelete={() => onRemoveTimeSlot(timeSlot.id)}
+              onMoveUp={() => onMoveTimeSlotLeft?.(timeSlot.id)}
+              onMoveDown={() => onMoveTimeSlotRight?.(timeSlot.id)}
+              onDelete={() => onRemoveTimeSlot?.(timeSlot.id)}
               label={timeSlot.label}
             >
               <motion.div
@@ -196,7 +180,7 @@ const TeamPlanHeader = ({
                   
                   {timeSlots.length > 1 && (
                     <button
-                      onClick={() => onRemoveTimeSlot(timeSlot.id)}
+                      onClick={() => onRemoveTimeSlot?.(timeSlot.id)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 p-1 hover:bg-red-100 rounded"
                       title="Remove time slot"
                     >

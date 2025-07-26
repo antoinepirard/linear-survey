@@ -525,7 +525,7 @@ function NotePad({
             <div className="px-4 py-2 flex items-center justify-between">
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" className="p-0 h-auto text-xs font-mono text-slate-600 hover:text-slate-900">
-                  <span>Documents ({allDocuments.length})</span>
+                  <span>Documents [{allDocuments.length}]</span>
                   <ChevronDown className="ml-1 h-3 w-3" />
                 </Button>
               </CollapsibleTrigger>
