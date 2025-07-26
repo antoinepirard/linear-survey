@@ -122,6 +122,19 @@ function NotePad({
         'aria-multiline': 'true',
       },
       handleKeyDown: (_view, event) => {
+        // Check if we're in a list context and prioritize ListKeymap for Enter key
+        if (event.key === 'Enter') {
+          const { state } = _view;
+          const { $from } = state.selection;
+          const isInList = $from.parent.type.name === 'listItem' || 
+                           $from.parent.type.name === 'taskItem';
+          
+          // If in list, let ListKeymap handle Enter exclusively
+          if (isInList) {
+            return false; // Let ListKeymap take priority
+          }
+        }
+
         // Handle keyboard shortcuts
         const mod = event.metaKey || event.ctrlKey;
         const shift = event.shiftKey;

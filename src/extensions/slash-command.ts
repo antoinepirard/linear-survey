@@ -280,6 +280,18 @@ export const SlashCommand = Extension.create({
                 return true;
               }
 
+              // Add timing check to prevent rapid-fire execution during fast typing
+              if (props.event.key === "Enter") {
+                const now = Date.now();
+                const lastExecutionTime = (this as any).lastExecutionTime || 0;
+                
+                if (now - lastExecutionTime < 200) {
+                  return false; // Ignore rapid Enter key presses
+                }
+                
+                (this as any).lastExecutionTime = now;
+              }
+
               return (
                 (
                   component?.ref as {
