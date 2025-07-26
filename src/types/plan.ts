@@ -114,12 +114,8 @@ export const validateDocument = (
     errors.push("Document ID is required and must be a non-empty string");
   }
 
-  if (
-    !doc.title ||
-    typeof doc.title !== "string" ||
-    doc.title.trim().length === 0
-  ) {
-    errors.push("Document title is required and must be a non-empty string");
+  if (doc.title !== undefined && typeof doc.title !== "string") {
+    errors.push("Document title must be a string");
   }
 
   if (doc.title && doc.title.length > 100) {

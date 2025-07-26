@@ -25,7 +25,7 @@ interface CreateDocumentButtonProps {
 const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({ onCreateDocument }) => {
   const handleClick = () => {
     // Create a new document directly without modal
-    onCreateDocument('New Document');
+    onCreateDocument('');
   };
 
   return (
@@ -148,7 +148,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
             <div className="flex items-center gap-2">
               <FileText className="size-3.5 opacity-50" />
               <span className="text-sm truncate max-w-[150px]">
-                {currentDocument?.title || 'No Document Selected'}
+                {currentDocument?.title?.trim() || 'New Document'}
               </span>
             </div>
             <ChevronsUpDown className="ml-2 size-3.5 shrink-0 opacity-50" />
@@ -185,7 +185,7 @@ const DocumentSelector: React.FC<DocumentSelectorProps> = ({
                       className="font-medium text-sm truncate hover:bg-slate-100 px-1 py-0.5 rounded cursor-text inline-block"
                       onClick={(e) => handleRenameClick(document, e)}
                     >
-                      {document.title}
+                      {document.title?.trim() || 'New Document'}
                     </div>
                   )}
                   <div className="text-xs text-muted-foreground px-1 flex items-center gap-2 -mt-0.5">

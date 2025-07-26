@@ -27,12 +27,17 @@ function NotePad({
   width,
   currentPlan = null,
   currentDocument = null,
-  allDocuments = [],
-  onCreateDocument,
-  onSwitchToDocument,
+  allDocuments: _allDocuments = [],
+  onCreateDocument: _onCreateDocument,
+  onSwitchToDocument: _onSwitchToDocument,
   onUpdateDocumentContent,
   onRenameDocument,
 }: NotePadProps) {
+  // Mark intentionally unused props
+  void _allDocuments;
+  void _onSwitchToDocument;
+  void _onCreateDocument;
+  
   const editorRef = useRef<HTMLDivElement>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -42,7 +47,6 @@ function NotePad({
   
   // Title management
   const [titleValue, setTitleValue] = useState('');
-  const [pendingTitleChange, setPendingTitleChange] = useState<string | null>(null);
   const titleSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const titleChangeAbortController = useRef<AbortController | null>(null);
@@ -60,7 +64,7 @@ function NotePad({
     return null;
   }, [currentDocument, currentPlan]);
 
-  // Title management helper with race condition protection
+  // Title management helper with basic debouncing
   const debouncedSaveTitle = useCallback((newTitle: string) => {
     if (!currentDocument || !onRenameDocument) return;
     
@@ -77,26 +81,25 @@ function NotePad({
     
     const controller = new AbortController();
     titleChangeAbortController.current = controller;
-    setPendingTitleChange(newTitle);
     
     titleSaveTimeoutRef.current = setTimeout(() => {
       if (!controller.signal.aborted) {
         try {
-          const trimmedTitle = newTitle.trim() || 'New Document';
-          if (trimmedTitle !== currentDocument.title) {
+          const trimmedTitle = newTitle.trim();
+          if (currentDocument && trimmedTitle !== currentDocument.title) {
             onRenameDocument(currentDocument.id, trimmedTitle);
           }
         } catch (error) {
           console.error('Failed to rename document:', error);
-          // Reset title on error
-          setTitleValue(currentDocument.title);
+          if (currentDocument) {
+            setTitleValue(currentDocument.title);
+          }
         } finally {
-          setPendingTitleChange(null);
           titleChangeAbortController.current = null;
           titleSaveTimeoutRef.current = null;
         }
       }
-    }, 500); // 500ms debounce for title changes
+    }, 500);
   }, [currentDocument, onRenameDocument]);
 
   // Handle title input changes
@@ -106,20 +109,14 @@ function NotePad({
     debouncedSaveTitle(newTitle);
   }, [debouncedSaveTitle]);
 
-
-  // Sync title when document changes (with pending change protection)
+  // Sync title when document changes
   useEffect(() => {
-    if (currentDocument && !pendingTitleChange) {
+    if (currentDocument) {
       setTitleValue(currentDocument.title);
-      // Auto-focus title if it's a new document
-      if (currentDocument.title === 'New Document' && titleInputRef.current) {
-        titleInputRef.current.focus();
-        titleInputRef.current.select();
-      }
     } else if (!currentDocument) {
       setTitleValue('');
     }
-  }, [currentDocument, pendingTitleChange]);
+  }, [currentDocument]);
 
   // Error handling helper
   const handleError = useCallback((error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
@@ -285,7 +282,7 @@ function NotePad({
           }
         }
 
-        // Handle keyboard shortcuts
+        // Handle keyboard shortcuts with better detection
         const mod = event.metaKey || event.ctrlKey;
         const shift = event.shiftKey;
         const alt = event.altKey;
@@ -310,24 +307,6 @@ function NotePad({
           editor?.chain().focus().toggleHeading({ level }).run();
           return true;
         }
-
-        // Document switching shortcuts (Cmd/Ctrl + 1-9)
-        if (mod && !shift && !alt && /^[1-9]$/.test(event.key)) {
-          const index = parseInt(event.key) - 1;
-          const targetDoc = allDocuments[index];
-          if (targetDoc && onSwitchToDocument) {
-            onSwitchToDocument(targetDoc.id);
-            return true;
-          }
-        }
-
-        // New document shortcut (Cmd/Ctrl + T)
-        if (mod && !shift && !alt && event.key === 't') {
-          if (onCreateDocument) {
-            onCreateDocument('New Document');
-            return true;
-          }
-        }
         
         return false;
       },
@@ -338,6 +317,7 @@ function NotePad({
           }
           return false;
         },
+
         compositionstart: () => {
           setIsComposing(true);
           return false;
@@ -436,11 +416,12 @@ function NotePad({
     // Set a longer timeout to be more forgiving with typing detection
     typingTimeoutRef.current = setTimeout(() => {
       // Double-check timing to prevent race conditions
-      if (Date.now() - lastTypingTime.current >= 500) {
+      if (Date.now() - lastTypingTime.current >= 750) {
         isActivelyTyping.current = false;
+
       }
       typingTimeoutRef.current = null;
-    }, 500); // Increased from 150ms to 500ms for better user experience
+    }, 750); // Increased from 500ms to 750ms for even better user experience
   }, []);
   
   // Update editor content when document changes
@@ -472,10 +453,12 @@ function NotePad({
       lastLoadedDocumentId.current = documentId;
       lastLoadedContent.current = savedContent;
     } else if (editor && !documentId) {
-      // Clear editor if no document
-      editor.commands.clearContent();
-      lastLoadedDocumentId.current = null;
-      lastLoadedContent.current = null;
+      // Clear editor if no document, but only if not actively typing
+      if (!isActivelyTyping.current) {
+        editor.commands.clearContent();
+        lastLoadedDocumentId.current = null;
+        lastLoadedContent.current = null;
+      }
     }
   }, [editor, currentDocument?.id, currentDocument?.content, isComposing]);
 
@@ -537,6 +520,7 @@ function NotePad({
                 value={titleValue}
                 onChange={handleTitleChange}
                 onKeyDown={handleTitleKeyDown}
+
                 placeholder="New Document"
                 className="w-full text-2xl font-bold text-slate-900 bg-transparent border-none outline-none resize-none placeholder:text-slate-400 mb-2"
                 maxLength={NOTEPAD_CONSTANTS.DOCUMENT_TITLE_MAX_LENGTH}

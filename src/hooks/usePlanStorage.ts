@@ -462,12 +462,12 @@ export const usePlanStorage = () => {
 
   // Document management functions
   const createDocument = useCallback(
-    (title: string = "New Document") => {
+    (title: string = "") => {
       if (!currentPlan) {
         throw new Error("No current plan selected");
       }
 
-      const trimmedTitle = title.trim() || "New Document";
+      const trimmedTitle = title.trim();
 
       // Validate title
       if (trimmedTitle.length > 100) {
@@ -585,7 +585,7 @@ export const usePlanStorage = () => {
         );
       }
 
-      const trimmedTitle = newTitle.trim() || "Untitled Document";
+      const trimmedTitle = newTitle.trim();
 
       // Validate title
       if (trimmedTitle.length > 100) {
@@ -737,7 +737,6 @@ export const usePlanStorage = () => {
     },
     [currentPlan, planStorage, queueSaveOperation]
   );
-
 
   const deleteDocument = useCallback(
     (documentId: string) => {

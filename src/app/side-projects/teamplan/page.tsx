@@ -156,12 +156,11 @@ export default function TeamPlanPage() {
       }
     }
 
-    // New document with Cmd/Ctrl + T
-    if (mod && !shift && event.key === 't') {
-      event.preventDefault();
-      createDocument('New Document');
+    // Handle keyboard shortcuts
+    if (event.metaKey || event.ctrlKey) {
+      // Document switching shortcuts can be handled here if needed in the future
     }
-  }, [allPlans, currentPlan?.id, switchToPlan, allDocuments, currentDocument?.id, switchToDocument, createDocument]);
+  }, [allPlans, currentPlan?.id, switchToPlan, allDocuments, currentDocument?.id, switchToDocument]);
 
   // Add and remove keyboard event listeners
   useEffect(() => {

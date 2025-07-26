@@ -443,7 +443,7 @@ export const sanitizePlanStorage = (storage: PlanStorage): PlanStorage => {
                         ...document,
                         title: document.title
                           ? document.title.trim().substring(0, 100)
-                          : "Untitled Document",
+                          : "",
                         content:
                           typeof document.content === "string"
                             ? document.content
