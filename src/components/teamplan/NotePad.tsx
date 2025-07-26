@@ -68,30 +68,28 @@ function NotePad({
     saveTimeoutRef.current = setTimeout(() => setSaveStatus('idle'), delay);
   }, []);
 
-  // Debounced save function for better performance
-  const debouncedSaveContent = useCallback(
-    (() => {
-      let timeoutId: NodeJS.Timeout;
-      return (content: string) => {
-        clearTimeout(timeoutId);
-        setSaveStatus('saving');
-        
-        timeoutId = setTimeout(async () => {
-          try {
-                         if (currentDocument && onUpdateDocumentContent) {
-               // Note: Version checking would be implemented here in the future
-               onUpdateDocumentContent(currentDocument.id, content);
-               setSaveStatusWithTimeout('saved', 1500);
-             }
-          } catch (error) {
-            setSaveStatusWithTimeout('error', 5000);
-            handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
-          }
-        }, 300); // 300ms debounce
-      };
-    })(),
-    [currentDocument, onUpdateDocumentContent, handleError, setSaveStatusWithTimeout]
-  );
+    // Debounced save function for better performance
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  
+  const debouncedSaveContent = useCallback((content: string) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+    setSaveStatus('saving');
+    
+    debounceTimeoutRef.current = setTimeout(async () => {
+      try {
+        if (currentDocument && onUpdateDocumentContent) {
+          // Note: Version checking would be implemented here in the future
+          onUpdateDocumentContent(currentDocument.id, content);
+          setSaveStatusWithTimeout('saved', 1500);
+        }
+      } catch (error) {
+        setSaveStatusWithTimeout('error', 5000);
+        handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
+      }
+    }, 300); // 300ms debounce
+  }, [currentDocument, onUpdateDocumentContent, handleError, setSaveStatusWithTimeout]);
 
   // Show save status when content is being saved
   const showSaveStatusForContent = useCallback((content: string) => {
