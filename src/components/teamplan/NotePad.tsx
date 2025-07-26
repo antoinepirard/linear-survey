@@ -89,6 +89,8 @@ function NotePad({
       bulletList: false, // Disable StarterKit's BulletList
       orderedList: false, // Disable StarterKit's OrderedList
       listItem: false, // Disable StarterKit's ListItem
+      link: false, // Disable StarterKit's Link
+      listKeymap: false, // Disable StarterKit's ListKeymap
       codeBlock: {
         exitOnTripleEnter: true,
         exitOnArrowDown: true,
