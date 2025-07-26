@@ -23,7 +23,6 @@ export interface NotePadProps {
   onRenameDocument?: (documentId: string, newTitle: string) => void;
   onDeleteDocument?: (documentId: string) => void;
   onUpdateDocumentContent?: (documentId: string, content: string) => void;
-  onAutoRenameFromContent?: (documentId: string, content: string) => void;
 }
 
 // Storage related interfaces

@@ -31,7 +31,7 @@ function NotePad({
   onCreateDocument,
   onSwitchToDocument,
   onUpdateDocumentContent,
-  onAutoRenameFromContent,
+  onRenameDocument,
 }: NotePadProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -39,6 +39,11 @@ function NotePad({
   const [isComposing, setIsComposing] = useState(false);
   const saveInProgressRef = useRef<boolean>(false);
   const pendingSaveRef = useRef<string | null>(null);
+  
+  // Title management
+  const [titleValue, setTitleValue] = useState('');
+  const titleSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
 
   // Content management helper
   const loadContent = useCallback((): string | null => {
@@ -53,7 +58,50 @@ function NotePad({
     return null;
   }, [currentDocument, currentPlan]);
 
+  // Title management helper
+  const debouncedSaveTitle = useCallback((newTitle: string) => {
+    if (!currentDocument || !onRenameDocument) return;
+    
+    // Clear existing timeout
+    if (titleSaveTimeoutRef.current) {
+      clearTimeout(titleSaveTimeoutRef.current);
+    }
+    
+    titleSaveTimeoutRef.current = setTimeout(() => {
+      try {
+        const trimmedTitle = newTitle.trim() || 'Untitled';
+        if (trimmedTitle !== currentDocument.title) {
+          onRenameDocument(currentDocument.id, trimmedTitle);
+        }
+      } catch (error) {
+        console.error('Failed to rename document:', error);
+        // Reset title on error
+        setTitleValue(currentDocument.title);
+      }
+    }, 500); // 500ms debounce for title changes
+  }, [currentDocument, onRenameDocument]);
 
+  // Handle title input changes
+  const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setTitleValue(newTitle);
+    debouncedSaveTitle(newTitle);
+  }, [debouncedSaveTitle]);
+
+
+  // Sync title when document changes
+  useEffect(() => {
+    if (currentDocument) {
+      setTitleValue(currentDocument.title);
+      // Auto-focus title if it's a new untitled document
+      if (currentDocument.title === 'Untitled' && titleInputRef.current) {
+        titleInputRef.current.focus();
+        titleInputRef.current.select();
+      }
+    } else {
+      setTitleValue('');
+    }
+  }, [currentDocument]);
 
   // Error handling helper
   const handleError = useCallback((error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
@@ -128,12 +176,6 @@ function NotePad({
           // Double-check document hasn't changed during debounce
           if (latestSave.documentId === currentDocument.id) {
             onUpdateDocumentContent(currentDocument.id, latestSave.content);
-            
-            // Try to auto-rename the document based on H1 content
-            if (onAutoRenameFromContent) {
-              onAutoRenameFromContent(currentDocument.id, latestSave.content);
-            }
-            
             setSaveStatusWithTimeout('saved', 1500);
           }
         }
@@ -145,7 +187,7 @@ function NotePad({
         pendingSaveRef.current = null;
       }
     }, 300); // 300ms debounce
-  }, [currentDocument, onUpdateDocumentContent, onAutoRenameFromContent, handleError, setSaveStatusWithTimeout]);
+  }, [currentDocument, onUpdateDocumentContent, handleError, setSaveStatusWithTimeout]);
 
   // Show save status when content is being saved
   const showSaveStatusForContent = useCallback((content: string) => {
@@ -336,6 +378,17 @@ function NotePad({
     containerRef: editorRef,
   });
 
+  // Handle title input key events
+  const handleTitleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      // Move focus to the editor
+      if (editor) {
+        editor.commands.focus();
+      }
+    }
+  }, [editor]);
+
   // Enhanced typing detection to prevent content loading during active typing
   const lastTypingTime = useRef<number>(0);
   const isActivelyTyping = useRef<boolean>(false);
@@ -415,6 +468,9 @@ function NotePad({
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
+      if (titleSaveTimeoutRef.current) {
+        clearTimeout(titleSaveTimeoutRef.current);
+      }
       // Reset save state
       saveInProgressRef.current = false;
       pendingSaveRef.current = null;
@@ -438,6 +494,22 @@ function NotePad({
         style={{ minHeight: 0 }} // This allows flex child to shrink below content size
       >
         <NotePadErrorBoundary onError={onError}>
+          {/* Title Input Field - Part of scrollable content */}
+          {currentDocument && (
+            <div className="px-8 pt-12 pb-0">
+              <input
+                ref={titleInputRef}
+                type="text"
+                value={titleValue}
+                onChange={handleTitleChange}
+                onKeyDown={handleTitleKeyDown}
+                placeholder="Untitled Document"
+                className="w-full text-2xl font-bold text-slate-900 bg-transparent border-none outline-none resize-none placeholder:text-slate-400 mb-2"
+                maxLength={100}
+              />
+            </div>
+          )}
+          
           <EditorContent 
             editor={editor} 
             className="w-full"

@@ -15,7 +15,6 @@ import { useDebounce } from "./useDebounce";
 import { SyncOperation } from "@/types/api";
 import { basicValidatePlanStorage } from "@/utils/dataValidation";
 import { planStorageLogger as logger, syncLogger } from "@/utils/logger";
-import { extractTitleFromH1, isDefaultTitle, ensureUniqueTitle } from "@/utils/extractTitle";
 
 const PLAN_STORAGE_KEY = "folio-plans";
 
@@ -739,39 +738,6 @@ export const usePlanStorage = () => {
     [currentPlan, planStorage, queueSaveOperation]
   );
 
-  // Auto-rename document based on H1 content
-  const autoRenameDocumentFromContent = useCallback(
-    (documentId: string, content: string) => {
-      if (!currentPlan) return;
-
-      const document = currentPlan.notepadData.documents[documentId];
-      if (!document) return;
-
-      // Only auto-rename if the document has a default title
-      if (!isDefaultTitle(document.title)) return;
-
-      // Extract title from H1
-      const extractedTitle = extractTitleFromH1(content);
-      if (!extractedTitle) return;
-
-      // Get all existing titles to avoid conflicts
-      const existingTitles = Object.values(currentPlan.notepadData.documents)
-        .filter(doc => doc.id !== documentId)
-        .map(doc => doc.title);
-
-      // Ensure the extracted title is unique
-      const finalTitle = ensureUniqueTitle(extractedTitle, existingTitles);
-
-      try {
-        // Use the existing rename function to update the title
-        renameDocument(documentId, finalTitle);
-      } catch (error) {
-        console.warn("Failed to auto-rename document:", error);
-        // Don't throw - auto-rename is a nice-to-have feature
-      }
-    },
-    [currentPlan, renameDocument]
-  );
 
   const deleteDocument = useCallback(
     (documentId: string) => {
@@ -861,7 +827,6 @@ export const usePlanStorage = () => {
     switchToDocument,
     renameDocument,
     updateDocumentContent,
-    autoRenameDocumentFromContent,
     deleteDocument,
     syncState,
     syncError,
