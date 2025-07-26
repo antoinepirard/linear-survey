@@ -10,6 +10,11 @@ interface UsePlanNotePadStorageProps {
   maxWidth: number;
 }
 
+interface SaveContentOptions {
+  onSaveComplete?: () => void;
+  onSaveError?: (error: Error) => void;
+}
+
 interface UsePlanNotePadStorageReturn {
   title: string;
   width: number;
@@ -17,7 +22,7 @@ interface UsePlanNotePadStorageReturn {
   setTitle: (title: string) => void;
   setWidth: (width: number) => void;
   loadContent: () => string | null;
-  saveContent: (content: string) => void;
+  saveContent: (content: string, options?: SaveContentOptions) => void;
 }
 
 export function usePlanNotePadStorage({
@@ -37,6 +42,9 @@ export function usePlanNotePadStorage({
     title?: string;
     width?: number;
   }>({});
+
+  // Store save callbacks for content saves
+  const saveCallbacksRef = useRef<Map<string, SaveContentOptions>>(new Map());
 
   // Track the last initialized plan ID to prevent re-initialization
   const lastInitializedPlanId = useRef<string | null>(null);
@@ -86,6 +94,13 @@ export function usePlanNotePadStorage({
       currentPlan &&
       onUpdatePlan
     ) {
+      // Validate that we're still on the same plan to prevent race conditions
+      const currentPlanId = currentPlan.id;
+      if (currentPlanId !== lastInitializedPlanId.current) {
+        console.warn('Plan changed during save operation, discarding updates for old plan');
+        setPendingUpdates({});
+        return;
+      }
       // Check if any updates are actually different from current plan
       const hasChanges =
         (debouncedUpdates.content !== undefined &&
@@ -112,10 +127,29 @@ export function usePlanNotePadStorage({
 
         try {
           onUpdatePlan({ notepadData: updatedNotepadData });
+          
+          // Call success callbacks for content saves
+          if (debouncedUpdates.content !== undefined) {
+            const callback = saveCallbacksRef.current.get(debouncedUpdates.content);
+            if (callback?.onSaveComplete) {
+              callback.onSaveComplete();
+            }
+            saveCallbacksRef.current.delete(debouncedUpdates.content);
+          }
+          
           // Clear the pending updates after successful save
           setPendingUpdates({});
         } catch (error) {
           console.error("Failed to save notepad updates to plan:", error);
+          
+          // Call error callbacks for content saves
+          if (debouncedUpdates.content !== undefined) {
+            const callback = saveCallbacksRef.current.get(debouncedUpdates.content);
+            if (callback?.onSaveError) {
+              callback.onSaveError(error as Error);
+            }
+            saveCallbacksRef.current.delete(debouncedUpdates.content);
+          }
 
           // Fallback: save to localStorage as backup
           try {
@@ -202,9 +236,14 @@ export function usePlanNotePadStorage({
     }
 
     return content || null;
-  }, [currentPlan]);
+  }, [currentPlan?.id, currentPlan?.notepadData.content]); // Memoize based on plan ID and content
 
-  const saveContent = useCallback((content: string) => {
+  const saveContent = useCallback((content: string, options?: SaveContentOptions) => {
+    // Store callbacks if provided
+    if (options) {
+      saveCallbacksRef.current.set(content, options);
+    }
+    
     setPendingUpdates((prev) => ({ ...prev, content }));
   }, []);
 

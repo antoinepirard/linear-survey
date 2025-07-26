@@ -123,22 +123,20 @@ export function useTextSelection({
 
   // Handle clicks outside to hide menu
   useEffect(() => {
+    if (!showSelectionMenu) return;
+    
+    const currentContainer = containerRef.current; // Capture current value
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (currentContainer && !currentContainer.contains(event.target as Node)) {
         setShowSelectionMenu(false);
       }
     };
 
-    if (showSelectionMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }
-  }, [showSelectionMenu, containerRef]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showSelectionMenu]); // Remove containerRef from dependencies to prevent unnecessary re-runs
 
   // Cleanup timeout on unmount
   useEffect(() => {

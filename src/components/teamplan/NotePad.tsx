@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState, memo } from 'react';
+import { useEffect, useRef, useCallback, useState, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import '@/styles/notepad.css';
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -15,6 +15,7 @@ import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import ListKeymap from '@tiptap/extension-list-keymap';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
+import { NotePadErrorBoundary } from '@/components/ui/NotePadErrorBoundary';
 import { useTextSelection } from '@/hooks/useTextSelection';
 import { usePlanNotePadStorage } from '@/hooks/usePlanNotePadStorage';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
@@ -30,6 +31,7 @@ function NotePad({
   const editorRef = useRef<HTMLDivElement>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isComposing, setIsComposing] = useState(false);
   
   // Use the plan-specific notepad storage hook
   const {
@@ -60,12 +62,17 @@ function NotePad({
   }, []);
 
   // Show save status when content is being saved
-  // Note: The actual saving is now handled by the storage hook's debouncing
   const showSaveStatusForContent = useCallback((content: string) => {
     if (currentPlan) {
       try {
-        saveContentToStorage(content);
-        setSaveStatusWithTimeout('saved', 1500);
+        setSaveStatus('saving'); // Show saving immediately
+        saveContentToStorage(content, {
+          onSaveComplete: () => setSaveStatusWithTimeout('saved', 1500),
+          onSaveError: (error) => {
+            setSaveStatusWithTimeout('error', 5000);
+            handleError(error, 'STORAGE_ERROR', { action: 'save_content' });
+          }
+        });
       } catch (error) {
         setSaveStatusWithTimeout('error', 5000);
         handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
@@ -73,45 +80,48 @@ function NotePad({
     }
   }, [currentPlan, saveContentToStorage, handleError, setSaveStatusWithTimeout]);
 
+  // Memoize extensions to prevent editor recreation on every render
+  const editorExtensions = useMemo(() => [
+    StarterKit.configure({
+      heading: {
+        levels: [1, 2, 3],
+      },
+      bulletList: false, // Disable StarterKit's BulletList
+      orderedList: false, // Disable StarterKit's OrderedList
+      listItem: false, // Disable StarterKit's ListItem
+      codeBlock: {
+        exitOnTripleEnter: true,
+        exitOnArrowDown: true,
+      },
+    }),
+    ListItem,
+    BulletList.configure({
+      keepMarks: true,
+      keepAttributes: false,
+    }),
+    OrderedList.configure({
+      keepMarks: true,
+      keepAttributes: false,
+    }),
+    TaskList,
+    TaskItem,
+    ListKeymap,
+    Link.configure({
+      openOnClick: false,
+      HTMLAttributes: {
+        class: 'text-slate-700 underline decoration-dashed decoration-1 underline-offset-2 cursor-pointer hover:text-slate-900',
+      },
+    }),
+    Placeholder.configure({
+      placeholder: NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT,
+    }),
+    Typography,
+    SlashCommand,
+    EmptyLinePlaceholder,
+  ], []); // Empty dependency array - extensions never change
+
   const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-        },
-        bulletList: false, // Disable StarterKit's BulletList
-        orderedList: false, // Disable StarterKit's OrderedList
-        listItem: false, // Disable StarterKit's ListItem
-        codeBlock: {
-          exitOnTripleEnter: true,
-          exitOnArrowDown: true,
-        },
-      }),
-      ListItem,
-      BulletList.configure({
-        keepMarks: true,
-        keepAttributes: false,
-      }),
-      OrderedList.configure({
-        keepMarks: true,
-        keepAttributes: false,
-      }),
-      TaskList,
-      TaskItem,
-      ListKeymap,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-slate-700 underline decoration-dashed decoration-1 underline-offset-2 cursor-pointer hover:text-slate-900',
-        },
-      }),
-      Placeholder.configure({
-        placeholder: NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT,
-      }),
-      Typography,
-      SlashCommand,
-      EmptyLinePlaceholder,
-    ],
+    extensions: editorExtensions,
     content: '',
     immediatelyRender: false,
     editorProps: {
@@ -170,9 +180,19 @@ function NotePad({
           }
           return false;
         },
+        compositionstart: () => {
+          setIsComposing(true);
+          return false;
+        },
+        compositionend: () => {
+          setIsComposing(false);
+          return false;
+        },
       },
     },
     onUpdate: ({ editor }) => {
+      if (isComposing) return; // Skip updates during IME composition
+      
       try {
         const newContent = editor.getHTML();
         // Call the save status function which handles storage
@@ -182,6 +202,8 @@ function NotePad({
       }
     },
     onSelectionUpdate: ({ editor }) => {
+      if (isComposing) return; // Skip selection updates during IME composition
+      
       try {
         handleSelectionUpdate(editor);
       } catch (error) {
@@ -199,7 +221,7 @@ function NotePad({
       try {
         const savedContent = loadContent();
         if (savedContent) {
-          editor.commands.setContent(savedContent);
+          editor.commands.setContent(savedContent, { emitUpdate: false });
         }
       } catch (error) {
         handleError(error as Error, 'STORAGE_ERROR', { action: 'load_content' });
@@ -219,21 +241,45 @@ function NotePad({
     containerRef: editorRef,
   });
 
-  // Update editor content when plan changes
+  // Memoize plan data to avoid unnecessary re-renders
+  const planData = useMemo(() => ({
+    id: currentPlan?.id,
+    content: currentPlan?.notepadData.content
+  }), [currentPlan?.id, currentPlan?.notepadData.content]);
+
+  // Update editor content when plan ID changes (not on every currentPlan object change)
   useEffect(() => {
-    if (editor && currentPlan) {
-      const savedContent = loadContent();
-      if (savedContent !== null) {
-        // Only update if the content is actually different to avoid unnecessary re-renders
-        if (editor.getHTML() !== savedContent) {
-          editor.commands.setContent(savedContent, { emitUpdate: false }); // don't emit update
+    if (editor && planData.id) {
+      // Inline content loading to avoid dependency on loadContent function
+      let savedContent = planData.content;
+      
+      // Check backup if no content in plan
+      if (!savedContent) {
+        try {
+          const backupKey = `plan-${planData.id}-notepad-backup`;
+          const backupData = localStorage.getItem(backupKey);
+          if (backupData) {
+            const backup = JSON.parse(backupData);
+            savedContent = backup.fullData?.content || backup.updates?.content;
+          }
+        } catch (error) {
+          console.error("Failed to load backup from localStorage:", error);
         }
-      } else {
-        // Clear editor if no content
+      }
+      
+      const currentContent = editor.getHTML();
+      
+      if (savedContent) {
+        // Only update if the content is actually different to avoid unnecessary operations
+        if (currentContent !== savedContent) {
+          editor.commands.setContent(savedContent, { emitUpdate: false });
+        }
+      } else if (currentContent !== '<p></p>') {
+        // Clear editor if no content and editor is not already empty
         editor.commands.clearContent();
       }
     }
-  }, [editor, currentPlan, loadContent]);
+  }, [editor, planData]); // Depend on memoized plan data
 
   // Click-outside handling is now managed by the useTextSelection hook
 
@@ -264,26 +310,28 @@ function NotePad({
         className="flex-1 overflow-y-auto relative notepad-editor"
         style={{ minHeight: 0 }} // This allows flex child to shrink below content size
       >
-        <EditorContent 
-          editor={editor} 
-          className="w-full"
-        />
-        
-        {/* Text Selection Menu */}
-        {editor && showSelectionMenu && (
-          <div
-            className="absolute z-50"
-            style={{
-              left: menuPosition.x,
-              top: menuPosition.y,
-              transform: 'translateX(-50%)',
-            }}
-          >
-            <TextSelectionMenu 
-              editor={editor}
-            />
-          </div>
-        )}
+        <NotePadErrorBoundary onError={onError}>
+          <EditorContent 
+            editor={editor} 
+            className="w-full"
+          />
+          
+          {/* Text Selection Menu */}
+          {editor && showSelectionMenu && (
+            <div
+              className="absolute z-50"
+              style={{
+                left: menuPosition.x,
+                top: menuPosition.y,
+                transform: 'translateX(-50%)',
+              }}
+            >
+              <TextSelectionMenu 
+                editor={editor}
+              />
+            </div>
+          )}
+        </NotePadErrorBoundary>
       </div>
 
       {/* Save Status Indicator - Outside scroll container to stay fixed */}
