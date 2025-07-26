@@ -30,9 +30,13 @@ export function usePlanNotePadStorage({
   const [title, setTitle] = useState('');
   const [width, setWidth] = useState(defaultWidth);
   const [isLoading, setIsLoading] = useState(false);
-  const [pendingContent, setPendingContent] = useState<string | null>(null);
-  const [pendingTitle, setPendingTitle] = useState<string | null>(null);
-  const [pendingWidth, setPendingWidth] = useState<number | null>(null);
+  
+  // Use a single pending updates object to batch all changes
+  const [pendingUpdates, setPendingUpdates] = useState<{
+    content?: string;
+    title?: string;
+    width?: number;
+  }>({});
   
   // Track the last initialized plan ID to prevent re-initialization
   const lastInitializedPlanId = useRef<string | null>(null);
@@ -47,10 +51,8 @@ export function usePlanNotePadStorage({
     onUpdatePlanRef.current = onUpdatePlan;
   });
 
-  // Debounce saves to prevent excessive updates
-  const debouncedContent = useDebounce(pendingContent, 500);
-  const debouncedTitle = useDebounce(pendingTitle, 500);
-  const debouncedWidth = useDebounce(pendingWidth, 300);
+  // Debounce all updates together to prevent race conditions
+  const debouncedUpdates = useDebounce(pendingUpdates, 500);
 
   // Initialize from current plan - only when plan ID changes
   useEffect(() => {
@@ -72,68 +74,113 @@ export function usePlanNotePadStorage({
     }
   }, [currentPlan?.id, minWidth, maxWidth, defaultWidth, currentPlan]);
 
-  // Save debounced content - only save if it's actually different from current plan
+  // Single effect that batches all updates atomically with error handling
   useEffect(() => {
     const currentPlan = currentPlanRef.current;
     const onUpdatePlan = onUpdatePlanRef.current;
     
-    if (debouncedContent !== null && currentPlan && onUpdatePlan && currentPlan.notepadData.content !== debouncedContent) {
-      onUpdatePlan({
-        notepadData: {
+    if (Object.keys(debouncedUpdates).length > 0 && currentPlan && onUpdatePlan) {
+      // Check if any updates are actually different from current plan
+      const hasChanges = 
+        (debouncedUpdates.content !== undefined && currentPlan.notepadData.content !== debouncedUpdates.content) ||
+        (debouncedUpdates.title !== undefined && currentPlan.notepadData.title !== debouncedUpdates.title) ||
+        (debouncedUpdates.width !== undefined && currentPlan.notepadData.width !== debouncedUpdates.width);
+      
+      if (hasChanges) {
+        // Build the updated notepad data by applying all pending changes atomically
+        const updatedNotepadData = {
           ...currentPlan.notepadData,
-          content: debouncedContent
+          ...(debouncedUpdates.content !== undefined && { content: debouncedUpdates.content }),
+          ...(debouncedUpdates.title !== undefined && { title: debouncedUpdates.title }),
+          ...(debouncedUpdates.width !== undefined && { width: debouncedUpdates.width }),
+        };
+        
+        try {
+          onUpdatePlan({ notepadData: updatedNotepadData });
+          // Clear the pending updates after successful save
+          setPendingUpdates({});
+        } catch (error) {
+          console.error('Failed to save notepad updates to plan:', error);
+          
+          // Fallback: save to localStorage as backup
+          try {
+            const backupKey = `plan-${currentPlan.id}-notepad-backup`;
+            const backupData = {
+              timestamp: Date.now(),
+              updates: debouncedUpdates,
+              fullData: updatedNotepadData,
+            };
+            localStorage.setItem(backupKey, JSON.stringify(backupData));
+            console.log('Notepad data saved to localStorage backup');
+          } catch (storageError) {
+            console.error('Failed to save backup to localStorage:', storageError);
+            // Could emit an error event here for user notification
+          }
+          
+          // Don't clear pending updates on error - keep them for potential retry
+          // setPendingUpdates({});
         }
-      });
+      }
     }
-  }, [debouncedContent]);
-
-  // Save debounced title - only save if it's actually different from current plan
-  useEffect(() => {
-    const currentPlan = currentPlanRef.current;
-    const onUpdatePlan = onUpdatePlanRef.current;
-    
-    if (debouncedTitle !== null && currentPlan && onUpdatePlan && currentPlan.notepadData.title !== debouncedTitle) {
-      onUpdatePlan({
-        notepadData: {
-          ...currentPlan.notepadData,
-          title: debouncedTitle
-        }
-      });
-    }
-  }, [debouncedTitle]);
-
-  // Save debounced width - only save if it's actually different from current plan
-  useEffect(() => {
-    const currentPlan = currentPlanRef.current;
-    const onUpdatePlan = onUpdatePlanRef.current;
-    
-    if (debouncedWidth !== null && currentPlan && onUpdatePlan && currentPlan.notepadData.width !== debouncedWidth) {
-      onUpdatePlan({
-        notepadData: {
-          ...currentPlan.notepadData,
-          width: debouncedWidth
-        }
-      });
-    }
-  }, [debouncedWidth]);
+  }, [debouncedUpdates]);
 
   const handleSetTitle = useCallback((newTitle: string) => {
     setTitle(newTitle);
-    setPendingTitle(newTitle);
+    setPendingUpdates(prev => ({ ...prev, title: newTitle }));
   }, []);
 
   const handleSetWidth = useCallback((newWidth: number) => {
     const clampedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
     setWidth(clampedWidth);
-    setPendingWidth(clampedWidth);
+    
+    // Width changes should be immediate for resize feedback
+    const currentPlan = currentPlanRef.current;
+    const onUpdatePlan = onUpdatePlanRef.current;
+    
+    if (currentPlan && onUpdatePlan && currentPlan.notepadData.width !== clampedWidth) {
+      try {
+        onUpdatePlan({
+          notepadData: {
+            ...currentPlan.notepadData,
+            width: clampedWidth
+          }
+        });
+      } catch (error) {
+        console.error('Failed to save width update:', error);
+        // Fallback: add to pending updates for retry
+        setPendingUpdates(prev => ({ ...prev, width: clampedWidth }));
+      }
+    }
   }, [minWidth, maxWidth]);
 
   const loadContent = useCallback((): string | null => {
-    return currentPlan?.notepadData.content || null;
+    if (!currentPlan) return null;
+    
+    // First try to load from the plan
+    let content = currentPlan.notepadData.content;
+    
+    // If no content in plan, check for backup in localStorage
+    if (!content) {
+      try {
+        const backupKey = `plan-${currentPlan.id}-notepad-backup`;
+        const backupData = localStorage.getItem(backupKey);
+        if (backupData) {
+          const backup = JSON.parse(backupData);
+          content = backup.fullData?.content || backup.updates?.content;
+          if (content) {
+            console.log('Loaded notepad content from localStorage backup');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load backup from localStorage:', error);
+      }
+    }
+    
+    return content || null;
   }, [currentPlan]);
 
   const saveContent = useCallback((content: string) => {
-    setPendingContent(content);
+    setPendingUpdates(prev => ({ ...prev, content }));
   }, []);
 
   return {

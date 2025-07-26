@@ -30,7 +30,7 @@ function NotePad({
 }: NotePadProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const [pendingContent, setPendingContent] = useState<string | null>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Use the plan-specific notepad storage hook
   const {
@@ -44,9 +44,6 @@ function NotePad({
     maxWidth: NOTEPAD_CONSTANTS.MAX_WIDTH,
   });
 
-  // Debounce content changes to coordinate with storage hook
-  const debouncedContent = useDebounce(pendingContent, 500);
-
   // Error handling helper
   const handleError = useCallback((error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
     const notePadError: NotePadError = Object.assign(error, { code, details });
@@ -54,25 +51,28 @@ function NotePad({
     onError?.(notePadError);
   }, [onError]);
 
-  // Track when debounced content changes to show save status
-  useEffect(() => {
-    if (debouncedContent !== null && currentPlan) {
+  // Helper to set save status with timeout cleanup
+  const setSaveStatusWithTimeout = useCallback((status: 'saved' | 'error', delay: number) => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    setSaveStatus(status);
+    saveTimeoutRef.current = setTimeout(() => setSaveStatus('idle'), delay);
+  }, []);
+
+  // Show save status when content is being saved
+  // Note: The actual saving is now handled by the storage hook's debouncing
+  const showSaveStatusForContent = useCallback((content: string) => {
+    if (currentPlan) {
       try {
-        saveContentToStorage(debouncedContent);
-        
-        // Since save is instant, go directly to "saved" state
-        setSaveStatus('saved');
-        // Clear status after showing saved for 1.5 seconds
-        setTimeout(() => setSaveStatus('idle'), 1500);
-        
+        saveContentToStorage(content);
+        setSaveStatusWithTimeout('saved', 1500);
       } catch (error) {
-        setSaveStatus('error');
+        setSaveStatusWithTimeout('error', 5000);
         handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
-        // Clear error status after 5 seconds
-        setTimeout(() => setSaveStatus('idle'), 5000);
       }
     }
-  }, [debouncedContent, currentPlan, saveContentToStorage, handleError]);
+  }, [currentPlan, saveContentToStorage, handleError, setSaveStatusWithTimeout]);
 
   const editor = useEditor({
     extensions: [
@@ -163,8 +163,8 @@ function NotePad({
     onUpdate: ({ editor }) => {
       try {
         const newContent = editor.getHTML();
-        // Only set pending content, don't trigger immediate save status
-        setPendingContent(newContent);
+        // Call the save status function which handles storage
+        showSaveStatusForContent(newContent);
       } catch (error) {
         handleError(error as Error, 'EDITOR_ERROR', { action: 'save_content' });
       }
@@ -228,7 +228,11 @@ function NotePad({
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      // Clean up any pending timeouts or event listeners
+      // Clean up timeouts
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      // Clean up editor
       if (editor) {
         editor.destroy();
       }
