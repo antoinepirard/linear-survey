@@ -1,8 +1,17 @@
-import { Plan, PlanStorage } from '@/types/plan';
+import { Plan, PlanStorage, NotepadDocument } from '@/types/plan';
 
 // Helper functions for consistent data serialization before API calls
 
 import { TeamPlanData } from '@/data/teamplan';
+
+export interface SerializedNotepadDocument {
+  id: string;
+  title: string;
+  content: string;
+  version: number;
+  createdAt: string; // ISO string
+  updatedAt: string; // ISO string
+}
 
 export interface SerializedPlan {
   id: string;
@@ -11,9 +20,9 @@ export interface SerializedPlan {
   updatedAt: string; // ISO string
   teamPlanData: TeamPlanData;
   notepadData: {
-    content: string;
-    title: string;
     width: number;
+    currentDocumentId: string | null;
+    documents: Record<string, SerializedNotepadDocument>;
   };
 }
 
@@ -24,6 +33,20 @@ export interface SerializedPlanStorage {
 
 // Serialize a Plan object for API transmission
 export const serializePlan = (plan: Plan): SerializedPlan => {
+  const serializedDocuments: Record<string, SerializedNotepadDocument> = {};
+  
+  // Serialize all documents
+  Object.entries(plan.notepadData.documents).forEach(([id, document]) => {
+    serializedDocuments[id] = {
+      id: document.id,
+      title: document.title,
+      content: document.content,
+      version: document.version,
+      createdAt: document.createdAt.toISOString(),
+      updatedAt: document.updatedAt.toISOString()
+    };
+  });
+
   return {
     id: plan.id,
     name: plan.name,
@@ -31,15 +54,29 @@ export const serializePlan = (plan: Plan): SerializedPlan => {
     updatedAt: plan.updatedAt.toISOString(),
     teamPlanData: plan.teamPlanData,
     notepadData: {
-      content: plan.notepadData.content,
-      title: plan.notepadData.title,
-      width: plan.notepadData.width
+      width: plan.notepadData.width,
+      currentDocumentId: plan.notepadData.currentDocumentId,
+      documents: serializedDocuments
     }
   };
 };
 
 // Deserialize a Plan object from API response
 export const deserializePlan = (serializedPlan: SerializedPlan): Plan => {
+  const documents: Record<string, NotepadDocument> = {};
+  
+  // Deserialize all documents
+  Object.entries(serializedPlan.notepadData.documents).forEach(([id, serializedDocument]) => {
+    documents[id] = {
+      id: serializedDocument.id,
+      title: serializedDocument.title,
+      content: serializedDocument.content,
+      version: serializedDocument.version,
+      createdAt: new Date(serializedDocument.createdAt),
+      updatedAt: new Date(serializedDocument.updatedAt)
+    };
+  });
+
   return {
     id: serializedPlan.id,
     name: serializedPlan.name,
@@ -47,9 +84,9 @@ export const deserializePlan = (serializedPlan: SerializedPlan): Plan => {
     updatedAt: new Date(serializedPlan.updatedAt),
     teamPlanData: serializedPlan.teamPlanData,
     notepadData: {
-      content: serializedPlan.notepadData.content,
-      title: serializedPlan.notepadData.title,
-      width: serializedPlan.notepadData.width
+      width: serializedPlan.notepadData.width,
+      currentDocumentId: serializedPlan.notepadData.currentDocumentId,
+      documents: documents
     }
   };
 };
