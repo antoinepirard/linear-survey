@@ -310,26 +310,6 @@ function NotePad({
   const lastTypingTime = useRef<number>(0);
   const isActivelyTyping = useRef<boolean>(false);
   
-  // Update placeholder when document changes without recreating extensions
-  useEffect(() => {
-    if (editor && !editor.isDestroyed) {
-      const placeholder = currentDocument?.title 
-        ? `Start writing in "${currentDocument.title}"...` 
-        : NOTEPAD_CONSTANTS.PLACEHOLDER_TEXT;
-      
-      // Update placeholder via editor extension update method
-      try {
-        const placeholderExt = editor.extensionManager.extensions.find(ext => ext.name === 'placeholder');
-        if (placeholderExt && placeholderExt.options.update) {
-          placeholderExt.options.update({ placeholder });
-        }
-      } catch (error) {
-        // Silently handle placeholder update errors - not critical
-        console.debug('Could not update placeholder:', error);
-      }
-    }
-  }, [editor, currentDocument?.title]);
-
   // Update editor content when document changes
   useEffect(() => {
     if (editor) {
