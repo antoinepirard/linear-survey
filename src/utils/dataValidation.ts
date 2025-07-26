@@ -1,4 +1,4 @@
-import { Plan, PlanStorage } from '@/types/plan';
+import { Plan, PlanStorage, NotepadDocument } from '@/types/plan';
 import { TeamPlanData } from '@/data/teamplan';
 
 export interface ValidationError {
@@ -219,24 +219,8 @@ const validateTeamPlanData = (data: TeamPlanData): ValidationResult => {
 };
 
 // Validate notepad data structure
-const validateNotepadData = (data: { content: string; title: string; width: number }): ValidationResult => {
+const validateNotepadData = (data: { width: number; currentDocumentId: string | null; documents: Record<string, any> }): ValidationResult => {
   const errors: ValidationError[] = [];
-
-  if (typeof data.content !== 'string') {
-    errors.push({
-      field: 'content',
-      message: 'Content must be a string',
-      code: 'INVALID_CONTENT'
-    });
-  }
-
-  if (typeof data.title !== 'string' || data.title.trim().length === 0) {
-    errors.push({
-      field: 'title',
-      message: 'Title must be a non-empty string',
-      code: 'INVALID_TITLE'
-    });
-  }
 
   if (typeof data.width !== 'number' || data.width < 200 || data.width > 1200) {
     errors.push({
@@ -244,6 +228,63 @@ const validateNotepadData = (data: { content: string; title: string; width: numb
       message: 'Width must be a number between 200 and 1200',
       code: 'INVALID_WIDTH'
     });
+  }
+
+  if (data.currentDocumentId !== null && typeof data.currentDocumentId !== 'string') {
+    errors.push({
+      field: 'currentDocumentId',
+      message: 'Current document ID must be a string or null',
+      code: 'INVALID_CURRENT_DOCUMENT_ID'
+    });
+  }
+
+  if (!data.documents || typeof data.documents !== 'object') {
+    errors.push({
+      field: 'documents',
+      message: 'Documents must be an object',
+      code: 'INVALID_DOCUMENTS'
+    });
+  } else {
+    // Validate each document
+    Object.entries(data.documents).forEach(([docId, document]) => {
+      if (!document.id || typeof document.id !== 'string') {
+        errors.push({
+          field: `documents[${docId}].id`,
+          message: 'Document ID must be a non-empty string',
+          code: 'INVALID_DOCUMENT_ID'
+        });
+      }
+      if (typeof document.title !== 'string' || document.title.trim().length === 0) {
+        errors.push({
+          field: `documents[${docId}].title`,
+          message: 'Document title must be a non-empty string',
+          code: 'INVALID_DOCUMENT_TITLE'
+        });
+      }
+      if (typeof document.content !== 'string') {
+        errors.push({
+          field: `documents[${docId}].content`,
+          message: 'Document content must be a string',
+          code: 'INVALID_DOCUMENT_CONTENT'
+        });
+      }
+      if (typeof document.version !== 'number' || document.version < 0) {
+        errors.push({
+          field: `documents[${docId}].version`,
+          message: 'Document version must be a non-negative number',
+          code: 'INVALID_DOCUMENT_VERSION'
+        });
+      }
+    });
+
+    // Validate that currentDocumentId references an existing document
+    if (data.currentDocumentId && !data.documents[data.currentDocumentId]) {
+      errors.push({
+        field: 'currentDocumentId',
+        message: 'Current document ID must reference an existing document',
+        code: 'CURRENT_DOCUMENT_NOT_FOUND'
+      });
+    }
   }
 
   return {
@@ -348,8 +389,19 @@ export const sanitizePlanStorage = (storage: PlanStorage): PlanStorage => {
           name: plan.name ? plan.name.trim().substring(0, 100) : 'Untitled Plan', // Handle undefined/null names
           notepadData: {
             ...plan.notepadData,
-            title: plan.notepadData?.title ? plan.notepadData.title.trim().substring(0, 50) : 'Notes', // Handle undefined titles
-            width: plan.notepadData?.width ? Math.max(200, Math.min(1200, plan.notepadData.width)) : 400 // Handle undefined width
+            width: plan.notepadData?.width ? Math.max(200, Math.min(1200, plan.notepadData.width)) : 400, // Handle undefined width
+            currentDocumentId: plan.notepadData?.currentDocumentId || null,
+            documents: plan.notepadData?.documents ? Object.fromEntries(
+              Object.entries(plan.notepadData.documents).map(([docId, document]) => [
+                docId,
+                {
+                  ...document,
+                  title: document.title ? document.title.trim().substring(0, 100) : 'Untitled Document',
+                  content: typeof document.content === 'string' ? document.content : '',
+                  version: typeof document.version === 'number' ? Math.max(0, document.version) : 1
+                }
+              ])
+            ) : {}
           }
         }
       ])
