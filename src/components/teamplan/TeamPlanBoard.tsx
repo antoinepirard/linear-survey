@@ -609,9 +609,22 @@ function TeamPlanBoard({
             </div>
             
             {/* Project Content */}
-            <div className="flex-1">
+            <div className="flex-1 relative">
+              {/* Column Background Gradients */}
+              <div className="absolute inset-0 px-6 pointer-events-none">
+                <div className="grid gap-2 h-full" style={{ gridTemplateColumns: `repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+                  {boardData.timeSlots.map(timeSlot => (
+                    <div
+                      key={`bg-${timeSlot.id}`}
+                      className="bg-gradient-to-b from-slate-100/50 to-transparent"
+                    />
+                  ))}
+                  <div></div> {/* Empty div for the delete button column */}
+                </div>
+              </div>
+              
               {/* Project Cells Grid */}
-              <div className="space-y-0 pb-6 px-6">
+              <div className="space-y-0 pb-6 px-6 relative">
                 {boardData.people.map((person, personIndex) => (
                   <div key={person.id}>
                     <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
@@ -634,7 +647,7 @@ function TeamPlanBoard({
                             personName={person.name}
                           >
                             <motion.div
-                              className="min-h-12 p-1 pt-1 pb-1 transition-all duration-200 relative overflow-visible group bg-slate-100"
+                              className="min-h-12 p-1 pt-1 pb-1 transition-all duration-200 relative overflow-visible group"
                               data-drop-zone
                               data-person-id={person.id}
                               data-timeslot-id={timeSlot.id}
