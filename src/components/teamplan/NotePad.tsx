@@ -17,6 +17,7 @@ import ListKeymap from '@tiptap/extension-list-keymap';
 import TextSelectionMenu from '@/components/ui/text-selection-menu';
 import { useTextSelection } from '@/hooks/useTextSelection';
 import { usePlanNotePadStorage } from '@/hooks/usePlanNotePadStorage';
+import { useDebounce } from '@/hooks/useDebounce';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { NotePadProps, NotePadError } from '@/types/notepad';
 
@@ -29,6 +30,7 @@ function NotePad({
 }: NotePadProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [pendingContent, setPendingContent] = useState<string | null>(null);
   
   // Use the plan-specific notepad storage hook
   const {
@@ -42,6 +44,9 @@ function NotePad({
     maxWidth: NOTEPAD_CONSTANTS.MAX_WIDTH,
   });
 
+  // Debounce content changes to coordinate with storage hook
+  const debouncedContent = useDebounce(pendingContent, 500);
+
   // Error handling helper
   const handleError = useCallback((error: Error, code: NotePadError['code'], details?: Record<string, unknown>) => {
     const notePadError: NotePadError = Object.assign(error, { code, details });
@@ -49,26 +54,30 @@ function NotePad({
     onError?.(notePadError);
   }, [onError]);
 
-  // Content save with status handling
-  const saveContent = useCallback(
-    async (newContent: string) => {
-      if (currentPlan && onUpdatePlan) {
-        setSaveStatus('saving');
-        try {
-          saveContentToStorage(newContent);
+  // Track when debounced content changes to show save status
+  useEffect(() => {
+    if (debouncedContent !== null && currentPlan) {
+      // Show saving indicator briefly when actual save happens
+      setSaveStatus('saving');
+      
+      try {
+        saveContentToStorage(debouncedContent);
+        
+        // Show saved status briefly
+        setTimeout(() => {
           setSaveStatus('saved');
-          // Clear 'saved' status after 2 seconds
-          setTimeout(() => setSaveStatus('idle'), 2000);
-        } catch (error) {
-          setSaveStatus('error');
-          handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
-          // Clear error status after 5 seconds
-          setTimeout(() => setSaveStatus('idle'), 5000);
-        }
+          // Clear status after showing saved for 1.5 seconds
+          setTimeout(() => setSaveStatus('idle'), 1500);
+        }, 100);
+        
+      } catch (error) {
+        setSaveStatus('error');
+        handleError(error as Error, 'STORAGE_ERROR', { action: 'save_content' });
+        // Clear error status after 5 seconds
+        setTimeout(() => setSaveStatus('idle'), 5000);
       }
-    },
-    [currentPlan, onUpdatePlan, saveContentToStorage, handleError]
-  );
+    }
+  }, [debouncedContent, currentPlan, saveContentToStorage, handleError]);
 
   const editor = useEditor({
     extensions: [
@@ -159,11 +168,8 @@ function NotePad({
     onUpdate: ({ editor }) => {
       try {
         const newContent = editor.getHTML();
-        saveContent(newContent);
-        // Reset save status when user starts typing
-        if (saveStatus !== 'idle') {
-          setSaveStatus('idle');
-        }
+        // Only set pending content, don't trigger immediate save status
+        setPendingContent(newContent);
       } catch (error) {
         handleError(error as Error, 'EDITOR_ERROR', { action: 'save_content' });
       }
