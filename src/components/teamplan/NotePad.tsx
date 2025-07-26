@@ -193,6 +193,17 @@ function NotePad({
     onUpdate: ({ editor }) => {
       if (isComposing) return; // Skip updates during IME composition
       
+      // Mark as actively typing
+      lastTypingTime.current = Date.now();
+      isActivelyTyping.current = true;
+      
+      // Clear typing flag after delay
+      setTimeout(() => {
+        if (Date.now() - lastTypingTime.current >= 100) {
+          isActivelyTyping.current = false;
+        }
+      }, 150);
+      
       try {
         const newContent = editor.getHTML();
         // Call the save status function which handles storage
@@ -227,7 +238,7 @@ function NotePad({
         handleError(error as Error, 'STORAGE_ERROR', { action: 'load_content' });
       }
     },
-  });
+  }, []); // Add empty dependency array to prevent editor recreation
 
   // Text selection hook
   const {
@@ -241,17 +252,20 @@ function NotePad({
     containerRef: editorRef,
   });
 
-  // Memoize plan data to avoid unnecessary re-renders
+  // Memoize plan data to avoid unnecessary re-renders - only depend on plan ID to prevent feedback loop
   const planData = useMemo(() => ({
-    id: currentPlan?.id,
-    content: currentPlan?.notepadData.content
-  }), [currentPlan?.id, currentPlan?.notepadData.content]);
+    id: currentPlan?.id
+  }), [currentPlan?.id]);
+
+  // Add typing detection to prevent content loading during active typing
+  const lastTypingTime = useRef<number>(0);
+  const isActivelyTyping = useRef<boolean>(false);
 
   // Update editor content when plan ID changes (not on every currentPlan object change)
   useEffect(() => {
     if (editor && planData.id) {
-      // Inline content loading to avoid dependency on loadContent function
-      let savedContent = planData.content;
+      // Access content directly from currentPlan, not through memo to avoid feedback loop
+      let savedContent = currentPlan?.notepadData.content;
       
       // Check backup if no content in plan
       if (!savedContent) {
@@ -270,16 +284,16 @@ function NotePad({
       const currentContent = editor.getHTML();
       
       if (savedContent) {
-        // Only update if the content is actually different to avoid unnecessary operations
-        if (currentContent !== savedContent) {
+        // Only update if content is different AND user isn't actively typing or composing
+        if (currentContent !== savedContent && !isComposing && !isActivelyTyping.current) {
           editor.commands.setContent(savedContent, { emitUpdate: false });
         }
-      } else if (currentContent !== '<p></p>') {
+      } else if (currentContent !== '<p></p>' && !isActivelyTyping.current) {
         // Clear editor if no content and editor is not already empty
         editor.commands.clearContent();
       }
     }
-  }, [editor, planData]); // Depend on memoized plan data
+  }, [editor, planData.id, isComposing, currentPlan?.notepadData.content]); // Include content dependency but protect with typing checks
 
   // Click-outside handling is now managed by the useTextSelection hook
 
