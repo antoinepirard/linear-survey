@@ -125,7 +125,7 @@
 .ProseMirror.ProseMirror ul[data-type="bulletList"] ul[data-type="bulletList"] ul[data-type="bulletList"],
 .ProseMirror.ProseMirror ul ul ul {
   list-style-type: square;
-  margin-left: var(--spacing-2xl); /* 24px - third level indentation */
+  margin-left: var(--spacing-2xl) !important; /* 24px - third level indentation */
 }
 
 /* Ordered Lists - Support both specific and fallback selectors */
@@ -149,7 +149,7 @@
 .ProseMirror.ProseMirror ol[data-type="orderedList"] ol[data-type="orderedList"] ol[data-type="orderedList"],
 .ProseMirror.ProseMirror ol ol ol {
   list-style-type: lower-roman;
-  margin-left: var(--spacing-2xl); /* 24px - third level ordered indentation */
+  margin-left: var(--spacing-2xl) !important; /* 24px - third level ordered indentation */
 }
 
 /* Task Lists */
@@ -278,32 +278,6 @@
   margin-bottom: var(--spacing-md); /* 12px for task items with sublists */
 }
 
-/* DEBUG: Visual verification of spacing (remove after testing) */
-.ProseMirror.ProseMirror li[data-type="listItem"] {
-  background-color: rgba(59, 130, 246, 0.1); /* Light blue background */
-  border-left: 2px solid #3b82f6; /* Blue left border */
-  border-radius: 2px;
-}
-
-.ProseMirror.ProseMirror li[data-type="taskItem"] {
-  background-color: rgba(34, 197, 94, 0.1); /* Light green background */
-  border-left: 2px solid #22c55e; /* Green left border */
-  border-radius: 2px;
-}
-
-/* Show spacing visually */
-.ProseMirror.ProseMirror li[data-type="listItem"]::after,
-.ProseMirror.ProseMirror li[data-type="taskItem"]::after {
-  content: "8px margin";
-  font-size: 10px;
-  color: #6b7280;
-  position: absolute;
-  right: 8px;
-  background: white;
-  padding: 1px 4px;
-  border-radius: 2px;
-  border: 1px solid #e5e7eb;
-}
 
 /* SURGICAL FIX: Remove margins from text elements but preserve list indentation */
 .ProseMirror li p,
