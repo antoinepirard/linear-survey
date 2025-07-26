@@ -298,7 +298,7 @@ function NotePad({
         editor.commands.clearContent();
       }
     }
-  }, [editor, currentDocument?.id, currentPlan?.id, loadContent]);
+  }, [editor, currentDocument?.id, currentPlan?.id, loadContent, isComposing]);
 
   // Click-outside handling is now managed by the useTextSelection hook
 
