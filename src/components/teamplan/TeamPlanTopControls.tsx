@@ -12,7 +12,7 @@ const TeamPlanTopControls = ({
 }: TeamPlanTopControlsProps) => {
   return (
     <div className={`w-full bg-white border-b border-slate-200/65 ${className}`}>
-      <div className="px-6 py-4">
+      <div className="px-6 py-[7px]">
         <div className="flex items-center justify-between">
           <ShadcnTabs defaultValue="plan" className="w-fit">
             <TabsList>
