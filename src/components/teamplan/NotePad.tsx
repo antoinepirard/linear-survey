@@ -283,31 +283,6 @@ function NotePad({
           }
         }
 
-        // Handle keyboard shortcuts with better detection
-        const mod = event.metaKey || event.ctrlKey;
-        const shift = event.shiftKey;
-        const alt = event.altKey;
-        
-        if (mod && !shift && !alt && event.key === 'b') {
-          editor?.chain().focus().toggleBold().run();
-          return true;
-        }
-        
-        if (mod && !shift && !alt && event.key === 'i') {
-          editor?.chain().focus().toggleItalic().run();
-          return true;
-        }
-        
-        if (mod && shift && !alt && event.key === 'S') {
-          editor?.chain().focus().toggleStrike().run();
-          return true;
-        }
-        
-        if (mod && alt && !shift && ['1', '2', '3'].includes(event.key)) {
-          const level = parseInt(event.key) as 1 | 2 | 3;
-          editor?.chain().focus().toggleHeading({ level }).run();
-          return true;
-        }
         
         return false;
       },
