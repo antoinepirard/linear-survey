@@ -566,8 +566,8 @@ function TeamPlanBoard({
 
   return (
     <div className="h-full flex flex-col relative" onContextMenu={handleContextMenu}>
-      {/* Left fade overlay */}
-      <div className={`absolute left-32 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-50 to-transparent z-30 pointer-events-none transition-opacity duration-200 ${
+      {/* Left fade overlay - positioned after person column */}
+      <div className={`absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-50 to-transparent z-30 pointer-events-none transition-opacity duration-200 ${
         showLeftFade ? 'opacity-100' : 'opacity-0'
       }`} />
       
