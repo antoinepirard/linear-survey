@@ -373,8 +373,6 @@ export default function TeamPlanPage() {
                 onCreatePlan={createPlan}
                 onDeletePlan={deletePlan}
                 onRenamePlan={renamePlan}
-                isColorCodingEnabled={isColorCodingEnabled}
-                onColorCodingChange={handleColorCodingChange}
                 isNotePadFullScreen={isNotePadFullScreen}
                 onToggleNotePadFullScreen={handleToggleNotePadFullScreen}
                 showFullScreenToggle={activePanel === 'notepad'}
@@ -476,7 +474,10 @@ export default function TeamPlanPage() {
       {/* Team Plan Board - Only render when NOT in full-screen notepad mode */}
       {!(isNotePadFullScreen && activePanel === 'notepad') && (
         <div className="flex-1 overflow-hidden flex flex-col">
-          <TeamPlanTopControls />
+          <TeamPlanTopControls 
+            isColorCodingEnabled={isColorCodingEnabled}
+            onColorCodingChange={handleColorCodingChange}
+          />
           <div className="flex-1 overflow-hidden">
             <TeamPlanBoard 
             data={currentPlan.teamPlanData}
