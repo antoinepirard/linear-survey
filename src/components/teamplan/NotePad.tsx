@@ -285,7 +285,7 @@ function NotePad({
           }
         }
 
-        
+        // Let TipTap handle all other keys (including "/" for slash commands)
         return false;
       },
       handleDOMEvents: {
