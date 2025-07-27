@@ -43,8 +43,8 @@ const PersonCell = ({
   };
 
   return (
-    <div className="p-2 group relative">
-      <div className="flex items-center">
+    <div className="min-h-12 p-1 pt-1 pb-1 group relative flex items-center">
+      <div className="flex items-center w-full">
         {isEditing ? (
           <input
             type="text"
@@ -53,12 +53,12 @@ const PersonCell = ({
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
             placeholder="Name"
-            className="text-sm font-medium text-slate-900 bg-transparent border-0 outline-none pt-4 pb-0 w-full"
+            className="text-sm font-medium text-slate-900 bg-transparent border-0 outline-none py-1 w-full"
             autoFocus
           />
         ) : (
           <h4
-            className="text-sm font-medium text-slate-900 pt-4 pb-0 transition-colors cursor-pointer"
+            className="text-sm font-medium text-slate-900 py-1 transition-colors cursor-pointer"
             onClick={() => setIsEditing(true)}
           >
             {person.name}

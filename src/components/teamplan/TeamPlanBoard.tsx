@@ -3,9 +3,8 @@
 import { useState, useEffect, useRef, memo } from 'react';
 import { motion } from 'motion/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
-import { TeamPlanData, Project, TimeSlot, Person, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor, getAllGroups } from '@/data/teamplan';
+import { TeamPlanData, Project, Person, TimeSlot, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor, getAllGroups } from '@/data/teamplan';
 import ProjectCard from './ProjectCard';
-import TimelineHeader from './TimelineHeader';
 import PersonCell from './PersonCell';
 import AddPersonCell from './AddPersonCell';
 import TeamPlanContextMenu from './TeamPlanContextMenu';
@@ -16,106 +15,31 @@ interface TeamPlanBoardProps {
   onChange?: (data: TeamPlanData) => void;
   onDataSyncError?: (originalData: TeamPlanData, errorData: TeamPlanData, error: Error) => void;
   isColorCodingEnabled?: boolean;
+  hoveredColumn?: string | null;
+  onColumnMouseEnter?: (timeSlotId: string) => void;
+  onColumnMouseLeave?: () => void;
+  // Header props
+  onAddTimeSlot?: (timeSlot: TimeSlot) => void;
+  onRemoveTimeSlot?: (timeSlotId: string) => void;
+  onUpdateTimeSlot?: (timeSlot: TimeSlot) => void;
+  onMoveTimeSlotLeft?: (timeSlotId: string) => void;
+  onMoveTimeSlotRight?: (timeSlotId: string) => void;
 }
-
-// Utility functions for time slot sequence management
-const shouldShiftSubsequentSlots = (originalLabel: string, newLabel: string): boolean => {
-  // Only shift if both labels follow a recognizable sequence pattern
-  return isSequencePattern(originalLabel) && isSequencePattern(newLabel);
-};
-
-const isSequencePattern = (label: string): boolean => {
-  const patterns = [
-    /^q(\d+)$/i,                    // Q1, Q2, etc.
-    /^(quarter)\s+(\d+)$/i,         // Quarter 1, Quarter 2
-    /^(week)\s+(\d+)$/i,            // Week 1, Week 2
-    /^(month)\s+(\d+)$/i,           // Month 1, Month 2
-    /^(\d{4})$/,                    // 2024, 2025
-    /^(year)\s+(\d+)$/i,            // Year 2023, Year 2024
-    /^([a-zA-Z]+)\s+(\d+)$/i        // Phase 1, Sprint 2, etc.
-  ];
-  
-  return patterns.some(pattern => pattern.test(label.trim()));
-};
-
-const generateSequenceLabels = (startLabel: string, count: number): string[] => {
-  const labels = [startLabel];
-  
-  if (count <= 0) return labels;
-  
-  // Handle different sequence patterns
-  const quarterMatch = startLabel.match(/^q(\d+)$/i);
-  if (quarterMatch) {
-    const startNumber = parseInt(quarterMatch[1]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`Q${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const quarterFullMatch = startLabel.match(/^(quarter)\s+(\d+)$/i);
-  if (quarterFullMatch) {
-    const startNumber = parseInt(quarterFullMatch[2]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`Quarter ${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const weekMatch = startLabel.match(/^(week)\s+(\d+)$/i);
-  if (weekMatch) {
-    const startNumber = parseInt(weekMatch[2]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`Week ${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const monthMatch = startLabel.match(/^(month)\s+(\d+)$/i);
-  if (monthMatch) {
-    const startNumber = parseInt(monthMatch[2]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`Month ${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const yearMatch = startLabel.match(/^(\d{4})$/);
-  if (yearMatch) {
-    const startNumber = parseInt(yearMatch[1]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const yearFullMatch = startLabel.match(/^(year)\s+(\d+)$/i);
-  if (yearFullMatch) {
-    const startNumber = parseInt(yearFullMatch[2]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`Year ${startNumber + i}`);
-    }
-    return labels;
-  }
-
-  const genericMatch = startLabel.match(/^([a-zA-Z]+)\s+(\d+)$/i);
-  if (genericMatch) {
-    const prefix = genericMatch[1];
-    const startNumber = parseInt(genericMatch[2]);
-    for (let i = 1; i <= count; i++) {
-      labels.push(`${prefix} ${startNumber + i}`);
-    }
-    return labels;
-  }
-  
-  return labels;
-};
 
 function TeamPlanBoard({ 
   data = DEFAULT_TEAMPLAN_DATA, 
   onChange,
   onDataSyncError,
-  isColorCodingEnabled = true
+  isColorCodingEnabled = true,
+  hoveredColumn: externalHoveredColumn,
+  onColumnMouseEnter: externalOnColumnMouseEnter,
+  onColumnMouseLeave: externalOnColumnMouseLeave,
+  // Header props
+  onAddTimeSlot,
+  onRemoveTimeSlot,
+  onUpdateTimeSlot,
+  onMoveTimeSlotLeft,
+  onMoveTimeSlotRight
 }: TeamPlanBoardProps) {
   const [boardData, setBoardData] = useState<TeamPlanData>(data);
   const [draggedProject, setDraggedProject] = useState<string | null>(null);
@@ -126,6 +50,9 @@ function TeamPlanBoard({
   const [draggedProjectData, setDraggedProjectData] = useState<Project | null>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
+  const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
+  const [editingSlot, setEditingSlot] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const cachedDropZones = useRef<Array<{
     element: HTMLElement;
@@ -171,6 +98,55 @@ function TeamPlanBoard({
     };
   }, []);
 
+
+  // Use external hover state if provided, otherwise use internal state
+  const currentHoveredColumn = externalHoveredColumn !== undefined ? externalHoveredColumn : hoveredColumn;
+  
+  // Column hover handlers
+  const handleColumnMouseEnter = (timeSlotId: string) => {
+    if (externalOnColumnMouseEnter) {
+      externalOnColumnMouseEnter(timeSlotId);
+    } else {
+      setHoveredColumn(timeSlotId);
+    }
+  };
+
+  const handleColumnMouseLeave = () => {
+    if (externalOnColumnMouseLeave) {
+      externalOnColumnMouseLeave();
+    } else {
+      setHoveredColumn(null);
+    }
+  };
+
+  // TimeSlot editing handlers
+  const handleStartEdit = (slot: TimeSlot) => {
+    setEditingSlot(slot.id);
+    setEditValue(slot.label);
+  };
+
+  const handleSaveEdit = (slotId: string) => {
+    const slot = boardData.timeSlots.find(s => s.id === slotId);
+    if (slot && editValue.trim() && onUpdateTimeSlot) {
+      onUpdateTimeSlot({ ...slot, label: editValue.trim() });
+    }
+    setEditingSlot(null);
+    setEditValue('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSlot(null);
+    setEditValue('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, slotId: string) => {
+    if (e.key === 'Enter') {
+      handleSaveEdit(slotId);
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
+  };
+
   // Get all unique groups from existing projects
   const getAvailableGroups = () => getAllGroups(boardData.projects);
 
@@ -180,7 +156,7 @@ function TeamPlanBoard({
     setBoardData(newData);
     
     try {
-      await onChange?.(newData);
+      onChange?.(newData);
     } catch (error) {
       console.error(`Failed to ${operation}:`, error);
       setBoardData(originalData);
@@ -478,55 +454,6 @@ function TeamPlanBoard({
     }
   };
 
-  const handleAddTimeSlot = async (timeSlot: TimeSlot) => {
-    const newData = {
-      ...boardData,
-      timeSlots: [...boardData.timeSlots, timeSlot]
-    };
-    
-    try {
-      await performOptimisticUpdate(newData, 'add time slot');
-    } catch {
-      // performOptimisticUpdate already handles rollback and error reporting
-    }
-  };
-
-
-  const handleUpdateTimeSlot = async (updatedTimeSlot: TimeSlot) => {
-    const timeSlotIndex = boardData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
-    if (timeSlotIndex === -1) return;
-
-    const updatedTimeSlots = [...boardData.timeSlots];
-    const originalLabel = updatedTimeSlots[timeSlotIndex].label;
-    updatedTimeSlots[timeSlotIndex] = updatedTimeSlot;
-
-    // Auto-shift subsequent time slots if the pattern changed
-    const shouldShift = shouldShiftSubsequentSlots(originalLabel, updatedTimeSlot.label);
-    if (shouldShift) {
-      const nextSequenceLabels = generateSequenceLabels(updatedTimeSlot.label, updatedTimeSlots.length - timeSlotIndex - 1);
-      for (let i = 1; i < nextSequenceLabels.length; i++) {
-        const targetIndex = timeSlotIndex + i;
-        if (targetIndex < updatedTimeSlots.length) {
-          updatedTimeSlots[targetIndex] = {
-            ...updatedTimeSlots[targetIndex],
-            label: nextSequenceLabels[i]
-          };
-        }
-      }
-    }
-
-    const newData = {
-      ...boardData,
-      timeSlots: updatedTimeSlots
-    };
-    
-    try {
-      await performOptimisticUpdate(newData, 'update time slot');
-    } catch {
-      // performOptimisticUpdate already handles rollback and error reporting
-    }
-  };
-
   const handleAddPerson = async (person: Person) => {
     const newData = {
       ...boardData,
@@ -607,58 +534,6 @@ function TeamPlanBoard({
     }
   };
 
-  const handleMoveTimeSlotLeft = async (timeSlotId: string) => {
-    const currentIndex = boardData.timeSlots.findIndex(t => t.id === timeSlotId);
-    if (currentIndex <= 0) return;
-
-    const newTimeSlots = [...boardData.timeSlots];
-    [newTimeSlots[currentIndex - 1], newTimeSlots[currentIndex]] = [newTimeSlots[currentIndex], newTimeSlots[currentIndex - 1]];
-
-    const newData = {
-      ...boardData,
-      timeSlots: newTimeSlots
-    };
-    
-    try {
-      await performOptimisticUpdate(newData, 'move time slot left');
-    } catch {
-      // performOptimisticUpdate already handles rollback and error reporting
-    }
-  };
-
-  const handleMoveTimeSlotRight = async (timeSlotId: string) => {
-    const currentIndex = boardData.timeSlots.findIndex(t => t.id === timeSlotId);
-    if (currentIndex >= boardData.timeSlots.length - 1) return;
-
-    const newTimeSlots = [...boardData.timeSlots];
-    [newTimeSlots[currentIndex], newTimeSlots[currentIndex + 1]] = [newTimeSlots[currentIndex + 1], newTimeSlots[currentIndex]];
-
-    const newData = {
-      ...boardData,
-      timeSlots: newTimeSlots
-    };
-    
-    try {
-      await performOptimisticUpdate(newData, 'move time slot right');
-    } catch {
-      // performOptimisticUpdate already handles rollback and error reporting
-    }
-  };
-
-  const handleDeleteTimeSlot = async (timeSlotId: string) => {
-    const newData = {
-      ...boardData,
-      timeSlots: boardData.timeSlots.filter(t => t.id !== timeSlotId),
-      projects: boardData.projects.filter(p => p.timeSlotId !== timeSlotId)
-    };
-    
-    try {
-      await performOptimisticUpdate(newData, 'delete time slot');
-    } catch {
-      // performOptimisticUpdate already handles rollback and error reporting
-    }
-  };
-
   const isDropTarget = (personId: string, timeSlotId: string) => {
     if (!draggedProject || !dragOverCell) return false;
     
@@ -690,8 +565,8 @@ function TeamPlanBoard({
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden relative" onContextMenu={handleContextMenu}>
-      {/* Left fade overlay */}
+    <div className="h-full flex flex-col relative" onContextMenu={handleContextMenu}>
+      {/* Left fade overlay - positioned after person column */}
       <div className={`absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none transition-opacity duration-200 ${
         showLeftFade ? 'opacity-100' : 'opacity-0'
       }`} />
@@ -701,170 +576,287 @@ function TeamPlanBoard({
         showRightFade ? 'opacity-100' : 'opacity-0'
       }`} />
       
-      <div 
-        ref={scrollContainerRef}
-        className="flex-1 overflow-auto p-6">
-        <div className="min-w-fit h-full">
-          {/* Header */}
-          <TimelineHeader
-            timeSlots={boardData.timeSlots}
-            onAddTimeSlot={handleAddTimeSlot}
-            onRemoveTimeSlot={handleDeleteTimeSlot}
-            onUpdateTimeSlot={handleUpdateTimeSlot}
-            onMoveTimeSlotLeft={handleMoveTimeSlotLeft}
-            onMoveTimeSlotRight={handleMoveTimeSlotRight}
-          />
-
-          {/* Board Grid */}
-          <div className="space-y-0">
-            {boardData.people.map((person, personIndex) => (
-              <TeamPlanContextMenu
-                key={person.id}
-                type="person"
-                canMoveUp={personIndex > 0}
-                canMoveDown={personIndex < boardData.people.length - 1}
-                canDelete={boardData.people.length > 1}
-                onMoveUp={() => handleMovePersonUp(person.id)}
-                onMoveDown={() => handleMovePersonDown(person.id)}
-                onDelete={() => handleRemovePerson(person.id)}
-                label={person.name}
-              >
-                <div className="grid gap-0 bg-slate-100/60 rounded-lg my-1 p-1.5 group/row" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
-                  {/* Person Column with Inline Editing */}
-                  <PersonCell
-                    person={person}
-                    onUpdatePerson={handleUpdatePerson}
-                  />
-              
-                {/* Project Cells */}
-                {boardData.timeSlots.map(timeSlot => {
-                  const cellProjects = getProjectsForCell(boardData.projects, person.id, timeSlot.id);
-                  const isDropping = isDropTarget(person.id, timeSlot.id);
-                  
-                  return (
-                    <TeamPlanContextMenu
-                      key={`${person.id}-${timeSlot.id}`}
-                      type="cell"
-                      canMoveUp={personIndex > 0}
-                      canMoveDown={personIndex < boardData.people.length - 1}
-                      canDelete={boardData.people.length > 1}
-                      onMoveUp={() => handleMovePersonUp(person.id)}
-                      onMoveDown={() => handleMovePersonDown(person.id)}
-                      onDelete={() => handleRemovePerson(person.id)}
-                      onAddProject={() => handleAddProject(person.id, timeSlot.id)}
-                      personName={person.name}
+      {/* Main Content Area with Unified Grid Layout */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Unified Scrollable Area for Header + Content */}
+        <div 
+          ref={scrollContainerRef}
+          className="flex-1 overflow-x-auto overflow-y-auto flex flex-col">
+          <div className="min-w-fit flex flex-col h-full">
+            {/* Unified Header with Person Column */}
+            <div className="border-b border-slate-200/65 bg-white">
+              <div className="grid gap-2 px-6" style={{ gridTemplateColumns: `160px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+                {/* Person Header */}
+                <div className="h-10 bg-transparent border-r border-slate-200/65"></div>
+                
+{/* Timeslots Header */}
+                {boardData.timeSlots.map((timeSlot, timeSlotIndex) => (
+                  <TeamPlanContextMenu
+                    key={timeSlot.id}
+                    type="timeSlot"
+                    canMoveUp={timeSlotIndex > 0}
+                    canMoveDown={timeSlotIndex < boardData.timeSlots.length - 1}
+                    canDelete={boardData.timeSlots.length > 1}
+                    onMoveUp={() => onMoveTimeSlotLeft?.(timeSlot.id)}
+                    onMoveDown={() => onMoveTimeSlotRight?.(timeSlot.id)}
+                    onDelete={() => onRemoveTimeSlot?.(timeSlot.id)}
+                    label={timeSlot.label}
+                  >
+                    <motion.div
+                      className={`p-2 group relative transition-colors duration-200 ${
+                        currentHoveredColumn === timeSlot.id ? 'bg-slate-100/70' : 'hover:bg-slate-50/60'
+                      }`}
+                      data-column-id={timeSlot.id}
+                      onMouseEnter={() => handleColumnMouseEnter(timeSlot.id)}
+                      onMouseLeave={handleColumnMouseLeave}
                     >
-                      <motion.div
-                        className="min-h-12 p-1.5 pt-2 pb-2 transition-all duration-20 relative overflow-visible group"
-                        data-drop-zone
-                        data-person-id={person.id}
-                        data-timeslot-id={timeSlot.id}
-                        role="region"
-                        aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
+                      <div className="flex items-center justify-between">
+                        {editingSlot === timeSlot.id ? (
+                          <input
+                            type="text"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            onBlur={() => handleSaveEdit(timeSlot.id)}
+                            onKeyDown={(e) => handleKeyDown(e, timeSlot.id)}
+                            className="font-mono uppercase text-xs text-slate-900 bg-transparent border-none outline-none pl-4 pr-2 py-1 text-left w-full transition-colors"
+                            autoFocus
+                          />
+                        ) : (
+                          <h3 
+                            className="font-mono uppercase text-xs text-slate-700 text-left cursor-pointer hover:text-slate-900 flex-1 pl-4"
+                            onClick={() => handleStartEdit(timeSlot)}
+                            title="Click to edit"
+                          >
+                            {timeSlot.label}
+                          </h3>
+                        )}
+                        
+                        {boardData.timeSlots.length > 1 && (
+                          <button
+                            onClick={() => onRemoveTimeSlot?.(timeSlot.id)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 p-1 hover:bg-red-100 rounded"
+                            title="Remove time slot"
+                          >
+                            <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </motion.div>
+                  </TeamPlanContextMenu>
+                ))}
+                
+{/* Add Time Slot Column */}
+                <div className="flex items-center justify-center">
+                  {onAddTimeSlot && (
+                    <Button
+                      onClick={() => {
+                        const newSlot = {
+                          id: `slot-${Date.now()}`,
+                          label: `Week ${boardData.timeSlots.length + 1}`,
+                          type: 'week' as const
+                        };
+                        onAddTimeSlot(newSlot);
+                      }}
+                      variant="secondary"
+                      size="icon"
+                      className="bg-white hover:bg-slate-50 ring-1 ring-slate-200/65 hover:ring-1 hover:ring-slate-300/50 size-7"
+                      title="Add time slot"
+                    >
+                      <PlusIcon className="size-3" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Unified Content Grid */}
+            <div className="flex-1 relative">
+              {/* Column Background Gradients */}
+              <div className="absolute inset-0 px-6 pointer-events-none">
+                <div className="grid gap-2 h-full" style={{ gridTemplateColumns: `160px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+                  {/* Person column background */}
+                  <div className="bg-transparent border-r border-slate-200/65"></div>
+                  {/* Project columns background */}
+                  {boardData.timeSlots.map(timeSlot => (
+                    <div
+                      key={`bg-${timeSlot.id}`}
+                      className="bg-gradient-to-b from-slate-100/50 to-transparent"
+                    />
+                  ))}
+                  <div></div> {/* Empty div for the delete button column */}
+                </div>
+              </div>
+              
+              {/* Unified Grid Content */}
+              <div className="space-y-0 pb-6 px-6 relative">
+                {boardData.people.map((person, personIndex) => (
+                  <div key={person.id} className="grid gap-2" style={{ gridTemplateColumns: `160px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+                    {/* Person Cell - First Column */}
+                    <div className="border-r border-slate-200/65">
+                      <TeamPlanContextMenu
+                        type="person"
+                        canMoveUp={personIndex > 0}
+                        canMoveDown={personIndex < boardData.people.length - 1}
+                        canDelete={boardData.people.length > 1}
+                        onMoveUp={() => handleMovePersonUp(person.id)}
+                        onMoveDown={() => handleMovePersonDown(person.id)}
+                        onDelete={() => handleRemovePerson(person.id)}
+                        label={person.name}
                       >
-                      {/* Inner drop target with glow effect */}
-                      <div className={`absolute inset-2 rounded-lg transition-all duration-200 pointer-events-none ${
-                        isDropping 
-                          ? 'bg-gradient-to-b from-blue-200/20 via-blue-100/10 to-transparent transition-all duration-200' 
-                          : ''
-                      }`} />
+                        <div className="min-h-12 p-1 pt-1 pb-1">
+                          <PersonCell
+                            person={person}
+                            onUpdatePerson={handleUpdatePerson}
+                          />
+                        </div>
+                      </TeamPlanContextMenu>
+                    </div>
+                    
+                    {/* Project Cells */}
+                    {boardData.timeSlots.map(timeSlot => {
+                      const cellProjects = getProjectsForCell(boardData.projects, person.id, timeSlot.id);
+                      const isDropping = isDropTarget(person.id, timeSlot.id);
                       
-                      <div className="space-y-1.5 relative">
-                          {/* Fixed insertion placeholder at the top */}
-                          <div className="h-1 flex items-center justify-center">
-                            <div
-                              className={`w-8 h-0.5 bg-blue-400 rounded-full transition-all duration-150 ${
-                                isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 
-                                  ? 'opacity-70 scale-x-100' 
-                                  : 'opacity-0 scale-x-0'
-                              }`}
-                            />
-                          </div>
+                      return (
+                        <TeamPlanContextMenu
+                          key={`${person.id}-${timeSlot.id}`}
+                          type="cell"
+                          canMoveUp={personIndex > 0}
+                          canMoveDown={personIndex < boardData.people.length - 1}
+                          canDelete={boardData.people.length > 1}
+                          onMoveUp={() => handleMovePersonUp(person.id)}
+                          onMoveDown={() => handleMovePersonDown(person.id)}
+                          onDelete={() => handleRemovePerson(person.id)}
+                          onAddProject={() => handleAddProject(person.id, timeSlot.id)}
+                          personName={person.name}
+                        >
+                          <motion.div
+                            className="min-h-12 p-1 pt-1 pb-1 transition-all duration-200 relative overflow-visible group"
+                            data-drop-zone
+                            data-person-id={person.id}
+                            data-timeslot-id={timeSlot.id}
+                            data-column-id={timeSlot.id}
+                            role="region"
+                            aria-label={`Projects for ${person.name} in ${timeSlot.label}`}
+                          >
+                          {/* Inner drop target with glow effect */}
+                          <div className={`absolute inset-2 rounded-lg transition-all duration-200 pointer-events-none ${
+                            isDropping 
+                              ? 'bg-gradient-to-b from-blue-200/20 via-blue-100/10 to-transparent transition-all duration-200' 
+                              : ''
+                          }`} />
                           
-                          {cellProjects.map((project, index) => (
-                            <motion.div 
-                              key={project.id}
-                              layout={!draggedProject}
-                              initial={{ opacity: 0.8, y: 2 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                type: "spring",
-                                stiffness: 600,
-                                damping: 50,
-                                duration: 0.05
-                              }}
-                            >
-                              <ProjectCard
-                                project={project}
-                                isDragging={draggedProject === project.id}
-                                isDuplicating={isDuplicating && draggedProject === project.id}
-                                isEditing={newProjectId === project.id}
-                                availableGroups={getAvailableGroups()}
-                                allProjects={boardData.projects}
-                                isColorCodingEnabled={isColorCodingEnabled}
-                                onEdit={handleEditProject}
-                                onDelete={handleDeleteProject}
-                                onDuplicate={handleDuplicateProject}
-                                onDragStart={handleDragStart}
-                                onDragEnd={handleDragEnd}
-                                onDrag={updateDropTarget}
-                              />
-                              
-                              {/* Fixed insertion placeholder after each card */}
+                          <div className="space-y-1.5 relative">
+                              {/* Fixed insertion placeholder at the top */}
                               <div className="h-1 flex items-center justify-center">
                                 <div
                                   className={`w-8 h-0.5 bg-blue-400 rounded-full transition-all duration-150 ${
-                                    isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1
-                                      ? 'opacity-70 scale-x-100'
+                                    isDropping && getInsertionIndex(person.id, timeSlot.id) === 0 
+                                      ? 'opacity-70 scale-x-100' 
                                       : 'opacity-0 scale-x-0'
                                   }`}
                                 />
                               </div>
-                            </motion.div>
-                          ))}
-                        
+                              
+                              {cellProjects.map((project, index) => (
+                                <motion.div 
+                                  key={project.id}
+                                  layout={!draggedProject}
+                                  initial={{ opacity: 0.8, y: 2 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{
+                                    type: "spring",
+                                    stiffness: 600,
+                                    damping: 50,
+                                    duration: 0.05
+                                  }}
+                                >
+                                  <ProjectCard
+                                    project={project}
+                                    isDragging={draggedProject === project.id}
+                                    isDuplicating={isDuplicating && draggedProject === project.id}
+                                    isEditing={newProjectId === project.id}
+                                    availableGroups={getAvailableGroups()}
+                                    allProjects={boardData.projects}
+                                    isColorCodingEnabled={isColorCodingEnabled}
+                                    onEdit={handleEditProject}
+                                    onDelete={handleDeleteProject}
+                                    onDuplicate={handleDuplicateProject}
+                                    onDragStart={handleDragStart}
+                                    onDragEnd={handleDragEnd}
+                                    onDrag={updateDropTarget}
+                                  />
+                                  
+                                  {/* Fixed insertion placeholder after each card */}
+                                  <div className="h-1 flex items-center justify-center">
+                                    <div
+                                      className={`w-8 h-0.5 bg-blue-400 rounded-full transition-all duration-150 ${
+                                        isDropping && getInsertionIndex(person.id, timeSlot.id) === index + 1
+                                          ? 'opacity-70 scale-x-100'
+                                          : 'opacity-0 scale-x-0'
+                                      }`}
+                                    />
+                                  </div>
+                                </motion.div>
+                              ))}
+                            
+                            <Button
+                              id={`add-project-${person.id}-${timeSlot.id}`}
+                              variant="ghost"
+                              onClick={() => handleAddProject(person.id, timeSlot.id)}
+                              className="w-full p-2 rounded-lg text-xs text-slate-600 hover:text-slate-800 font-medium bg-transparent hover:bg-transparent border border-dashed border-slate-200 hover:border-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-200 min-h-[2.5rem] flex items-center justify-center select-none"
+                            >
+                              <PlusIcon className="w-3 h-3 mr-1" />
+                              Add Project
+                            </Button>
+                          </div>
+                          </motion.div>
+                        </TeamPlanContextMenu>
+                      );
+                    })}
+                    
+                    {/* Delete Person Button */}
+                    <div className="min-h-12 flex items-start justify-center pt-5">
+                      {boardData.people.length > 1 && (
                         <Button
-                          id={`add-project-${person.id}-${timeSlot.id}`}
+                          onClick={() => handleRemovePerson(person.id)}
                           variant="ghost"
-                          onClick={() => handleAddProject(person.id, timeSlot.id)}
-                          className="w-full p-2 rounded-lg text-xs text-slate-600 hover:text-slate-800 font-medium bg-transparent hover:bg-transparent border border-dashed border-slate-200 hover:border-slate-300 opacity-0 group-hover:opacity-100 transition-all duration-200 min-h-[2.5rem] flex items-center justify-center select-none"
+                          size="icon"
+                          className="opacity-0 hover:opacity-100 transition-opacity size-7"
+                          title="Remove person"
                         >
-                          <PlusIcon className="w-3 h-3 mr-1" />
-                          Add Project
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-slate-500 hover:text-red-500">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244 2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.134H8.09c-1.18 0-2.09.954-2.09 2.134v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                          </svg>
                         </Button>
-                      </div>
-                      </motion.div>
-                    </TeamPlanContextMenu>
-                  );
-                })}
+                      )}
+                    </div>
+                  </div>
+                ))}
                 
-                {/* Delete Person Button */}
-                <div className="min-h-12 flex items-start justify-center pt-5">
-                  {boardData.people.length > 1 && (
-                    <Button
-                      onClick={() => handleRemovePerson(person.id)}
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 group-hover/row:opacity-100 transition-opacity size-7"
-                      title="Remove person"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-slate-500 hover:text-red-500">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.134H8.09c-1.18 0-2.09.954-2.09 2.134v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                      </svg>
-                    </Button>
-                  )}
+                {/* Add Person Row */}
+                <div className="grid gap-2" style={{ gridTemplateColumns: `160px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
+                  {/* Add Person Cell - Person Column */}
+                  <div className="border-r border-slate-200/65">
+                    <AddPersonCell 
+                      onAddPerson={handleAddPerson}
+                      isDraggedOver={dragOverAddPerson}
+                      numTimeSlots={boardData.timeSlots.length}
+                      showOnlyPersonColumn={true}
+                    />
+                  </div>
+                  
+                  {/* Add Person Row - Project Cells */}
+                  {Array.from({ length: boardData.timeSlots.length }, (_, index) => (
+                    <div key={index} className="min-h-12 p-1 pt-1 pb-1" />
+                  ))}
+                  
+                  {/* Empty cell for delete button column */}
+                  <div className="min-h-12" />
                 </div>
-                </div>
-              </TeamPlanContextMenu>
-            ))}
-            
-            {/* Add Person Row */}
-            <div className="grid gap-0" style={{ gridTemplateColumns: `130px repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
-              <AddPersonCell 
-                onAddPerson={handleAddPerson}
-                isDraggedOver={dragOverAddPerson}
-                numTimeSlots={boardData.timeSlots.length}
-              />
+              </div>
             </div>
           </div>
         </div>

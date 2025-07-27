@@ -4,30 +4,119 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLoader from '@/components/PageLoader';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
+import TeamPlanTopControls from '@/components/teamplan/TeamPlanTopControls';
 import NotePad from '@/components/teamplan/NotePad';
 import BacklogPanel from '@/components/teamplan/BacklogPanel';
 import CommentsPanel from '@/components/teamplan/CommentsPanel';
 import VerticalNavigation from '@/components/teamplan/VerticalNavigation';
-import PlanSelector from '@/components/teamplan/PlanSelector';
-import DocumentSelector from '@/components/teamplan/DocumentSelector';
+import SidebarHeader from '@/components/teamplan/SidebarHeader';
 import { usePlanStorage } from '@/hooks/usePlanStorage';
 import { useResizable } from '@/hooks/useResizable';
 import { useNotePadStorage } from '@/hooks/useNotePadStorage';
 import { TeamPlanData } from '@/data/teamplan';
 import { CubeIcon } from '@heroicons/react/24/solid';
-import { Cog6ToothIcon } from '@heroicons/react/24/outline';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { teamPlanLogger as logger } from '@/utils/logger';
+
+// Utility functions for time slot sequence management
+const shouldShiftSubsequentSlots = (originalLabel: string, newLabel: string): boolean => {
+  // Only shift if both labels follow a recognizable sequence pattern
+  return isSequencePattern(originalLabel) && isSequencePattern(newLabel);
+};
+
+const isSequencePattern = (label: string): boolean => {
+  const patterns = [
+    /^q(\d+)$/i,                    // Q1, Q2, etc.
+    /^(quarter)\s+(\d+)$/i,         // Quarter 1, Quarter 2
+    /^(week)\s+(\d+)$/i,            // Week 1, Week 2
+    /^(month)\s+(\d+)$/i,           // Month 1, Month 2
+    /^(\d{4})$/,                    // 2024, 2025
+    /^(year)\s+(\d+)$/i,            // Year 2023, Year 2024
+    /^([a-zA-Z]+)\s+(\d+)$/i        // Phase 1, Sprint 2, etc.
+  ];
+  
+  return patterns.some(pattern => pattern.test(label.trim()));
+};
+
+const generateSequenceLabels = (startLabel: string, count: number): string[] => {
+  const labels = [startLabel];
+  
+  if (count <= 0) return labels;
+  
+  // Handle different sequence patterns
+  const quarterMatch = startLabel.match(/^q(\d+)$/i);
+  if (quarterMatch) {
+    const startNumber = parseInt(quarterMatch[1]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`Q${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const quarterFullMatch = startLabel.match(/^(quarter)\s+(\d+)$/i);
+  if (quarterFullMatch) {
+    const startNumber = parseInt(quarterFullMatch[2]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`Quarter ${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const weekMatch = startLabel.match(/^(week)\s+(\d+)$/i);
+  if (weekMatch) {
+    const startNumber = parseInt(weekMatch[2]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`Week ${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const monthMatch = startLabel.match(/^(month)\s+(\d+)$/i);
+  if (monthMatch) {
+    const startNumber = parseInt(monthMatch[2]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`Month ${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const yearMatch = startLabel.match(/^(\d{4})$/);
+  if (yearMatch) {
+    const startNumber = parseInt(yearMatch[1]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const yearFullMatch = startLabel.match(/^(year)\s+(\d+)$/i);
+  if (yearFullMatch) {
+    const startNumber = parseInt(yearFullMatch[2]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`Year ${startNumber + i}`);
+    }
+    return labels;
+  }
+
+  const genericMatch = startLabel.match(/^([a-zA-Z]+)\s+(\d+)$/i);
+  if (genericMatch) {
+    const prefix = genericMatch[1];
+    const startNumber = parseInt(genericMatch[2]);
+    for (let i = 1; i <= count; i++) {
+      labels.push(`${prefix} ${startNumber + i}`);
+    }
+    return labels;
+  }
+  
+  return labels;
+};
 
 export default function TeamPlanPage() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [activePanel, setActivePanel] = useState<'notepad' | 'backlog' | 'comments'>('notepad');
   const [isColorCodingEnabled, setIsColorCodingEnabled] = useState(true);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
 
   // Load color coding preference from localStorage on mount
   useEffect(() => {
@@ -59,9 +148,9 @@ export default function TeamPlanPage() {
     updateCurrentPlan,
     renamePlan,
     createDocument,
+    deleteDocument,
     switchToDocument,
     renameDocument,
-    deleteDocument,
     updateDocumentContent,
   } = usePlanStorage();
 
@@ -87,23 +176,6 @@ export default function TeamPlanPage() {
     }
   }, [switchToDocument]);
 
-  const handleRenameDocument = useCallback(async (documentId: string, newTitle: string) => {
-    try {
-      renameDocument(documentId, newTitle);
-    } catch (error) {
-      console.error('Failed to rename document:', error);
-      // Could show error toast here in the future
-    }
-  }, [renameDocument]);
-
-  const handleDeleteDocument = useCallback(async (documentId: string) => {
-    try {
-      deleteDocument(documentId);
-    } catch (error) {
-      console.error('Failed to delete document:', error);
-      // Could show error toast here in the future
-    }
-  }, [deleteDocument]);
 
   const handleUpdateDocumentContent = useCallback(async (documentId: string, content: string) => {
     try {
@@ -113,6 +185,15 @@ export default function TeamPlanPage() {
       // Could show error toast here in the future
     }
   }, [updateDocumentContent]);
+
+  const handleDeleteDocument = useCallback(async (documentId: string) => {
+    try {
+      deleteDocument(documentId);
+    } catch (error) {
+      console.error('Failed to delete document:', error);
+      // Could show error toast here in the future
+    }
+  }, [deleteDocument]);
 
   // Keyboard shortcuts for plan and document switching
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
@@ -254,94 +335,50 @@ export default function TeamPlanPage() {
         style={{ display: isPageLoading ? 'none' : 'flex' }}
       >
       {/* Sidebar Container with Resize */}
-      <div className="relative flex p-3">
-        <div className="relative flex bg-white rounded-md shadow-md ring-1 ring-slate-200/50 overflow-visible">
-          {/* Always present navigation - no animation */}
-          <div className="w-12 h-full bg-transparent border-r border-slate-200/65 flex flex-col flex-shrink-0">
-            {/* Logo/Header Section */}
-            <div className="bg-transparent px-2 py-3 flex-shrink-0 flex items-center justify-center">
-            <div className="w-8 h-8 flex items-center justify-center">
-              <CubeIcon className="w-5 h-5 text-slate-900" />
-            </div>
-            </div>
-            
-            {/* Navigation */}
-            <VerticalNavigation 
-              isSidebarExpanded={isSidebarExpanded && activePanel === 'notepad'}
-              isBacklogExpanded={isSidebarExpanded && activePanel === 'backlog'}
-              isCommentsExpanded={isSidebarExpanded && activePanel === 'comments'}
-              onToggleSidebar={handleToggleSidebar}
-              onToggleBacklog={handleToggleBacklog}
-              onToggleComments={handleToggleComments}
-            />
-          </div>
-
-          {/* Expandable content area */}
+      <div className="relative flex">
+        <div className="flex flex-col bg-white overflow-visible ring-1 ring-slate-300/30 shadow-md z-20" style={{ width: isSidebarExpanded ? sidebarWidth : 48 }}>
+          
+          {/* SidebarHeader - spans full width when expanded */}
           {isSidebarExpanded && (
-            <div
-              style={{ width: sidebarWidth - 48 }} // Subtract navigation width
-              className="flex flex-col overflow-hidden"
-            >
-                {/* Plan and Document Selector Header */}
-                <div className="bg-transparent border-b border-slate-200/65 px-4 flex-shrink-0 flex items-center justify-between" style={{ paddingTop: '7px', paddingBottom: '7px' }}>
-                <div className="flex items-center gap-3">
-                  <PlanSelector
-                    currentPlan={currentPlan}
-                    allPlans={allPlans}
-                    onSelectPlan={switchToPlan}
-                    onCreatePlan={createPlan}
-                    onDeletePlan={deletePlan}
-                    onRenamePlan={renamePlan}
-                  />
-                  
-                  {/* Separator */}
-                  <div className="h-4 w-px bg-slate-200/65" />
-                  
-                  {/* Document Selector */}
-                  <DocumentSelector
-                    currentDocument={currentDocument}
-                    allDocuments={allDocuments}
-                    onSelectDocument={handleSwitchToDocument}
-                    onCreateDocument={handleCreateDocument}
-                    onDeleteDocument={handleDeleteDocument}
-                    onRenameDocument={handleRenameDocument}
-                  />
+            <div className="flex-shrink-0">
+              <SidebarHeader
+                currentPlan={currentPlan}
+                allPlans={allPlans}
+                onSelectPlan={switchToPlan}
+                onCreatePlan={createPlan}
+                onDeletePlan={deletePlan}
+                onRenamePlan={renamePlan}
+                isColorCodingEnabled={isColorCodingEnabled}
+                onColorCodingChange={handleColorCodingChange}
+              />
+            </div>
+          )}
+
+          {/* Bottom section: Navigation + Content */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* Always present navigation */}
+            <div className="w-12 h-full bg-transparent border-r border-slate-200/65 flex flex-col flex-shrink-0">
+              {/* Logo/Header Section */}
+              <div className="bg-transparent px-2 py-3 flex-shrink-0 flex items-center justify-center">
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <CubeIcon className="w-5 h-5 text-slate-900" />
                 </div>
-                
-                {/* Settings Button */}
-                <Popover open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
-                      title="Settings"
-                    >
-                      <Cog6ToothIcon className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-64 p-0" align="end">
-                    <div className="px-4 py-3 border-b border-slate-100">
-                      <span className="text-xs font-mono text-slate-900">Settings</span>
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-sm font-medium text-slate-900">Color coding</span>
-                          <p className="text-xs text-slate-500 mt-0.5">
-                            Color code cards with identical values for easier reading.
-                          </p>
-                        </div>
-                        <Switch
-                          checked={isColorCodingEnabled}
-                          onCheckedChange={handleColorCodingChange}
-                          className="ml-3"
-                        />
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
               </div>
+              
+              {/* Navigation */}
+              <VerticalNavigation 
+                isSidebarExpanded={isSidebarExpanded && activePanel === 'notepad'}
+                isBacklogExpanded={isSidebarExpanded && activePanel === 'backlog'}
+                isCommentsExpanded={isSidebarExpanded && activePanel === 'comments'}
+                onToggleSidebar={handleToggleSidebar}
+                onToggleBacklog={handleToggleBacklog}
+                onToggleComments={handleToggleComments}
+              />
+            </div>
+
+            {/* Expandable content area */}
+            {isSidebarExpanded && (
+              <div className="flex-1 flex flex-col overflow-hidden">
               
                 {/* Panel Content */}
                 <AnimatePresence mode="wait">
@@ -355,7 +392,6 @@ export default function TeamPlanPage() {
                       className="flex-1 min-h-0"
                     >
                       <NotePad 
-                        width={sidebarWidth - 48} // Subtract navigation width (48px = 12px width + borders)
                         currentPlan={currentPlan}
                         currentDocument={currentDocument}
                         allDocuments={allDocuments}
@@ -363,6 +399,8 @@ export default function TeamPlanPage() {
                         onSwitchToDocument={handleSwitchToDocument}
                         onUpdateDocumentContent={handleUpdateDocumentContent}
                         onRenameDocument={renameDocument}
+                        onDeleteDocument={handleDeleteDocument}
+                        showDocumentList={true}
                       />
                     </motion.div>
                   ) : activePanel === 'backlog' ? (
@@ -374,7 +412,7 @@ export default function TeamPlanPage() {
                       transition={{ duration: 0.1, ease: "easeOut" }}
                       className="flex-1 min-h-0"
                     >
-                      <BacklogPanel width={sidebarWidth - 48} />
+                      <BacklogPanel />
                     </motion.div>
                   ) : (
                     <motion.div
@@ -385,12 +423,13 @@ export default function TeamPlanPage() {
                       transition={{ duration: 0.1, ease: "easeOut" }}
                       className="flex-1 min-h-0"
                     >
-                      <CommentsPanel width={sidebarWidth - 48} />
+                      <CommentsPanel />
                     </motion.div>
                   )}
                 </AnimatePresence>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
 
           {/* Resize Handle - Only show when sidebar is expanded */}
           {isSidebarExpanded && (
@@ -413,13 +452,85 @@ export default function TeamPlanPage() {
       </div>
       
       {/* Team Plan Board */}
-      <div className="flex-1 overflow-hidden">
-        <TeamPlanBoard 
+      <div className="flex-1 overflow-hidden flex flex-col">
+        <TeamPlanTopControls />
+        <div className="flex-1 overflow-hidden">
+          <TeamPlanBoard 
           data={currentPlan.teamPlanData}
           onChange={handleDataChange}
           onDataSyncError={handleDataSyncError}
           isColorCodingEnabled={isColorCodingEnabled}
+          hoveredColumn={hoveredColumn}
+          onColumnMouseEnter={setHoveredColumn}
+          onColumnMouseLeave={() => setHoveredColumn(null)}
+          onAddTimeSlot={(timeSlot) => {
+            const newData = {
+              ...currentPlan.teamPlanData,
+              timeSlots: [...currentPlan.teamPlanData.timeSlots, timeSlot]
+            };
+            updateCurrentPlan({ teamPlanData: newData });
+          }}
+          onRemoveTimeSlot={(timeSlotId) => {
+            const newData = {
+              ...currentPlan.teamPlanData,
+              timeSlots: currentPlan.teamPlanData.timeSlots.filter(t => t.id !== timeSlotId),
+              projects: currentPlan.teamPlanData.projects.filter(p => p.timeSlotId !== timeSlotId)
+            };
+            updateCurrentPlan({ teamPlanData: newData });
+          }}
+          onUpdateTimeSlot={(updatedTimeSlot) => {
+            const timeSlotIndex = currentPlan.teamPlanData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
+            if (timeSlotIndex === -1) return;
+
+            const updatedTimeSlots = [...currentPlan.teamPlanData.timeSlots];
+            const originalLabel = updatedTimeSlots[timeSlotIndex].label;
+            updatedTimeSlots[timeSlotIndex] = updatedTimeSlot;
+
+            // Auto-shift subsequent time slots if the pattern changed
+            const shouldShift = shouldShiftSubsequentSlots(originalLabel, updatedTimeSlot.label);
+            if (shouldShift) {
+              const nextSequenceLabels = generateSequenceLabels(updatedTimeSlot.label, updatedTimeSlots.length - timeSlotIndex - 1);
+              for (let i = 1; i < nextSequenceLabels.length; i++) {
+                const targetIndex = timeSlotIndex + i;
+                if (targetIndex < updatedTimeSlots.length) {
+                  updatedTimeSlots[targetIndex] = {
+                    ...updatedTimeSlots[targetIndex],
+                    label: nextSequenceLabels[i]
+                  };
+                }
+              }
+            }
+
+            const newData = {
+              ...currentPlan.teamPlanData,
+              timeSlots: updatedTimeSlots
+            };
+            updateCurrentPlan({ teamPlanData: newData });
+          }}
+          onMoveTimeSlotLeft={(timeSlotId) => {
+            const currentIndex = currentPlan.teamPlanData.timeSlots.findIndex(t => t.id === timeSlotId);
+            if (currentIndex <= 0) return;
+            const newTimeSlots = [...currentPlan.teamPlanData.timeSlots];
+            [newTimeSlots[currentIndex - 1], newTimeSlots[currentIndex]] = [newTimeSlots[currentIndex], newTimeSlots[currentIndex - 1]];
+            const newData = {
+              ...currentPlan.teamPlanData,
+              timeSlots: newTimeSlots
+            };
+            updateCurrentPlan({ teamPlanData: newData });
+          }}
+          onMoveTimeSlotRight={(timeSlotId) => {
+            const currentIndex = currentPlan.teamPlanData.timeSlots.findIndex(t => t.id === timeSlotId);
+            if (currentIndex >= currentPlan.teamPlanData.timeSlots.length - 1) return;
+            const newTimeSlots = [...currentPlan.teamPlanData.timeSlots];
+            [newTimeSlots[currentIndex], newTimeSlots[currentIndex + 1]] = [newTimeSlots[currentIndex + 1], newTimeSlots[currentIndex]];
+            const newData = {
+              ...currentPlan.teamPlanData,
+              timeSlots: newTimeSlots
+            };
+            updateCurrentPlan({ teamPlanData: newData });
+          }}
         />
+        </div>
       </div>
     </div>
     </>
