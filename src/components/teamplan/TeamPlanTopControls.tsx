@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import { Tabs as ShadcnTabs, TabsList, TabsTrigger } from '@/components/ui/shadcn-tabs';
+import { Button } from '@/components/ui/button';
 
 interface TeamPlanTopControlsProps {
   className?: string;
@@ -22,7 +23,9 @@ const TeamPlanTopControls = ({
               </TabsTrigger>
             </TabsList>
           </ShadcnTabs>
-          {/* Future: Could add action buttons, filters, or other controls here */}
+          <Button size="sm">
+            Share
+          </Button>
         </div>
       </div>
     </div>
