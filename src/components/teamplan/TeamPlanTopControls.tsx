@@ -70,8 +70,17 @@ const TeamPlanTopControls = ({
               </Popover>
             )}
             
-            <Button size="sm">
+            <Button variant="outline" size="sm">
               Share
+            </Button>
+            
+            <Button size="sm" className="bg-slate-900 text-white hover:bg-slate-800">
+              <img 
+                src="/Assets/TeamPlan-Ravell/logo-light.svg" 
+                alt="" 
+                className="h-4 w-4"
+              />
+              Push
             </Button>
           </div>
         </div>
