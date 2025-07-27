@@ -21,7 +21,7 @@ const DocumentSidebar: React.FC<DocumentSidebarProps> = ({
   onDeleteDocument,
 }) => {
   return (
-    <div className="h-full flex flex-col w-64 border-r border-slate-200/65 flex-shrink-0 bg-slate-50/50">
+    <div className="h-full flex flex-col w-64 border-r border-slate-200/65 flex-shrink-0 bg-white">
       {/* Header */}
       <div className="px-4 py-3 border-b border-slate-200/65">
         <div className="flex items-center justify-between">
