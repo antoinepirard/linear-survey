@@ -504,14 +504,20 @@ function NotePad({
       {isFullScreen ? (
         <>
           {/* Left Document Sidebar */}
-          <DocumentSidebar 
-            currentDocument={currentDocument}
-            allDocuments={allDocuments}
-            onCreateDocument={onCreateDocument}
-            onSwitchToDocument={onSwitchToDocument}
-            onRenameDocument={onRenameDocument}
-            onDeleteDocument={onDeleteDocument}
-          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.12, ease: "easeOut" }}
+          >
+            <DocumentSidebar 
+              currentDocument={currentDocument}
+              allDocuments={allDocuments}
+              onCreateDocument={onCreateDocument}
+              onSwitchToDocument={onSwitchToDocument}
+              onRenameDocument={onRenameDocument}
+              onDeleteDocument={onDeleteDocument}
+            />
+          </motion.div>
           
           {/* Main Content Area with Max Width */}
           <div 
@@ -519,7 +525,12 @@ function NotePad({
             className="flex-1 overflow-y-auto relative notepad-editor"
             style={{ minHeight: 0 }}
           >
-            <div className="w-full max-w-4xl mx-auto relative">
+            <motion.div 
+              className="w-full max-w-4xl mx-auto relative"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.1, ease: "easeOut" }}
+            >
               <NotePadErrorBoundary onError={onError}>
                 {/* Title Input Field */}
                 {currentDocument && (
@@ -558,7 +569,7 @@ function NotePad({
                   </div>
                 )}
               </NotePadErrorBoundary>
-            </div>
+            </motion.div>
             
             {/* Save Status Indicator - positioned within the scrollable area but visually fixed */}
             <AnimatePresence>

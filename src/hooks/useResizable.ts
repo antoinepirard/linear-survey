@@ -102,7 +102,7 @@ export function useResizable({
 
     // Re-enable CSS transitions after resize is complete
     if (elementRef.current) {
-      elementRef.current.style.transition = "width 0.2s ease-out";
+      elementRef.current.style.transition = "none";
     }
   }, [currentWidth, initialWidth, onWidthChange, handleMouseMove, elementRef]);
 
