@@ -97,6 +97,26 @@ function TeamPlanBoard({
     };
   }, []);
 
+  // Synchronize person row heights with project row heights
+  useEffect(() => {
+    const syncRowHeights = () => {
+      boardData.people.forEach((person) => {
+        const personRowElement = document.querySelector(`[data-person-row="${person.id}"]`) as HTMLElement;
+        const projectRowElement = document.querySelector(`[data-project-row="${person.id}"]`) as HTMLElement;
+        
+        if (personRowElement && projectRowElement) {
+          const projectRowHeight = projectRowElement.offsetHeight;
+          personRowElement.style.height = `${projectRowHeight}px`;
+        }
+      });
+    };
+
+    // Sync heights after render
+    const timeoutId = setTimeout(syncRowHeights, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [boardData.people, boardData.projects]);
+
   // Use external hover state if provided, otherwise use internal state
   const currentHoveredColumn = externalHoveredColumn !== undefined ? externalHoveredColumn : hoveredColumn;
   
@@ -553,37 +573,42 @@ function TeamPlanBoard({
           {/* Person Header */}
           <div className="h-10 bg-transparent"></div>
           
-          {/* Person Names List */}
-          <div className="flex-1 space-y-0 px-6 pb-6 overflow-y-auto">
-            {boardData.people.map((person, personIndex) => (
-              <TeamPlanContextMenu
-                key={person.id}
-                type="person"
-                canMoveUp={personIndex > 0}
-                canMoveDown={personIndex < boardData.people.length - 1}
-                canDelete={boardData.people.length > 1}
-                onMoveUp={() => handleMovePersonUp(person.id)}
-                onMoveDown={() => handleMovePersonDown(person.id)}
-                onDelete={() => handleRemovePerson(person.id)}
-                label={person.name}
-              >
-                <div>
-                  <PersonCell
-                    person={person}
-                    onUpdatePerson={handleUpdatePerson}
-                  />
-                </div>
-              </TeamPlanContextMenu>
-            ))}
-            
-            {/* Add Person Row - Person Column */}
-            <div>
-              <AddPersonCell 
-                onAddPerson={handleAddPerson}
-                isDraggedOver={dragOverAddPerson}
-                numTimeSlots={boardData.timeSlots.length}
-                showOnlyPersonColumn={true}
-              />
+          {/* Person Names List - matches project rows */}
+          <div className="flex-1 px-6 pb-6 overflow-y-auto">
+            <div className="space-y-0">
+              {boardData.people.map((person, personIndex) => (
+                <TeamPlanContextMenu
+                  key={person.id}
+                  type="person"
+                  canMoveUp={personIndex > 0}
+                  canMoveDown={personIndex < boardData.people.length - 1}
+                  canDelete={boardData.people.length > 1}
+                  onMoveUp={() => handleMovePersonUp(person.id)}
+                  onMoveDown={() => handleMovePersonDown(person.id)}
+                  onDelete={() => handleRemovePerson(person.id)}
+                  label={person.name}
+                >
+                  <div 
+                    className="person-row-container"
+                    data-person-row={person.id}
+                  >
+                    <PersonCell
+                      person={person}
+                      onUpdatePerson={handleUpdatePerson}
+                    />
+                  </div>
+                </TeamPlanContextMenu>
+              ))}
+              
+              {/* Add Person Row - Person Column */}
+              <div>
+                <AddPersonCell 
+                  onAddPerson={handleAddPerson}
+                  isDraggedOver={dragOverAddPerson}
+                  numTimeSlots={boardData.timeSlots.length}
+                  showOnlyPersonColumn={true}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -626,7 +651,7 @@ function TeamPlanBoard({
               {/* Project Cells Grid */}
               <div className="space-y-0 pb-6 px-6 relative">
                 {boardData.people.map((person, personIndex) => (
-                  <div key={person.id}>
+                  <div key={person.id} data-project-row={person.id}>
                     <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${boardData.timeSlots.length}, minmax(200px, 1fr)) 60px` }}>
                       {/* Project Cells */}
                       {boardData.timeSlots.map(timeSlot => {
