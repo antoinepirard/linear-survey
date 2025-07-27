@@ -9,6 +9,7 @@ interface Position {
 interface UseTextSelectionProps {
   editor: Editor | null;
   containerRef: React.RefObject<HTMLDivElement | null>;
+  isFullScreen?: boolean;
 }
 
 interface UseTextSelectionReturn {
@@ -23,6 +24,7 @@ interface UseTextSelectionReturn {
 export function useTextSelection({
   editor,
   containerRef,
+  isFullScreen = false,
 }: UseTextSelectionProps): UseTextSelectionReturn {
   const [showSelectionMenu, setShowSelectionMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState<Position>({ x: 0, y: 0 });
@@ -39,35 +41,55 @@ export function useTextSelection({
       try {
         const start = editor.view.coordsAtPos(from);
         const end = editor.view.coordsAtPos(to);
-        const containerRect = container.getBoundingClientRect();
+        
+        // In full-screen mode, look for the centered content wrapper
+        let referenceRect: DOMRect;
+        let referenceElement: HTMLElement;
+        
+        if (isFullScreen) {
+          // Find the centered content wrapper (max-w-4xl element)
+          const contentWrapper = container.querySelector('.max-w-4xl') as HTMLElement;
+          if (contentWrapper) {
+            referenceRect = contentWrapper.getBoundingClientRect();
+            referenceElement = contentWrapper;
+          } else {
+            // Fallback to container if content wrapper not found
+            referenceRect = container.getBoundingClientRect();
+            referenceElement = container;
+          }
+        } else {
+          // Use container for sidebar mode
+          referenceRect = container.getBoundingClientRect();
+          referenceElement = container;
+        }
 
         const menuWidth = 200;
         const menuHeight = 40;
         const gap = 20;
 
-        // Account for scroll position within the container
-        let x = (start.left + end.left) / 2 - containerRect.left;
+        // Calculate position relative to the reference element
+        let x = (start.left + end.left) / 2 - referenceRect.left;
         let y =
           start.top -
-          containerRect.top -
+          referenceRect.top -
           menuHeight -
           gap +
-          container.scrollTop;
+          referenceElement.scrollTop;
 
-        // Horizontal bounds checking
-        const containerWidth = containerRect.width;
+        // Horizontal bounds checking against reference element width
+        const referenceWidth = referenceRect.width;
         const halfMenuWidth = menuWidth / 2;
 
         if (x - halfMenuWidth < 0) {
           x = halfMenuWidth;
-        } else if (x + halfMenuWidth > containerWidth) {
-          x = containerWidth - halfMenuWidth;
+        } else if (x + halfMenuWidth > referenceWidth) {
+          x = referenceWidth - halfMenuWidth;
         }
 
-        // Vertical bounds checking - position below if would go above container
+        // Vertical bounds checking - position below if would go above reference element
         // Also account for scroll position in vertical bounds checking
-        if (y < container.scrollTop) {
-          y = end.top - containerRect.top + gap + 10 + container.scrollTop;
+        if (y < referenceElement.scrollTop) {
+          y = end.top - referenceRect.top + gap + 10 + referenceElement.scrollTop;
         }
 
         return { x, y };
@@ -76,7 +98,7 @@ export function useTextSelection({
         return { x: 0, y: 0 };
       }
     },
-    []
+    [isFullScreen]
   );
 
   const handleSelectionUpdate = useCallback(

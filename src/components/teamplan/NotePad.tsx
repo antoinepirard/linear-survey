@@ -351,6 +351,7 @@ function NotePad({
   } = useTextSelection({
     editor,
     containerRef: editorRef,
+    isFullScreen,
   });
 
   // Connect mouseup handler after useTextSelection is set up
