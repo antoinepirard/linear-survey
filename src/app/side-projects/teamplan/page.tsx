@@ -453,10 +453,7 @@ export default function TeamPlanPage() {
       
       {/* Team Plan Board */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        <TeamPlanTopControls 
-          title="Team Plan"
-          subtitle="Manage projects and timelines across your team"
-        />
+        <TeamPlanTopControls />
         <div className="flex-1 overflow-hidden">
           <TeamPlanBoard 
           data={currentPlan.teamPlanData}
