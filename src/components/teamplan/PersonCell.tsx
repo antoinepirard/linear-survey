@@ -43,7 +43,7 @@ const PersonCell = ({
   };
 
   return (
-    <div className="h-full min-h-12 p-1 pt-1 pb-1 group relative flex items-center">
+    <div className="min-h-12 p-1 pt-1 pb-1 group relative flex items-center">
       <div className="flex items-center w-full">
         {isEditing ? (
           <input

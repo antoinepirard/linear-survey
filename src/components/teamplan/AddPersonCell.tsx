@@ -112,7 +112,7 @@ export default function AddPersonCell({
       <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${numTimeSlots}, minmax(200px, 1fr)) 60px` }}>
         {/* Empty cells for each time slot */}
         {Array.from({ length: numTimeSlots }, (_, index) => (
-          <div key={index} className="min-h-12 p-1.5 pt-2 pb-2" />
+          <div key={index} className="min-h-12 p-1 pt-1 pb-1" />
         ))}
         {/* Empty cell for delete button column */}
         <div className="min-h-12" />
