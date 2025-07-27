@@ -23,6 +23,7 @@ import { isLegacyNotepadData } from '@/types/plan';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import DocumentSidebar from '@/components/teamplan/DocumentSidebar';
 
 function NotePad({
   className = '',
@@ -36,6 +37,7 @@ function NotePad({
   onRenameDocument,
   onDeleteDocument,
   showDocumentList = false,
+  isFullScreen = false,
 }: NotePadProps) {
   
   const editorRef = useRef<HTMLDivElement>(null);
@@ -491,160 +493,277 @@ function NotePad({
   return (
     <div 
       className={`bg-transparent notepad-container ${className}`} 
-      style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: isFullScreen ? 'row' : 'column' 
+      }}
     >
-      {/* Document List - Collapsible */}
-      {showDocumentList && currentDocument && allDocuments && allDocuments.length > 0 && (
-        <div className="border-b border-slate-200/65">
-          <Collapsible open={showDocumentListCollapsed} onOpenChange={setShowDocumentListCollapsed}>
-            <div className="px-4 py-2 flex items-center justify-between">
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="p-0 h-auto text-xs font-mono text-slate-600 hover:text-slate-900">
-                  <span>Documents [{allDocuments.length}]</span>
-                  <ChevronDown className="ml-1 h-3 w-3" />
-                </Button>
-              </CollapsibleTrigger>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onCreateDocument?.('')}
-                className="h-6 w-6 p-0"
-              >
-                <Plus className="h-3 w-3" />
-              </Button>
-            </div>
-            
-            <CollapsibleContent>
-              <div className="px-4 pb-2 max-h-32 overflow-y-auto">
-                {allDocuments.map((doc, index) => (
-                  <div
-                    key={doc.id}
-                    className={`px-2 py-1 rounded text-sm cursor-pointer flex items-center justify-between group hover:bg-slate-50 ${
-                      doc.id === currentDocument.id ? 'bg-slate-100 text-slate-900' : 'text-slate-600'
-                    }`}
-                  >
-                    <div className="flex-1 min-w-0" onClick={() => onSwitchToDocument?.(doc.id)}>
-                      <span className="truncate">{doc.title || 'Untitled'}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {index < 9 && (
-                        <span className="text-xs font-mono text-slate-400">⌘{index + 1}</span>
-                      )}
-                      {allDocuments.length > 1 && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onDeleteDocument?.(doc.id);
-                          }}
-                          className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-600"
-                          title="Delete document"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-      )}
-      
-      {/* Editor Container - This is the scroll container */}
-      <div 
-        ref={editorRef} 
-        className="flex-1 overflow-y-auto relative notepad-editor"
-        style={{ minHeight: 0 }} // This allows flex child to shrink below content size
-      >
-        <NotePadErrorBoundary onError={onError}>
-          {/* Title Input Field - Part of scrollable content */}
-          {currentDocument && (
-            <div className="px-8 pt-12 pb-0">
-              <input
-                ref={titleInputRef}
-                type="text"
-                value={titleValue}
-                onChange={handleTitleChange}
-                onKeyDown={handleTitleKeyDown}
-
-                placeholder="New Document"
-                className="w-full text-2xl font-bold text-slate-900 bg-transparent border-none outline-none resize-none placeholder:text-slate-400 mb-2"
-                maxLength={NOTEPAD_CONSTANTS.DOCUMENT_TITLE_MAX_LENGTH}
-              />
-            </div>
-          )}
-          
-          <EditorContent 
-            editor={editor} 
-            className="w-full"
+      {isFullScreen ? (
+        <>
+          {/* Left Document Sidebar */}
+          <DocumentSidebar 
+            currentDocument={currentDocument}
+            allDocuments={allDocuments}
+            onCreateDocument={onCreateDocument}
+            onSwitchToDocument={onSwitchToDocument}
+            onRenameDocument={onRenameDocument}
+            onDeleteDocument={onDeleteDocument}
           />
           
-          {/* Text Selection Menu */}
-          {editor && showSelectionMenu && (
-            <div
-              className="absolute z-50"
-              style={{
-                left: menuPosition.x,
-                top: menuPosition.y,
-                transform: 'translateX(-50%)',
-              }}
-            >
-              <TextSelectionMenu 
-                editor={editor}
-              />
+          {/* Main Content Area with Max Width */}
+          <div className="flex-1 flex justify-center">
+            <div className="w-full max-w-4xl relative">
+              {/* Editor Container */}
+              <div 
+                ref={editorRef} 
+                className="h-full overflow-y-auto relative notepad-editor"
+                style={{ minHeight: 0 }}
+              >
+                <NotePadErrorBoundary onError={onError}>
+                  {/* Title Input Field */}
+                  {currentDocument && (
+                    <div className="px-8 pt-12 pb-0">
+                      <input
+                        ref={titleInputRef}
+                        type="text"
+                        value={titleValue}
+                        onChange={handleTitleChange}
+                        onKeyDown={handleTitleKeyDown}
+                        placeholder="New Document"
+                        className="w-full text-2xl font-bold text-slate-900 bg-transparent border-none outline-none resize-none placeholder:text-slate-400 mb-2"
+                        maxLength={NOTEPAD_CONSTANTS.DOCUMENT_TITLE_MAX_LENGTH}
+                      />
+                    </div>
+                  )}
+                  
+                  <EditorContent 
+                    editor={editor} 
+                    className="w-full"
+                  />
+                  
+                  {/* Text Selection Menu */}
+                  {editor && showSelectionMenu && (
+                    <div
+                      className="absolute z-50"
+                      style={{
+                        left: menuPosition.x,
+                        top: menuPosition.y,
+                        transform: 'translateX(-50%)',
+                      }}
+                    >
+                      <TextSelectionMenu 
+                        editor={editor}
+                      />
+                    </div>
+                  )}
+                </NotePadErrorBoundary>
+              </div>
+              
+              {/* Save Status Indicator */}
+              <AnimatePresence>
+                {saveStatus !== 'idle' && (
+                  <motion.div 
+                    className="absolute bottom-4 right-4 z-40"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ 
+                      duration: 0.15,
+                      ease: "easeOut"
+                    }}
+                  >
+                    <div className="text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded-md flex items-center gap-1.5">
+                      {/* Icon */}
+                      <div className="w-3 h-3 flex items-center justify-center">
+                        {saveStatus === 'saving' && (
+                          <div className="animate-spin rounded-full h-3 w-3 border border-slate-300 border-t-slate-600" />
+                        )}
+                        {saveStatus === 'saved' && (
+                          <div className="h-3 w-3 rounded-full bg-green-500 flex items-center justify-center">
+                            <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                        {saveStatus === 'error' && (
+                          <div className="h-3 w-3 rounded-full bg-red-500 flex items-center justify-center">
+                            <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Text */}
+                      <span className="whitespace-nowrap">
+                        {saveStatus === 'saving' && `Saving ${currentDocument?.title || 'document'}...`}
+                        {saveStatus === 'saved' && `${currentDocument?.title || 'Document'} saved`}
+                        {saveStatus === 'error' && `Failed to save ${currentDocument?.title || 'document'}`}
+                      </span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Normal Layout - Document List at Top */}
+          {showDocumentList && currentDocument && allDocuments && allDocuments.length > 0 && (
+            <div className="border-b border-slate-200/65">
+              <Collapsible open={showDocumentListCollapsed} onOpenChange={setShowDocumentListCollapsed}>
+                <div className="px-4 py-2 flex items-center justify-between">
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" className="p-0 h-auto text-xs font-mono text-slate-600 hover:text-slate-900">
+                      <span>Documents [{allDocuments.length}]</span>
+                      <ChevronDown className="ml-1 h-3 w-3" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onCreateDocument?.('')}
+                    className="h-6 w-6 p-0"
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </div>
+                
+                <CollapsibleContent>
+                  <div className="px-4 pb-2 max-h-32 overflow-y-auto">
+                    {allDocuments.map((doc, index) => (
+                      <div
+                        key={doc.id}
+                        className={`px-2 py-1 rounded text-sm cursor-pointer flex items-center justify-between group hover:bg-slate-50 ${
+                          doc.id === currentDocument.id ? 'bg-slate-100 text-slate-900' : 'text-slate-600'
+                        }`}
+                      >
+                        <div className="flex-1 min-w-0" onClick={() => onSwitchToDocument?.(doc.id)}>
+                          <span className="truncate">{doc.title || 'Untitled'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {index < 9 && (
+                            <span className="text-xs font-mono text-slate-400">⌘{index + 1}</span>
+                          )}
+                          {allDocuments.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteDocument?.(doc.id);
+                              }}
+                              className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-600"
+                              title="Delete document"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           )}
-        </NotePadErrorBoundary>
-      </div>
-
-      {/* Save Status Indicator - Outside scroll container to stay fixed */}
-      <AnimatePresence>
-        {saveStatus !== 'idle' && (
-          <motion.div 
-            className="absolute bottom-4 right-4 z-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ 
-              duration: 0.15,
-              ease: "easeOut"
-            }}
+          
+          {/* Editor Container */}
+          <div 
+            ref={editorRef} 
+            className="flex-1 overflow-y-auto relative notepad-editor"
+            style={{ minHeight: 0 }}
           >
-            <div className="text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded-md flex items-center gap-1.5">
-              {/* Icon */}
-              <div className="w-3 h-3 flex items-center justify-center">
-                {saveStatus === 'saving' && (
-                  <div className="animate-spin rounded-full h-3 w-3 border border-slate-300 border-t-slate-600" />
-                )}
-                {saveStatus === 'saved' && (
-                  <div className="h-3 w-3 rounded-full bg-green-500 flex items-center justify-center">
-                    <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                )}
-                {saveStatus === 'error' && (
-                  <div className="h-3 w-3 rounded-full bg-red-500 flex items-center justify-center">
-                    <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                )}
-              </div>
+            <NotePadErrorBoundary onError={onError}>
+              {/* Title Input Field */}
+              {currentDocument && (
+                <div className="px-8 pt-12 pb-0">
+                  <input
+                    ref={titleInputRef}
+                    type="text"
+                    value={titleValue}
+                    onChange={handleTitleChange}
+                    onKeyDown={handleTitleKeyDown}
+                    placeholder="New Document"
+                    className="w-full text-2xl font-bold text-slate-900 bg-transparent border-none outline-none resize-none placeholder:text-slate-400 mb-2"
+                    maxLength={NOTEPAD_CONSTANTS.DOCUMENT_TITLE_MAX_LENGTH}
+                  />
+                </div>
+              )}
+              
+              <EditorContent 
+                editor={editor} 
+                className="w-full"
+              />
+              
+              {/* Text Selection Menu */}
+              {editor && showSelectionMenu && (
+                <div
+                  className="absolute z-50"
+                  style={{
+                    left: menuPosition.x,
+                    top: menuPosition.y,
+                    transform: 'translateX(-50%)',
+                  }}
+                >
+                  <TextSelectionMenu 
+                    editor={editor}
+                  />
+                </div>
+              )}
+            </NotePadErrorBoundary>
+          </div>
 
-              {/* Text */}
-              <span className="whitespace-nowrap">
-                {saveStatus === 'saving' && `Saving ${currentDocument?.title || 'document'}...`}
-                {saveStatus === 'saved' && `${currentDocument?.title || 'Document'} saved`}
-                {saveStatus === 'error' && `Failed to save ${currentDocument?.title || 'document'}`}
-              </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          {/* Save Status Indicator */}
+          <AnimatePresence>
+            {saveStatus !== 'idle' && (
+              <motion.div 
+                className="absolute bottom-4 right-4 z-40"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ 
+                  duration: 0.15,
+                  ease: "easeOut"
+                }}
+              >
+                <div className="text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded-md flex items-center gap-1.5">
+                  {/* Icon */}
+                  <div className="w-3 h-3 flex items-center justify-center">
+                    {saveStatus === 'saving' && (
+                      <div className="animate-spin rounded-full h-3 w-3 border border-slate-300 border-t-slate-600" />
+                    )}
+                    {saveStatus === 'saved' && (
+                      <div className="h-3 w-3 rounded-full bg-green-500 flex items-center justify-center">
+                        <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                    {saveStatus === 'error' && (
+                      <div className="h-3 w-3 rounded-full bg-red-500 flex items-center justify-center">
+                        <svg className="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Text */}
+                  <span className="whitespace-nowrap">
+                    {saveStatus === 'saving' && `Saving ${currentDocument?.title || 'document'}...`}
+                    {saveStatus === 'saved' && `${currentDocument?.title || 'Document'} saved`}
+                    {saveStatus === 'error' && `Failed to save ${currentDocument?.title || 'document'}`}
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
     </div>
   );
 }

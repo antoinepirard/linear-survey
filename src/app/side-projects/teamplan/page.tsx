@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageLoader from '@/components/PageLoader';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
@@ -116,6 +116,7 @@ export default function TeamPlanPage() {
   const [isColorCodingEnabled, setIsColorCodingEnabled] = useState(true);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
+  const [isNotePadFullScreen, setIsNotePadFullScreen] = useState(false);
 
   // Load color coding preference from localStorage on mount
   useEffect(() => {
@@ -212,6 +213,13 @@ export default function TeamPlanPage() {
     const mod = event.metaKey || event.ctrlKey;
     const shift = event.shiftKey;
 
+    // ESC key to exit full-screen mode
+    if (event.key === 'Escape' && isNotePadFullScreen && activePanel === 'notepad') {
+      event.preventDefault();
+      setIsNotePadFullScreen(false);
+      return;
+    }
+
     // Plan switching with Shift + number keys
     if (shift && !mod && event.key >= '1' && event.key <= '9') {
       event.preventDefault();
@@ -240,7 +248,7 @@ export default function TeamPlanPage() {
     if (event.metaKey || event.ctrlKey) {
       // Document switching shortcuts can be handled here if needed in the future
     }
-  }, [allPlans, currentPlan?.id, switchToPlan, allDocuments, currentDocument?.id, switchToDocument]);
+  }, [allPlans, currentPlan?.id, switchToPlan, allDocuments, currentDocument?.id, switchToDocument, isNotePadFullScreen, activePanel]);
 
   // Add and remove keyboard event listeners
   useEffect(() => {
@@ -265,12 +273,14 @@ export default function TeamPlanPage() {
   });
 
 
-  // Sidebar resize functionality
+  // Sidebar resize functionality with direct DOM manipulation
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const { isResizing, handleResizeStart } = useResizable({
     initialWidth: sidebarWidth,
     minWidth: NOTEPAD_CONSTANTS.MIN_WIDTH,
     maxWidth: NOTEPAD_CONSTANTS.MAX_WIDTH,
     onWidthChange: setSidebarWidth,
+    elementRef: sidebarRef,
   });
 
   const handleDataChange = (newData: TeamPlanData) => {
@@ -321,6 +331,10 @@ export default function TeamPlanPage() {
     }
   };
 
+  const handleToggleNotePadFullScreen = () => {
+    setIsNotePadFullScreen(!isNotePadFullScreen);
+  };
+
 
   if (!currentPlan || isLoading || isStorageLoading) {
     return null;
@@ -331,11 +345,23 @@ export default function TeamPlanPage() {
       {isPageLoading && <PageLoader onComplete={handlePageLoadingComplete} />}
       <div 
         className="h-screen bg-slate-50/75 overflow-hidden flex"
-        style={{ display: isPageLoading ? 'none' : 'flex' }}
+        style={{ 
+          display: isPageLoading ? 'none' : 'flex',
+          '--sidebar-width': `${sidebarWidth}px` // CSS custom property
+        } as React.CSSProperties}
       >
       {/* Sidebar Container with Resize */}
       <div className="relative flex">
-        <div className="flex flex-col bg-white overflow-visible ring-1 ring-slate-300/30 shadow-md z-20" style={{ width: isSidebarExpanded ? sidebarWidth : 48 }}>
+        <div 
+          ref={sidebarRef}
+          className="flex flex-col bg-white overflow-visible ring-1 ring-slate-300/30 shadow-md z-20 sidebar-container" 
+          style={{ 
+            width: isSidebarExpanded 
+              ? (isNotePadFullScreen && activePanel === 'notepad' ? '100vw' : 'var(--sidebar-width)')
+              : '48px',
+            transition: isResizing ? 'none' : 'width 0.2s ease-out'
+          }}
+        >
           
           {/* SidebarHeader - spans full width when expanded */}
           {isSidebarExpanded && (
@@ -349,6 +375,9 @@ export default function TeamPlanPage() {
                 onRenamePlan={renamePlan}
                 isColorCodingEnabled={isColorCodingEnabled}
                 onColorCodingChange={handleColorCodingChange}
+                isNotePadFullScreen={isNotePadFullScreen}
+                onToggleNotePadFullScreen={handleToggleNotePadFullScreen}
+                showFullScreenToggle={activePanel === 'notepad'}
               />
             </div>
           )}
@@ -393,6 +422,7 @@ export default function TeamPlanPage() {
                         onRenameDocument={renameDocument}
                         onDeleteDocument={handleDeleteDocument}
                         showDocumentList={true}
+                        isFullScreen={isNotePadFullScreen}
                       />
                     </motion.div>
                   ) : activePanel === 'backlog' ? (
@@ -423,8 +453,8 @@ export default function TeamPlanPage() {
             )}
           </div>
 
-          {/* Resize Handle - Only show when sidebar is expanded */}
-          {isSidebarExpanded && (
+          {/* Resize Handle - Only show when sidebar is expanded and not in full-screen mode */}
+          {isSidebarExpanded && !(isNotePadFullScreen && activePanel === 'notepad') && (
             <div
               onMouseDown={handleResizeStart}
               className="absolute top-0 w-4 h-full cursor-col-resize flex items-center justify-center z-50"
@@ -443,87 +473,89 @@ export default function TeamPlanPage() {
         </div>
       </div>
       
-      {/* Team Plan Board */}
-      <div className="flex-1 overflow-hidden flex flex-col">
-        <TeamPlanTopControls />
-        <div className="flex-1 overflow-hidden">
-          <TeamPlanBoard 
-          data={currentPlan.teamPlanData}
-          onChange={handleDataChange}
-          onDataSyncError={handleDataSyncError}
-          isColorCodingEnabled={isColorCodingEnabled}
-          hoveredColumn={hoveredColumn}
-          onColumnMouseEnter={setHoveredColumn}
-          onColumnMouseLeave={() => setHoveredColumn(null)}
-          onAddTimeSlot={(timeSlot) => {
-            const newData = {
-              ...currentPlan.teamPlanData,
-              timeSlots: [...currentPlan.teamPlanData.timeSlots, timeSlot]
-            };
-            updateCurrentPlan({ teamPlanData: newData });
-          }}
-          onRemoveTimeSlot={(timeSlotId) => {
-            const newData = {
-              ...currentPlan.teamPlanData,
-              timeSlots: currentPlan.teamPlanData.timeSlots.filter(t => t.id !== timeSlotId),
-              projects: currentPlan.teamPlanData.projects.filter(p => p.timeSlotId !== timeSlotId)
-            };
-            updateCurrentPlan({ teamPlanData: newData });
-          }}
-          onUpdateTimeSlot={(updatedTimeSlot) => {
-            const timeSlotIndex = currentPlan.teamPlanData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
-            if (timeSlotIndex === -1) return;
+      {/* Team Plan Board - Only render when NOT in full-screen notepad mode */}
+      {!(isNotePadFullScreen && activePanel === 'notepad') && (
+        <div className="flex-1 overflow-hidden flex flex-col">
+          <TeamPlanTopControls />
+          <div className="flex-1 overflow-hidden">
+            <TeamPlanBoard 
+            data={currentPlan.teamPlanData}
+            onChange={handleDataChange}
+            onDataSyncError={handleDataSyncError}
+            isColorCodingEnabled={isColorCodingEnabled}
+            hoveredColumn={hoveredColumn}
+            onColumnMouseEnter={setHoveredColumn}
+            onColumnMouseLeave={() => setHoveredColumn(null)}
+            onAddTimeSlot={(timeSlot) => {
+              const newData = {
+                ...currentPlan.teamPlanData,
+                timeSlots: [...currentPlan.teamPlanData.timeSlots, timeSlot]
+              };
+              updateCurrentPlan({ teamPlanData: newData });
+            }}
+            onRemoveTimeSlot={(timeSlotId) => {
+              const newData = {
+                ...currentPlan.teamPlanData,
+                timeSlots: currentPlan.teamPlanData.timeSlots.filter(t => t.id !== timeSlotId),
+                projects: currentPlan.teamPlanData.projects.filter(p => p.timeSlotId !== timeSlotId)
+              };
+              updateCurrentPlan({ teamPlanData: newData });
+            }}
+            onUpdateTimeSlot={(updatedTimeSlot) => {
+              const timeSlotIndex = currentPlan.teamPlanData.timeSlots.findIndex(ts => ts.id === updatedTimeSlot.id);
+              if (timeSlotIndex === -1) return;
 
-            const updatedTimeSlots = [...currentPlan.teamPlanData.timeSlots];
-            const originalLabel = updatedTimeSlots[timeSlotIndex].label;
-            updatedTimeSlots[timeSlotIndex] = updatedTimeSlot;
+              const updatedTimeSlots = [...currentPlan.teamPlanData.timeSlots];
+              const originalLabel = updatedTimeSlots[timeSlotIndex].label;
+              updatedTimeSlots[timeSlotIndex] = updatedTimeSlot;
 
-            // Auto-shift subsequent time slots if the pattern changed
-            const shouldShift = shouldShiftSubsequentSlots(originalLabel, updatedTimeSlot.label);
-            if (shouldShift) {
-              const nextSequenceLabels = generateSequenceLabels(updatedTimeSlot.label, updatedTimeSlots.length - timeSlotIndex - 1);
-              for (let i = 1; i < nextSequenceLabels.length; i++) {
-                const targetIndex = timeSlotIndex + i;
-                if (targetIndex < updatedTimeSlots.length) {
-                  updatedTimeSlots[targetIndex] = {
-                    ...updatedTimeSlots[targetIndex],
-                    label: nextSequenceLabels[i]
-                  };
+              // Auto-shift subsequent time slots if the pattern changed
+              const shouldShift = shouldShiftSubsequentSlots(originalLabel, updatedTimeSlot.label);
+              if (shouldShift) {
+                const nextSequenceLabels = generateSequenceLabels(updatedTimeSlot.label, updatedTimeSlots.length - timeSlotIndex - 1);
+                for (let i = 1; i < nextSequenceLabels.length; i++) {
+                  const targetIndex = timeSlotIndex + i;
+                  if (targetIndex < updatedTimeSlots.length) {
+                    updatedTimeSlots[targetIndex] = {
+                      ...updatedTimeSlots[targetIndex],
+                      label: nextSequenceLabels[i]
+                    };
+                  }
                 }
               }
-            }
 
-            const newData = {
-              ...currentPlan.teamPlanData,
-              timeSlots: updatedTimeSlots
-            };
-            updateCurrentPlan({ teamPlanData: newData });
-          }}
-          onMoveTimeSlotLeft={(timeSlotId) => {
-            const currentIndex = currentPlan.teamPlanData.timeSlots.findIndex(t => t.id === timeSlotId);
-            if (currentIndex <= 0) return;
-            const newTimeSlots = [...currentPlan.teamPlanData.timeSlots];
-            [newTimeSlots[currentIndex - 1], newTimeSlots[currentIndex]] = [newTimeSlots[currentIndex], newTimeSlots[currentIndex - 1]];
-            const newData = {
-              ...currentPlan.teamPlanData,
-              timeSlots: newTimeSlots
-            };
-            updateCurrentPlan({ teamPlanData: newData });
-          }}
-          onMoveTimeSlotRight={(timeSlotId) => {
-            const currentIndex = currentPlan.teamPlanData.timeSlots.findIndex(t => t.id === timeSlotId);
-            if (currentIndex >= currentPlan.teamPlanData.timeSlots.length - 1) return;
-            const newTimeSlots = [...currentPlan.teamPlanData.timeSlots];
-            [newTimeSlots[currentIndex], newTimeSlots[currentIndex + 1]] = [newTimeSlots[currentIndex + 1], newTimeSlots[currentIndex]];
-            const newData = {
-              ...currentPlan.teamPlanData,
-              timeSlots: newTimeSlots
-            };
-            updateCurrentPlan({ teamPlanData: newData });
-          }}
-        />
+              const newData = {
+                ...currentPlan.teamPlanData,
+                timeSlots: updatedTimeSlots
+              };
+              updateCurrentPlan({ teamPlanData: newData });
+            }}
+            onMoveTimeSlotLeft={(timeSlotId) => {
+              const currentIndex = currentPlan.teamPlanData.timeSlots.findIndex(t => t.id === timeSlotId);
+              if (currentIndex <= 0) return;
+              const newTimeSlots = [...currentPlan.teamPlanData.timeSlots];
+              [newTimeSlots[currentIndex - 1], newTimeSlots[currentIndex]] = [newTimeSlots[currentIndex], newTimeSlots[currentIndex - 1]];
+              const newData = {
+                ...currentPlan.teamPlanData,
+                timeSlots: newTimeSlots
+              };
+              updateCurrentPlan({ teamPlanData: newData });
+            }}
+            onMoveTimeSlotRight={(timeSlotId) => {
+              const currentIndex = currentPlan.teamPlanData.timeSlots.findIndex(t => t.id === timeSlotId);
+              if (currentIndex >= currentPlan.teamPlanData.timeSlots.length - 1) return;
+              const newTimeSlots = [...currentPlan.teamPlanData.timeSlots];
+              [newTimeSlots[currentIndex], newTimeSlots[currentIndex + 1]] = [newTimeSlots[currentIndex + 1], newTimeSlots[currentIndex]];
+              const newData = {
+                ...currentPlan.teamPlanData,
+                timeSlots: newTimeSlots
+              };
+              updateCurrentPlan({ teamPlanData: newData });
+            }}
+          />
+          </div>
         </div>
-      </div>
+      )}
     </div>
     </>
   );

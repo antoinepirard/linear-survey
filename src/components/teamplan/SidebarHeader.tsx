@@ -5,7 +5,7 @@ import { PlanMetadata } from '@/types/plan';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { Cog6ToothIcon, ArrowsPointingInIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import PlanSelector from '@/components/teamplan/PlanSelector';
 
 interface SidebarHeaderProps {
@@ -20,6 +20,11 @@ interface SidebarHeaderProps {
   // Settings (always visible)
   isColorCodingEnabled: boolean;
   onColorCodingChange: (enabled: boolean) => void;
+  
+  // Full-screen toggle (notepad only)
+  isNotePadFullScreen?: boolean;
+  onToggleNotePadFullScreen?: () => void;
+  showFullScreenToggle?: boolean;
 }
 
 const SidebarHeader: React.FC<SidebarHeaderProps> = ({
@@ -31,6 +36,9 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   onRenamePlan,
   isColorCodingEnabled,
   onColorCodingChange,
+  isNotePadFullScreen,
+  onToggleNotePadFullScreen,
+  showFullScreenToggle,
 }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -47,8 +55,26 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
         />
       </div>
       
-      {/* Settings Button */}
-      <Popover open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+      <div className="flex items-center gap-2">
+        {/* Full-screen Toggle Button */}
+        {showFullScreenToggle && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+            onClick={onToggleNotePadFullScreen}
+            title={isNotePadFullScreen ? "Exit full screen" : "Full screen"}
+          >
+            {isNotePadFullScreen ? (
+              <ArrowsPointingInIcon className="h-4 w-4" />
+            ) : (
+              <ArrowsPointingOutIcon className="h-4 w-4" />
+            )}
+          </Button>
+        )}
+        
+        {/* Settings Button */}
+        <Popover open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="ghost"
@@ -79,7 +105,8 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
             </div>
           </div>
         </PopoverContent>
-      </Popover>
+        </Popover>
+      </div>
     </div>
   );
 };

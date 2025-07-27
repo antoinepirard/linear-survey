@@ -24,6 +24,7 @@ export interface NotePadProps {
   onDeleteDocument?: (documentId: string) => void;
   onUpdateDocumentContent?: (documentId: string, content: string) => void;
   showDocumentList?: boolean;
+  isFullScreen?: boolean;
 }
 
 // Storage related interfaces

@@ -487,3 +487,17 @@
 .slash-menu-scrollbar:hover {
   scrollbar-color: rgba(148, 163, 184, 0.4) transparent; /* Hover thumb, transparent track */
 }
+
+/* Performance optimizations for smooth resizing */
+.sidebar-container {
+  /* Enable hardware acceleration for smooth resizing */
+  will-change: width;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Optimize full-screen transitions */
+.sidebar-container[data-fullscreen="true"] {
+  width: 100vw !important;
+  transition: width 0.3s ease-out;
+}
