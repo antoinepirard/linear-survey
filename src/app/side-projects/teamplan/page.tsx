@@ -14,7 +14,6 @@ import { usePlanStorage } from '@/hooks/usePlanStorage';
 import { useResizable } from '@/hooks/useResizable';
 import { useNotePadStorage } from '@/hooks/useNotePadStorage';
 import { TeamPlanData } from '@/data/teamplan';
-import { CubeIcon } from '@heroicons/react/24/solid';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { teamPlanLogger as logger } from '@/utils/logger';
 
@@ -358,13 +357,6 @@ export default function TeamPlanPage() {
           <div className="flex flex-1 overflow-hidden">
             {/* Always present navigation */}
             <div className="w-12 h-full bg-transparent border-r border-slate-200/65 flex flex-col flex-shrink-0">
-              {/* Logo/Header Section */}
-              <div className="bg-transparent px-2 py-3 flex-shrink-0 flex items-center justify-center">
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <CubeIcon className="w-5 h-5 text-slate-900" />
-                </div>
-              </div>
-              
               {/* Navigation */}
               <VerticalNavigation 
                 isSidebarExpanded={isSidebarExpanded && activePanel === 'notepad'}
