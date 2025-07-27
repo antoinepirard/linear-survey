@@ -499,5 +499,4 @@
 /* Optimize full-screen transitions */
 .sidebar-container[data-fullscreen="true"] {
   width: 100vw !important;
-  transition: width 0.3s ease-out;
 }

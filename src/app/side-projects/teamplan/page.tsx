@@ -359,7 +359,7 @@ export default function TeamPlanPage() {
             width: isSidebarExpanded 
               ? (isNotePadFullScreen && activePanel === 'notepad' ? '100vw' : 'var(--sidebar-width)')
               : '48px',
-            transition: isResizing ? 'none' : 'width 0.2s ease-out'
+            transition: 'none'
           }}
         >
           
