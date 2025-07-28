@@ -117,7 +117,7 @@ export default function TeamPlanPage() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
   const [isNotePadFullScreen, setIsNotePadFullScreen] = useState(false);
-  const [groupColorOverrides, setGroupColorOverrides] = useState<Record<string, any>>({});
+  const [groupColorOverrides, setGroupColorOverrides] = useState<Record<string, { bg: string; text: string; border: string }>>({});
 
   // Load color coding preference from localStorage on mount
   useEffect(() => {
