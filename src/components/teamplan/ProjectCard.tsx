@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { motion } from 'motion/react';
-import { TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, PlusIcon, ArchiveBoxArrowDownIcon } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
 import { Project, ProjectImpact } from '@/data/teamplan';
 
@@ -602,7 +602,7 @@ const ProjectCard = ({
                   size="sm"
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 h-5 w-5 p-0.5"
                 >
-                  <TrashIcon />
+                  {onMoveToBacklog ? <ArchiveBoxArrowDownIcon /> : <TrashIcon />}
                 </Button>
               </div>
             )}
