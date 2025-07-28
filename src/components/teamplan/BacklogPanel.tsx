@@ -136,6 +136,7 @@ interface BacklogPanelProps {
   onUpdateProject: (project: Project) => void;
   onDeleteProject: (projectId: string) => void;
   onMoveToBoard: (projectId: string, personId?: string, timeSlotId?: string) => void;
+  onRenameGroup?: (oldGroupName: string, newGroupName: string) => void;
 }
 
 export default function BacklogPanel({ 
@@ -147,7 +148,8 @@ export default function BacklogPanel({
   onCreateProject, 
   onUpdateProject, 
   onDeleteProject,
-  onMoveToBoard
+  onMoveToBoard,
+  onRenameGroup
 }: BacklogPanelProps) {
   // Track which project should start in edit mode
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
@@ -267,16 +269,13 @@ export default function BacklogPanel({
       return;
     }
 
-    // Update all projects in this group to use the new group name
-    backlogProjects.forEach(project => {
-      if (project.group === oldGroupName) {
-        const updatedProject = {
-          ...project,
-          group: newGroupName
-        };
-        onUpdateProject(updatedProject);
-      }
-    });
+    // Batch all updates into a single operation
+    const projectsToUpdate = backlogProjects.filter(project => project.group === oldGroupName);
+    
+    // Call a new prop function that handles batched group rename
+    if (projectsToUpdate.length > 0 && onRenameGroup) {
+      onRenameGroup(oldGroupName, newGroupName);
+    }
 
     toast.success(`Group renamed from "${oldGroupName}" to "${newGroupName}"`);
     handleCancelGroupEdit();

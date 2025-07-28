@@ -308,6 +308,21 @@ export default function TeamPlanPage() {
     updateCurrentPlan({ teamPlanData: newData });
   };
 
+  const handleRenameGroup = (oldGroupName: string, newGroupName: string) => {
+    if (!currentPlan) return;
+    
+    const newData = {
+      ...currentPlan.teamPlanData,
+      projects: currentPlan.teamPlanData.projects.map(project => 
+        project.group === oldGroupName 
+          ? { ...project, group: newGroupName }
+          : project
+      )
+    };
+    
+    handleDataChange(newData);
+  };
+
   const handleDataSyncError = (originalData: TeamPlanData, errorData: TeamPlanData, error: Error) => {
     logger.error('Data sync error occurred', { 
       error: error.message,
@@ -511,6 +526,7 @@ export default function TeamPlanPage() {
                       onUpdateProject={handleUpdateBacklogProject}
                       onDeleteProject={handleDeleteBacklogProject}
                       onMoveToBoard={handleMoveBacklogProjectToBoard}
+                      onRenameGroup={handleRenameGroup}
                       people={currentPlan.teamPlanData.people}
                       timeSlots={currentPlan.teamPlanData.timeSlots}
                     />
