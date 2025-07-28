@@ -44,6 +44,11 @@ export const EmptyLinePlaceholder =
                 return DecorationSet.empty;
               }
 
+              // Hide placeholders during any active selection to prevent drag interference
+              if (!selection.empty) {
+                return DecorationSet.empty;
+              }
+
               // Check if we should show placeholder
               const currentLineStart = $from.start();
               const currentLineEnd = $from.end();
