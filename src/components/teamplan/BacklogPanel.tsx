@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { RectangleGroupIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, FolderIcon } from '@heroicons/react/24/solid';
-import { Project, getRandomColor, getProjectsByGroup } from '@/data/teamplan';
+import { Project, getRandomColor, getProjectsByGroup, getAllGroups } from '@/data/teamplan';
 import { Button } from '@/components/ui/button';
 import ProjectCard from './ProjectCard';
 import { motion, AnimatePresence } from 'motion/react';
@@ -56,6 +56,8 @@ export default function BacklogPanel({
   // Track which project should start in edit mode
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [hoveredGroupHeader, setHoveredGroupHeader] = useState<string | null>(null);
+  const [editingGroupName, setEditingGroupName] = useState<string | null>(null);
+  const [editingGroupValue, setEditingGroupValue] = useState<string>('');
   const hasInitializedGroups = useRef(false);
 
   // ProjectCard handles the parsing - we just pass through the updates
@@ -95,6 +97,57 @@ export default function BacklogPanel({
   const handleUpdateProject = (project: Project) => {
     // ProjectCard already handles parsing - just pass through the update
     onUpdateProject(project);
+  };
+
+  const handleStartGroupEdit = (groupName: string) => {
+    setEditingGroupName(groupName);
+    setEditingGroupValue(groupName);
+  };
+
+  const handleCancelGroupEdit = () => {
+    setEditingGroupName(null);
+    setEditingGroupValue('');
+  };
+
+  const handleSaveGroupEdit = () => {
+    if (!editingGroupName || !editingGroupValue.trim()) {
+      handleCancelGroupEdit();
+      return;
+    }
+
+    const oldGroupName = editingGroupName;
+    const newGroupName = editingGroupValue.trim();
+
+    // If name hasn't changed, just cancel
+    if (oldGroupName === newGroupName) {
+      handleCancelGroupEdit();
+      return;
+    }
+
+    // Check if new group name already exists (case-insensitive)
+    const existingGroups = getAllGroups(backlogProjects);
+    const groupExists = existingGroups.some(group => 
+      group.toLowerCase() === newGroupName.toLowerCase() && group !== oldGroupName
+    );
+
+    if (groupExists) {
+      // Could show a toast/alert here, but for now just cancel
+      handleCancelGroupEdit();
+      return;
+    }
+
+    // Update all projects in this group to use the new group name
+    backlogProjects.forEach(project => {
+      if (project.group === oldGroupName) {
+        const updatedProject = {
+          ...project,
+          group: newGroupName
+        };
+        onUpdateProject(updatedProject);
+      }
+    });
+
+    handleCancelGroupEdit();
   };
 
   const toggleGroup = (groupName: string) => {
@@ -159,19 +212,55 @@ export default function BacklogPanel({
               <div key={groupName} className={`mb-4 rounded-lg ${groupColor.bg}`}>
                 {/* Group Header */}
                 <div 
-                  className="flex items-center gap-2 p-2 cursor-pointer transition-colors hover:opacity-80"
-                  onClick={() => toggleGroup(groupName)}
+                  className={`flex items-center gap-2 p-2 transition-colors ${
+                    editingGroupName === groupName 
+                      ? 'cursor-default' 
+                      : 'cursor-pointer hover:opacity-80'
+                  }`}
+                  onClick={editingGroupName === groupName ? undefined : () => toggleGroup(groupName)}
                   onMouseEnter={() => setHoveredGroupHeader(groupName)}
                   onMouseLeave={() => setHoveredGroupHeader(null)}
                 >
                   <FolderIcon className={`w-4 h-4 ${groupColor.text}`} />
-                  <span className={`text-sm font-medium ${groupColor.text} flex-1`}>{groupName}</span>
+                  
+                  {/* Group Name - Editable */}
+                  {editingGroupName === groupName ? (
+                    <input
+                      type="text"
+                      value={editingGroupValue}
+                      onChange={(e) => setEditingGroupValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSaveGroupEdit();
+                        } else if (e.key === 'Escape') {
+                          handleCancelGroupEdit();
+                        }
+                      }}
+                      onBlur={handleSaveGroupEdit}
+                      className={`text-sm font-medium ${groupColor.text} bg-white/80 border border-white/50 rounded px-2 py-0.5 flex-1 outline-none focus:border-blue-400`}
+                      autoFocus
+                      onFocus={(e) => e.target.select()}
+                    />
+                  ) : (
+                    <div className="flex-1">
+                      <span 
+                        className={`text-sm font-medium ${groupColor.text} cursor-pointer hover:underline inline-block`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStartGroupEdit(groupName);
+                        }}
+                        title="Click to rename group"
+                      >
+                        {groupName}
+                      </span>
+                    </div>
+                  )}
                   <span className={`text-xs px-1.5 py-0.5 rounded bg-white/50 ${groupColor.text}`}>
                     {groupProjects.length}
                   </span>
                   
-                  {/* Add Project Button - appears on hover */}
-                  {hoveredGroupHeader === groupName && (
+                  {/* Add Project Button - appears on hover (but not when editing group name) */}
+                  {hoveredGroupHeader === groupName && editingGroupName !== groupName && (
                     <Button
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent toggling group
