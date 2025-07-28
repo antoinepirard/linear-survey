@@ -66,7 +66,6 @@ interface TeamPlanContextMenuProps {
   currentGroup?: string;
   currentImpact?: ProjectImpact;
   personName?: string;
-  label?: string;
 }
 
 export default function TeamPlanContextMenu({
@@ -88,12 +87,7 @@ export default function TeamPlanContextMenu({
   currentGroup,
   currentImpact,
   personName,
-  label,
 }: TeamPlanContextMenuProps) {
-  const getLabel = () => {
-    if (label) return label;
-    return type === 'person' ? 'Person' : type === 'timeSlot' ? 'Time Slot' : 'Project';
-  };
 
   const getMoveUpIcon = () => {
     return type === 'timeSlot' ? <ChevronLeftIcon className="h-4 w-4" /> : <ChevronUpIcon className="h-4 w-4" />;
@@ -265,11 +259,10 @@ export default function TeamPlanContextMenu({
             <ContextMenuItem
               onClick={onDelete}
               disabled={!canDelete}
-              variant="destructive"
               className="flex items-center gap-2"
             >
               <TrashIcon className="h-4 w-4" />
-              Delete <span className="text-red-400">{getLabel()}</span>
+              Delete
             </ContextMenuItem>
           </>
         ) : type === 'cell' ? (
@@ -303,11 +296,10 @@ export default function TeamPlanContextMenu({
                 <ContextMenuItem
                   onClick={onDelete}
                   disabled={!canDelete}
-                  variant="destructive"
                   className="flex items-center gap-2"
                 >
                   <TrashIcon className="h-4 w-4" />
-                  Delete <span className="text-red-400">{personName}</span>
+                  Delete
                 </ContextMenuItem>
               </>
             )}
@@ -334,11 +326,10 @@ export default function TeamPlanContextMenu({
             <ContextMenuItem
               onClick={onDelete}
               disabled={!canDelete}
-              variant="destructive"
               className="flex items-center gap-2"
             >
               <TrashIcon className="h-4 w-4" />
-              Delete <span className="text-red-400">{getLabel()}</span>
+              Delete
             </ContextMenuItem>
           </>
         )}
