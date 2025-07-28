@@ -13,7 +13,7 @@ import SidebarHeader from '@/components/teamplan/SidebarHeader';
 import { usePlanStorage } from '@/hooks/usePlanStorage';
 import { useResizable } from '@/hooks/useResizable';
 import { useNotePadStorage } from '@/hooks/useNotePadStorage';
-import { TeamPlanData } from '@/data/teamplan';
+import { TeamPlanData, Project, getBacklogProjects, getAllGroups, generateId, getRandomColor } from '@/data/teamplan';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { teamPlanLogger as logger } from '@/utils/logger';
 
@@ -304,6 +304,48 @@ export default function TeamPlanPage() {
     // For now, this is a placeholder that demonstrates the error handling structure
   };
 
+  // Backlog management handlers
+  const handleCreateBacklogProject = (project: Omit<Project, 'id'>) => {
+    if (!currentPlan) return;
+    
+    const projectId = generateId();
+    const newProject: Project = {
+      ...project,
+      id: projectId,
+    };
+    
+    const newData = {
+      ...currentPlan.teamPlanData,
+      projects: [...currentPlan.teamPlanData.projects, newProject]
+    };
+    
+    handleDataChange(newData);
+  };
+
+  const handleUpdateBacklogProject = (updatedProject: Project) => {
+    if (!currentPlan) return;
+    
+    const newData = {
+      ...currentPlan.teamPlanData,
+      projects: currentPlan.teamPlanData.projects.map(p => 
+        p.id === updatedProject.id ? updatedProject : p
+      )
+    };
+    
+    handleDataChange(newData);
+  };
+
+  const handleDeleteBacklogProject = (projectId: string) => {
+    if (!currentPlan) return;
+    
+    const newData = {
+      ...currentPlan.teamPlanData,
+      projects: currentPlan.teamPlanData.projects.filter(p => p.id !== projectId)
+    };
+    
+    handleDataChange(newData);
+  };
+
   const handleToggleSidebar = () => {
     if (activePanel === 'notepad' && isSidebarExpanded) {
       setIsSidebarExpanded(false);
@@ -432,7 +474,14 @@ export default function TeamPlanPage() {
                       transition={{ duration: 0.1, ease: "easeOut" }}
                       className="flex-1 min-h-0"
                     >
-                      <BacklogPanel />
+                      <BacklogPanel 
+                        width={sidebarWidth - 48}
+                        backlogProjects={getBacklogProjects(currentPlan.teamPlanData.projects)}
+                        availableGroups={getAllGroups(currentPlan.teamPlanData.projects)}
+                        onCreateProject={handleCreateBacklogProject}
+                        onUpdateProject={handleUpdateBacklogProject}
+                        onDeleteProject={handleDeleteBacklogProject}
+                      />
                     </motion.div>
                   ) : (
                     <motion.div
@@ -443,7 +492,7 @@ export default function TeamPlanPage() {
                       transition={{ duration: 0.1, ease: "easeOut" }}
                       className="flex-1 min-h-0"
                     >
-                      <CommentsPanel />
+                      <CommentsPanel width={sidebarWidth - 48} />
                     </motion.div>
                   )}
                 </AnimatePresence>

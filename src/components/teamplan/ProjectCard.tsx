@@ -66,6 +66,7 @@ interface ProjectCardProps {
   availableGroups?: string[];
   allProjects?: Project[];
   isColorCodingEnabled?: boolean;
+  isBacklogMode?: boolean; // New prop for backlog-specific behavior
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
   onDuplicate?: (projectId: string) => void;
@@ -82,6 +83,7 @@ const ProjectCard = ({
   availableGroups = [],
   allProjects = [],
   isColorCodingEnabled = true,
+  isBacklogMode = false,
   onEdit,
   onDelete,
   onDuplicate,
@@ -388,7 +390,7 @@ const ProjectCard = ({
           zIndex: 1000,
           boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15)"
         }}
-        drag
+        drag={!isBacklogMode} // Disable drag in backlog mode
         dragMomentum={false}
         dragElastic={0}
         dragSnapToOrigin={true}
@@ -408,7 +410,7 @@ const ProjectCard = ({
         data-project-card
         data-project-id={project.id}
         className={`
-          relative cursor-move p-2 py-2.5 rounded-lg ring-1 font-regular text-sm
+          relative ${isBacklogMode ? 'cursor-default' : 'cursor-move'} p-2 py-2.5 rounded-lg ring-1 font-regular text-sm
           transition-shadow duration-200
           ${isDraggingLocal ? '' : isHovered ? 'shadow-md' : 'shadow-none'}
           ${project.color}

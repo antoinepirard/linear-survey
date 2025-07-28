@@ -2,9 +2,10 @@ export interface Project {
   id: string;
   title: string;
   color: string;
-  personId: string;
-  timeSlotId: string;
+  personId?: string; // Optional - undefined for backlog projects
+  timeSlotId?: string; // Optional - undefined for backlog projects
   group?: string;
+  order?: number; // Optional - for explicit positioning in backlog
 }
 
 export interface Person {
@@ -77,6 +78,37 @@ export const DEFAULT_TEAMPLAN_DATA: TeamPlanData = {
       timeSlotId: '1',
       group: 'design',
     },
+    // Backlog projects (no personId/timeSlotId assignments)
+    {
+      id: 'backlog-1',
+      title: 'Mobile App Research',
+      color: PROJECT_COLORS[3],
+      group: 'research',
+    },
+    {
+      id: 'backlog-2',
+      title: 'API Documentation',
+      color: PROJECT_COLORS[4],
+      group: 'backend',
+    },
+    {
+      id: 'backlog-3',
+      title: 'Performance Optimization',
+      color: PROJECT_COLORS[5],
+      group: 'engineering',
+    },
+    {
+      id: 'backlog-4',
+      title: 'User Analytics Setup',
+      color: PROJECT_COLORS[6],
+      group: 'research',
+    },
+    {
+      id: 'backlog-5',
+      title: 'Accessibility Audit',
+      color: PROJECT_COLORS[7],
+      // No group = ungrouped project
+    },
   ],
 };
 
@@ -91,3 +123,36 @@ export const getProjectsForCell = (projects: Project[], personId: string, timeSl
 
 export const getAllGroups = (projects: Project[]): string[] =>
   [...new Set(projects.map(p => p.group).filter((group): group is string => Boolean(group)))].sort();
+
+// Utility functions for backlog management
+export const getBacklogProjects = (projects: Project[]) =>
+  projects.filter(p => !p.personId || !p.timeSlotId);
+
+export const getPlannedProjects = (projects: Project[]) =>
+  projects.filter(p => p.personId && p.timeSlotId);
+
+export const getProjectsByGroup = (projects: Project[]) => {
+  const backlogProjects = getBacklogProjects(projects);
+  const grouped: Record<string, Project[]> = {};
+  const ungrouped: Project[] = [];
+
+  backlogProjects.forEach((project) => {
+    if (project.group) {
+      if (!grouped[project.group]) {
+        grouped[project.group] = [];
+      }
+      grouped[project.group].push(project);
+    } else {
+      ungrouped.push(project);
+    }
+  });
+
+  // Sort projects within each group by order
+  Object.keys(grouped).forEach((group) => {
+    grouped[group].sort((a, b) => (a.order || 0) - (b.order || 0));
+  });
+
+  ungrouped.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  return { grouped, ungrouped };
+};
