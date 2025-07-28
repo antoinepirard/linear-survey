@@ -3,7 +3,9 @@ import { PluginKey } from "@tiptap/pm/state";
 import Suggestion from "@tiptap/suggestion";
 import { ReactRenderer } from "@tiptap/react";
 import { Editor } from "@tiptap/react";
-import SlashMenu from "@/components/ui/slash-menu";
+import React from "react";
+import { createRoot, Root } from "react-dom/client";
+import SlashMenu, { SlashMenuRef } from "@/components/ui/slash-menu";
 
 interface SlashCommandItem {
   title: string;
@@ -139,7 +141,9 @@ export const SlashCommand = Extension.create({
           );
         },
         render: () => {
-          let component: ReactRenderer;
+          let component: ReactRenderer | null = null;
+          let fallbackRoot: Root | null = null;
+          let fallbackRef: SlashMenuRef | null = null;
           let popup: HTMLDivElement | null = null;
           let filterIndicator: HTMLDivElement | null = null;
 
@@ -174,6 +178,7 @@ export const SlashCommand = Extension.create({
 
           return {
             onStart: (props: SuggestionProps) => {
+              // Try ReactRenderer first
               component = new ReactRenderer(SlashMenu, {
                 props: {
                   items: props.items,
@@ -184,6 +189,18 @@ export const SlashCommand = Extension.create({
 
               if (!props.clientRect) {
                 return;
+              }
+
+              // Check if ReactRenderer actually rendered content
+              const hasContent = component.element && (
+                component.element.innerHTML.trim() !== "" ||
+                component.element.children.length > 0
+              );
+
+              if (!hasContent) {
+                console.log('🔧 ReactRenderer failed - using fallback portal');
+                component.destroy();
+                component = null;
               }
 
               // Create filter indicator
@@ -218,7 +235,22 @@ export const SlashCommand = Extension.create({
               popup = document.createElement("div");
               popup.style.position = "absolute";
               popup.style.zIndex = "50";
-              popup.appendChild(component.element);
+              
+              if (component) {
+                // ReactRenderer worked - use it
+                popup.appendChild(component.element);
+              } else {
+                // ReactRenderer failed - use direct React portal
+                fallbackRoot = createRoot(popup);
+                fallbackRoot.render(
+                  React.createElement(SlashMenu, {
+                    ref: (ref: SlashMenuRef) => { fallbackRef = ref; },
+                    items: props.items,
+                    command: props.command,
+                  })
+                );
+              }
+              
               document.body.appendChild(popup);
 
               // Position elements using the new positioning logic
@@ -227,10 +259,22 @@ export const SlashCommand = Extension.create({
             },
 
             onUpdate(props: SuggestionProps) {
-              component?.updateProps({
-                items: props.items,
-                command: props.command,
-              });
+              if (component) {
+                // Update ReactRenderer component
+                component.updateProps({
+                  items: props.items,
+                  command: props.command,
+                });
+              } else if (fallbackRoot) {
+                // Update fallback React portal
+                fallbackRoot.render(
+                  React.createElement(SlashMenu, {
+                    ref: (ref: SlashMenuRef) => { fallbackRef = ref; },
+                    items: props.items,
+                    command: props.command,
+                  })
+                );
+              }
 
               if (!props.clientRect || !popup) {
                 return;
@@ -293,13 +337,22 @@ export const SlashCommand = Extension.create({
                 context.lastExecutionTime = now;
               }
 
-              return (
-                (
-                  component?.ref as {
-                    onKeyDown?: (event: KeyboardEvent) => boolean;
-                  }
-                )?.onKeyDown?.(props.event) || false
-              );
+              // Handle keyboard navigation for both ReactRenderer and fallback
+              if (component) {
+                // Use ReactRenderer's ref
+                return (
+                  (
+                    component.ref as {
+                      onKeyDown?: (event: KeyboardEvent) => boolean;
+                    }
+                  )?.onKeyDown?.(props.event) || false
+                );
+              } else if (fallbackRef) {
+                // Use fallback ref
+                return fallbackRef.onKeyDown(props.event);
+              }
+              
+              return false;
             },
 
             onExit() {
@@ -311,7 +364,19 @@ export const SlashCommand = Extension.create({
                 document.body.removeChild(filterIndicator);
                 filterIndicator = null;
               }
-              component?.destroy();
+              
+              // Clean up ReactRenderer if it was used
+              if (component) {
+                component.destroy();
+                component = null;
+              }
+              
+              // Clean up fallback React portal if it was used
+              if (fallbackRoot) {
+                fallbackRoot.unmount();
+                fallbackRoot = null;
+                fallbackRef = null;
+              }
             },
           };
         },
