@@ -456,6 +456,23 @@ function NotePad({
 
   // Click-outside handling is now managed by the useTextSelection hook
 
+  // Handle page refresh/navigation to ensure slash menu cleanup
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Force close any open suggestions before page unload
+      if (editor) {
+        // This should trigger the suggestion plugin's onExit
+        editor.chain().focus().run();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [editor]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -486,9 +503,12 @@ function NotePad({
       saveQueueRef.current = [];
       // Reset typing state
       isActivelyTyping.current = false;
-      // Clean up editor - will be handled by useEditor destruction
+      // Explicitly destroy editor to ensure plugin cleanup
+      if (editor) {
+        editor.destroy();
+      }
     };
-  }, []); // Only run on mount/unmount
+  }, [editor]); // Add editor to dependencies
   
 
   return (

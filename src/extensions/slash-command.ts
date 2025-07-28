@@ -178,6 +178,10 @@ export const SlashCommand = Extension.create({
 
           return {
             onStart: (props: SuggestionProps) => {
+              // Clean up any existing popup elements first
+              const existingPopups = document.querySelectorAll('[data-slash-menu]');
+              existingPopups.forEach(popup => popup.remove());
+
               // Try ReactRenderer first
               component = new ReactRenderer(SlashMenu, {
                 props: {
@@ -229,12 +233,14 @@ export const SlashCommand = Extension.create({
 
               filterIndicator.appendChild(slashSpan);
               filterIndicator.appendChild(filterSpan);
+              filterIndicator.setAttribute('data-slash-menu', 'true');
               document.body.appendChild(filterIndicator);
 
               // Create popup element
               popup = document.createElement("div");
               popup.style.position = "absolute";
               popup.style.zIndex = "50";
+              popup.setAttribute('data-slash-menu', 'true');
 
               if (component) {
                 // ReactRenderer worked - use it
