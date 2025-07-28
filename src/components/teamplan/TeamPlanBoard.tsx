@@ -791,6 +791,12 @@ function TeamPlanBoard({
                                     onEdit={handleEditProject}
                                     onDelete={handleDeleteProject}
                                     onDuplicate={handleDuplicateProject}
+                                    onSetImpact={(projectId, impact) => {
+                                      const updatedProject = boardData.projects.find(p => p.id === projectId);
+                                      if (updatedProject) {
+                                        handleEditProject({ ...updatedProject, impact });
+                                      }
+                                    }}
                                     onDragStart={handleDragStart}
                                     onDragEnd={handleDragEnd}
                                     onDrag={updateDropTarget}

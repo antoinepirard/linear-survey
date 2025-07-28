@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { motion } from 'motion/react';
 import { TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
-import { Project } from '@/data/teamplan';
+import { Project, ProjectImpact } from '@/data/teamplan';
 
 // Validation utilities
 export const validateProjectTitle = (title: string): { isValid: boolean; error?: string } => {
@@ -96,6 +96,7 @@ export const calculateProjectColorMappings = (projects: Project[]): Record<strin
 
 import { Button } from '@/components/ui/button';
 import TeamPlanContextMenu from './TeamPlanContextMenu';
+import ImpactSelector from './ImpactSelector';
 
 // Moved outside the component to prevent re-creation on every render
 const colorGroups = [
@@ -162,6 +163,7 @@ interface ProjectCardProps {
   onDuplicate?: (projectId: string) => void;
   onMoveToBoard?: (projectId: string) => void;
   onMoveToGroup?: (projectId: string, groupName: string) => void;
+  onSetImpact?: (projectId: string, impact: ProjectImpact) => void;
   onDragStart?: (projectId: string, isDuplicating: boolean) => void;
   onDragEnd?: () => void;
   onDrag?: (element: HTMLElement) => void;
@@ -181,6 +183,7 @@ const ProjectCard = ({
   onDuplicate,
   onMoveToBoard,
   onMoveToGroup,
+  onSetImpact,
   onDragStart,
   onDragEnd,
   onDrag
@@ -447,8 +450,10 @@ const ProjectCard = ({
             onDuplicate={() => onDuplicate?.(project.id)}
             onMoveToBoard={isBacklogMode ? () => onMoveToBoard?.(project.id) : undefined}
             onMoveToGroup={isBacklogMode ? (groupName: string) => onMoveToGroup?.(project.id, groupName) : undefined}
+            onSetImpact={isBacklogMode ? (impact: ProjectImpact) => onSetImpact?.(project.id, impact) : undefined}
             availableGroups={availableGroups}
             currentGroup={project.group}
+            currentImpact={project.impact}
             label={project.title}
           >
         <motion.div
@@ -562,7 +567,16 @@ const ProjectCard = ({
         </div>
         
         {!isEditingLocal && (
-          <div className="relative flex items-center justify-end min-w-0 flex-shrink-0">
+          <div className="relative flex items-center gap-1 justify-end min-w-0 flex-shrink-0">
+            {/* Impact selector - only visible in backlog mode */}
+            {isBacklogMode && onSetImpact && (
+              <ImpactSelector
+                impact={project.impact}
+                onChange={(impact) => onSetImpact(project.id, impact)}
+                disabled={false}
+              />
+            )}
+            
             {/* Show tag by default, trash icon on hover - but hide in backlog mode since projects are already visually grouped */}
             {project.group && !isBacklogMode && (
               <span className={`transition-opacity duration-200 text-[10px] px-1.5 py-0.5 rounded-full font-mono max-w-16 truncate ${getGroupColor(project.group).bg} ${getGroupColor(project.group).text} ${isHovered ? 'opacity-0' : 'opacity-100'}`}>

@@ -14,7 +14,7 @@ import SidebarHeader from '@/components/teamplan/SidebarHeader';
 import { usePlanStorage } from '@/hooks/usePlanStorage';
 import { useResizable } from '@/hooks/useResizable';
 import { useNotePadStorage } from '@/hooks/useNotePadStorage';
-import { TeamPlanData, Project, getBacklogProjects, getAllGroups, generateId, getRandomColor } from '@/data/teamplan';
+import { TeamPlanData, Project, getBacklogProjects, getAllGroups, generateId } from '@/data/teamplan';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { teamPlanLogger as logger } from '@/utils/logger';
 

@@ -54,8 +54,8 @@ export default function BacklogPanel({
   width, 
   backlogProjects, 
   availableGroups, 
-  people,
-  timeSlots,
+  people, // eslint-disable-line @typescript-eslint/no-unused-vars
+  timeSlots, // eslint-disable-line @typescript-eslint/no-unused-vars
   onCreateProject, 
   onUpdateProject, 
   onDeleteProject,
@@ -344,6 +344,10 @@ export default function BacklogPanel({
                               onDelete={onDeleteProject}
                               onMoveToBoard={() => onMoveToBoard(project.id)}
                               onMoveToGroup={handleMoveProjectToGroup}
+                              onSetImpact={(projectId, impact) => {
+                                const updatedProject = { ...project, impact };
+                                handleUpdateProject(updatedProject);
+                              }}
                               isBacklogMode={true}
                               isEditing={!project.title.trim()}
                             />
@@ -396,6 +400,10 @@ export default function BacklogPanel({
                       onDelete={onDeleteProject}
                       onMoveToBoard={() => onMoveToBoard(project.id)}
                       onMoveToGroup={handleMoveProjectToGroup}
+                      onSetImpact={(projectId, impact) => {
+                        const updatedProject = { ...project, impact };
+                        handleUpdateProject(updatedProject);
+                      }}
                       isBacklogMode={true}
                       isEditing={!project.title.trim()}
                     />

@@ -10,7 +10,8 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
 } from '@/components/ui/context-menu';
-import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, TrashIcon, DocumentDuplicateIcon, PlusIcon, ArrowRightIcon, FolderIcon, TagIcon } from '@heroicons/react/24/outline';
+import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, TrashIcon, DocumentDuplicateIcon, PlusIcon, ArrowRightIcon, FolderIcon, TagIcon, ExclamationTriangleIcon, FireIcon } from '@heroicons/react/24/outline';
+import { ProjectImpact } from '@/data/teamplan';
 
 export type ContextMenuType = 'person' | 'timeSlot' | 'project' | 'cell' | 'backlogProject';
 
@@ -27,8 +28,10 @@ interface TeamPlanContextMenuProps {
   onAddProject?: () => void;
   onMoveToBoard?: () => void;
   onMoveToGroup?: (groupName: string) => void;
+  onSetImpact?: (impact: ProjectImpact) => void;
   availableGroups?: string[];
   currentGroup?: string;
+  currentImpact?: ProjectImpact;
   personName?: string;
   label?: string;
 }
@@ -46,8 +49,10 @@ export default function TeamPlanContextMenu({
   onAddProject,
   onMoveToBoard,
   onMoveToGroup,
+  onSetImpact,
   availableGroups = [],
   currentGroup,
+  currentImpact,
   personName,
   label,
 }: TeamPlanContextMenuProps) {
@@ -147,6 +152,47 @@ export default function TeamPlanContextMenu({
                     No groups available
                   </ContextMenuItem>
                 )}
+              </ContextMenuSubContent>
+            </ContextMenuSub>
+            
+            {/* Set Impact Submenu */}
+            <ContextMenuSub>
+              <ContextMenuSubTrigger className="flex items-center gap-2">
+                <ExclamationTriangleIcon className="h-4 w-4" />
+                Set Impact
+                {currentImpact && (
+                  <span className="ml-auto text-xs text-gray-500 capitalize">{currentImpact}</span>
+                )}
+              </ContextMenuSubTrigger>
+              <ContextMenuSubContent className="w-36">
+                <ContextMenuItem
+                  onClick={() => onSetImpact?.('low')}
+                  className="flex items-center gap-2 text-slate-600"
+                >
+                  <ChevronDownIcon className="h-4 w-4" />
+                  Low
+                </ContextMenuItem>
+                <ContextMenuItem
+                  onClick={() => onSetImpact?.('medium')}
+                  className="flex items-center gap-2 text-blue-600"
+                >
+                  <ChevronUpIcon className="h-4 w-4" />
+                  Medium
+                </ContextMenuItem>
+                <ContextMenuItem
+                  onClick={() => onSetImpact?.('high')}
+                  className="flex items-center gap-2 text-orange-600"
+                >
+                  <ExclamationTriangleIcon className="h-4 w-4" />
+                  High
+                </ContextMenuItem>
+                <ContextMenuItem
+                  onClick={() => onSetImpact?.('urgent')}
+                  className="flex items-center gap-2 text-red-600"
+                >
+                  <FireIcon className="h-4 w-4" />
+                  Urgent
+                </ContextMenuItem>
               </ContextMenuSubContent>
             </ContextMenuSub>
             

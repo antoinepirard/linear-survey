@@ -1,5 +1,5 @@
 import { Plan, PlanStorage, NotepadDocument } from "@/types/plan";
-import { TeamPlanData } from "@/data/teamplan";
+import { TeamPlanData, ProjectImpact } from "@/data/teamplan";
 
 export interface ValidationError {
   field: string;
@@ -142,6 +142,23 @@ const validateTeamPlanData = (data: TeamPlanData): ValidationResult => {
           message: "Project timeSlotId must be a non-empty string",
           code: "INVALID_PROJECT_TIME_SLOT_ID",
         });
+      }
+
+      // Validate impact if present (optional field)
+      if (project.impact !== undefined) {
+        const validImpacts: ProjectImpact[] = [
+          "low",
+          "medium",
+          "high",
+          "urgent",
+        ];
+        if (!validImpacts.includes(project.impact as ProjectImpact)) {
+          errors.push({
+            field: `projects[${index}].impact`,
+            message: "Project impact must be one of: low, medium, high, urgent",
+            code: "INVALID_PROJECT_IMPACT",
+          });
+        }
       }
     });
   }
