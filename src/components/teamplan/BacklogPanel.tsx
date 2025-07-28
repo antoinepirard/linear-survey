@@ -55,6 +55,7 @@ export default function BacklogPanel({
 }: BacklogPanelProps) {
   // Track which project should start in edit mode
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [hoveredGroupHeader, setHoveredGroupHeader] = useState<string | null>(null);
   const hasInitializedGroups = useRef(false);
 
   // ProjectCard handles the parsing - we just pass through the updates
@@ -63,6 +64,28 @@ export default function BacklogPanel({
     const newProject: Omit<Project, 'id'> = {
       title: '', // Empty title triggers edit mode
       color: getRandomColor(),
+      // No personId/timeSlotId = backlog project
+    };
+    
+    onCreateProject(newProject);
+  };
+
+  const handleCreateProjectInGroup = (groupName: string) => {
+    const newProject: Omit<Project, 'id'> = {
+      title: '', // Empty title triggers edit mode
+      color: getRandomColor(),
+      group: groupName, // Pre-assign to specific group
+      // No personId/timeSlotId = backlog project
+    };
+    
+    onCreateProject(newProject);
+  };
+
+  const handleCreateUngroupedProject = () => {
+    const newProject: Omit<Project, 'id'> = {
+      title: '', // Empty title triggers edit mode
+      color: getRandomColor(),
+      // No group = ungrouped project
       // No personId/timeSlotId = backlog project
     };
     
@@ -138,12 +161,31 @@ export default function BacklogPanel({
                 <div 
                   className="flex items-center gap-2 p-2 cursor-pointer transition-colors hover:opacity-80"
                   onClick={() => toggleGroup(groupName)}
+                  onMouseEnter={() => setHoveredGroupHeader(groupName)}
+                  onMouseLeave={() => setHoveredGroupHeader(null)}
                 >
                   <FolderIcon className={`w-4 h-4 ${groupColor.text}`} />
                   <span className={`text-sm font-medium ${groupColor.text} flex-1`}>{groupName}</span>
                   <span className={`text-xs px-1.5 py-0.5 rounded bg-white/50 ${groupColor.text}`}>
                     {groupProjects.length}
                   </span>
+                  
+                  {/* Add Project Button - appears on hover */}
+                  {hoveredGroupHeader === groupName && (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent toggling group
+                        handleCreateProjectInGroup(groupName);
+                      }}
+                      variant="ghost"
+                      size="sm"
+                      className={`h-5 w-5 p-0 ${groupColor.text} hover:${groupColor.bg} hover:opacity-100 transition-all duration-200`}
+                      title={`Add project to ${groupName}`}
+                    >
+                      <PlusIcon className="w-3 h-3" />
+                    </Button>
+                  )}
+                  
                   {isExpanded ? (
                     <ChevronDownIcon className={`w-4 h-4 ${groupColor.text}`} />
                   ) : (
@@ -168,7 +210,7 @@ export default function BacklogPanel({
                             project={project}
                             availableGroups={availableGroups}
                             allProjects={backlogProjects}
-                            isColorCodingEnabled={true}
+                            isColorCodingEnabled={false}
                             onEdit={handleUpdateProject}
                             onDelete={onDeleteProject}
                             isBacklogMode={true}
@@ -183,36 +225,55 @@ export default function BacklogPanel({
             );
           })}
           
-          {/* Ungrouped Projects */}
-          {ungrouped.length > 0 && (
+          {/* Ungrouped Projects - always show header for easy access */}
+          {(ungrouped.length > 0 || groupNames.length > 0) && (
             <div className="mb-4">
-              <div className="flex items-center gap-2 p-2 mb-2 bg-slate-100 rounded-lg">
+              <div 
+                className="flex items-center gap-2 p-2 mb-2 bg-slate-100 rounded-lg hover:bg-slate-200/50 transition-colors"
+                onMouseEnter={() => setHoveredGroupHeader('ungrouped')}
+                onMouseLeave={() => setHoveredGroupHeader(null)}
+              >
                 <div className="w-4 h-4" /> {/* Spacer for alignment */}
                 <span className="text-sm font-medium text-slate-600 flex-1">Other Projects</span>
                 <span className="text-xs text-slate-500 bg-white/70 px-1.5 py-0.5 rounded">
                   {ungrouped.length}
                 </span>
+                
+                {/* Add Ungrouped Project Button - appears on hover */}
+                {hoveredGroupHeader === 'ungrouped' && (
+                  <Button
+                    onClick={handleCreateUngroupedProject}
+                    variant="ghost"
+                    size="sm"
+                    className="h-5 w-5 p-0 text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-all duration-200"
+                    title="Add ungrouped project"
+                  >
+                    <PlusIcon className="w-3 h-3" />
+                  </Button>
+                )}
               </div>
-              <div className="pl-4 pr-2 space-y-2">
-                {ungrouped.map((project) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                    availableGroups={availableGroups}
-                    allProjects={backlogProjects}
-                    isColorCodingEnabled={true}
-                    onEdit={handleUpdateProject}
-                    onDelete={onDeleteProject}
-                    isBacklogMode={true}
-                    isEditing={!project.title.trim()}
-                  />
-                ))}
-              </div>
+              {ungrouped.length > 0 && (
+                <div className="pl-4 pr-2 space-y-2">
+                  {ungrouped.map((project) => (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      availableGroups={availableGroups}
+                      allProjects={backlogProjects}
+                      isColorCodingEnabled={false}
+                      onEdit={handleUpdateProject}
+                      onDelete={onDeleteProject}
+                      isBacklogMode={true}
+                      isEditing={!project.title.trim()}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
           {/* Empty State */}
-          {backlogProjects.length === 0 && (
+          {backlogProjects.length === 0 && groupNames.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3">
                 <RectangleGroupIcon className="w-6 h-6 text-slate-400" />
