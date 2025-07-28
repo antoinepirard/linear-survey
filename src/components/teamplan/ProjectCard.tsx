@@ -2,10 +2,101 @@
 
 import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { motion } from 'motion/react';
-import { TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
-import { Project } from '@/data/teamplan';
+import { TrashIcon, PlusIcon, ArchiveBoxArrowDownIcon } from '@heroicons/react/24/outline';
+import { toast } from 'sonner';
+import { Project, ProjectImpact } from '@/data/teamplan';
+
+// Validation utilities
+export const validateProjectTitle = (title: string): { isValid: boolean; error?: string } => {
+  const trimmedTitle = title.trim();
+  
+  if (!trimmedTitle) {
+    return { isValid: false, error: 'Project title cannot be empty' };
+  }
+  
+  if (trimmedTitle.length > 100) {
+    return { isValid: false, error: 'Project title cannot exceed 100 characters' };
+  }
+  
+  // Check for invalid characters
+  if (/[<>"]/.test(trimmedTitle)) {
+    return { isValid: false, error: 'Project title cannot contain < > or " characters' };
+  }
+  
+  return { isValid: true };
+};
+
+export const validateGroupName = (groupName: string): { isValid: boolean; error?: string } => {
+  const trimmedGroup = groupName.trim();
+  
+  if (!trimmedGroup) {
+    return { isValid: false, error: 'Group name cannot be empty' };
+  }
+  
+  if (trimmedGroup.length > 50) {
+    return { isValid: false, error: 'Group name cannot exceed 50 characters' };
+  }
+  
+  // Check for invalid characters
+  if (/[<>/"]/.test(trimmedGroup)) {
+    return { isValid: false, error: 'Group name cannot contain < > / or " characters' };
+  }
+  
+  return { isValid: true };
+};
+
+// Color calculation utilities moved outside for performance
+export const calculateProjectColorMappings = (projects: Project[]): Record<string, string> => {
+  // Get all unique duplicate values (titles that appear 2+ times)
+  const duplicateValues = projects
+    .filter(p => p.title.trim())
+    .reduce((acc, p) => {
+      const title = p.title.trim().toLowerCase();
+      acc[title] = (acc[title] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+  
+  const duplicateKeys = Object.keys(duplicateValues)
+    .filter(key => duplicateValues[key] >= 2)
+    .sort(); // Sort for consistency
+  
+  const colorMappings: Record<string, string> = {};
+  
+  duplicateKeys.forEach((title, duplicateIndex) => {
+    // Find a project with this title to get group info
+    const project = projects.find(p => p.title.trim().toLowerCase() === title);
+    if (!project) {
+      colorMappings[title] = 'border-l-slate-200';
+      return;
+    }
+    
+    // If project has a group, use that group's color family
+    if (project.group) {
+      const groupColorData = getGroupColor(project.group);
+      const colorMatch = groupColorData.border.match(/border-l-(\w+)-/);
+      if (colorMatch) {
+        const colorName = colorMatch[1];
+        const colorGroup = colorGroups.find(g => g.name === colorName);
+        if (colorGroup) {
+          const shadeIndex = Math.min(duplicateIndex, colorGroup.shades.length - 1);
+          colorMappings[title] = colorGroup.shades[shadeIndex];
+          return;
+        }
+      }
+    }
+    
+    // Default color assignment based on duplicate index
+    const defaultColorIndex = duplicateIndex % colorGroups.length;
+    const defaultColor = colorGroups[defaultColorIndex];
+    colorMappings[title] = defaultColor.shades[0];
+  });
+  
+  return colorMappings;
+};
+
 import { Button } from '@/components/ui/button';
 import TeamPlanContextMenu from './TeamPlanContextMenu';
+import ImpactSelector from './ImpactSelector';
 
 // Moved outside the component to prevent re-creation on every render
 const colorGroups = [
@@ -64,11 +155,16 @@ interface ProjectCardProps {
   isDuplicating?: boolean;
   isEditing?: boolean;
   availableGroups?: string[];
-  allProjects?: Project[];
+  colorMappings?: Record<string, string>; // Pre-calculated color mappings for performance
   isColorCodingEnabled?: boolean;
+  isBacklogMode?: boolean; // New prop for backlog-specific behavior
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
   onDuplicate?: (projectId: string) => void;
+  onMoveToBoard?: (projectId: string) => void;
+  onMoveToGroup?: (projectId: string, groupName: string) => void;
+  onSetImpact?: (projectId: string, impact: ProjectImpact | undefined) => void;
+  onMoveToBacklog?: (projectId: string) => void;
   onDragStart?: (projectId: string, isDuplicating: boolean) => void;
   onDragEnd?: () => void;
   onDrag?: (element: HTMLElement) => void;
@@ -80,11 +176,16 @@ const ProjectCard = ({
   isDuplicating = false,
   isEditing = false,
   availableGroups = [],
-  allProjects = [],
+  colorMappings = {},
   isColorCodingEnabled = true,
+  isBacklogMode = false,
   onEdit,
   onDelete,
   onDuplicate,
+  onMoveToBoard,
+  onMoveToGroup,
+  onSetImpact,
+  onMoveToBacklog,
   onDragStart,
   onDragEnd,
   onDrag
@@ -100,50 +201,10 @@ const ProjectCard = ({
 
   const cardColor = useMemo(() => {
     if (!isColorCodingEnabled || !project.title.trim()) return 'border-l-slate-200';
-  
-    const sameValueCount = allProjects.filter(p => 
-      p.title.trim().toLowerCase() === project.title.trim().toLowerCase()
-    ).length;
-    
-    if (sameValueCount < 2) return 'border-l-slate-200';
-
-    // Get all unique duplicate values (titles that appear 2+ times)
-    const duplicateValues = allProjects
-      .filter(p => p.title.trim())
-      .reduce((acc, p) => {
-        const title = p.title.trim().toLowerCase();
-        acc[title] = (acc[title] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-    
-    const duplicateKeys = Object.keys(duplicateValues)
-      .filter(key => duplicateValues[key] >= 2)
-      .sort(); // Sort for consistency
     
     const currentTitle = project.title.trim().toLowerCase();
-    const duplicateIndex = duplicateKeys.indexOf(currentTitle);
-    
-    if (duplicateIndex === -1) return 'border-l-slate-200';
-    
-    // If project has a group, use that group's color family
-    if (project.group) {
-      const groupColorData = getGroupColor(project.group);
-      const colorMatch = groupColorData.border.match(/border-l-(\w+)-/);
-      if (colorMatch) {
-        const colorName = colorMatch[1];
-        const colorGroup = colorGroups.find(cg => cg.name === colorName);
-        if (colorGroup) {
-          const shadeIndex = duplicateIndex % colorGroup.shades.length;
-          return colorGroup.shades[shadeIndex];
-        }
-      }
-    }
-    
-    // Fallback: use different color groups if no group or color not found
-    const colorGroupIndex = duplicateIndex % colorGroups.length;
-    const selectedColorGroup = colorGroups[colorGroupIndex];
-    return selectedColorGroup.shades[0];
-  }, [project.title, project.group, allProjects, isColorCodingEnabled]);
+    return colorMappings[currentTitle] || 'border-l-slate-200';
+  }, [isColorCodingEnabled, project.title, colorMappings]);
 
   useEffect(() => {
     if (isEditing) {
@@ -195,6 +256,23 @@ const ProjectCard = ({
 
   const handleSave = () => {
     const { title, group } = parseValue(editValue);
+    
+    // Validate title
+    const titleValidation = validateProjectTitle(title);
+    if (!titleValidation.isValid) {
+      toast.error(titleValidation.error);
+      return;
+    }
+    
+    // Validate group if provided
+    if (group) {
+      const groupValidation = validateGroupName(group);
+      if (!groupValidation.isValid) {
+        toast.error(groupValidation.error);
+        return;
+      }
+    }
+    
     if (title && onEdit) {
       onEdit({
         ...project,
@@ -367,13 +445,20 @@ const ProjectCard = ({
       )}
       
       {/* Draggable element */}
-      <TeamPlanContextMenu
-        type="project"
-        canDelete={true}
-        onDelete={() => onDelete?.(project.id)}
-        onDuplicate={() => onDuplicate?.(project.id)}
-        label={project.title}
-      >
+                <TeamPlanContextMenu
+            type={isBacklogMode ? "backlogProject" : "project"}
+            canDelete={true}
+            onDelete={isBacklogMode ? () => onDelete?.(project.id) : () => {}}
+            onMoveToBacklog={!isBacklogMode ? () => onMoveToBacklog?.(project.id) : undefined}
+            onDuplicate={() => onDuplicate?.(project.id)}
+            onMoveToBoard={isBacklogMode ? () => onMoveToBoard?.(project.id) : undefined}
+            onMoveToGroup={isBacklogMode ? (groupName: string) => onMoveToGroup?.(project.id, groupName) : undefined}
+            onSetImpact={isBacklogMode ? (impact: ProjectImpact | undefined) => onSetImpact?.(project.id, impact) : undefined}
+            availableGroups={availableGroups}
+            currentGroup={project.group}
+            currentImpact={project.impact}
+            label={project.title}
+          >
         <motion.div
         ref={dragRef}
         initial={{ opacity: 0.9, scale: 0.98 }}
@@ -388,7 +473,7 @@ const ProjectCard = ({
           zIndex: 1000,
           boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15)"
         }}
-        drag
+        drag={!isBacklogMode} // Disable drag in backlog mode
         dragMomentum={false}
         dragElastic={0}
         dragSnapToOrigin={true}
@@ -408,7 +493,7 @@ const ProjectCard = ({
         data-project-card
         data-project-id={project.id}
         className={`
-          relative cursor-move p-2 py-2.5 rounded-lg ring-1 font-regular text-sm
+          relative ${isBacklogMode ? 'cursor-default' : 'cursor-move'} p-2 py-2.5 rounded-lg ring-1 font-regular text-sm
           transition-shadow duration-200
           ${isDraggingLocal ? '' : isHovered ? 'shadow-md' : 'shadow-none'}
           ${project.color}
@@ -437,11 +522,11 @@ const ProjectCard = ({
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 onBlur={handleSave}
-                placeholder="Project title"
+                placeholder={project.group ? "Project title" : "Project title (add /group for grouping)"}
                 className="w-full font-medium leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit h-5"
                 autoFocus
               />
-              {showAutocomplete && availableGroups.length > 0 && (
+              {showAutocomplete && availableGroups.length > 0 && !project.group && (
                 <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-md shadow-lg z-50 min-w-32">
                   <div className="px-3 py-2 text-xs text-slate-500 border-b border-slate-100">
                     Select a group:
@@ -485,26 +570,40 @@ const ProjectCard = ({
         </div>
         
         {!isEditingLocal && (
-          <div className="relative flex items-center justify-end min-w-0 flex-shrink-0">
-            {/* Show tag by default, trash icon on hover */}
-            {project.group && (
+          <div className="relative flex items-center gap-1 justify-end min-w-0 flex-shrink-0">
+            {/* Impact selector - only visible in backlog mode */}
+            {isBacklogMode && onSetImpact && (
+              <ImpactSelector
+                impact={project.impact}
+                onChange={(impact) => onSetImpact(project.id, impact)}
+                disabled={false}
+              />
+            )}
+            
+            {/* Show tag by default, trash icon on hover - but hide in backlog mode since projects are already visually grouped */}
+            {project.group && !isBacklogMode && (
               <span className={`transition-opacity duration-200 text-[10px] px-1.5 py-0.5 rounded-full font-mono max-w-16 truncate ${getGroupColor(project.group).bg} ${getGroupColor(project.group).text} ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
                 {project.group}
               </span>
             )}
-            {onDelete && (
+            {/* Trash icon - only show in team plan board mode, not in backlog */}
+            {!isBacklogMode && (onDelete || onMoveToBacklog) && (
               <div className={`absolute right-0 transition-opacity duration-200 flex items-center ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDelete(project.id);
+                    if (onMoveToBacklog) {
+                      onMoveToBacklog(project.id);
+                    } else if (onDelete) {
+                      onDelete(project.id);
+                    }
                   }}
-                  title="Delete project"
+                  title={onMoveToBacklog ? "Remove from plan (move to backlog)" : "Delete project"}
                   variant="ghost"
                   size="sm"
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 h-5 w-5 p-0.5"
                 >
-                  <TrashIcon />
+                  {onMoveToBacklog ? <ArchiveBoxArrowDownIcon /> : <TrashIcon />}
                 </Button>
               </div>
             )}

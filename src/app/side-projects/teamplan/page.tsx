@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import PageLoader from '@/components/PageLoader';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
 import TeamPlanTopControls from '@/components/teamplan/TeamPlanTopControls';
@@ -13,7 +13,7 @@ import SidebarHeader from '@/components/teamplan/SidebarHeader';
 import { usePlanStorage } from '@/hooks/usePlanStorage';
 import { useResizable } from '@/hooks/useResizable';
 import { useNotePadStorage } from '@/hooks/useNotePadStorage';
-import { TeamPlanData } from '@/data/teamplan';
+import { TeamPlanData, Project, getBacklogProjects, getAllGroups, generateId } from '@/data/teamplan';
 import { NOTEPAD_CONSTANTS } from '@/constants/notepad';
 import { teamPlanLogger as logger } from '@/utils/logger';
 
@@ -117,6 +117,7 @@ export default function TeamPlanPage() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
   const [isNotePadFullScreen, setIsNotePadFullScreen] = useState(false);
+  const [groupColorOverrides, setGroupColorOverrides] = useState<Record<string, { bg: string; text: string; border: string }>>({});
 
   // Load color coding preference from localStorage on mount
   useEffect(() => {
@@ -126,10 +127,25 @@ export default function TeamPlanPage() {
     }
   }, []);
 
+  // Load active panel preference from localStorage on mount
+  useEffect(() => {
+    const savedActivePanel = localStorage.getItem('teamplan-active-panel');
+    if (savedActivePanel && ['notepad', 'backlog', 'comments'].includes(savedActivePanel)) {
+      setActivePanel(savedActivePanel as 'notepad' | 'backlog' | 'comments');
+      setIsSidebarExpanded(true); // Ensure sidebar is expanded when restoring panel
+    }
+  }, []);
+
   // Save color coding preference to localStorage when it changes
   const handleColorCodingChange = (checked: boolean) => {
     setIsColorCodingEnabled(checked);
     localStorage.setItem('teamplan-color-coding-enabled', JSON.stringify(checked));
+  };
+
+  // Save active panel preference to localStorage when it changes
+  const handleSetActivePanel = (panel: 'notepad' | 'backlog' | 'comments') => {
+    setActivePanel(panel);
+    localStorage.setItem('teamplan-active-panel', panel);
   };
 
   const handlePageLoadingComplete = () => {
@@ -293,6 +309,21 @@ export default function TeamPlanPage() {
     updateCurrentPlan({ teamPlanData: newData });
   };
 
+  const handleRenameGroup = (oldGroupName: string, newGroupName: string) => {
+    if (!currentPlan) return;
+    
+    const newData = {
+      ...currentPlan.teamPlanData,
+      projects: currentPlan.teamPlanData.projects.map(project => 
+        project.group === oldGroupName 
+          ? { ...project, group: newGroupName }
+          : project
+      )
+    };
+    
+    handleDataChange(newData);
+  };
+
   const handleDataSyncError = (originalData: TeamPlanData, errorData: TeamPlanData, error: Error) => {
     logger.error('Data sync error occurred', { 
       error: error.message,
@@ -304,11 +335,82 @@ export default function TeamPlanPage() {
     // For now, this is a placeholder that demonstrates the error handling structure
   };
 
+  // Backlog management handlers
+  const handleCreateBacklogProject = (project: Omit<Project, 'id'>) => {
+    if (!currentPlan) return;
+    
+    const projectId = generateId();
+    const newProject: Project = {
+      ...project,
+      id: projectId,
+    };
+    
+    const newData = {
+      ...currentPlan.teamPlanData,
+      projects: [...currentPlan.teamPlanData.projects, newProject]
+    };
+    
+    handleDataChange(newData);
+  };
+
+  const handleUpdateBacklogProject = (updatedProject: Project) => {
+    if (!currentPlan) return;
+    
+    const newData = {
+      ...currentPlan.teamPlanData,
+      projects: currentPlan.teamPlanData.projects.map(p => 
+        p.id === updatedProject.id ? updatedProject : p
+      )
+    };
+    
+    handleDataChange(newData);
+  };
+
+  const handleDeleteBacklogProject = (projectId: string) => {
+    if (!currentPlan) return;
+    
+    const newData = {
+      ...currentPlan.teamPlanData,
+      projects: currentPlan.teamPlanData.projects.filter(p => p.id !== projectId)
+    };
+    
+    handleDataChange(newData);
+  };
+
+  const handleMoveBacklogProjectToBoard = (projectId: string, personId?: string, timeSlotId?: string) => {
+    if (!currentPlan) return;
+    
+    const project = currentPlan.teamPlanData.projects.find(p => p.id === projectId);
+    if (!project) return;
+    
+    // If no person/timeSlot specified, use first available
+    const targetPersonId = personId || currentPlan.teamPlanData.people[0]?.id;
+    const targetTimeSlotId = timeSlotId || currentPlan.teamPlanData.timeSlots[0]?.id;
+    
+    if (!targetPersonId || !targetTimeSlotId) return;
+    
+    const updatedProject = {
+      ...project,
+      personId: targetPersonId,
+      timeSlotId: targetTimeSlotId,
+    };
+    
+    const newData = {
+      ...currentPlan.teamPlanData,
+      projects: currentPlan.teamPlanData.projects.map(p => 
+        p.id === projectId ? updatedProject : p
+      )
+    };
+    
+    handleDataChange(newData);
+    toast.success('Project moved to board successfully!');
+  };
+
   const handleToggleSidebar = () => {
     if (activePanel === 'notepad' && isSidebarExpanded) {
       setIsSidebarExpanded(false);
     } else {
-      setActivePanel('notepad');
+      handleSetActivePanel('notepad');
       setIsSidebarExpanded(true);
     }
   };
@@ -317,7 +419,7 @@ export default function TeamPlanPage() {
     if (activePanel === 'backlog') {
       setIsSidebarExpanded(false);
     } else {
-      setActivePanel('backlog');
+      handleSetActivePanel('backlog');
       setIsSidebarExpanded(true);
     }
   };
@@ -326,7 +428,7 @@ export default function TeamPlanPage() {
     if (activePanel === 'comments') {
       setIsSidebarExpanded(false);
     } else {
-      setActivePanel('comments');
+      handleSetActivePanel('comments');
       setIsSidebarExpanded(true);
     }
   };
@@ -400,53 +502,43 @@ export default function TeamPlanPage() {
               <div className="flex-1 flex flex-col overflow-hidden">
               
                 {/* Panel Content */}
-                <AnimatePresence mode="wait">
-                  {activePanel === 'notepad' ? (
-                    <motion.div
-                      key="notepad"
-                      initial={{ opacity: 0, x: -3 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 3 }}
-                      transition={{ duration: 0.1, ease: "easeOut" }}
-                      className="flex-1 min-h-0"
-                    >
-                      <NotePad 
-                        currentPlan={currentPlan}
-                        currentDocument={currentDocument}
-                        allDocuments={allDocuments}
-                        onCreateDocument={handleCreateDocument}
-                        onSwitchToDocument={handleSwitchToDocument}
-                        onUpdateDocumentContent={handleUpdateDocumentContent}
-                        onRenameDocument={renameDocument}
-                        onDeleteDocument={handleDeleteDocument}
-                        showDocumentList={true}
-                        isFullScreen={isNotePadFullScreen}
-                      />
-                    </motion.div>
-                  ) : activePanel === 'backlog' ? (
-                    <motion.div
-                      key="backlog"
-                      initial={{ opacity: 0, x: -3 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 3 }}
-                      transition={{ duration: 0.1, ease: "easeOut" }}
-                      className="flex-1 min-h-0"
-                    >
-                      <BacklogPanel />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="comments"
-                      initial={{ opacity: 0, x: -3 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 3 }}
-                      transition={{ duration: 0.1, ease: "easeOut" }}
-                      className="flex-1 min-h-0"
-                    >
-                      <CommentsPanel />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {activePanel === 'notepad' ? (
+                  <div className="flex-1 min-h-0">
+                    <NotePad 
+                      currentPlan={currentPlan}
+                      currentDocument={currentDocument}
+                      allDocuments={allDocuments}
+                      onCreateDocument={handleCreateDocument}
+                      onSwitchToDocument={handleSwitchToDocument}
+                      onUpdateDocumentContent={handleUpdateDocumentContent}
+                      onRenameDocument={renameDocument}
+                      onDeleteDocument={handleDeleteDocument}
+                      showDocumentList={true}
+                      isFullScreen={isNotePadFullScreen}
+                    />
+                  </div>
+                ) : activePanel === 'backlog' ? (
+                  <div className="flex-1 min-h-0">
+                    <BacklogPanel 
+                      width={sidebarWidth - 48}
+                      backlogProjects={getBacklogProjects(currentPlan.teamPlanData.projects)}
+                      availableGroups={getAllGroups(currentPlan.teamPlanData.projects)}
+                      onCreateProject={handleCreateBacklogProject}
+                      onUpdateProject={handleUpdateBacklogProject}
+                      onDeleteProject={handleDeleteBacklogProject}
+                      onMoveToBoard={handleMoveBacklogProjectToBoard}
+                      onRenameGroup={handleRenameGroup}
+                      groupColorOverrides={groupColorOverrides}
+                      onUpdateGroupColorOverrides={setGroupColorOverrides}
+                      people={currentPlan.teamPlanData.people}
+                      timeSlots={currentPlan.teamPlanData.timeSlots}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex-1 min-h-0">
+                    <CommentsPanel width={sidebarWidth - 48} />
+                  </div>
+                )}
               </div>
             )}
           </div>
