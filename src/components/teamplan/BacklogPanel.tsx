@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { RectangleGroupIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, FolderIcon } from '@heroicons/react/24/solid';
-import { Project, getRandomColor, getProjectsByGroup, getAllGroups } from '@/data/teamplan';
+import { toast } from 'sonner';
+import { Project, Person, TimeSlot, getRandomColor, getProjectsByGroup, getAllGroups } from '@/data/teamplan';
+import { calculateProjectColorMappings, validateGroupName } from './ProjectCard';
 import { Button } from '@/components/ui/button';
 import ProjectCard from './ProjectCard';
 import { motion, AnimatePresence } from 'motion/react';
@@ -40,18 +42,24 @@ interface BacklogPanelProps {
   width: number;
   backlogProjects: Project[];
   availableGroups: string[];
+  people: Person[];
+  timeSlots: TimeSlot[];
   onCreateProject: (project: Omit<Project, 'id'>) => void;
   onUpdateProject: (project: Project) => void;
   onDeleteProject: (projectId: string) => void;
+  onMoveToBoard: (projectId: string, personId?: string, timeSlotId?: string) => void;
 }
 
 export default function BacklogPanel({ 
   width, 
   backlogProjects, 
   availableGroups, 
+  people,
+  timeSlots,
   onCreateProject, 
   onUpdateProject, 
-  onDeleteProject
+  onDeleteProject,
+  onMoveToBoard
 }: BacklogPanelProps) {
   // Track which project should start in edit mode
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
@@ -59,6 +67,12 @@ export default function BacklogPanel({
   const [editingGroupName, setEditingGroupName] = useState<string | null>(null);
   const [editingGroupValue, setEditingGroupValue] = useState<string>('');
   const hasInitializedGroups = useRef(false);
+
+  // Calculate color mappings once per render for performance
+  const colorMappings = useMemo(() => 
+    calculateProjectColorMappings(backlogProjects), 
+    [backlogProjects]
+  );
 
   // ProjectCard handles the parsing - we just pass through the updates
 
@@ -99,6 +113,24 @@ export default function BacklogPanel({
     onUpdateProject(project);
   };
 
+  const handleMoveProjectToGroup = (projectId: string, groupName: string) => {
+    const project = backlogProjects.find(p => p.id === projectId);
+    if (!project) return;
+    
+    const updatedProject = {
+      ...project,
+      group: groupName || undefined, // Empty string becomes undefined (ungrouped)
+    };
+    
+    onUpdateProject(updatedProject);
+    
+    if (groupName) {
+      toast.success(`Project moved to "${groupName}" group`);
+    } else {
+      toast.success('Project removed from group');
+    }
+  };
+
   const handleStartGroupEdit = (groupName: string) => {
     setEditingGroupName(groupName);
     setEditingGroupValue(groupName);
@@ -117,6 +149,13 @@ export default function BacklogPanel({
 
     const oldGroupName = editingGroupName;
     const newGroupName = editingGroupValue.trim();
+    
+    // Validate the new group name
+    const validation = validateGroupName(newGroupName);
+    if (!validation.isValid) {
+      toast.error(validation.error);
+      return;
+    }
 
     // If name hasn't changed, just cancel
     if (oldGroupName === newGroupName) {
@@ -131,7 +170,7 @@ export default function BacklogPanel({
     );
 
     if (groupExists) {
-      // Could show a toast/alert here, but for now just cancel
+      toast.error('A group with this name already exists');
       handleCancelGroupEdit();
       return;
     }
@@ -147,6 +186,7 @@ export default function BacklogPanel({
       }
     });
 
+    toast.success(`Group renamed from "${oldGroupName}" to "${newGroupName}"`);
     handleCancelGroupEdit();
   };
 
@@ -294,17 +334,19 @@ export default function BacklogPanel({
                     >
                       <div className="pl-4 pr-2 pt-0 pb-2 space-y-2">
                         {groupProjects.map((project) => (
-                          <ProjectCard
-                            key={project.id}
-                            project={project}
-                            availableGroups={availableGroups}
-                            allProjects={backlogProjects}
-                            isColorCodingEnabled={false}
-                            onEdit={handleUpdateProject}
-                            onDelete={onDeleteProject}
-                            isBacklogMode={true}
-                            isEditing={!project.title.trim()}
-                          />
+                                                      <ProjectCard
+                              key={project.id}
+                              project={project}
+                              availableGroups={availableGroups}
+                              colorMappings={colorMappings}
+                              isColorCodingEnabled={false}
+                              onEdit={handleUpdateProject}
+                              onDelete={onDeleteProject}
+                              onMoveToBoard={() => onMoveToBoard(project.id)}
+                              onMoveToGroup={handleMoveProjectToGroup}
+                              isBacklogMode={true}
+                              isEditing={!project.title.trim()}
+                            />
                         ))}
                       </div>
                     </motion.div>
@@ -348,10 +390,12 @@ export default function BacklogPanel({
                       key={project.id}
                       project={project}
                       availableGroups={availableGroups}
-                      allProjects={backlogProjects}
+                      colorMappings={colorMappings}
                       isColorCodingEnabled={false}
                       onEdit={handleUpdateProject}
                       onDelete={onDeleteProject}
+                      onMoveToBoard={() => onMoveToBoard(project.id)}
+                      onMoveToGroup={handleMoveProjectToGroup}
                       isBacklogMode={true}
                       isEditing={!project.title.trim()}
                     />

@@ -3,7 +3,97 @@
 import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { motion } from 'motion/react';
 import { TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { toast } from 'sonner';
 import { Project } from '@/data/teamplan';
+
+// Validation utilities
+export const validateProjectTitle = (title: string): { isValid: boolean; error?: string } => {
+  const trimmedTitle = title.trim();
+  
+  if (!trimmedTitle) {
+    return { isValid: false, error: 'Project title cannot be empty' };
+  }
+  
+  if (trimmedTitle.length > 100) {
+    return { isValid: false, error: 'Project title cannot exceed 100 characters' };
+  }
+  
+  // Check for invalid characters
+  if (/[<>"]/.test(trimmedTitle)) {
+    return { isValid: false, error: 'Project title cannot contain < > or " characters' };
+  }
+  
+  return { isValid: true };
+};
+
+export const validateGroupName = (groupName: string): { isValid: boolean; error?: string } => {
+  const trimmedGroup = groupName.trim();
+  
+  if (!trimmedGroup) {
+    return { isValid: false, error: 'Group name cannot be empty' };
+  }
+  
+  if (trimmedGroup.length > 50) {
+    return { isValid: false, error: 'Group name cannot exceed 50 characters' };
+  }
+  
+  // Check for invalid characters
+  if (/[<>/"]/.test(trimmedGroup)) {
+    return { isValid: false, error: 'Group name cannot contain < > / or " characters' };
+  }
+  
+  return { isValid: true };
+};
+
+// Color calculation utilities moved outside for performance
+export const calculateProjectColorMappings = (projects: Project[]): Record<string, string> => {
+  // Get all unique duplicate values (titles that appear 2+ times)
+  const duplicateValues = projects
+    .filter(p => p.title.trim())
+    .reduce((acc, p) => {
+      const title = p.title.trim().toLowerCase();
+      acc[title] = (acc[title] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+  
+  const duplicateKeys = Object.keys(duplicateValues)
+    .filter(key => duplicateValues[key] >= 2)
+    .sort(); // Sort for consistency
+  
+  const colorMappings: Record<string, string> = {};
+  
+  duplicateKeys.forEach((title, duplicateIndex) => {
+    // Find a project with this title to get group info
+    const project = projects.find(p => p.title.trim().toLowerCase() === title);
+    if (!project) {
+      colorMappings[title] = 'border-l-slate-200';
+      return;
+    }
+    
+    // If project has a group, use that group's color family
+    if (project.group) {
+      const groupColorData = getGroupColor(project.group);
+      const colorMatch = groupColorData.border.match(/border-l-(\w+)-/);
+      if (colorMatch) {
+        const colorName = colorMatch[1];
+        const colorGroup = colorGroups.find(g => g.name === colorName);
+        if (colorGroup) {
+          const shadeIndex = Math.min(duplicateIndex, colorGroup.shades.length - 1);
+          colorMappings[title] = colorGroup.shades[shadeIndex];
+          return;
+        }
+      }
+    }
+    
+    // Default color assignment based on duplicate index
+    const defaultColorIndex = duplicateIndex % colorGroups.length;
+    const defaultColor = colorGroups[defaultColorIndex];
+    colorMappings[title] = defaultColor.shades[0];
+  });
+  
+  return colorMappings;
+};
+
 import { Button } from '@/components/ui/button';
 import TeamPlanContextMenu from './TeamPlanContextMenu';
 
@@ -64,12 +154,14 @@ interface ProjectCardProps {
   isDuplicating?: boolean;
   isEditing?: boolean;
   availableGroups?: string[];
-  allProjects?: Project[];
+  colorMappings?: Record<string, string>; // Pre-calculated color mappings for performance
   isColorCodingEnabled?: boolean;
   isBacklogMode?: boolean; // New prop for backlog-specific behavior
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
   onDuplicate?: (projectId: string) => void;
+  onMoveToBoard?: (projectId: string) => void;
+  onMoveToGroup?: (projectId: string, groupName: string) => void;
   onDragStart?: (projectId: string, isDuplicating: boolean) => void;
   onDragEnd?: () => void;
   onDrag?: (element: HTMLElement) => void;
@@ -81,12 +173,14 @@ const ProjectCard = ({
   isDuplicating = false,
   isEditing = false,
   availableGroups = [],
-  allProjects = [],
+  colorMappings = {},
   isColorCodingEnabled = true,
   isBacklogMode = false,
   onEdit,
   onDelete,
   onDuplicate,
+  onMoveToBoard,
+  onMoveToGroup,
   onDragStart,
   onDragEnd,
   onDrag
@@ -102,50 +196,10 @@ const ProjectCard = ({
 
   const cardColor = useMemo(() => {
     if (!isColorCodingEnabled || !project.title.trim()) return 'border-l-slate-200';
-  
-    const sameValueCount = allProjects.filter(p => 
-      p.title.trim().toLowerCase() === project.title.trim().toLowerCase()
-    ).length;
-    
-    if (sameValueCount < 2) return 'border-l-slate-200';
-
-    // Get all unique duplicate values (titles that appear 2+ times)
-    const duplicateValues = allProjects
-      .filter(p => p.title.trim())
-      .reduce((acc, p) => {
-        const title = p.title.trim().toLowerCase();
-        acc[title] = (acc[title] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-    
-    const duplicateKeys = Object.keys(duplicateValues)
-      .filter(key => duplicateValues[key] >= 2)
-      .sort(); // Sort for consistency
     
     const currentTitle = project.title.trim().toLowerCase();
-    const duplicateIndex = duplicateKeys.indexOf(currentTitle);
-    
-    if (duplicateIndex === -1) return 'border-l-slate-200';
-    
-    // If project has a group, use that group's color family
-    if (project.group) {
-      const groupColorData = getGroupColor(project.group);
-      const colorMatch = groupColorData.border.match(/border-l-(\w+)-/);
-      if (colorMatch) {
-        const colorName = colorMatch[1];
-        const colorGroup = colorGroups.find(cg => cg.name === colorName);
-        if (colorGroup) {
-          const shadeIndex = duplicateIndex % colorGroup.shades.length;
-          return colorGroup.shades[shadeIndex];
-        }
-      }
-    }
-    
-    // Fallback: use different color groups if no group or color not found
-    const colorGroupIndex = duplicateIndex % colorGroups.length;
-    const selectedColorGroup = colorGroups[colorGroupIndex];
-    return selectedColorGroup.shades[0];
-  }, [project.title, project.group, allProjects, isColorCodingEnabled]);
+    return colorMappings[currentTitle] || 'border-l-slate-200';
+  }, [isColorCodingEnabled, project.title, colorMappings]);
 
   useEffect(() => {
     if (isEditing) {
@@ -197,6 +251,23 @@ const ProjectCard = ({
 
   const handleSave = () => {
     const { title, group } = parseValue(editValue);
+    
+    // Validate title
+    const titleValidation = validateProjectTitle(title);
+    if (!titleValidation.isValid) {
+      toast.error(titleValidation.error);
+      return;
+    }
+    
+    // Validate group if provided
+    if (group) {
+      const groupValidation = validateGroupName(group);
+      if (!groupValidation.isValid) {
+        toast.error(groupValidation.error);
+        return;
+      }
+    }
+    
     if (title && onEdit) {
       onEdit({
         ...project,
@@ -369,13 +440,17 @@ const ProjectCard = ({
       )}
       
       {/* Draggable element */}
-      <TeamPlanContextMenu
-        type="project"
-        canDelete={true}
-        onDelete={() => onDelete?.(project.id)}
-        onDuplicate={() => onDuplicate?.(project.id)}
-        label={project.title}
-      >
+                <TeamPlanContextMenu
+            type={isBacklogMode ? "backlogProject" : "project"}
+            canDelete={true}
+            onDelete={() => onDelete?.(project.id)}
+            onDuplicate={() => onDuplicate?.(project.id)}
+            onMoveToBoard={isBacklogMode ? () => onMoveToBoard?.(project.id) : undefined}
+            onMoveToGroup={isBacklogMode ? (groupName: string) => onMoveToGroup?.(project.id, groupName) : undefined}
+            availableGroups={availableGroups}
+            currentGroup={project.group}
+            label={project.title}
+          >
         <motion.div
         ref={dragRef}
         initial={{ opacity: 0.9, scale: 0.98 }}

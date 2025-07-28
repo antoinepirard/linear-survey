@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { motion } from 'motion/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { TeamPlanData, Project, Person, TimeSlot, DEFAULT_TEAMPLAN_DATA, getProjectsForCell, generateId, getRandomColor, getAllGroups } from '@/data/teamplan';
+import { calculateProjectColorMappings } from './ProjectCard';
 import ProjectCard from './ProjectCard';
 import PersonCell from './PersonCell';
 import AddPersonCell from './AddPersonCell';
@@ -149,6 +150,12 @@ function TeamPlanBoard({
 
   // Get all unique groups from existing projects
   const getAvailableGroups = () => getAllGroups(boardData.projects);
+
+  // Calculate color mappings once per render for performance
+  const colorMappings = useMemo(() => 
+    calculateProjectColorMappings(boardData.projects), 
+    [boardData.projects]
+  );
 
   // Helper function for optimistic updates with error handling
   const performOptimisticUpdate = async (newData: TeamPlanData, operation: string) => {
@@ -779,7 +786,7 @@ function TeamPlanBoard({
                                     isDuplicating={isDuplicating && draggedProject === project.id}
                                     isEditing={newProjectId === project.id}
                                     availableGroups={getAvailableGroups()}
-                                    allProjects={boardData.projects}
+                                    colorMappings={colorMappings}
                                     isColorCodingEnabled={isColorCodingEnabled}
                                     onEdit={handleEditProject}
                                     onDelete={handleDeleteProject}

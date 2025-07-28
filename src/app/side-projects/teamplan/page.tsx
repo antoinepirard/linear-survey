@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import PageLoader from '@/components/PageLoader';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
 import TeamPlanTopControls from '@/components/teamplan/TeamPlanTopControls';
@@ -346,6 +347,35 @@ export default function TeamPlanPage() {
     handleDataChange(newData);
   };
 
+  const handleMoveBacklogProjectToBoard = (projectId: string, personId?: string, timeSlotId?: string) => {
+    if (!currentPlan) return;
+    
+    const project = currentPlan.teamPlanData.projects.find(p => p.id === projectId);
+    if (!project) return;
+    
+    // If no person/timeSlot specified, use first available
+    const targetPersonId = personId || currentPlan.teamPlanData.people[0]?.id;
+    const targetTimeSlotId = timeSlotId || currentPlan.teamPlanData.timeSlots[0]?.id;
+    
+    if (!targetPersonId || !targetTimeSlotId) return;
+    
+    const updatedProject = {
+      ...project,
+      personId: targetPersonId,
+      timeSlotId: targetTimeSlotId,
+    };
+    
+    const newData = {
+      ...currentPlan.teamPlanData,
+      projects: currentPlan.teamPlanData.projects.map(p => 
+        p.id === projectId ? updatedProject : p
+      )
+    };
+    
+    handleDataChange(newData);
+    toast.success('Project moved to board successfully!');
+  };
+
   const handleToggleSidebar = () => {
     if (activePanel === 'notepad' && isSidebarExpanded) {
       setIsSidebarExpanded(false);
@@ -481,6 +511,9 @@ export default function TeamPlanPage() {
                         onCreateProject={handleCreateBacklogProject}
                         onUpdateProject={handleUpdateBacklogProject}
                         onDeleteProject={handleDeleteBacklogProject}
+                        onMoveToBoard={handleMoveBacklogProjectToBoard}
+                        people={currentPlan.teamPlanData.people}
+                        timeSlots={currentPlan.teamPlanData.timeSlots}
                       />
                     </motion.div>
                   ) : (
