@@ -32,7 +32,7 @@ export const EmptyLinePlaceholder =
           key: new PluginKey("emptyLinePlaceholder"),
           props: {
             handleDOMEvents: {
-              mousedown: (view, event) => {
+              mousedown: (_view, _event) => {
                 // Track mouse down to detect potential drag operations
                 this.storage.isDragging = true;
                 // Set a timeout to reset dragging state if no mouseup occurs
@@ -43,7 +43,7 @@ export const EmptyLinePlaceholder =
                 }, 1000); // Reset after 1 second to handle edge cases
                 return false; // Don't prevent default behavior
               },
-              mouseup: (view, event) => {
+              mouseup: (_view, _event) => {
                 // Reset dragging state on mouse up
                 this.storage.isDragging = false;
                 return false; // Don't prevent default behavior
