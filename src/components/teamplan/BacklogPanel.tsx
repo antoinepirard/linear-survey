@@ -585,7 +585,7 @@ export default function BacklogPanel({
                     className="w-4 h-4"
                   />
                 ) : (
-                  <div className="w-4 h-4" /> {/* Spacer for alignment */}
+                  <div className="w-4 h-4" />
                 )}
                 <span className="text-sm font-medium text-slate-600 flex-1">
                   {groupingMode === 'priority' ? 'No Priority Set' : 'Other Projects'}
