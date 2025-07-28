@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { RectangleGroupIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, FolderIcon, ChevronUpDownIcon } from '@heroicons/react/24/solid';
 import { toast } from 'sonner';
+import Image from 'next/image';
 import { Project, Person, TimeSlot, getRandomColor, getProjectsByGroup, getAllGroups, ProjectImpact } from '@/data/teamplan';
 import { calculateProjectColorMappings, validateGroupName } from './ProjectCard';
 import { Button } from '@/components/ui/button';
@@ -146,7 +147,7 @@ export default function BacklogPanel({
   timeSlots, // eslint-disable-line @typescript-eslint/no-unused-vars
   onCreateProject, 
   onUpdateProject, 
-  onDeleteProject, // eslint-disable-line @typescript-eslint/no-unused-vars
+  onDeleteProject,
   onMoveToBoard
 }: BacklogPanelProps) {
   // Track which project should start in edit mode
@@ -446,9 +447,11 @@ export default function BacklogPanel({
                   onMouseLeave={() => setHoveredGroupHeader(null)}
                 >
                   {groupingMode === 'priority' ? (
-                    <img 
+                    <Image 
                       src={`/Assets/TeamPlan-Ravell/priority-${groupName}.svg`} 
                       alt={`${displayName} priority`}
+                      width={16}
+                      height={16}
                       className={`w-4 h-4 ${groupName === 'urgent' ? 'text-orange-500' : 'text-slate-500'}`}
                       style={{ filter: groupName === 'urgent' ? 'brightness(0) saturate(100%) invert(51%) sepia(96%) saturate(2073%) hue-rotate(8deg) brightness(100%) contrast(107%)' : 'brightness(0) saturate(100%) invert(62%) sepia(8%) saturate(729%) hue-rotate(185deg) brightness(94%) contrast(84%)' }}
                     />
