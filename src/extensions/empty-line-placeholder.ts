@@ -32,6 +32,7 @@ export const EmptyLinePlaceholder =
           key: new PluginKey("emptyLinePlaceholder"),
           props: {
             handleDOMEvents: {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               mousedown: (_view, _event) => {
                 // Track mouse down to detect potential drag operations
                 this.storage.isDragging = true;
@@ -43,6 +44,7 @@ export const EmptyLinePlaceholder =
                 }, 1000); // Reset after 1 second to handle edge cases
                 return false; // Don't prevent default behavior
               },
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               mouseup: (_view, _event) => {
                 // Reset dragging state on mouse up
                 this.storage.isDragging = false;
