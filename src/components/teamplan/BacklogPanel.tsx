@@ -1,11 +1,17 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { RectangleGroupIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, FolderIcon } from '@heroicons/react/24/solid';
+import { RectangleGroupIcon, PlusIcon, ChevronDownIcon, ChevronRightIcon, FolderIcon, ChevronUpDownIcon } from '@heroicons/react/24/solid';
 import { toast } from 'sonner';
-import { Project, Person, TimeSlot, getRandomColor, getProjectsByGroup, getAllGroups } from '@/data/teamplan';
+import { Project, Person, TimeSlot, getRandomColor, getProjectsByGroup, getAllGroups, ProjectImpact } from '@/data/teamplan';
 import { calculateProjectColorMappings, validateGroupName } from './ProjectCard';
 import { Button } from '@/components/ui/button';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 import ProjectCard from './ProjectCard';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -38,6 +44,88 @@ const getGroupColor = (group: string) => {
   return colors[Math.abs(hash) % colors.length];
 };
 
+// Impact level ordering for sorting (highest to lowest impact)
+const IMPACT_ORDER: Record<ProjectImpact, number> = {
+  'urgent': 0,
+  'high': 1,
+  'medium': 2,
+  'low': 3,
+};
+
+// Impact level display names
+const IMPACT_DISPLAY: Record<ProjectImpact, string> = {
+  'urgent': 'Urgent',
+  'high': 'High',
+  'medium': 'Medium',
+  'low': 'Low',
+};
+
+// Sort options
+type SortOrder = 'impact-desc' | 'impact-asc' | 'none';
+type GroupingMode = 'group' | 'priority';
+
+// Utility function to sort projects by impact
+const sortProjectsByImpact = (projects: Project[], order: SortOrder): Project[] => {
+  if (order === 'none') return projects;
+  
+  return [...projects].sort((a, b) => {
+    const aImpact = a.impact || 'low';
+    const bImpact = b.impact || 'low';
+    const aOrder = IMPACT_ORDER[aImpact];
+    const bOrder = IMPACT_ORDER[bImpact];
+    
+    if (order === 'impact-desc') {
+      return aOrder - bOrder; // Highest impact first
+    } else {
+      return bOrder - aOrder; // Lowest impact first
+    }
+  });
+};
+
+// Utility function to group projects by priority/impact
+const getProjectsByPriority = (projects: Project[]) => {
+  const backlogProjects = projects.filter((p) => !p.personId || !p.timeSlotId);
+  const grouped: Record<string, Project[]> = {};
+  const ungrouped: Project[] = [];
+
+  backlogProjects.forEach((project) => {
+    if (project.impact) {
+      const impactKey = project.impact;
+      if (!grouped[impactKey]) {
+        grouped[impactKey] = [];
+      }
+      grouped[impactKey].push(project);
+    } else {
+      ungrouped.push(project);
+    }
+  });
+
+  // Sort projects within each priority group by order
+  Object.keys(grouped).forEach((priority) => {
+    grouped[priority].sort((a, b) => (a.order || 0) - (b.order || 0));
+  });
+
+  ungrouped.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  return { grouped, ungrouped };
+};
+
+// Get priority color for visual consistency
+const getPriorityColor = (priority: ProjectImpact) => {
+  switch (priority) {
+    case 'urgent':
+      return { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-l-orange-400' };
+    case 'high':
+      return { bg: 'bg-slate-200', text: 'text-slate-700', border: 'border-l-slate-500' };
+    case 'medium':
+      return { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-l-slate-400' };
+    case 'low':
+      return { bg: 'bg-slate-50', text: 'text-slate-500', border: 'border-l-slate-300' };
+    default:
+      return { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-l-slate-400' };
+  }
+};
+
 interface BacklogPanelProps {
   width: number;
   backlogProjects: Project[];
@@ -67,6 +155,10 @@ export default function BacklogPanel({
   const [editingGroupName, setEditingGroupName] = useState<string | null>(null);
   const [editingGroupValue, setEditingGroupValue] = useState<string>('');
   const hasInitializedGroups = useRef(false);
+
+  // New state for sorting and grouping
+  const [sortOrder, setSortOrder] = useState<SortOrder>('none');
+  const [groupingMode, setGroupingMode] = useState<GroupingMode>('group');
 
   // Calculate color mappings once per render for performance
   const colorMappings = useMemo(() => 
@@ -200,9 +292,36 @@ export default function BacklogPanel({
     setExpandedGroups(newExpanded);
   };
 
-  // Get organized project data
-  const { grouped, ungrouped } = getProjectsByGroup(backlogProjects);
-  const groupNames = Object.keys(grouped).sort();
+  // Get organized project data based on grouping mode
+  const { grouped, ungrouped } = useMemo(() => {
+    const data = groupingMode === 'group' 
+      ? getProjectsByGroup(backlogProjects)
+      : getProjectsByPriority(backlogProjects);
+    
+    // Apply sorting to projects within each group
+    const sortedGrouped: Record<string, Project[]> = {};
+    Object.keys(data.grouped).forEach(key => {
+      sortedGrouped[key] = sortProjectsByImpact(data.grouped[key], sortOrder);
+    });
+    
+    return {
+      grouped: sortedGrouped,
+      ungrouped: sortProjectsByImpact(data.ungrouped, sortOrder)
+    };
+  }, [backlogProjects, groupingMode, sortOrder]);
+
+  const groupNames = useMemo(() => {
+    if (groupingMode === 'priority') {
+      // Sort priority groups by impact order (urgent first)
+      return Object.keys(grouped).sort((a, b) => {
+        const aOrder = IMPACT_ORDER[a as ProjectImpact] ?? 999;
+        const bOrder = IMPACT_ORDER[b as ProjectImpact] ?? 999;
+        return aOrder - bOrder;
+      });
+    } else {
+      return Object.keys(grouped).sort();
+    }
+  }, [grouped, groupingMode]);
 
   // Initialize expanded groups when groups change
   useEffect(() => {
@@ -227,15 +346,75 @@ export default function BacklogPanel({
               {backlogProjects.length}
             </span>
           </div>
-          <Button
-            onClick={handleCreateProject}
-            variant="ghost"
-            size="sm"
-            className="h-7 text-xs"
-          >
-            <PlusIcon className="w-3 h-3 mr-1" />
-            Add
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Grouping Mode Button Group */}
+            <div className="flex rounded-md border border-slate-200 overflow-hidden">
+              <button
+                onClick={() => setGroupingMode('group')}
+                className={`px-2 py-1 text-xs font-medium transition-colors ${
+                  groupingMode === 'group' 
+                    ? 'bg-slate-100 text-slate-900' 
+                    : 'bg-white text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                Group
+              </button>
+              <button
+                onClick={() => setGroupingMode('priority')}
+                className={`px-2 py-1 text-xs font-medium border-l border-slate-200 transition-colors ${
+                  groupingMode === 'priority' 
+                    ? 'bg-slate-100 text-slate-900' 
+                    : 'bg-white text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                Priority
+              </button>
+            </div>
+            
+            {/* Sorting Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs gap-1"
+                >
+                  <ChevronUpDownIcon className="w-3 h-3" />
+                  Sort
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem 
+                  onClick={() => setSortOrder('none')}
+                  className={sortOrder === 'none' ? 'bg-slate-100' : ''}
+                >
+                  <span className="text-sm">Default order</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setSortOrder('impact-desc')}
+                  className={sortOrder === 'impact-desc' ? 'bg-slate-100' : ''}
+                >
+                  <span className="text-sm">Highest impact first</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setSortOrder('impact-asc')}
+                  className={sortOrder === 'impact-asc' ? 'bg-slate-100' : ''}
+                >
+                  <span className="text-sm">Lowest impact first</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button
+              onClick={handleCreateProject}
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs"
+            >
+              <PlusIcon className="w-3 h-3 mr-1" />
+              Add
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -246,7 +425,12 @@ export default function BacklogPanel({
           {groupNames.map((groupName) => {
             const groupProjects = grouped[groupName];
             const isExpanded = expandedGroups.has(groupName);
-            const groupColor = getGroupColor(groupName);
+            const groupColor = groupingMode === 'priority' 
+              ? getPriorityColor(groupName as ProjectImpact)
+              : getGroupColor(groupName);
+            const displayName = groupingMode === 'priority' 
+              ? IMPACT_DISPLAY[groupName as ProjectImpact] || groupName
+              : groupName;
             
             return (
               <div key={groupName} className={`mb-4 rounded-lg ${groupColor.bg}`}>
@@ -261,10 +445,19 @@ export default function BacklogPanel({
                   onMouseEnter={() => setHoveredGroupHeader(groupName)}
                   onMouseLeave={() => setHoveredGroupHeader(null)}
                 >
-                  <FolderIcon className={`w-4 h-4 ${groupColor.text}`} />
+                  {groupingMode === 'priority' ? (
+                    <img 
+                      src={`/Assets/TeamPlan-Ravell/priority-${groupName}.svg`} 
+                      alt={`${displayName} priority`}
+                      className={`w-4 h-4 ${groupName === 'urgent' ? 'text-orange-500' : 'text-slate-500'}`}
+                      style={{ filter: groupName === 'urgent' ? 'brightness(0) saturate(100%) invert(51%) sepia(96%) saturate(2073%) hue-rotate(8deg) brightness(100%) contrast(107%)' : 'brightness(0) saturate(100%) invert(62%) sepia(8%) saturate(729%) hue-rotate(185deg) brightness(94%) contrast(84%)' }}
+                    />
+                  ) : (
+                    <FolderIcon className={`w-4 h-4 ${groupColor.text}`} />
+                  )}
                   
-                  {/* Group Name - Editable */}
-                  {editingGroupName === groupName ? (
+                  {/* Group Name - Editable only in group mode */}
+                  {editingGroupName === groupName && groupingMode === 'group' ? (
                     <input
                       type="text"
                       value={editingGroupValue}
@@ -287,11 +480,13 @@ export default function BacklogPanel({
                         className={`text-sm font-medium ${groupColor.text} cursor-pointer hover:underline inline-block`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleStartGroupEdit(groupName);
+                          if (groupingMode === 'group') {
+                            handleStartGroupEdit(groupName);
+                          }
                         }}
-                        title="Click to rename group"
+                        title={groupingMode === 'group' ? "Click to rename group" : undefined}
                       >
-                        {groupName}
+                        {displayName}
                       </span>
                     </div>
                   )}
@@ -304,12 +499,22 @@ export default function BacklogPanel({
                     <Button
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent toggling group
-                        handleCreateProjectInGroup(groupName);
+                        if (groupingMode === 'priority') {
+                          // Create project with specific priority/impact
+                          const newProject: Omit<Project, 'id'> = {
+                            title: '',
+                            color: getRandomColor(),
+                            impact: groupName as ProjectImpact,
+                          };
+                          onCreateProject(newProject);
+                        } else {
+                          handleCreateProjectInGroup(groupName);
+                        }
                       }}
                       variant="ghost"
                       size="sm"
                       className={`h-5 w-5 p-0 ${groupColor.text} hover:${groupColor.bg} hover:opacity-100 transition-all duration-200`}
-                      title={`Add project to ${groupName}`}
+                      title={groupingMode === 'priority' ? `Add ${displayName} priority project` : `Add project to ${groupName}`}
                     >
                       <PlusIcon className="w-3 h-3" />
                     </Button>
@@ -369,7 +574,9 @@ export default function BacklogPanel({
                 onMouseLeave={() => setHoveredGroupHeader(null)}
               >
                 <div className="w-4 h-4" /> {/* Spacer for alignment */}
-                <span className="text-sm font-medium text-slate-600 flex-1">Other Projects</span>
+                <span className="text-sm font-medium text-slate-600 flex-1">
+                  {groupingMode === 'priority' ? 'No Priority Set' : 'Other Projects'}
+                </span>
                 <span className="text-xs text-slate-500 bg-white/70 px-1.5 py-0.5 rounded">
                   {ungrouped.length}
                 </span>
