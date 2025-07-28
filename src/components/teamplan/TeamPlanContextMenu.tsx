@@ -10,7 +10,8 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
 } from '@/components/ui/context-menu';
-import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, TrashIcon, DocumentDuplicateIcon, PlusIcon, ArrowRightIcon, FolderIcon, TagIcon, ExclamationTriangleIcon, ArchiveBoxArrowDownIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, TrashIcon, DocumentDuplicateIcon, PlusIcon, ArrowRightIcon, FolderIcon, TagIcon, ExclamationTriangleIcon, ArchiveBoxArrowDownIcon, CheckIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 import { ProjectImpact } from '@/data/teamplan';
 
 // Custom priority icons (same as in ImpactSelector)
@@ -195,6 +196,22 @@ export default function TeamPlanContextMenu({
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-36">
                 <ContextMenuItem
+                  onClick={() => onSetImpact?.(undefined)}
+                  className="flex items-center gap-2 text-slate-600"
+                >
+                  <Image 
+                    src="/Assets/TeamPlan-Ravell/priority-unset.svg" 
+                    alt="Unset priority"
+                    width={16}
+                    height={16}
+                    className="h-4 w-4"
+                  />
+                  Unset
+                  {!currentImpact && (
+                    <CheckIcon className="ml-auto h-4 w-4" />
+                  )}
+                </ContextMenuItem>
+                <ContextMenuItem
                   onClick={() => onSetImpact?.('low')}
                   className="flex items-center gap-2 text-slate-600"
                 >
@@ -231,16 +248,6 @@ export default function TeamPlanContextMenu({
                   <PriorityUrgentIcon className="h-4 w-4" />
                   Urgent
                   {currentImpact === 'urgent' && (
-                    <CheckIcon className="ml-auto h-4 w-4" />
-                  )}
-                </ContextMenuItem>
-                <ContextMenuItem
-                  onClick={() => onSetImpact?.(undefined)}
-                  className="flex items-center gap-2 text-slate-600"
-                >
-                  <XMarkIcon className="h-4 w-4" />
-                  Unset
-                  {!currentImpact && (
                     <CheckIcon className="ml-auto h-4 w-4" />
                   )}
                 </ContextMenuItem>

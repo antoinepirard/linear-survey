@@ -576,7 +576,17 @@ export default function BacklogPanel({
                 onMouseEnter={() => setHoveredGroupHeader('ungrouped')}
                 onMouseLeave={() => setHoveredGroupHeader(null)}
               >
-                <div className="w-4 h-4" /> {/* Spacer for alignment */}
+                {groupingMode === 'priority' ? (
+                  <Image 
+                    src="/Assets/TeamPlan-Ravell/priority-unset.svg" 
+                    alt="No Priority Set"
+                    width={16}
+                    height={16}
+                    className="w-4 h-4"
+                  />
+                ) : (
+                  <div className="w-4 h-4" /> {/* Spacer for alignment */}
+                )}
                 <span className="text-sm font-medium text-slate-600 flex-1">
                   {groupingMode === 'priority' ? 'No Priority Set' : 'Other Projects'}
                 </span>

@@ -12,7 +12,7 @@ import Image from 'next/image';
 
 interface ImpactSelectorProps {
   impact?: ProjectImpact;
-  onChange: (impact: ProjectImpact) => void;
+  onChange: (impact: ProjectImpact | undefined) => void;
   disabled?: boolean;
 }
 
@@ -38,8 +38,8 @@ const impactConfig = {
   urgent: {
     icon: '/Assets/TeamPlan-Ravell/priority-urgent.svg',
     label: 'Urgent',
-    color: 'text-orange-600',
-    hoverColor: 'hover:text-orange-700 hover:bg-orange-50',
+    color: 'text-slate-600',
+    hoverColor: 'hover:text-slate-700 hover:bg-slate-50',
   },
 };
 
@@ -82,6 +82,19 @@ export default function ImpactSelector({ impact, onChange, disabled = false }: I
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-32" align="start">
+        <DropdownMenuItem
+          onClick={() => onChange(undefined)}
+          className="flex items-center gap-2 text-slate-600 cursor-pointer"
+        >
+          <Image
+            src="/Assets/TeamPlan-Ravell/priority-unset.svg"
+            alt="Unset"
+            width={16}
+            height={16}
+            className="w-4 h-4"
+          />
+          Unset
+        </DropdownMenuItem>
         {Object.entries(impactConfig).map(([level, config]) => {
           return (
             <DropdownMenuItem
