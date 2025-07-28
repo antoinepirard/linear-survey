@@ -1,5 +1,6 @@
 import { Editor } from "@tiptap/react";
 import { Plan, NotepadDocument } from "@/types/plan";
+import { Project } from "@/data/teamplan";
 
 // Type for TipTap editor instance
 export type TipTapEditor = Editor;
@@ -23,6 +24,7 @@ export interface NotePadProps {
   onRenameDocument?: (documentId: string, newTitle: string) => void;
   onDeleteDocument?: (documentId: string) => void;
   onUpdateDocumentContent?: (documentId: string, content: string) => void;
+  onCreateProject?: (project: Omit<Project, "id">) => void;
   showDocumentList?: boolean;
   isFullScreen?: boolean;
 }
@@ -101,3 +103,16 @@ export interface NotePadError extends Error {
 export type NotePadEventHandler<T = void> = (event: React.SyntheticEvent) => T;
 export type EditorEventHandler = (editor: Editor) => void;
 export type ResizeEventHandler = (e: React.MouseEvent) => void;
+
+export type SlashCommandItem = {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  command: ({
+    editor,
+    range,
+  }: {
+    editor: Editor;
+    range: { from: number; to: number };
+  }) => void;
+};

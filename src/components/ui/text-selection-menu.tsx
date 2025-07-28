@@ -17,12 +17,17 @@ import {
   H2Icon,
   H3Icon,
   NumberedListIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  PlusIcon
 } from '@heroicons/react/24/outline';
+import { Project, getRandomColor } from '@/data/teamplan';
+import { validateProjectTitle } from '@/components/teamplan/ProjectCard';
+import { toast } from 'sonner';
 
 interface TextSelectionMenuProps {
   editor: Editor;
   className?: string;
+  onCreateProject?: (project: Omit<Project, 'id'>) => void;
 }
 
 interface MenuButtonProps {
@@ -52,7 +57,7 @@ function MenuButton({ isActive, onMouseDown, children, title }: MenuButtonProps)
   );
 }
 
-export default function TextSelectionMenu({ editor, className }: TextSelectionMenuProps) {
+export default function TextSelectionMenu({ editor, className, onCreateProject }: TextSelectionMenuProps) {
   const [showSubmenu, setShowSubmenu] = useState(false);
   const [submenuTimeout, setSubmenuTimeout] = useState<NodeJS.Timeout | null>(null);
   const [openTimeout, setOpenTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -129,6 +134,58 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
     };
   }, [clearAllTimeouts]);
 
+  // Function to handle project creation from selected text
+  const handleCreateProject = useCallback(() => {
+    if (!onCreateProject) return;
+    
+    // Check if editor is still valid
+    if (!editor || editor.isDestroyed) {
+      toast.error('Editor is not available. Please try again.');
+      return;
+    }
+    
+    try {
+      // Extract selected text
+      const selectedText = editor.state.doc.textBetween(
+        editor.state.selection.from,
+        editor.state.selection.to
+      );
+      
+      // Validate that we have selected text
+      if (!selectedText.trim()) {
+        toast.error('Please select some text to create a project');
+        return;
+      }
+      
+      const trimmedTitle = selectedText.trim();
+      
+      // Use existing validation function
+      const titleValidation = validateProjectTitle(trimmedTitle);
+      if (!titleValidation.isValid) {
+        toast.error(titleValidation.error);
+        return;
+      }
+      
+      // Create a new project with the validated text
+      const newProject: Omit<Project, 'id'> = {
+        title: trimmedTitle,
+        color: getRandomColor(),
+        // No personId/timeSlotId = backlog project
+      };
+      
+      // Attempt to create the project
+      onCreateProject(newProject);
+      
+      // Success feedback
+      toast.success(`Project "${trimmedTitle}" added to backlog`);
+      
+    } catch (error) {
+      // Handle any unexpected errors
+      console.error('Failed to create project from selection:', error);
+      toast.error('Failed to create project. Please try again.');
+    }
+  }, [editor, onCreateProject]);
+
   // Memoize actions to prevent recreation on every render
   const formatActions = useMemo(() => [
     {
@@ -157,6 +214,20 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
   ], [editor, updateTrigger]);
+
+  // Project actions - only show if onCreateProject is provided
+  const projectActions = useMemo(() => {
+    if (!onCreateProject) return [];
+    
+    return [
+      {
+        icon: <PlusIcon className="h-4 w-4" />,
+        title: "Create Project",
+        isActive: false,
+        onMouseDown: handleCreateProject,
+      },
+    ];
+  }, [onCreateProject, handleCreateProject]);
 
   const structuralActions = useMemo(() => [
     {
@@ -248,6 +319,27 @@ export default function TextSelectionMenu({ editor, className }: TextSelectionMe
             </MenuButton>
           ))}
         </div>
+
+        {/* Project actions - only show if onCreateProject is provided */}
+        {projectActions.length > 0 && (
+          <>
+            {/* Separator */}
+            <div className="w-px h-4 bg-gray-300 mx-1" />
+            
+            <div className="flex items-center gap-0.5">
+              {projectActions.map((action, index) => (
+                <MenuButton
+                  key={index}
+                  isActive={action.isActive}
+                  onMouseDown={action.onMouseDown}
+                  title={action.title}
+                >
+                  {action.icon}
+                </MenuButton>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Separator */}
         <div className="w-px h-4 bg-gray-300 mx-1" />

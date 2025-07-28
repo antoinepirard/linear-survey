@@ -513,6 +513,7 @@ export default function TeamPlanPage() {
                       onUpdateDocumentContent={handleUpdateDocumentContent}
                       onRenameDocument={renameDocument}
                       onDeleteDocument={handleDeleteDocument}
+                      onCreateProject={handleCreateBacklogProject}
                       showDocumentList={true}
                       isFullScreen={isNotePadFullScreen}
                     />

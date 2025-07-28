@@ -36,6 +36,7 @@ function NotePad({
   onUpdateDocumentContent,
   onRenameDocument,
   onDeleteDocument,
+  onCreateProject,
   showDocumentList = false,
   isFullScreen = false,
 }: NotePadProps) {
@@ -576,6 +577,7 @@ function NotePad({
                   >
                     <TextSelectionMenu 
                       editor={editor}
+                      onCreateProject={onCreateProject}
                     />
                   </div>
                 )}
@@ -731,6 +733,7 @@ function NotePad({
                 >
                   <TextSelectionMenu 
                     editor={editor}
+                    onCreateProject={onCreateProject}
                   />
                 </div>
               )}
