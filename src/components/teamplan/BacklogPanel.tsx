@@ -341,6 +341,7 @@ export default function BacklogPanel({
                               colorMappings={colorMappings}
                               isColorCodingEnabled={false}
                               onEdit={handleUpdateProject}
+                              onDelete={(projectId) => onDeleteProject(projectId)}
                               onMoveToBoard={() => onMoveToBoard(project.id)}
                               onMoveToGroup={handleMoveProjectToGroup}
                               onSetImpact={(projectId, impact) => {
@@ -396,6 +397,7 @@ export default function BacklogPanel({
                       colorMappings={colorMappings}
                       isColorCodingEnabled={false}
                       onEdit={handleUpdateProject}
+                      onDelete={(projectId) => onDeleteProject(projectId)}
                       onMoveToBoard={() => onMoveToBoard(project.id)}
                       onMoveToGroup={handleMoveProjectToGroup}
                       onSetImpact={(projectId, impact) => {

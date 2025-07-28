@@ -448,7 +448,8 @@ const ProjectCard = ({
                 <TeamPlanContextMenu
             type={isBacklogMode ? "backlogProject" : "project"}
             canDelete={true}
-            onDelete={() => onDelete?.(project.id)}
+            onDelete={isBacklogMode ? () => onDelete?.(project.id) : () => {}}
+            onMoveToBacklog={!isBacklogMode ? () => onMoveToBacklog?.(project.id) : undefined}
             onDuplicate={() => onDuplicate?.(project.id)}
             onMoveToBoard={isBacklogMode ? () => onMoveToBoard?.(project.id) : undefined}
             onMoveToGroup={isBacklogMode ? (groupName: string) => onMoveToGroup?.(project.id, groupName) : undefined}

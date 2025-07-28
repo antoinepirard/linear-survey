@@ -10,7 +10,7 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
 } from '@/components/ui/context-menu';
-import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, TrashIcon, DocumentDuplicateIcon, PlusIcon, ArrowRightIcon, FolderIcon, TagIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, TrashIcon, DocumentDuplicateIcon, PlusIcon, ArrowRightIcon, FolderIcon, TagIcon, ExclamationTriangleIcon, ArchiveBoxArrowDownIcon } from '@heroicons/react/24/outline';
 import { ProjectImpact } from '@/data/teamplan';
 
 // Custom priority icons (same as in ImpactSelector)
@@ -58,6 +58,7 @@ interface TeamPlanContextMenuProps {
   onDuplicate?: () => void;
   onAddProject?: () => void;
   onMoveToBoard?: () => void;
+  onMoveToBacklog?: () => void;
   onMoveToGroup?: (groupName: string) => void;
   onSetImpact?: (impact: ProjectImpact) => void;
   availableGroups?: string[];
@@ -79,6 +80,7 @@ export default function TeamPlanContextMenu({
   onDuplicate,
   onAddProject,
   onMoveToBoard,
+  onMoveToBacklog,
   onMoveToGroup,
   onSetImpact,
   availableGroups = [],
@@ -125,13 +127,12 @@ export default function TeamPlanContextMenu({
             </ContextMenuItem>
             <ContextMenuSeparator />
             <ContextMenuItem
-              onClick={onDelete}
-              disabled={!canDelete}
-              variant="destructive"
+              onClick={onMoveToBacklog}
+              disabled={!onMoveToBacklog}
               className="flex items-center gap-2"
             >
-              <TrashIcon className="h-4 w-4" />
-              Delete <span className="text-red-400">{getLabel()}</span>
+              <ArchiveBoxArrowDownIcon className="h-4 w-4" />
+              Remove from plan
             </ContextMenuItem>
           </>
         ) : type === 'backlogProject' ? (
