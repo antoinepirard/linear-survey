@@ -44,6 +44,11 @@ const getGroupColor = (group: string) => {
   return colors[Math.abs(hash) % colors.length];
 };
 
+// Get group color with override support to preserve colors during renames
+const getGroupColorWithOverrides = (group: string, overrides: Record<string, ReturnType<typeof getGroupColor>>) => {
+  return overrides[group] || getGroupColor(group);
+};
+
 // Impact level ordering for sorting (highest to lowest impact)
 const IMPACT_ORDER: Record<ProjectImpact, number> = {
   'urgent': 0,
@@ -137,6 +142,8 @@ interface BacklogPanelProps {
   onDeleteProject: (projectId: string) => void;
   onMoveToBoard: (projectId: string, personId?: string, timeSlotId?: string) => void;
   onRenameGroup?: (oldGroupName: string, newGroupName: string) => void;
+  groupColorOverrides?: Record<string, ReturnType<typeof getGroupColor>>;
+  onUpdateGroupColorOverrides?: (overrides: Record<string, ReturnType<typeof getGroupColor>>) => void;
 }
 
 export default function BacklogPanel({ 
@@ -149,7 +156,9 @@ export default function BacklogPanel({
   onUpdateProject, 
   onDeleteProject,
   onMoveToBoard,
-  onRenameGroup
+  onRenameGroup,
+  groupColorOverrides = {},
+  onUpdateGroupColorOverrides
 }: BacklogPanelProps) {
   // Track which project should start in edit mode
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
@@ -275,6 +284,20 @@ export default function BacklogPanel({
     // Call a new prop function that handles batched group rename
     if (projectsToUpdate.length > 0 && onRenameGroup) {
       onRenameGroup(oldGroupName, newGroupName);
+      
+      // Preserve the original group color by creating an override
+      if (onUpdateGroupColorOverrides) {
+        const originalColor = getGroupColorWithOverrides(oldGroupName, groupColorOverrides);
+        const newOverrides = { ...groupColorOverrides };
+        
+        // Set the new group name to use the original color
+        newOverrides[newGroupName] = originalColor;
+        
+        // Remove the old group name from overrides if it exists
+        delete newOverrides[oldGroupName];
+        
+        onUpdateGroupColorOverrides(newOverrides);
+      }
     }
 
     toast.success(`Group renamed from "${oldGroupName}" to "${newGroupName}"`);
@@ -426,7 +449,7 @@ export default function BacklogPanel({
             const isExpanded = expandedGroups.has(groupName);
             const groupColor = groupingMode === 'priority' 
               ? getPriorityColor(groupName as ProjectImpact)
-              : getGroupColor(groupName);
+              : getGroupColorWithOverrides(groupName, groupColorOverrides);
             const displayName = groupingMode === 'priority' 
               ? IMPACT_DISPLAY[groupName as ProjectImpact] || groupName
               : groupName;

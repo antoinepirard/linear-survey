@@ -117,6 +117,7 @@ export default function TeamPlanPage() {
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
   const [isNotePadFullScreen, setIsNotePadFullScreen] = useState(false);
+  const [groupColorOverrides, setGroupColorOverrides] = useState<Record<string, any>>({});
 
   // Load color coding preference from localStorage on mount
   useEffect(() => {
@@ -527,6 +528,8 @@ export default function TeamPlanPage() {
                       onDeleteProject={handleDeleteBacklogProject}
                       onMoveToBoard={handleMoveBacklogProjectToBoard}
                       onRenameGroup={handleRenameGroup}
+                      groupColorOverrides={groupColorOverrides}
+                      onUpdateGroupColorOverrides={setGroupColorOverrides}
                       people={currentPlan.teamPlanData.people}
                       timeSlots={currentPlan.teamPlanData.timeSlots}
                     />
