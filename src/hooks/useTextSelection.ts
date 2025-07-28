@@ -41,14 +41,16 @@ export function useTextSelection({
       try {
         const start = editor.view.coordsAtPos(from);
         const end = editor.view.coordsAtPos(to);
-        
+
         // In full-screen mode, look for the centered content wrapper
         let referenceRect: DOMRect;
         let referenceElement: HTMLElement;
-        
+
         if (isFullScreen) {
           // Find the centered content wrapper (max-w-4xl element)
-          const contentWrapper = container.querySelector('.max-w-4xl') as HTMLElement;
+          const contentWrapper = container.querySelector(
+            ".max-w-4xl"
+          ) as HTMLElement;
           if (contentWrapper) {
             referenceRect = contentWrapper.getBoundingClientRect();
             referenceElement = contentWrapper;
@@ -89,7 +91,8 @@ export function useTextSelection({
         // Vertical bounds checking - position below if would go above reference element
         // Also account for scroll position in vertical bounds checking
         if (y < referenceElement.scrollTop) {
-          y = end.top - referenceRect.top + gap + 10 + referenceElement.scrollTop;
+          y =
+            end.top - referenceRect.top + gap + 10 + referenceElement.scrollTop;
         }
 
         return { x, y };

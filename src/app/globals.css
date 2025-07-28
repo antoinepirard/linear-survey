@@ -27,6 +27,16 @@ html, body {
   text-shadow: none; /* Remove text shadow on selection */
 }
 
+/* Reset selection styling for notepad editor - enhanced specificity */
+.notepad-container ::selection,
+.notepad-editor ::selection,
+.ProseMirror ::selection,
+.notepad-container .ProseMirror ::selection {
+  background-color: #334155 !important; /* slate-700 */
+  color: inherit !important; /* Keep original text color */
+  text-shadow: none !important;
+}
+
 /* Fluid typography for better responsive design */
 .fluid-text-lg {
   font-size: clamp(1rem, 2.5vw, 1.125rem);
