@@ -10,7 +10,7 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
 } from '@/components/ui/context-menu';
-import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, TrashIcon, DocumentDuplicateIcon, PlusIcon, ArrowRightIcon, FolderIcon, TagIcon, ExclamationTriangleIcon, ArchiveBoxArrowDownIcon } from '@heroicons/react/24/outline';
+import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, TrashIcon, DocumentDuplicateIcon, PlusIcon, ArrowRightIcon, FolderIcon, TagIcon, ExclamationTriangleIcon, ArchiveBoxArrowDownIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { ProjectImpact } from '@/data/teamplan';
 
 // Custom priority icons (same as in ImpactSelector)
@@ -60,7 +60,7 @@ interface TeamPlanContextMenuProps {
   onMoveToBoard?: () => void;
   onMoveToBacklog?: () => void;
   onMoveToGroup?: (groupName: string) => void;
-  onSetImpact?: (impact: ProjectImpact) => void;
+  onSetImpact?: (impact: ProjectImpact | undefined) => void;
   availableGroups?: string[];
   currentGroup?: string;
   currentImpact?: ProjectImpact;
@@ -192,9 +192,6 @@ export default function TeamPlanContextMenu({
               <ContextMenuSubTrigger className="flex items-center gap-2">
                 <ExclamationTriangleIcon className="h-4 w-4" />
                 Set Impact
-                {currentImpact && (
-                  <span className="ml-auto text-xs text-gray-500 capitalize">{currentImpact}</span>
-                )}
               </ContextMenuSubTrigger>
               <ContextMenuSubContent className="w-36">
                 <ContextMenuItem
@@ -203,6 +200,9 @@ export default function TeamPlanContextMenu({
                 >
                   <PriorityLowIcon className="h-4 w-4" />
                   Low
+                  {currentImpact === 'low' && (
+                    <CheckIcon className="ml-auto h-4 w-4" />
+                  )}
                 </ContextMenuItem>
                 <ContextMenuItem
                   onClick={() => onSetImpact?.('medium')}
@@ -210,6 +210,9 @@ export default function TeamPlanContextMenu({
                 >
                   <PriorityMediumIcon className="h-4 w-4" />
                   Medium
+                  {currentImpact === 'medium' && (
+                    <CheckIcon className="ml-auto h-4 w-4" />
+                  )}
                 </ContextMenuItem>
                 <ContextMenuItem
                   onClick={() => onSetImpact?.('high')}
@@ -217,13 +220,29 @@ export default function TeamPlanContextMenu({
                 >
                   <PriorityHighIcon className="h-4 w-4" />
                   High
+                  {currentImpact === 'high' && (
+                    <CheckIcon className="ml-auto h-4 w-4" />
+                  )}
                 </ContextMenuItem>
                 <ContextMenuItem
                   onClick={() => onSetImpact?.('urgent')}
-                  className="flex items-center gap-2 text-orange-600"
+                  className="flex items-center gap-2 text-slate-600"
                 >
                   <PriorityUrgentIcon className="h-4 w-4" />
                   Urgent
+                  {currentImpact === 'urgent' && (
+                    <CheckIcon className="ml-auto h-4 w-4" />
+                  )}
+                </ContextMenuItem>
+                <ContextMenuItem
+                  onClick={() => onSetImpact?.(undefined)}
+                  className="flex items-center gap-2 text-slate-600"
+                >
+                  <XMarkIcon className="h-4 w-4" />
+                  Unset
+                  {!currentImpact && (
+                    <CheckIcon className="ml-auto h-4 w-4" />
+                  )}
                 </ContextMenuItem>
               </ContextMenuSubContent>
             </ContextMenuSub>

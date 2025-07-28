@@ -809,7 +809,7 @@ function TeamPlanBoard({
                                     onSetImpact={(projectId, impact) => {
                                       const updatedProject = boardData.projects.find(p => p.id === projectId);
                                       if (updatedProject) {
-                                        handleEditProject({ ...updatedProject, impact });
+                                        handleEditProject({ ...updatedProject, impact: impact || undefined });
                                       }
                                     }}
                                     onDragStart={handleDragStart}

@@ -553,7 +553,7 @@ export default function BacklogPanel({
                               onMoveToBoard={() => onMoveToBoard(project.id)}
                               onMoveToGroup={handleMoveProjectToGroup}
                               onSetImpact={(projectId, impact) => {
-                                const updatedProject = { ...project, impact };
+                                const updatedProject = { ...project, impact: impact || undefined };
                                 handleUpdateProject(updatedProject);
                               }}
                               isBacklogMode={true}
@@ -611,7 +611,7 @@ export default function BacklogPanel({
                       onMoveToBoard={() => onMoveToBoard(project.id)}
                       onMoveToGroup={handleMoveProjectToGroup}
                       onSetImpact={(projectId, impact) => {
-                        const updatedProject = { ...project, impact };
+                        const updatedProject = { ...project, impact: impact || undefined };
                         handleUpdateProject(updatedProject);
                       }}
                       isBacklogMode={true}

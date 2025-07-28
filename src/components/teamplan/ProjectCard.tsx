@@ -163,7 +163,7 @@ interface ProjectCardProps {
   onDuplicate?: (projectId: string) => void;
   onMoveToBoard?: (projectId: string) => void;
   onMoveToGroup?: (projectId: string, groupName: string) => void;
-  onSetImpact?: (projectId: string, impact: ProjectImpact) => void;
+  onSetImpact?: (projectId: string, impact: ProjectImpact | undefined) => void;
   onMoveToBacklog?: (projectId: string) => void;
   onDragStart?: (projectId: string, isDuplicating: boolean) => void;
   onDragEnd?: () => void;
@@ -453,7 +453,7 @@ const ProjectCard = ({
             onDuplicate={() => onDuplicate?.(project.id)}
             onMoveToBoard={isBacklogMode ? () => onMoveToBoard?.(project.id) : undefined}
             onMoveToGroup={isBacklogMode ? (groupName: string) => onMoveToGroup?.(project.id, groupName) : undefined}
-            onSetImpact={isBacklogMode ? (impact: ProjectImpact) => onSetImpact?.(project.id, impact) : undefined}
+            onSetImpact={isBacklogMode ? (impact: ProjectImpact | undefined) => onSetImpact?.(project.id, impact) : undefined}
             availableGroups={availableGroups}
             currentGroup={project.group}
             currentImpact={project.impact}
