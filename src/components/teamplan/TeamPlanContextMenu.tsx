@@ -206,21 +206,21 @@ export default function TeamPlanContextMenu({
                 </ContextMenuItem>
                 <ContextMenuItem
                   onClick={() => onSetImpact?.('medium')}
-                  className="flex items-center gap-2 text-blue-600"
+                  className="flex items-center gap-2 text-slate-600"
                 >
                   <PriorityMediumIcon className="h-4 w-4" />
                   Medium
                 </ContextMenuItem>
                 <ContextMenuItem
                   onClick={() => onSetImpact?.('high')}
-                  className="flex items-center gap-2 text-orange-600"
+                  className="flex items-center gap-2 text-slate-600"
                 >
                   <PriorityHighIcon className="h-4 w-4" />
                   High
                 </ContextMenuItem>
                 <ContextMenuItem
                   onClick={() => onSetImpact?.('urgent')}
-                  className="flex items-center gap-2 text-red-600"
+                  className="flex items-center gap-2 text-orange-600"
                 >
                   <PriorityUrgentIcon className="h-4 w-4" />
                   Urgent
