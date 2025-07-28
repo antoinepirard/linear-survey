@@ -121,11 +121,11 @@ const getPriorityColor = (priority: ProjectImpact) => {
     case 'urgent':
       return { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-l-orange-400' };
     case 'high':
-      return { bg: 'bg-slate-200', text: 'text-slate-700', border: 'border-l-slate-500' };
+      return { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-l-slate-400' };
     case 'medium':
       return { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-l-slate-400' };
     case 'low':
-      return { bg: 'bg-slate-50', text: 'text-slate-500', border: 'border-l-slate-300' };
+      return { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-l-slate-400' };
     default:
       return { bg: 'bg-slate-100', text: 'text-slate-600', border: 'border-l-slate-400' };
   }
