@@ -395,7 +395,7 @@ function TeamPlanBoard({
     }
   };
 
-  const handleDeleteProject = async (projectId: string) => {
+  const handleDeleteProject = async (projectId: string) => { // eslint-disable-line @typescript-eslint/no-unused-vars
     const newData = {
       ...boardData,
       projects: boardData.projects.filter(p => p.id !== projectId)
@@ -403,6 +403,21 @@ function TeamPlanBoard({
     
     try {
       await performOptimisticUpdate(newData, 'delete project');
+    } catch {
+      // performOptimisticUpdate already handles rollback and error reporting
+    }
+  };
+
+  const handleMoveProjectToBacklog = async (projectId: string) => {
+    const newData = {
+      ...boardData,
+      projects: boardData.projects.map(p => 
+        p.id === projectId ? { ...p, personId: undefined, timeSlotId: undefined } : p
+      )
+    };
+    
+    try {
+      await performOptimisticUpdate(newData, 'move project to backlog');
     } catch {
       // performOptimisticUpdate already handles rollback and error reporting
     }
@@ -789,8 +804,8 @@ function TeamPlanBoard({
                                     colorMappings={colorMappings}
                                     isColorCodingEnabled={isColorCodingEnabled}
                                     onEdit={handleEditProject}
-                                    onDelete={handleDeleteProject}
                                     onDuplicate={handleDuplicateProject}
+                                    onMoveToBacklog={handleMoveProjectToBacklog}
                                     onSetImpact={(projectId, impact) => {
                                       const updatedProject = boardData.projects.find(p => p.id === projectId);
                                       if (updatedProject) {

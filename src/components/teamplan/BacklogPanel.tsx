@@ -58,7 +58,7 @@ export default function BacklogPanel({
   timeSlots, // eslint-disable-line @typescript-eslint/no-unused-vars
   onCreateProject, 
   onUpdateProject, 
-  onDeleteProject,
+  onDeleteProject, // eslint-disable-line @typescript-eslint/no-unused-vars
   onMoveToBoard
 }: BacklogPanelProps) {
   // Track which project should start in edit mode
@@ -341,7 +341,6 @@ export default function BacklogPanel({
                               colorMappings={colorMappings}
                               isColorCodingEnabled={false}
                               onEdit={handleUpdateProject}
-                              onDelete={onDeleteProject}
                               onMoveToBoard={() => onMoveToBoard(project.id)}
                               onMoveToGroup={handleMoveProjectToGroup}
                               onSetImpact={(projectId, impact) => {
@@ -397,7 +396,6 @@ export default function BacklogPanel({
                       colorMappings={colorMappings}
                       isColorCodingEnabled={false}
                       onEdit={handleUpdateProject}
-                      onDelete={onDeleteProject}
                       onMoveToBoard={() => onMoveToBoard(project.id)}
                       onMoveToGroup={handleMoveProjectToGroup}
                       onSetImpact={(projectId, impact) => {

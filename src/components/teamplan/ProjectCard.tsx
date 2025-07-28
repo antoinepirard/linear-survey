@@ -164,6 +164,7 @@ interface ProjectCardProps {
   onMoveToBoard?: (projectId: string) => void;
   onMoveToGroup?: (projectId: string, groupName: string) => void;
   onSetImpact?: (projectId: string, impact: ProjectImpact) => void;
+  onMoveToBacklog?: (projectId: string) => void;
   onDragStart?: (projectId: string, isDuplicating: boolean) => void;
   onDragEnd?: () => void;
   onDrag?: (element: HTMLElement) => void;
@@ -184,6 +185,7 @@ const ProjectCard = ({
   onMoveToBoard,
   onMoveToGroup,
   onSetImpact,
+  onMoveToBacklog,
   onDragStart,
   onDragEnd,
   onDrag
@@ -583,14 +585,19 @@ const ProjectCard = ({
                 {project.group}
               </span>
             )}
-            {onDelete && (
+            {/* Trash icon - only show in team plan board mode, not in backlog */}
+            {!isBacklogMode && (onDelete || onMoveToBacklog) && (
               <div className={`absolute right-0 transition-opacity duration-200 flex items-center ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDelete(project.id);
+                    if (onMoveToBacklog) {
+                      onMoveToBacklog(project.id);
+                    } else if (onDelete) {
+                      onDelete(project.id);
+                    }
                   }}
-                  title="Delete project"
+                  title={onMoveToBacklog ? "Remove from plan (move to backlog)" : "Delete project"}
                   variant="ghost"
                   size="sm"
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 h-5 w-5 p-0.5"
