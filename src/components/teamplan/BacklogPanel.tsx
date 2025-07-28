@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import ProjectCard from './ProjectCard';
-import { motion, AnimatePresence } from 'motion/react';
 
 // Group color function for visual consistency
 const getGroupColor = (group: string) => {
@@ -531,39 +530,31 @@ export default function BacklogPanel({
                 </div>
                 
                 {/* Group Projects */}
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-visible"
-                    >
-                      <div className="pl-4 pr-2 pt-0 pb-2 space-y-2">
-                        {groupProjects.map((project) => (
-                                                      <ProjectCard
-                              key={project.id}
-                              project={project}
-                              availableGroups={availableGroups}
-                              colorMappings={colorMappings}
-                              isColorCodingEnabled={false}
-                              onEdit={handleUpdateProject}
-                              onDelete={(projectId) => onDeleteProject(projectId)}
-                              onMoveToBoard={() => onMoveToBoard(project.id)}
-                              onMoveToGroup={handleMoveProjectToGroup}
-                              onSetImpact={(projectId, impact) => {
-                                const updatedProject = { ...project, impact: impact || undefined };
-                                handleUpdateProject(updatedProject);
-                              }}
-                              isBacklogMode={true}
-                              isEditing={!project.title.trim()}
-                            />
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {isExpanded && (
+                  <div className="overflow-visible">
+                    <div className="pl-4 pr-2 pt-0 pb-2 space-y-2">
+                      {groupProjects.map((project) => (
+                                                    <ProjectCard
+                            key={project.id}
+                            project={project}
+                            availableGroups={availableGroups}
+                            colorMappings={colorMappings}
+                            isColorCodingEnabled={false}
+                            onEdit={handleUpdateProject}
+                            onDelete={(projectId) => onDeleteProject(projectId)}
+                            onMoveToBoard={() => onMoveToBoard(project.id)}
+                            onMoveToGroup={handleMoveProjectToGroup}
+                            onSetImpact={(projectId, impact) => {
+                              const updatedProject = { ...project, impact: impact || undefined };
+                              handleUpdateProject(updatedProject);
+                            }}
+                            isBacklogMode={true}
+                            isEditing={!project.title.trim()}
+                          />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

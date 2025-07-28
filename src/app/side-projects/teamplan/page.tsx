@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import PageLoader from '@/components/PageLoader';
 import TeamPlanBoard from '@/components/teamplan/TeamPlanBoard';
@@ -487,63 +486,40 @@ export default function TeamPlanPage() {
               <div className="flex-1 flex flex-col overflow-hidden">
               
                 {/* Panel Content */}
-                <AnimatePresence mode="wait">
-                  {activePanel === 'notepad' ? (
-                    <motion.div
-                      key="notepad"
-                      initial={{ opacity: 0, x: -3 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 3 }}
-                      transition={{ duration: 0.1, ease: "easeOut" }}
-                      className="flex-1 min-h-0"
-                    >
-                      <NotePad 
-                        currentPlan={currentPlan}
-                        currentDocument={currentDocument}
-                        allDocuments={allDocuments}
-                        onCreateDocument={handleCreateDocument}
-                        onSwitchToDocument={handleSwitchToDocument}
-                        onUpdateDocumentContent={handleUpdateDocumentContent}
-                        onRenameDocument={renameDocument}
-                        onDeleteDocument={handleDeleteDocument}
-                        showDocumentList={true}
-                        isFullScreen={isNotePadFullScreen}
-                      />
-                    </motion.div>
-                  ) : activePanel === 'backlog' ? (
-                    <motion.div
-                      key="backlog"
-                      initial={{ opacity: 0, x: -3 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 3 }}
-                      transition={{ duration: 0.1, ease: "easeOut" }}
-                      className="flex-1 min-h-0"
-                    >
-                      <BacklogPanel 
-                        width={sidebarWidth - 48}
-                        backlogProjects={getBacklogProjects(currentPlan.teamPlanData.projects)}
-                        availableGroups={getAllGroups(currentPlan.teamPlanData.projects)}
-                        onCreateProject={handleCreateBacklogProject}
-                        onUpdateProject={handleUpdateBacklogProject}
-                        onDeleteProject={handleDeleteBacklogProject}
-                        onMoveToBoard={handleMoveBacklogProjectToBoard}
-                        people={currentPlan.teamPlanData.people}
-                        timeSlots={currentPlan.teamPlanData.timeSlots}
-                      />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="comments"
-                      initial={{ opacity: 0, x: -3 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 3 }}
-                      transition={{ duration: 0.1, ease: "easeOut" }}
-                      className="flex-1 min-h-0"
-                    >
-                      <CommentsPanel width={sidebarWidth - 48} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {activePanel === 'notepad' ? (
+                  <div className="flex-1 min-h-0">
+                    <NotePad 
+                      currentPlan={currentPlan}
+                      currentDocument={currentDocument}
+                      allDocuments={allDocuments}
+                      onCreateDocument={handleCreateDocument}
+                      onSwitchToDocument={handleSwitchToDocument}
+                      onUpdateDocumentContent={handleUpdateDocumentContent}
+                      onRenameDocument={renameDocument}
+                      onDeleteDocument={handleDeleteDocument}
+                      showDocumentList={true}
+                      isFullScreen={isNotePadFullScreen}
+                    />
+                  </div>
+                ) : activePanel === 'backlog' ? (
+                  <div className="flex-1 min-h-0">
+                    <BacklogPanel 
+                      width={sidebarWidth - 48}
+                      backlogProjects={getBacklogProjects(currentPlan.teamPlanData.projects)}
+                      availableGroups={getAllGroups(currentPlan.teamPlanData.projects)}
+                      onCreateProject={handleCreateBacklogProject}
+                      onUpdateProject={handleUpdateBacklogProject}
+                      onDeleteProject={handleDeleteBacklogProject}
+                      onMoveToBoard={handleMoveBacklogProjectToBoard}
+                      people={currentPlan.teamPlanData.people}
+                      timeSlots={currentPlan.teamPlanData.timeSlots}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex-1 min-h-0">
+                    <CommentsPanel width={sidebarWidth - 48} />
+                  </div>
+                )}
               </div>
             )}
           </div>
