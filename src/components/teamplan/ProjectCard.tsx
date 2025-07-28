@@ -488,8 +488,8 @@ const ProjectCard = ({
         
         {!isEditingLocal && (
           <div className="relative flex items-center justify-end min-w-0 flex-shrink-0">
-            {/* Show tag by default, trash icon on hover */}
-            {project.group && (
+            {/* Show tag by default, trash icon on hover - but hide in backlog mode since projects are already visually grouped */}
+            {project.group && !isBacklogMode && (
               <span className={`transition-opacity duration-200 text-[10px] px-1.5 py-0.5 rounded-full font-mono max-w-16 truncate ${getGroupColor(project.group).bg} ${getGroupColor(project.group).text} ${isHovered ? 'opacity-0' : 'opacity-100'}`}>
                 {project.group}
               </span>
