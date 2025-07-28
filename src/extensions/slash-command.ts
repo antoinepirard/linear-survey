@@ -192,13 +192,13 @@ export const SlashCommand = Extension.create({
               }
 
               // Check if ReactRenderer actually rendered content
-              const hasContent = component.element && (
-                component.element.innerHTML.trim() !== "" ||
-                component.element.children.length > 0
-              );
+              const hasContent =
+                component.element &&
+                (component.element.innerHTML.trim() !== "" ||
+                  component.element.children.length > 0);
 
               if (!hasContent) {
-                console.log('🔧 ReactRenderer failed - using fallback portal');
+                console.log("🔧 ReactRenderer failed - using fallback portal");
                 component.destroy();
                 component = null;
               }
@@ -235,7 +235,7 @@ export const SlashCommand = Extension.create({
               popup = document.createElement("div");
               popup.style.position = "absolute";
               popup.style.zIndex = "50";
-              
+
               if (component) {
                 // ReactRenderer worked - use it
                 popup.appendChild(component.element);
@@ -244,13 +244,15 @@ export const SlashCommand = Extension.create({
                 fallbackRoot = createRoot(popup);
                 fallbackRoot.render(
                   React.createElement(SlashMenu, {
-                    ref: (ref: SlashMenuRef) => { fallbackRef = ref; },
+                    ref: (ref: SlashMenuRef) => {
+                      fallbackRef = ref;
+                    },
                     items: props.items,
                     command: props.command,
                   })
                 );
               }
-              
+
               document.body.appendChild(popup);
 
               // Position elements using the new positioning logic
@@ -269,7 +271,9 @@ export const SlashCommand = Extension.create({
                 // Update fallback React portal
                 fallbackRoot.render(
                   React.createElement(SlashMenu, {
-                    ref: (ref: SlashMenuRef) => { fallbackRef = ref; },
+                    ref: (ref: SlashMenuRef) => {
+                      fallbackRef = ref;
+                    },
                     items: props.items,
                     command: props.command,
                   })
@@ -329,11 +333,11 @@ export const SlashCommand = Extension.create({
                 const now = Date.now();
                 const context = this as { lastExecutionTime?: number };
                 const lastExecutionTime = context.lastExecutionTime || 0;
-                
+
                 if (now - lastExecutionTime < 200) {
                   return false; // Ignore rapid Enter key presses
                 }
-                
+
                 context.lastExecutionTime = now;
               }
 
@@ -351,7 +355,7 @@ export const SlashCommand = Extension.create({
                 // Use fallback ref
                 return fallbackRef.onKeyDown(props.event);
               }
-              
+
               return false;
             },
 
@@ -364,13 +368,13 @@ export const SlashCommand = Extension.create({
                 document.body.removeChild(filterIndicator);
                 filterIndicator = null;
               }
-              
+
               // Clean up ReactRenderer if it was used
               if (component) {
                 component.destroy();
                 component = null;
               }
-              
+
               // Clean up fallback React portal if it was used
               if (fallbackRoot) {
                 fallbackRoot.unmount();

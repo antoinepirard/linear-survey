@@ -20,11 +20,35 @@ export const EmptyLinePlaceholder =
       };
     },
 
+    addStorage() {
+      return {
+        isDragging: false,
+      };
+    },
+
     addProseMirrorPlugins() {
       return [
         new Plugin({
           key: new PluginKey("emptyLinePlaceholder"),
           props: {
+            handleDOMEvents: {
+              mousedown: (view, event) => {
+                // Track mouse down to detect potential drag operations
+                this.storage.isDragging = true;
+                // Set a timeout to reset dragging state if no mouseup occurs
+                setTimeout(() => {
+                  if (this.storage.isDragging) {
+                    this.storage.isDragging = false;
+                  }
+                }, 1000); // Reset after 1 second to handle edge cases
+                return false; // Don't prevent default behavior
+              },
+              mouseup: (view, event) => {
+                // Reset dragging state on mouse up
+                this.storage.isDragging = false;
+                return false; // Don't prevent default behavior
+              },
+            },
             decorations: (state) => {
               const { doc, selection } = state;
               const { $from } = selection;
@@ -46,6 +70,11 @@ export const EmptyLinePlaceholder =
 
               // Hide placeholders during any active selection to prevent drag interference
               if (!selection.empty) {
+                return DecorationSet.empty;
+              }
+
+              // Hide placeholders during mouse drag operations to prevent coordinate interference
+              if (this.storage.isDragging) {
                 return DecorationSet.empty;
               }
 
