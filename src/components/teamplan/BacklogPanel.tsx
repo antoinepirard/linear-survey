@@ -463,7 +463,17 @@ export default function BacklogPanel({
                       ? 'cursor-default' 
                       : 'cursor-pointer hover:opacity-80'
                   }`}
-                  onClick={editingGroupName === groupName ? undefined : () => toggleGroup(groupName)}
+                  onClick={(e) => {
+                    if (editingGroupName === groupName) {
+                      e.preventDefault();
+                      return;
+                    }
+                    // Only toggle if the click wasn't on the editable group name
+                    if (groupingMode === 'group' && (e.target as HTMLElement).closest('.group-name-edit')) {
+                      return;
+                    }
+                    toggleGroup(groupName);
+                  }}
                   onMouseEnter={() => setHoveredGroupHeader(groupName)}
                   onMouseLeave={() => setHoveredGroupHeader(null)}
                 >
@@ -501,7 +511,7 @@ export default function BacklogPanel({
                   ) : (
                     <div className="flex-1">
                       <span 
-                        className={`text-sm font-medium ${groupColor.text} cursor-pointer hover:underline inline-block`}
+                        className={`text-sm font-medium ${groupColor.text} cursor-pointer hover:underline inline-block group-name-edit`}
                         onClick={(e) => {
                           e.stopPropagation();
                           if (groupingMode === 'group') {

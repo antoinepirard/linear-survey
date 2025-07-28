@@ -457,7 +457,6 @@ const ProjectCard = ({
             availableGroups={availableGroups}
             currentGroup={project.group}
             currentImpact={project.impact}
-            label={project.title}
           >
         <motion.div
         ref={dragRef}
