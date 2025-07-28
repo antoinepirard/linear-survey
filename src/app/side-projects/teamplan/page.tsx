@@ -127,10 +127,25 @@ export default function TeamPlanPage() {
     }
   }, []);
 
+  // Load active panel preference from localStorage on mount
+  useEffect(() => {
+    const savedActivePanel = localStorage.getItem('teamplan-active-panel');
+    if (savedActivePanel && ['notepad', 'backlog', 'comments'].includes(savedActivePanel)) {
+      setActivePanel(savedActivePanel as 'notepad' | 'backlog' | 'comments');
+      setIsSidebarExpanded(true); // Ensure sidebar is expanded when restoring panel
+    }
+  }, []);
+
   // Save color coding preference to localStorage when it changes
   const handleColorCodingChange = (checked: boolean) => {
     setIsColorCodingEnabled(checked);
     localStorage.setItem('teamplan-color-coding-enabled', JSON.stringify(checked));
+  };
+
+  // Save active panel preference to localStorage when it changes
+  const handleSetActivePanel = (panel: 'notepad' | 'backlog' | 'comments') => {
+    setActivePanel(panel);
+    localStorage.setItem('teamplan-active-panel', panel);
   };
 
   const handlePageLoadingComplete = () => {
@@ -380,7 +395,7 @@ export default function TeamPlanPage() {
     if (activePanel === 'notepad' && isSidebarExpanded) {
       setIsSidebarExpanded(false);
     } else {
-      setActivePanel('notepad');
+      handleSetActivePanel('notepad');
       setIsSidebarExpanded(true);
     }
   };
@@ -389,7 +404,7 @@ export default function TeamPlanPage() {
     if (activePanel === 'backlog') {
       setIsSidebarExpanded(false);
     } else {
-      setActivePanel('backlog');
+      handleSetActivePanel('backlog');
       setIsSidebarExpanded(true);
     }
   };
@@ -398,7 +413,7 @@ export default function TeamPlanPage() {
     if (activePanel === 'comments') {
       setIsSidebarExpanded(false);
     } else {
-      setActivePanel('comments');
+      handleSetActivePanel('comments');
       setIsSidebarExpanded(true);
     }
   };
