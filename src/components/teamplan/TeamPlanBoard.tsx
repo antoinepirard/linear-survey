@@ -622,7 +622,6 @@ function TeamPlanBoard({
                     onMoveUp={() => onMoveTimeSlotLeft?.(timeSlot.id)}
                     onMoveDown={() => onMoveTimeSlotRight?.(timeSlot.id)}
                     onDelete={() => onRemoveTimeSlot?.(timeSlot.id)}
-                    label={timeSlot.label}
                   >
                     <motion.div
                       className={`p-2 group relative transition-colors duration-200 ${
@@ -725,7 +724,6 @@ function TeamPlanBoard({
                         onMoveUp={() => handleMovePersonUp(person.id)}
                         onMoveDown={() => handleMovePersonDown(person.id)}
                         onDelete={() => handleRemovePerson(person.id)}
-                        label={person.name}
                       >
                         <div className="min-h-12 p-1 pt-1 pb-1">
                           <PersonCell

@@ -143,7 +143,6 @@ const TeamPlanHeader = ({
               onMoveUp={() => onMoveTimeSlotLeft?.(timeSlot.id)}
               onMoveDown={() => onMoveTimeSlotRight?.(timeSlot.id)}
               onDelete={() => onRemoveTimeSlot?.(timeSlot.id)}
-              label={timeSlot.label}
             >
               <motion.div
                 className={`p-2 group relative transition-colors duration-200 ${
