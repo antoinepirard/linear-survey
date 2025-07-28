@@ -439,11 +439,11 @@ const ProjectCard = ({
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
                 onBlur={handleSave}
-                placeholder="Project title"
+                placeholder={project.group ? "Project title" : "Project title (add /group for grouping)"}
                 className="w-full font-medium leading-snug bg-transparent border-none outline-none p-0 m-0 text-inherit h-5"
                 autoFocus
               />
-              {showAutocomplete && availableGroups.length > 0 && (
+              {showAutocomplete && availableGroups.length > 0 && !project.group && (
                 <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-md shadow-lg z-50 min-w-32">
                   <div className="px-3 py-2 text-xs text-slate-500 border-b border-slate-100">
                     Select a group:
