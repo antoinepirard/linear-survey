@@ -17,7 +17,7 @@ export default function Services() {
             {/* Main Content */}
             <div className="flex flex-col gap-6 max-w-2xl">
               <AnimationWrapper delay="150ms">
-                <h1 className="text-lg font-medium leading-relaxed text-slate-950">
+                <h1 className="text-base font-medium leading-relaxed text-slate-950">
                   A product & design partner for 0→1 and pivots.
                 </h1>
               </AnimationWrapper>

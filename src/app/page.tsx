@@ -115,7 +115,7 @@ export default function Home() {
             {/* Main Content */}
             <div className="flex flex-col gap-6 max-w-2xl">
               <AnimationWrapper delay="150ms">
-                <p className="text-lg font-medium leading-relaxed text-slate-950">
+                <p className="text-base font-medium leading-relaxed text-slate-950">
                   Product & design partner for founders.
                 </p>
                 <p className="text-base leading-relaxed text-slate-700">
@@ -126,7 +126,7 @@ export default function Home() {
               </AnimationWrapper>
 
               <AnimationWrapper delay="200ms">
-                <p className="text-base leading-relaxed text-slate-600">
+                <p className="text-base leading-relaxed text-slate-700">
                   I&apos;ve spent the last decade working at early stage
                   startups and collaborating with brillant engineers. I enjoy
                   finding my way through the chaos to figure out the most
@@ -190,7 +190,7 @@ export default function Home() {
             {/* <CompanyLogos /> */}
 
             {/* Testimonials Section */}
-            <TestimonialsSection />
+            {/* <TestimonialsSection /> */}
 
             {/* Separation Line */}
             <motion.div
