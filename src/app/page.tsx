@@ -25,14 +25,6 @@ const PhotoModal = dynamic(() => import("@/components/PhotoModal"), {
   loading: () => null,
 });
 
-const TestimonialsSection = dynamic(
-  () => import("@/components/TestimonialsSection"),
-  {
-    loading: () => (
-      <div className="animate-pulse h-48 bg-slate-100 rounded-lg" />
-    ),
-  }
-);
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);

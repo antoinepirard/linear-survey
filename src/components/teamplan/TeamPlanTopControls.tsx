@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useState } from 'react';
+import Image from 'next/image';
 import { Tabs as ShadcnTabs, TabsList, TabsTrigger } from '@/components/ui/shadcn-tabs';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -75,9 +76,11 @@ const TeamPlanTopControls = ({
             </Button>
             
             <Button size="sm" className="bg-slate-900 text-white hover:bg-slate-800">
-              <img 
+              <Image 
                 src="/Assets/TeamPlan-Ravell/logo-light.svg" 
                 alt="" 
+                width={16}
+                height={16}
                 className="h-4 w-4"
               />
               Push
