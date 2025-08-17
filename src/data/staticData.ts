@@ -49,6 +49,19 @@ export const quotes = [
   },
 ];
 
+export const testimonials = [
+  {
+    text: "I worked with Antoine at Rasayel and he pushed everyone else to raise their game. During my time working with him, I've watched him transform our approach to user experience through sheer obsession with getting it right. He talks to customers A LOT and brings feedback back fast so we can continue iterating. What I value most is his sense of when to ship and when to polish. He sweats the details users notice and lets the rest improve after launch. He doesn't just hand off designs—he owns the work and ships with the team. I'd honestly love to work with him again.",
+    author: "Abdelrahman Awad",
+    company: "Engineer at Sentry & Google Dev Expert",
+  },
+  {
+    text: "I worked with Antoine for 3 years at Rasayel. Together we planned, scoped and executed on a huge number of projects. Antoine really excels at taking problems, understanding their root cause, and searching for a solution beyond the surface level. I cannot recommend Antoine highly enough.",
+    author: "Jonathan O'Mahony",
+    company: "Nory (Prev. Intercom & Evervault)",
+  },
+];
+
 export const companyLogos = [
   {
     src: "/Assets/Logos/Rasayel Logo.svg",
