@@ -1,16 +1,16 @@
-import { AnimationWrapper } from '@/hooks/useAnimation';
-import Link from 'next/link';
-import { motion, useScroll, useTransform } from 'motion/react';
-import { useEffect, useState, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
-import { ChevronLeftIcon as ChevronLeftIconSolid } from '@heroicons/react/24/solid';
-import Navigation from './Navigation';
+import { AnimationWrapper } from "@/hooks/useAnimation";
+import Link from "next/link";
+import { motion, useScroll, useTransform } from "motion/react";
+import { useEffect, useState, useCallback } from "react";
+import { usePathname } from "next/navigation";
+import { ChevronLeftIcon as ChevronLeftIconSolid } from "@heroicons/react/24/solid";
+import Navigation from "./Navigation";
 
 export default function HeaderSection() {
   const { scrollY } = useScroll();
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
-  const isHomePage = pathname === '/';
+  const isHomePage = pathname === "/";
 
   const checkMobile = useCallback(() => {
     setIsMobile(window.innerWidth < 640);
@@ -19,17 +19,17 @@ export default function HeaderSection() {
   useEffect(() => {
     // Initial check
     checkMobile();
-    
+
     // Throttled resize handler for better performance
     let timeoutId: NodeJS.Timeout;
     const handleResize = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(checkMobile, 100);
     };
-    
-    window.addEventListener('resize', handleResize);
+
+    window.addEventListener("resize", handleResize);
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       clearTimeout(timeoutId);
     };
   }, [checkMobile]);
@@ -56,7 +56,7 @@ export default function HeaderSection() {
                         Antoine Pirard
                       </h1>
                       <p className="text-base font-normal text-slate-600 leading-tight">
-                        Product designer
+                        Product & design
                       </p>
                     </div>
                   </div>
@@ -69,18 +69,18 @@ export default function HeaderSection() {
                   animate="rest"
                 >
                   <Link href="/">
-                    <motion.div 
+                    <motion.div
                       className="relative h-10 overflow-hidden flex flex-col justify-center rounded-md"
                       variants={{
-                        rest: { backgroundColor: 'rgb(248 250 252 / 0)' },
-                        hover: { backgroundColor: 'rgb(248 250 252 / 1)' }
+                        rest: { backgroundColor: "rgb(248 250 252 / 0)" },
+                        hover: { backgroundColor: "rgb(248 250 252 / 1)" },
                       }}
                       transition={{ duration: 0.2 }}
                     >
                       <motion.div
                         variants={{
                           rest: { y: 0, opacity: 1 },
-                          hover: { y: -12, opacity: 0 }
+                          hover: { y: -12, opacity: 0 },
                         }}
                         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                       >
@@ -88,14 +88,14 @@ export default function HeaderSection() {
                           Antoine Pirard
                         </h1>
                         <p className="text-base font-normal text-slate-600 leading-tight">
-                          Product designer
+                          Product & design
                         </p>
                       </motion.div>
-                      <motion.div 
+                      <motion.div
                         className="absolute inset-y-0 left-2 flex items-center"
                         variants={{
                           rest: { y: 12, opacity: 0 },
-                          hover: { y: 0, opacity: 1 }
+                          hover: { y: 0, opacity: 1 },
                         }}
                         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                       >
@@ -123,7 +123,10 @@ export default function HeaderSection() {
       >
         <div className="max-w-4xl mx-auto px-6 py-2">
           <div className="flex justify-between items-center">
-            <Link href="/" className="text-sm font-semibold text-slate-900 hover:text-slate-600 transition-colors cursor-pointer">
+            <Link
+              href="/"
+              className="text-sm font-semibold text-slate-900 hover:text-slate-600 transition-colors cursor-pointer"
+            >
               Antoine Pirard
             </Link>
             <Navigation showDot={false} />

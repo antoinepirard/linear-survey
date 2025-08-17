@@ -57,8 +57,8 @@ export default function Services() {
                     <span className="font-medium text-slate-900">
                       In practice:
                     </span>{" "}
-                    problem framing & success criteria → clickable flows with
-                    user tests and insights → specs, acceptance criteria, and a
+                    problem framing & success criteria → validated experiences
+                    and designs with users → specs, acceptance criteria, and a
                     clean handoff to development.
                   </p>
 
@@ -66,13 +66,13 @@ export default function Services() {
                     <span className="font-medium text-slate-900">
                       Best fit:
                     </span>{" "}
-                    engaged founders, a technical core, and access to users.{" "}
-                    <br />
+                    engaged founders, a technical core, and access to users.
+                    Multi weeks or months collaborations. <br />
                     <span className="font-medium text-slate-900">
                       Not a fit:
                     </span>{" "}
                     pixel-only work, &quot;just make it pretty,&quot; or no
-                    access to decision-makers.
+                    access to decision-makers. Single day or week engagements.
                   </p>
                 </div>
               </AnimationWrapper>
