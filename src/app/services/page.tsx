@@ -25,23 +25,39 @@ export default function Services() {
               <AnimationWrapper delay="200ms">
                 <div className="flex flex-col gap-4 text-base leading-relaxed text-slate-600">
                   <p>
-                    I partner with early-stage founders building their first product and mature teams making product pivots. In one month, we clarify the bet, test it with users, and align engineering with a prototype and decision brief.
+                    I partner with early-stage founders building their first
+                    product and mature teams making product pivots. As an
+                    ongoing embedded partner, we choose the next bet, test it
+                    with users, and keep engineering aligned and work withe the
+                    team to ensure the output is outcome driven and well
+                    crafted.
                   </p>
-                  
+
                   <p>
-                    My approach is hands-on product and design work embedded with your founder and tech lead. We run weekly outcome loops—goal, prototype and test, decision memo, next step. I don't write code, but I make sure the right code gets written.
+                    My approach is hands-on product and design, embedded with
+                    your founder and tech lead. We run weekly outcome loops—goal
+                    → prototype & test → decision memo → next step. I work
+                    closely with engineers and, when it unblocks momentum,
+                    I&apos;ll open small PRs to ensure implementation quality.
                   </p>
-                  
+
                   <p>
-                    What we achieve together: decision velocity on the next bet in days not months, risk reduction by testing top assumptions before code, and team alignment with prototypes and specs engineering trusts.
+                    What we achieve together: decision velocity (days, not
+                    months), risk reduction (test top assumptions before code),
+                    and team alignment (prototypes and specs engineering
+                    trusts).
                   </p>
-                  
+
                   <p>
-                    In practice, this means problem framing and success criteria, clickable flows with user tests and insights, then specs, acceptance criteria, and clean handoff to development.
+                    In practice: problem framing & success criteria → clickable
+                    flows with user tests and insights → specs, acceptance
+                    criteria, and a clean handoff to development.
                   </p>
-                  
+
                   <p>
-                    This works best with engaged founders, technical core teams, and access to users. It's not a fit for pixel-only work, "just make it pretty" requests, or situations without access to decision-makers.
+                    Best fit: engaged founders, a technical core, and access to
+                    users. Not a fit: pixel-only work, &quot;just make it
+                    pretty,&quot; or no access to decision-makers.
                   </p>
                 </div>
               </AnimationWrapper>
