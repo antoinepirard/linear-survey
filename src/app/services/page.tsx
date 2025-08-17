@@ -42,22 +42,23 @@ export default function Services() {
                   </p>
 
                   <p>
-                    What we achieve together: decision velocity (days, not
+                    <span className="font-medium text-slate-900">What we achieve together:</span> decision velocity (days, not
                     months), risk reduction (test top assumptions before code),
                     and team alignment (prototypes and specs engineering
                     trusts).
                   </p>
 
                   <p>
-                    In practice: problem framing & success criteria → clickable
+                    <span className="font-medium text-slate-900">In practice:</span> problem framing & success criteria → clickable
                     flows with user tests and insights → specs, acceptance
                     criteria, and a clean handoff to development.
                   </p>
 
                   <p>
-                    Best fit: engaged founders, a technical core, and access to
-                    users. Not a fit: pixel-only work, &quot;just make it
-                    pretty,&quot; or no access to decision-makers.
+                    <span className="font-medium text-slate-900">Best fit:</span> engaged founders, a technical core, and access to
+                    users. <br />
+                    <span className="font-medium text-slate-900">Not a fit:</span> pixel-only work, &quot;just make it pretty,&quot;
+                    or no access to decision-makers.
                   </p>
                 </div>
               </AnimationWrapper>
