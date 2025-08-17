@@ -25,11 +25,14 @@ export default function Services() {
               <AnimationWrapper delay="200ms">
                 <div className="flex flex-col gap-4 text-base leading-relaxed text-slate-600">
                   <p>
-                    I partner with early-stage founders building their first
-                    product and mature teams making product pivots. As an
-                    ongoing embedded partner, we choose the next bet, test it
-                    with users, and keep engineering aligned and work withe the
-                    team to ensure the output is outcome driven and well
+                    <span className="font-medium text-slate-900">
+                      {" "}
+                      I partner with early-stage founders building their first
+                      product and teams making product pivots.{" "}
+                    </span>{" "}
+                    As an ongoing embedded partner, we choose the next bet, test
+                    it with users, and keep engineering aligned and work withe
+                    the team to ensure the output is outcome driven and well
                     crafted.
                   </p>
 
@@ -42,23 +45,34 @@ export default function Services() {
                   </p>
 
                   <p>
-                    <span className="font-medium text-slate-900">What we achieve together:</span> decision velocity (days, not
-                    months), risk reduction (test top assumptions before code),
-                    and team alignment (prototypes and specs engineering
-                    trusts).
+                    <span className="font-medium text-slate-900">
+                      What we achieve together:
+                    </span>{" "}
+                    decision velocity (days, not months), risk reduction (test
+                    top assumptions before code), and team alignment (prototypes
+                    and specs engineering trusts).
                   </p>
 
                   <p>
-                    <span className="font-medium text-slate-900">In practice:</span> problem framing & success criteria → clickable
-                    flows with user tests and insights → specs, acceptance
-                    criteria, and a clean handoff to development.
+                    <span className="font-medium text-slate-900">
+                      In practice:
+                    </span>{" "}
+                    problem framing & success criteria → clickable flows with
+                    user tests and insights → specs, acceptance criteria, and a
+                    clean handoff to development.
                   </p>
 
                   <p>
-                    <span className="font-medium text-slate-900">Best fit:</span> engaged founders, a technical core, and access to
-                    users. <br />
-                    <span className="font-medium text-slate-900">Not a fit:</span> pixel-only work, &quot;just make it pretty,&quot;
-                    or no access to decision-makers.
+                    <span className="font-medium text-slate-900">
+                      Best fit:
+                    </span>{" "}
+                    engaged founders, a technical core, and access to users.{" "}
+                    <br />
+                    <span className="font-medium text-slate-900">
+                      Not a fit:
+                    </span>{" "}
+                    pixel-only work, &quot;just make it pretty,&quot; or no
+                    access to decision-makers.
                   </p>
                 </div>
               </AnimationWrapper>
