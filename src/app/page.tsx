@@ -111,7 +111,8 @@ export default function Home() {
                 </p>
                 <p className="text-base leading-relaxed text-slate-700">
                   I partner with founders to validate the next bet and craft
-                  thoughtful experiences with engineers. From research to code.
+                  thoughtful experiences with engineers. From research to code
+                  handover.
                 </p>
               </AnimationWrapper>
 
