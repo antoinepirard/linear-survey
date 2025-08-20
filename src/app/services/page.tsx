@@ -3,7 +3,11 @@
 import { AnimationWrapper } from "@/hooks/useAnimation";
 import HeaderSection from "@/components/HeaderSection";
 import { Button } from "@/components/ui/button";
-import { CalendarDaysIcon } from "@heroicons/react/24/outline";
+import {
+  CalendarDaysIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
 
 export default function Services() {
   return (
@@ -62,26 +66,37 @@ export default function Services() {
                     clean handoff to development.
                   </p>
 
-                  <p>
-                    <span className="font-medium text-slate-900">
-                      Best fit:
-                    </span>{" "}
-                    engaged founders, a technical core, and access to users.
-                    Multi months or quarter collaborations. <br />
-                    <span className="font-medium text-slate-900">
-                      Not a fit:
-                    </span>{" "}
-                    pixel-only work, &quot;just make it pretty,&quot; or no
-                    access to decision-makers. Single day or week engagements.
-                  </p>
+                  <div className="flex flex-col gap-2 mt-6">
+                    <div className="flex items-start gap-2">
+                      <CheckCircleIcon className="w-4 h-4 text-green-600 mt-1 flex-shrink-0" />
+                      <span>
+                        <span className="font-medium text-slate-900">
+                          Best fit:
+                        </span>{" "}
+                        engaged founders, a technical core, and access to users.
+                        Multi months or quarter collaborations.
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <XCircleIcon className="w-4 h-4 text-red-500 mt-1 flex-shrink-0" />
+                      <span>
+                        <span className="font-medium text-slate-900">
+                          Not a fit:
+                        </span>{" "}
+                        pixel-only work, &quot;just make it pretty,&quot; or no
+                        access to decision-makers. Single day or week
+                        engagements.
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </AnimationWrapper>
 
-              <AnimationWrapper delay="300ms">
+              <AnimationWrapper delay="300ms" className="mt-6 mb-24">
                 <Button
                   asChild
                   variant="secondary"
-                  className="bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200 hover:text-slate-800 transition-all duration-150 w-fit"
+                  className="bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200 hover:text-slate-800 transition-all duration-150 w-full sm:w-fit"
                 >
                   <a
                     href="https://cal.com/antoine-ravell/30min"
