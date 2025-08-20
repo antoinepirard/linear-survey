@@ -67,7 +67,7 @@ export default function Services() {
                       Best fit:
                     </span>{" "}
                     engaged founders, a technical core, and access to users.
-                    Multi weeks or months collaborations. <br />
+                    Multi months or quarter collaborations. <br />
                     <span className="font-medium text-slate-900">
                       Not a fit:
                     </span>{" "}
