@@ -44,8 +44,8 @@ export default function Services() {
                     My approach is hands-on product and design, embedded with
                     your founder and tech lead. We run weekly outcome loops—goal
                     → prototype & test → decision memo → next step. I work
-                    closely with engineers and, when it unblocks momentum,
-                    I&apos;ll open small PRs to ensure implementation quality.
+                    closely with engineers beyond just handover—prioritizing,
+                    scoping, and jumping in to work alongside them when needed.
                   </p>
 
                   <p>
