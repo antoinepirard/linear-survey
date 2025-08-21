@@ -25,7 +25,6 @@ const PhotoModal = dynamic(() => import("@/components/PhotoModal"), {
   loading: () => null,
 });
 
-
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -158,7 +157,7 @@ export default function Home() {
                   className="bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200 hover:text-slate-800 transition-all duration-150"
                 >
                   <a
-                    href="https://cal.com/antoine-ravell/30min"
+                    href="https://cal.com/antoine-ravell/15min"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

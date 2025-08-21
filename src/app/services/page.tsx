@@ -100,7 +100,7 @@ export default function Services() {
                   className="active:scale-[0.97]"
                 >
                   <a
-                    href="https://cal.com/antoine-ravell/30min"
+                    href="https://cal.com/antoine-ravell/15min"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
