@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { AnimationWrapper } from "@/hooks/useAnimation";
 import HeaderSection from "@/components/HeaderSection";
 import { Button } from "@/components/ui/button";
@@ -36,16 +37,16 @@ export default function Services() {
                       I partner with early-stage founders building their first
                       product and teams making product pivots.{" "}
                     </span>{" "}
-                    As an ongoing embedded partner, we choose the next bet, test
-                    it with users, and keep engineering aligned and work withe
+                    As an ongoing partner, together we choose the next bet, test
+                    it with users, and keep engineering aligned and work with
                     the team to ensure the output is outcome driven and well
                     crafted.
                   </p>
 
                   <p>
                     My approach is hands-on product and design, embedded with
-                    your founder and tech lead. We run weekly outcome loops—goal
-                    → prototype & test → decision memo → next step. I work
+                    your founder and tech lead. We run weekly outcome loops —
+                    goal → prototype & test → decision memo → next step. I work
                     closely with engineers beyond just handover—prioritizing,
                     scoping, and jumping in to work alongside them when needed.
                   </p>
@@ -115,7 +116,7 @@ export default function Services() {
               </AnimationWrapper>
 
               {/* Case Study */}
-              <AnimationWrapper delay="350ms" className="mt-8 mb-24">
+              <AnimationWrapper delay="350ms" className="mt-8">
                 <div className="flex flex-col gap-3">
                   <h2 className="text-sm font-medium text-slate-600">
                     Projects I&apos;ve delivered
@@ -139,6 +140,30 @@ export default function Services() {
                     </div>
                   </a>
                 </div>
+              </AnimationWrapper>
+
+              {/* LinkedIn Recommendations */}
+              <AnimationWrapper delay="400ms" className="mt-8 mb-24">
+                <Button
+                  asChild
+                  variant="secondary"
+                  size="sm"
+                  className="bg-white hover:bg-slate-100 text-slate-600"
+                >
+                  <a
+                    href="https://www.linkedin.com/in/antoinepirard/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Image
+                      src="/Assets/Logos/linkedin-logo.svg"
+                      alt="LinkedIn"
+                      width={16}
+                      height={16}
+                    />
+                    Read recommendations
+                  </a>
+                </Button>
               </AnimationWrapper>
             </div>
           </div>

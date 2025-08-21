@@ -1,7 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { EnvelopeIcon, ClipboardIcon } from "@heroicons/react/24/outline";
+import {
+  EnvelopeIcon,
+  ClipboardDocumentIcon,
+} from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
 interface DualEmailButtonProps {
@@ -38,7 +41,7 @@ export function DualEmailButton({ email, className }: DualEmailButtonProps) {
         size="icon"
         className="bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-all duration-150 rounded-l-none"
       >
-        <ClipboardIcon className="w-4 h-4" />
+        <ClipboardDocumentIcon className="w-4 h-4" />
       </Button>
       <div className="absolute top-1/2 -translate-y-1/2 right-9 w-px h-4 bg-slate-200 pointer-events-none" />
     </div>
