@@ -114,7 +114,7 @@ export default function Services() {
               <AnimationWrapper delay="350ms" className="mt-8 mb-24">
                 <div className="flex flex-col gap-3">
                   <h2 className="text-sm font-medium text-slate-600">
-                    Some of my work
+                    Projects I&apos;ve delivered
                   </h2>
                   <a
                     href="/case-studies/chatbot-flow-builder"
