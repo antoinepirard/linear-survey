@@ -3,12 +3,12 @@
 import { AnimationWrapper } from "@/hooks/useAnimation";
 import HeaderSection from "@/components/HeaderSection";
 import { Button } from "@/components/ui/button";
+import { DualEmailButton } from "@/components/ui/dual-email-button";
 import {
   CalendarDaysIcon,
   CheckCircleIcon,
   XCircleIcon,
   BookOpenIcon,
-  EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 
 export default function Services() {
@@ -110,16 +110,7 @@ export default function Services() {
                       Book a 15 min call
                     </a>
                   </Button>
-                  <Button
-                    asChild
-                    variant="secondary"
-                    className="bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200 hover:text-slate-800 transition-all duration-150"
-                  >
-                    <a href="mailto:antoine@ravell.io">
-                      <EnvelopeIcon className="w-4 h-4" />
-                      Send email
-                    </a>
-                  </Button>
+                  <DualEmailButton email="antoine@ravell.io" />
                 </div>
               </AnimationWrapper>
 
