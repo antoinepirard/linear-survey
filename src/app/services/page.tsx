@@ -94,7 +94,11 @@ export default function Services() {
               </AnimationWrapper>
 
               <AnimationWrapper delay="300ms" className="mt-6">
-                <Button asChild variant="default">
+                <Button
+                  asChild
+                  variant="default"
+                  className="active:scale-[0.97]"
+                >
                   <a
                     href="https://cal.com/antoine-ravell/30min"
                     target="_blank"
@@ -112,10 +116,10 @@ export default function Services() {
                   <h2 className="text-sm font-medium text-slate-600">
                     Some of my work
                   </h2>
-                                      <a
-                      href="/case-studies/chatbot-flow-builder"
-                      className="flex items-start gap-4 max-w-2xl bg-slate-50 ring-1 ring-slate-100 hover:bg-slate-100 rounded-xl px-6 py-4 transition-all duration-150 active:scale-[0.98]"
-                    >
+                  <a
+                    href="/case-studies/chatbot-flow-builder"
+                    className="flex items-start gap-4 max-w-2xl bg-slate-50 ring-1 ring-slate-100 hover:bg-slate-100 rounded-xl px-6 py-4 transition-all duration-150"
+                  >
                     <div className="bg-white shadow-sm rounded-lg p-2 flex-shrink-0">
                       <BookOpenIcon className="w-4.5 h-4.5 text-slate-600" />
                     </div>
