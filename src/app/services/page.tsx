@@ -7,6 +7,7 @@ import {
   CalendarDaysIcon,
   CheckCircleIcon,
   XCircleIcon,
+  BookOpenIcon,
 } from "@heroicons/react/24/outline";
 
 export default function Services() {
@@ -92,21 +93,44 @@ export default function Services() {
                 </div>
               </AnimationWrapper>
 
-              <AnimationWrapper delay="300ms" className="mt-6 mb-24">
-                <Button
-                  asChild
-                  variant="secondary"
-                  className="bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200 hover:text-slate-800 transition-all duration-150 w-full sm:w-fit"
-                >
+              <AnimationWrapper delay="300ms" className="mt-6">
+                <Button asChild variant="default">
                   <a
                     href="https://cal.com/antoine-ravell/30min"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     <CalendarDaysIcon className="w-4 h-4" />
-                    Book a call
+                    Book a 15 min call
                   </a>
                 </Button>
+              </AnimationWrapper>
+
+              {/* Case Study */}
+              <AnimationWrapper delay="350ms" className="mt-8 mb-24">
+                <div className="flex flex-col gap-3">
+                  <h2 className="text-sm font-medium text-slate-600">
+                    Some of my work
+                  </h2>
+                                      <a
+                      href="/case-studies/chatbot-flow-builder"
+                      className="flex items-start gap-4 max-w-2xl bg-slate-50 ring-1 ring-slate-100 hover:bg-slate-100 rounded-xl px-6 py-4 transition-all duration-150 active:scale-[0.98]"
+                    >
+                    <div className="bg-white shadow-sm rounded-lg p-2 flex-shrink-0">
+                      <BookOpenIcon className="w-4.5 h-4.5 text-slate-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-medium text-slate-900 mb-0">
+                        Chatbot flow builder for WhatsApp
+                      </h3>
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        A multi months project to allow Rasayel customers to
+                        build complex conversational and integrated chatbot
+                        flows.
+                      </p>
+                    </div>
+                  </a>
+                </div>
               </AnimationWrapper>
             </div>
           </div>
