@@ -10,6 +10,9 @@ import {
   ChevronDownIcon,
   ArrowTrendingUpIcon,
   LightBulbIcon,
+  BoltIcon,
+  ChartBarIcon,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tabs";
@@ -427,10 +430,47 @@ export default function ChatbotFlowBuilderCaseStudy() {
         <div className="bg-white rounded-md ring-1 ring-slate-300/20 shadow-xl overflow-hidden">
           <section className="p-6 md:p-12">
             <div className="max-w-2xl mx-auto">
-              <ArrowTrendingUpIcon className="w-6 h-6 text-slate-300 mb-3" />
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">
-                Growth
-              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-8">
+                {[
+                  {
+                    icon: BoltIcon,
+                    title: "Workflow that actually deliver value",
+                    description:
+                      "From no automations to complex conversational flows integrated with the customer CRMs.",
+                  },
+                  {
+                    icon: ChartBarIcon,
+                    title: "Fueled growth from 0 to 65k MRR",
+                    description:
+                      "One of the key features allowing us to close deals within our ICP.",
+                  },
+                  {
+                    icon: ShieldCheckIcon,
+                    title: "Differentiated from competitors",
+                    description:
+                      "Flow is fully WhatsApp Native, allowing us to outcompete competitors.",
+                  },
+                ].map((item, index) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <div
+                      key={index}
+                      className="text-left bg-slate-50 rounded-xl p-4"
+                    >
+                      <div className="w-8 h-8 mb-3 flex items-center justify-center">
+                        <IconComponent className="w-6 h-6 text-slate-400" />
+                      </div>
+                      <h4 className="font-medium text-slate-900 mb-2">
+                        {item.title}
+                      </h4>
+                      <p className="text-sm text-slate-700 leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+
               <p className="text-slate-700 leading-relaxed">
                 The chatbot builder became a core differentiator for Rasayel,
                 allowing us to close deals with customers using other platforms
