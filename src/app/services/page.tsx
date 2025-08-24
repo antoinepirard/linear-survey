@@ -37,18 +37,18 @@ export default function Services() {
                       I partner with early-stage founders building their first
                       product and teams making product pivots.{" "}
                     </span>{" "}
-                    As an ongoing partner, together we choose the next bet, test
-                    it with users, and keep engineering aligned and work with
-                    the team to ensure the output is outcome driven and well
-                    crafted.
+                    As a embedded partner, I work with you to choose the next
+                    priority, validate it with users, and make sure product and
+                    engineering stay aligned so we deliver meaningful outcomes.
                   </p>
 
                   <p>
-                    My approach is hands-on product and design, embedded with
-                    your founder and tech lead. We run weekly outcome loops —
-                    goal → prototype & test → decision memo → next step. I work
-                    closely with engineers beyond just handover—prioritizing,
-                    scoping, and jumping in to work alongside them when needed.
+                    My approach is hands-on product and design, working directly
+                    with your founder and tech lead. We run weekly outcome loops
+                    — goal → prototype & test → decision memo → next step. I
+                    work closely with engineers beyond just handover — I
+                    prioritize, scope, and jump in to work alongside them when
+                    needed.
                   </p>
 
                   <p>

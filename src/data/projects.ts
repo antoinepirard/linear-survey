@@ -52,16 +52,19 @@ export const projects: Project[] = [
     year: "2025",
     projectName: "Import CSV as campaign audience",
     category: "Marketing",
+    previewImage: "/case-studies/rasayel-big-picture/campaign-csv-import.png",
   },
   {
     year: "2025",
     projectName: "Property syncing (Pipedrive)",
     category: "Integration",
+    previewImage: "/case-studies/rasayel-big-picture/propertysync.jpg",
   },
   {
     year: "2025",
     projectName: "WhatsApp Carousels",
     category: "WhatsApp Natives",
+    previewImage: "/case-studies/rasayel-big-picture/carousels.jpg",
   },
   {
     year: "2025",
@@ -76,7 +79,8 @@ export const projects: Project[] = [
   {
     year: "2025",
     projectName: "WhatsApp Flows",
-    category: "WhatsApp Natives"
+    category: "WhatsApp Natives",
+    previewImage: "/case-studies/rasayel-big-picture/whatsapp-flows.png",
   },
   {
     year: "2025",
@@ -86,7 +90,8 @@ export const projects: Project[] = [
   {
     year: "2025",
     projectName: "Detect email domain when joining workspace",
-    category: "Onboarding & Activation"
+    category: "Onboarding & Activation",
+    previewImage: "/case-studies/rasayel-big-picture/detect-email-domain-when-joining.png",
   },
   {
     year: "2024",
@@ -96,12 +101,14 @@ export const projects: Project[] = [
   {
     year: "2024",
     projectName: "Team Assignment when starting outbound campaigns",
-    category: "Outbound"
+    category: "Outbound",
+    previewImage: "/case-studies/rasayel-big-picture/tea-assignment-campaigns.png",
   },
   {
     year: "2024",
     projectName: "Billing & paywalls",
-    category: "Onboarding & Activation"
+    category: "Onboarding & Activation",
+    previewImage: "/case-studies/rasayel-big-picture/billing & paywalls.png",
   },
   {
     year: "2024",
@@ -146,12 +153,14 @@ export const projects: Project[] = [
   {
     year: "2024",
     projectName: "WA Interactive CTA URL button",
-    category: "Inbox"
+    category: "Inbox",
+    previewImage: "/case-studies/rasayel-big-picture/wa-interactive-cta-button.png",
   },
   {
     year: "2024",
     projectName: "Calendly Integration Buttons",
-    category: "Integration"
+    category: "Integration",
+    previewImage: "/case-studies/rasayel-big-picture/calendly-integration.png",
   },
   {
     year: "2024",
