@@ -8,8 +8,6 @@ import {
   ChevronLeftIcon,
   LinkIcon,
   ChevronDownIcon,
-  ArrowTrendingUpIcon,
-  LightBulbIcon,
   BoltIcon,
   ChartBarIcon,
   ShieldCheckIcon,
