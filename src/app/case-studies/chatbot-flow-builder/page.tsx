@@ -469,7 +469,7 @@ export default function ChatbotFlowBuilderCaseStudy() {
                 })}
               </div>
 
-              <p className="text-slate-700 leading-relaxed">
+              <p className="text-slate-700 leading-relaxed mb-6">
                 The chatbot builder became a core differentiator for Rasayel,
                 allowing us to close deals with customers using other platforms
                 like WATI, Respond.io etc. It fueled our growth from 0$ to 65k$
@@ -478,6 +478,14 @@ export default function ChatbotFlowBuilderCaseStudy() {
                 many things I would want to do next, I am proud of the
                 product&apos;s impact on the business and customers, especially
                 accounting for the very limited resources we had.
+              </p>
+
+              <p className="text-slate-700 leading-relaxed">
+                We iterated on the features for 2.5 years, continually testing
+                and discussing with our customers through dedicated Slack
+                channels. As a consequence, the product was delivering on all
+                key use cases while having a solid design system that we also
+                iterated 2-3 times throughout the development process.
               </p>
             </div>
           </section>
