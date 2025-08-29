@@ -18,8 +18,17 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
   const [clickedProject, setClickedProject] = useState<Project | null>(null);
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [preloadedMedia, setPreloadedMedia] = useState<Set<string>>(new Set());
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>(
+    {}
+  );
   const { position, containerRef } = useCursorPosition();
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Get first 4 projects with preview images or videos
+  const projectsWithMedia = projects
+    .filter((project) => project.previewImage || project.previewVideo)
+    .slice(0, 4);
 
   useEffect(() => {
     setMounted(true);
@@ -35,10 +44,53 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Get first 4 projects with preview images or videos
-  const projectsWithMedia = projects
-    .filter((project) => project.previewImage || project.previewVideo)
-    .slice(0, 4);
+  // Preload media on mobile after component mounts
+  useEffect(() => {
+    if (!mounted || !isMobile) return;
+
+    const preloadMedia = async () => {
+      const mediaToPreload = projectsWithMedia
+        .filter((project) => project.previewVideo || project.hoverPreviewImage)
+        .slice(0, 2); // Only preload first 2 to avoid overwhelming
+
+      for (const project of mediaToPreload) {
+        const mediaUrl = project.previewVideo || project.hoverPreviewImage;
+        if (!mediaUrl || preloadedMedia.has(mediaUrl)) continue;
+
+        try {
+          if (project.previewVideo) {
+            // Preload video
+            const video = document.createElement("video");
+            video.preload = "metadata";
+            video.src = mediaUrl;
+            video.load();
+
+            await new Promise((resolve) => {
+              video.addEventListener("loadedmetadata", resolve, { once: true });
+              video.addEventListener("error", resolve, { once: true });
+            });
+          } else if (project.hoverPreviewImage) {
+            // Preload image
+            const img = document.createElement("img");
+            img.src = mediaUrl;
+
+            await new Promise<void>((resolve) => {
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            });
+          }
+
+          setPreloadedMedia((prev) => new Set(prev).add(mediaUrl));
+        } catch {
+          console.warn("Failed to preload media:", mediaUrl);
+        }
+      }
+    };
+
+    // Delay preloading to not interfere with initial page load
+    const timer = setTimeout(preloadMedia, 1000);
+    return () => clearTimeout(timer);
+  }, [mounted, isMobile, projectsWithMedia, preloadedMedia]);
 
   const handleProjectHover = (project: Project | null) => {
     if (isMobile) return; // No hover on mobile
@@ -62,8 +114,16 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
 
   const handleProjectClick = (project: Project) => {
     if (isMobile) {
+      const mediaUrl = project.previewVideo || project.hoverPreviewImage;
+      if (mediaUrl) {
+        setLoadingStates((prev) => ({ ...prev, [mediaUrl]: true }));
+      }
       setClickedProject(project);
     }
+  };
+
+  const handleMediaLoaded = (mediaUrl: string) => {
+    setLoadingStates((prev) => ({ ...prev, [mediaUrl]: false }));
   };
 
   const closeMobileModal = () => {
@@ -255,27 +315,45 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                     transition={{ duration: 0.2 }}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {clickedProject.previewVideo ? (
-                      <video
-                        key={clickedProject.previewVideo}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-64 object-cover"
-                        poster={clickedProject.previewImage}
-                      >
-                        <source
-                          src={clickedProject.previewVideo}
-                          type="video/mp4"
-                        />
-                        <source
-                          src={clickedProject.previewVideo}
-                          type="video/webm"
-                        />
-                      </video>
-                    ) : (
-                      <div className="relative w-full h-64">
+                    <div className="relative w-full h-64 bg-slate-100">
+                      {/* Loading spinner */}
+                      {loadingStates[
+                        clickedProject.previewVideo ||
+                          clickedProject.hoverPreviewImage ||
+                          ""
+                      ] && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
+                          <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-300 border-t-slate-600"></div>
+                        </div>
+                      )}
+
+                      {clickedProject.previewVideo ? (
+                        <video
+                          key={clickedProject.previewVideo}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          preload="metadata"
+                          className="w-full h-64 object-cover"
+                          poster={clickedProject.previewImage}
+                          onLoadedData={() =>
+                            handleMediaLoaded(clickedProject.previewVideo!)
+                          }
+                          onCanPlayThrough={() =>
+                            handleMediaLoaded(clickedProject.previewVideo!)
+                          }
+                        >
+                          <source
+                            src={clickedProject.previewVideo}
+                            type="video/mp4"
+                          />
+                          <source
+                            src={clickedProject.previewVideo}
+                            type="video/webm"
+                          />
+                        </video>
+                      ) : (
                         <Image
                           src={
                             clickedProject.hoverPreviewImage ||
@@ -285,9 +363,19 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                           fill
                           className="object-cover"
                           sizes="400px"
+                          priority={preloadedMedia.has(
+                            clickedProject.hoverPreviewImage ||
+                              clickedProject.previewImage!
+                          )}
+                          onLoad={() =>
+                            handleMediaLoaded(
+                              clickedProject.hoverPreviewImage ||
+                                clickedProject.previewImage!
+                            )
+                          }
                         />
-                      </div>
-                    )}
+                      )}
+                    </div>
                     <div className="p-4">
                       <div className="text-lg font-medium text-slate-900 mb-2">
                         {clickedProject.projectName}
