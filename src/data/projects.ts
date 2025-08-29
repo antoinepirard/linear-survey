@@ -5,37 +5,45 @@ export interface Project {
   description?: string;
   previewImage?: string;
   previewVideo?: string;
+  hoverPreviewImage?: string;
 }
 
 export const projects: Project[] = [
   {
-    year: "2025",
-    projectName: "Linear Integration",
-    category: "Integration",
-    previewImage: "/projects/linear-integration-preview.jpg",
-    previewVideo: "/case-studies/rasayel-big-picture/linear-integration.webm",
-    description: "This integration allowed users to log issues from Rasayel. The issue is linked to a conversation, and once the issue is completed, a message appears in the chat, effectively letting the agent know a bug or request has been completed and they can now let the customers know. Linear wasn't a priority for us, but it allowed us to iterate fast and learn from our own team what to build. With more time, we would have improved the composer and made it so you can still see the conversation context, among many other things.",
+    year: "2024",
+    projectName: "Transpoco",
+    category: "Fleet Management",
+    previewImage: "/Assets/Images/thumbn-transpoco.jpg",
+    previewVideo: "/Assets/Videos/transpoco.webm",
+    description:
+      "Fleet management and logistics platform for transportation companies.",
   },
   {
     year: "2025",
-    projectName: "Contact Lists",
-    category: "Contact Management",
-    previewImage: "/case-studies/rasayel-big-picture/contact-lists.png",
-    description: "Redesigned contact management system with improved filtering, bulk actions, and real-time synchronization across multiple platforms.",
+    projectName: "Rasayel",
+    category: "Customer Support Platform",
+    previewImage: "/Assets/Images/thumbn-rasayel.jpg",
+    previewVideo: "/Assets/Videos/reporting-highquality.webm",
+    description:
+      "Customer support platform integrating WhatsApp, email, and other channels.",
   },
   {
     year: "2025",
-    projectName: "Zoho: Allow to turn off activity logging",
-    category: "Integration",
-    previewImage: "/case-studies/rasayel-big-picture/zoho-toggle-activity.png",
-    description: "Added privacy controls allowing users to disable activity tracking while maintaining essential functionality and compliance requirements.",
+    projectName: "Ravell",
+    category: "Product Design",
+    previewImage: "/Assets/Images/thumbn-ravell.jpg",
+    hoverPreviewImage: "/Assets/Images/ravell (1).jpg",
+    description:
+      "Building Ravell, the non-linear planner for creative teams and individuals.",
   },
   {
-    year: "2025",
-    projectName: "Performance Reporting - v2",
-    category: "Analytics",
-    previewImage: "/case-studies/rasayel-big-picture/reporting-v2.png",
-    description: "Complete overhaul of the reporting system with real-time analytics, customizable dashboards, and improved data visualization.",
+    year: "2024",
+    projectName: "GoVocal",
+    category: "Civic Engagement",
+    previewImage: "/Assets/Images/thumbn-govocal.jpg",
+    hoverPreviewImage: "/Assets/Images/govocal-preview.jpg",
+    description:
+      "Citizen participation platform for democratic engagement and community feedback.",
   },
   {
     year: "2025",
@@ -91,18 +99,20 @@ export const projects: Project[] = [
     year: "2025",
     projectName: "Detect email domain when joining workspace",
     category: "Onboarding & Activation",
-    previewImage: "/case-studies/rasayel-big-picture/detect-email-domain-when-joining.png",
+    previewImage:
+      "/case-studies/rasayel-big-picture/detect-email-domain-when-joining.png",
   },
   {
     year: "2024",
     projectName: "Unassigned inbox: Switch between user or team unassigned",
-    category: "Inbox"
+    category: "Inbox",
   },
   {
     year: "2024",
     projectName: "Team Assignment when starting outbound campaigns",
     category: "Outbound",
-    previewImage: "/case-studies/rasayel-big-picture/tea-assignment-campaigns.png",
+    previewImage:
+      "/case-studies/rasayel-big-picture/tea-assignment-campaigns.png",
   },
   {
     year: "2024",
@@ -113,48 +123,49 @@ export const projects: Project[] = [
   {
     year: "2024",
     projectName: "Improve HS activity logging formatting",
-    category: "Integration"
+    category: "Integration",
   },
   {
     year: "2024",
     projectName: "Companies: Auto fill domain based on name",
-    category: "Rasayel Objects"
+    category: "Rasayel Objects",
   },
   {
     year: "2024",
     projectName: "Emojis on WA inbound",
-    category: "WhatsApp Natives"
+    category: "WhatsApp Natives",
   },
   {
     year: "2024",
     projectName: "Rebuilding Exports",
-    category: "Import & Export"
+    category: "Import & Export",
   },
   {
     year: "2024",
     projectName: "Quick Templates",
-    category: "Inbox"
+    category: "Inbox",
   },
   {
     year: "2024",
-    projectName: "Unread count for \"assigned to me\"",
-    category: "Inbox"
+    projectName: 'Unread count for "assigned to me"',
+    category: "Inbox",
   },
   {
     year: "2024",
     projectName: "Filter template composer by all/mine",
-    category: "Inbox"
+    category: "Inbox",
   },
   {
     year: "2024",
     projectName: "Company v1",
-    category: "Rasayel Objects"
+    category: "Rasayel Objects",
   },
   {
     year: "2024",
     projectName: "WA Interactive CTA URL button",
     category: "Inbox",
-    previewImage: "/case-studies/rasayel-big-picture/wa-interactive-cta-button.png",
+    previewImage:
+      "/case-studies/rasayel-big-picture/wa-interactive-cta-button.png",
   },
   {
     year: "2024",
@@ -165,72 +176,72 @@ export const projects: Project[] = [
   {
     year: "2024",
     projectName: "More & Mixed Buttons",
-    category: "WhatsApp Natives"
+    category: "WhatsApp Natives",
   },
   {
     year: "2024",
     projectName: "Primary teams & assignment",
-    category: "Assignment"
+    category: "Assignment",
   },
   {
     year: "2024",
     projectName: "Onboarding Redesign",
-    category: "Onboarding & Activation"
+    category: "Onboarding & Activation",
   },
   {
     year: "2024",
     projectName: "Property syncing",
-    category: "Integration"
+    category: "Integration",
   },
   {
     year: "2024",
     projectName: "Signature to messages",
-    category: "Inbox"
+    category: "Inbox",
   },
   {
     year: "2024",
     projectName: "Unanswered Inbox Filter",
-    category: "Inbox"
+    category: "Inbox",
   },
   {
     year: "2024",
-    projectName: "Fix \"Waiting longest\" sorting",
-    category: "Inbox"
+    projectName: 'Fix "Waiting longest" sorting',
+    category: "Inbox",
   },
   {
     year: "2024",
     projectName: "Emojis reactions on notes",
-    category: "Inbox"
+    category: "Inbox",
   },
   {
     year: "2024",
     projectName: "FE Property editing",
-    category: "Contact Management"
+    category: "Contact Management",
   },
   {
     year: "2024",
     projectName: "Sequences",
-    category: "Automations"
+    category: "Automations",
   },
   {
     year: "2024",
     projectName: "Follow ups (formerly Snooze)",
-    category: "UI/UX"
+    category: "UI/UX",
   },
   {
     year: "2024",
     projectName: "Activities v0.1 - Reminders & Mentions",
-    category: "Notifications"
+    category: "Notifications",
   },
   {
     year: "2024",
     projectName: "App Redesign v2.1",
-    category: "UI/UX"
+    category: "UI/UX",
   },
   {
     year: "2024",
     projectName: "Salesforce v0.1",
-    category: "Integration"
+    category: "Integration",
   },
   {
     year: "2024",

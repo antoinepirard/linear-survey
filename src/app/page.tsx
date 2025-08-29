@@ -169,21 +169,18 @@ export default function Home() {
               </AnimationWrapper>
             </div>
 
-            {/* Projects Grid Section */}
-            <AnimationWrapper delay="350ms" className="max-w-4xl">
-              <h2 className="text-lg font-medium text-slate-900 mb-6">
-                Recent Projects
-              </h2>
-              <ProjectsGrid />
-            </AnimationWrapper>
-
             {/* Highlights Section */}
             <div className="max-w-4xl">
               <ListItem
                 items={staticHighlights}
                 title="Work"
-                animationDelay="500ms"
+                animationDelay="400ms"
               />
+
+              {/* Projects Grid under Work section */}
+              <AnimationWrapper delay="450ms" className="mt-20">
+                <ProjectsGrid />
+              </AnimationWrapper>
             </div>
 
             {/* Company Logos Section */}

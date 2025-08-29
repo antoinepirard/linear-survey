@@ -11,8 +11,7 @@ interface ProjectsGridProps {
   className?: string;
 }
 
-const PREVIEW_W = 320; // tailwind w-80
-const GAP = 12;
+const PREVIEW_W = 640; // tailwind w-[40rem]
 
 export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
   const [hoveredProject, setHoveredProject] = useState<Project | null>(null);
@@ -21,10 +20,10 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
 
   useEffect(() => setMounted(true), []);
 
-  // Get first 6 projects with preview images or videos
+  // Get first 4 projects with preview images or videos
   const projectsWithMedia = projects
     .filter((project) => project.previewImage || project.previewVideo)
-    .slice(0, 6);
+    .slice(0, 4);
 
   const handleProjectHover = (project: Project | null) => {
     setHoveredProject(project);
@@ -36,11 +35,11 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
       className={`relative ${className}`}
     >
       {/* Projects Grid */}
-      <div className="grid grid-cols-3 gap-4 sm:gap-6">
-        {projectsWithMedia.map((project, index) => (
+      <div className="grid grid-cols-4 gap-4 sm:gap-6">
+        {projectsWithMedia.map((project) => (
           <motion.div
             key={`${project.year}-${project.projectName}`}
-            className="relative aspect-square group cursor-pointer"
+            className="relative aspect-[3/4] group cursor-pointer"
             onMouseEnter={() => handleProjectHover(project)}
             onMouseLeave={() => handleProjectHover(null)}
             whileHover={{ scale: 1.02 }}
@@ -78,7 +77,7 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                   <div className="text-sm font-medium mb-1 line-clamp-2">
                     {project.projectName}
                   </div>
-                  <div className="text-xs text-white/80">
+                  <div className="text-sm text-white/80">
                     {project.year} • {project.category}
                   </div>
                 </div>
@@ -95,17 +94,11 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
             {hoveredProject &&
               (hoveredProject.previewImage || hoveredProject.previewVideo) && (
                 <motion.div
-                  className="fixed pointer-events-none z-50 w-80"
+                  className="fixed pointer-events-none z-50 w-[40rem]"
                   style={{
-                    left:
-                      position.x + GAP + PREVIEW_W <= position.windowWidth
-                        ? position.x + GAP
-                        : position.x - GAP,
-                    top: position.y + GAP,
-                    transform:
-                      position.x + GAP + PREVIEW_W <= position.windowWidth
-                        ? undefined
-                        : "translateX(-100%)",
+                    left: position.x - PREVIEW_W / 2,
+                    top: position.y - 60,
+                    transform: "translateY(-100%)",
                   }}
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -115,11 +108,12 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                   <div className="bg-white rounded-lg shadow-2xl overflow-hidden w-full">
                     {hoveredProject.previewVideo ? (
                       <video
+                        key={hoveredProject.previewVideo}
                         autoPlay
                         loop
                         muted
                         playsInline
-                        className="w-full h-48 object-cover"
+                        className="w-full h-[30rem] object-cover"
                         poster={hoveredProject.previewImage}
                       >
                         <source
@@ -132,13 +126,16 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                         />
                       </video>
                     ) : (
-                      <div className="relative w-full h-48">
+                      <div className="relative w-full h-[30rem]">
                         <Image
-                          src={hoveredProject.previewImage!}
+                          src={
+                            hoveredProject.hoverPreviewImage ||
+                            hoveredProject.previewImage!
+                          }
                           alt={hoveredProject.projectName}
                           fill
                           className="object-cover"
-                          sizes="320px"
+                          sizes="640px"
                         />
                       </div>
                     )}
@@ -146,11 +143,11 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                       <div className="text-sm font-medium text-slate-900 mb-1 line-clamp-2">
                         {hoveredProject.projectName}
                       </div>
-                      <div className="text-xs text-slate-600">
+                      <div className="text-sm text-slate-600">
                         {hoveredProject.year} • {hoveredProject.category}
                       </div>
                       {hoveredProject.description && (
-                        <div className="text-xs text-slate-500 mt-2 line-clamp-3">
+                        <div className="text-sm text-slate-500 mt-2 line-clamp-3">
                           {hoveredProject.description}
                         </div>
                       )}
