@@ -107,47 +107,23 @@ export default function Home() {
             {/* Main Content */}
             <div className="flex flex-col gap-6 max-w-2xl">
               <AnimationWrapper delay="150ms">
-                <h3 className="text-lg font-medium leading-relaxed text-slate-950 mb-4">
-                  A product & design partner for 0→1 and pivots.
-                </h3>
-                <p className="text-base leading-relaxed text-slate-700 mb-4">
-                  <strong>
-                    I partner with early-stage founders building their first
-                    product, and with teams making product pivots.
-                  </strong>{" "}
-                  As an embedded partner, I work with you to choose the next
-                  priority, validate it with users, and make sure product and
-                  engineering stay aligned so we deliver meaningful outcomes.
+                <p className="text-base font-medium leading-relaxed text-slate-950">
+                  Product & design partner for founders.
                 </p>
-                <p className="text-base leading-relaxed text-slate-700 mb-4">
-                  My approach is hands-on product and design. I work directly
-                  with your founder and tech lead. Each week, we run outcome
-                  loops: set a goal → prototype & test → write a decision memo →
-                  next steps. I work closely with engineers, prioritizing,
-                  scoping, and jumping in with small PRs when needed.
+                <p className="text-base leading-relaxed text-slate-700">
+                  I partner with founders to validate the next bet and craft
+                  thoughtful experiences with engineers. From research to code
+                  handover.
                 </p>
               </AnimationWrapper>
 
               <AnimationWrapper delay="200ms">
-                <p className="text-base leading-relaxed text-slate-700 mb-4">
-                  What we achieve together: Faster decisions (days, not months),
-                  lower risk (testing top assumptions before code), and team
-                  alignment (prototypes and specs that engineering can trust).
-                </p>
-                <p className="text-base leading-relaxed text-slate-700 mb-4">
-                  In practise: Frame the problem → define success → validate
-                  experience & design with users → build specs, acceptance
-                  criteria, and a clean handoff to development.
-                </p>
-                <p className="text-base leading-relaxed text-slate-700 mb-4">
-                  <strong>Best fit:</strong> Engaged founders, a technical core,
-                  and access to users. Multi-month or longer term
-                  collaborations.
-                </p>
                 <p className="text-base leading-relaxed text-slate-700">
-                  <strong>Not a fit:</strong> Pixel-only work, &quot;just make
-                  it pretty&quot;, or having no access to decision makers.
-                  Single day or week engagements.
+                  I&apos;ve spent the last decade working at early stage
+                  startups and collaborating with brillant engineers. I enjoy
+                  finding my way through the chaos to figure out the most
+                  valuable problems to solve, and solving them from first
+                  principles.
                 </p>
               </AnimationWrapper>
             </div>

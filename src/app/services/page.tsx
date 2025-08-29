@@ -33,39 +33,37 @@ export default function Services() {
                 <div className="flex flex-col gap-4 text-base leading-relaxed text-slate-600">
                   <p>
                     <span className="font-medium text-slate-900">
-                      {" "}
                       I partner with early-stage founders building their first
-                      product and teams making product pivots.{" "}
+                      product, and with teams making product pivots.
                     </span>{" "}
-                    As a embedded partner, I work with you to choose the next
+                    As an embedded partner, I work with you to choose the next
                     priority, validate it with users, and make sure product and
                     engineering stay aligned so we deliver meaningful outcomes.
                   </p>
 
                   <p>
-                    My approach is hands-on product and design, working directly
-                    with your founder and tech lead. We run weekly outcome loops
-                    — goal → prototype & test → decision memo → next step. I
-                    work closely with engineers beyond just handover — I
-                    prioritize, scope, and jump in to work alongside them when
-                    needed.
+                    My approach is hands-on product and design. I work directly
+                    with your founder and tech lead. Each week, we run outcome
+                    loops: set a goal → prototype & test → write a decision memo
+                    → next steps. I work closely with engineers, prioritizing,
+                    scoping, and jumping in with small PRs when needed.
                   </p>
 
                   <p>
                     <span className="font-medium text-slate-900">
                       What we achieve together:
                     </span>{" "}
-                    decision velocity (days, not months), risk reduction (test
-                    top assumptions before code), and team alignment (prototypes
-                    and specs engineering trusts).
+                    Faster decisions (days, not months), lower risk (testing top
+                    assumptions before code), and team alignment (prototypes and
+                    specs that engineering can trust).
                   </p>
 
                   <p>
                     <span className="font-medium text-slate-900">
-                      In practice:
+                      In practise:
                     </span>{" "}
-                    problem framing & success criteria → validated experiences
-                    and designs with users → specs, acceptance criteria, and a
+                    Frame the problem → define success → validate experience &
+                    design with users → build specs, acceptance criteria, and a
                     clean handoff to development.
                   </p>
 
@@ -76,8 +74,8 @@ export default function Services() {
                         <span className="font-medium text-slate-900">
                           Best fit:
                         </span>{" "}
-                        engaged founders, a technical core, and access to users.
-                        Multi months or quarter collaborations.
+                        Engaged founders, a technical core, and access to users.
+                        Multi-month or longer term collaborations.
                       </span>
                     </div>
                     <div className="flex items-start gap-2">
@@ -86,8 +84,8 @@ export default function Services() {
                         <span className="font-medium text-slate-900">
                           Not a fit:
                         </span>{" "}
-                        pixel-only work, &quot;just make it pretty,&quot; or no
-                        access to decision-makers. Single day or week
+                        Pixel-only work, "just make it pretty", or having no
+                        access to decision makers. Single day or week
                         engagements.
                       </span>
                     </div>
