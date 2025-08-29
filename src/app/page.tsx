@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 import ListItem from "@/components/ListItem";
 import HeaderSection from "@/components/HeaderSection";
+import ProjectsGrid from "@/components/ProjectsGrid";
 import { AnimationWrapper } from "@/hooks/useAnimation";
 import { staticHighlights } from "@/data/staticData";
 import { Button } from "@/components/ui/button";
@@ -168,12 +169,20 @@ export default function Home() {
               </AnimationWrapper>
             </div>
 
+            {/* Projects Grid Section */}
+            <AnimationWrapper delay="350ms" className="max-w-4xl">
+              <h2 className="text-lg font-medium text-slate-900 mb-6">
+                Recent Projects
+              </h2>
+              <ProjectsGrid />
+            </AnimationWrapper>
+
             {/* Highlights Section */}
             <div className="max-w-4xl">
               <ListItem
                 items={staticHighlights}
                 title="Work"
-                animationDelay="400ms"
+                animationDelay="500ms"
               />
             </div>
 
