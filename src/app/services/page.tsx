@@ -84,8 +84,8 @@ export default function Services() {
                         <span className="font-medium text-slate-900">
                           Not a fit:
                         </span>{" "}
-                        Pixel-only work, "just make it pretty", or having no
-                        access to decision makers. Single day or week
+                        Pixel-only work, &quot;just make it pretty&quot;, or
+                        having no access to decision makers. Single day or week
                         engagements.
                       </span>
                     </div>
