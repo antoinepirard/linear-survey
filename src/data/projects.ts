@@ -43,7 +43,7 @@ export const projects: Project[] = [
     previewImage: "/Assets/Images/thumbn-govocal.jpg",
     hoverPreviewImage: "/Assets/Images/govocal-preview.jpg",
     description:
-      "GoVocal is a citizen participation platform for democratic engagement and community feedback. I was the first employee at GoVocal, and worked on all aspects of the product, from designing new features to improving our reporting to making the platform more reliable and scalable. By the time I left, GoVocal had 10,000 organisations and 500,000 users and grew the business to a multi-millions ARR business.",
+      "GoVocal is a citizen participation platform for democratic engagement and community feedback. I was the first employee at GoVocal, and worked on all aspects of the product, from designing new features to improving our reporting to making the platform more reliable and scalable. By the time I left, GoVocal had 200+ organisations and 500,000 users and grew the business to a multi-millions ARR business.",
   },
   {
     year: "2025",
