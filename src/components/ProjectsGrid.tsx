@@ -15,11 +15,25 @@ const PREVIEW_W = 640; // tailwind w-[40rem]
 
 export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
   const [hoveredProject, setHoveredProject] = useState<Project | null>(null);
+  const [clickedProject, setClickedProject] = useState<Project | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { position, containerRef } = useCursorPosition();
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+
+    // Check if mobile on mount and window resize
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Get first 4 projects with preview images or videos
   const projectsWithMedia = projects
@@ -27,6 +41,8 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
     .slice(0, 4);
 
   const handleProjectHover = (project: Project | null) => {
+    if (isMobile) return; // No hover on mobile
+
     // Clear any existing timeout
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
@@ -37,11 +53,21 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
       // Immediately show the new project
       setHoveredProject(project);
     } else {
-      // Delay closing by 500ms
+      // Delay closing by 250ms
       closeTimeoutRef.current = setTimeout(() => {
         setHoveredProject(null);
       }, 250);
     }
+  };
+
+  const handleProjectClick = (project: Project) => {
+    if (isMobile) {
+      setClickedProject(project);
+    }
+  };
+
+  const closeMobileModal = () => {
+    setClickedProject(null);
   };
 
   // Cleanup timeout on unmount
@@ -59,13 +85,14 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
       className={`relative ${className}`}
     >
       {/* Projects Grid */}
-      <div className="grid grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
         {projectsWithMedia.map((project) => (
           <motion.div
             key={`${project.year}-${project.projectName}`}
             className="relative aspect-[3/4] group cursor-pointer"
             onMouseEnter={() => handleProjectHover(project)}
             onMouseLeave={() => handleProjectHover(null)}
+            onClick={() => handleProjectClick(project)}
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
@@ -111,8 +138,9 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
         ))}
       </div>
 
-      {/* Cursor-following preview (via portal) */}
+      {/* Desktop Cursor-following preview (via portal) */}
       {mounted &&
+        !isMobile &&
         createPortal(
           <AnimatePresence>
             {hoveredProject &&
@@ -177,6 +205,103 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                       )}
                     </div>
                   </div>
+                </motion.div>
+              )}
+          </AnimatePresence>,
+          document.body
+        )}
+
+      {/* Mobile Fullscreen Modal */}
+      {mounted &&
+        isMobile &&
+        createPortal(
+          <AnimatePresence>
+            {clickedProject &&
+              (clickedProject.previewImage || clickedProject.previewVideo) && (
+                <motion.div
+                  className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  onClick={closeMobileModal}
+                >
+                  {/* Close button */}
+                  <button
+                    onClick={closeMobileModal}
+                    className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Modal content */}
+                  <motion.div
+                    className="bg-white rounded-2xl overflow-hidden max-w-sm w-full max-h-[80vh] overflow-y-auto"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {clickedProject.previewVideo ? (
+                      <video
+                        key={clickedProject.previewVideo}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-64 object-cover"
+                        poster={clickedProject.previewImage}
+                      >
+                        <source
+                          src={clickedProject.previewVideo}
+                          type="video/mp4"
+                        />
+                        <source
+                          src={clickedProject.previewVideo}
+                          type="video/webm"
+                        />
+                      </video>
+                    ) : (
+                      <div className="relative w-full h-64">
+                        <Image
+                          src={
+                            clickedProject.hoverPreviewImage ||
+                            clickedProject.previewImage!
+                          }
+                          alt={clickedProject.projectName}
+                          fill
+                          className="object-cover"
+                          sizes="400px"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <div className="text-lg font-medium text-slate-900 mb-2">
+                        {clickedProject.projectName}
+                      </div>
+                      <div className="text-sm text-slate-600 mb-3">
+                        {clickedProject.year} • {clickedProject.category}
+                      </div>
+                      {clickedProject.description && (
+                        <div className="text-sm text-slate-500">
+                          {clickedProject.description}
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
                 </motion.div>
               )}
           </AnimatePresence>,
