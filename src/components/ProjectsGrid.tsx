@@ -121,7 +121,7 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                   className="fixed pointer-events-none z-50 w-[40rem]"
                   style={{
                     left: position.x - PREVIEW_W / 2,
-                    top: position.y - 60,
+                    top: position.y - 200,
                     transform: "translateY(-100%)",
                   }}
                   initial={{ opacity: 0, scale: 0.96 }}
