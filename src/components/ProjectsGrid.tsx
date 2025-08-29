@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
@@ -17,6 +17,7 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
   const [hoveredProject, setHoveredProject] = useState<Project | null>(null);
   const [mounted, setMounted] = useState(false);
   const { position, containerRef } = useCursorPosition();
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -26,8 +27,31 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
     .slice(0, 4);
 
   const handleProjectHover = (project: Project | null) => {
-    setHoveredProject(project);
+    // Clear any existing timeout
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+
+    if (project) {
+      // Immediately show the new project
+      setHoveredProject(project);
+    } else {
+      // Delay closing by 500ms
+      closeTimeoutRef.current = setTimeout(() => {
+        setHoveredProject(null);
+      }, 250);
+    }
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div
@@ -140,14 +164,14 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                       </div>
                     )}
                     <div className="p-3">
-                      <div className="text-sm font-medium text-slate-900 mb-1 line-clamp-2">
+                      <div className="text-sm font-medium text-slate-900 mb-1">
                         {hoveredProject.projectName}
                       </div>
                       <div className="text-sm text-slate-600">
                         {hoveredProject.year} • {hoveredProject.category}
                       </div>
                       {hoveredProject.description && (
-                        <div className="text-sm text-slate-500 mt-2 line-clamp-3">
+                        <div className="text-sm text-slate-500 mt-2">
                           {hoveredProject.description}
                         </div>
                       )}

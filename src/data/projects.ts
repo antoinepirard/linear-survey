@@ -10,40 +10,40 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    year: "2024",
+    year: "2025",
     projectName: "Transpoco",
     category: "Fleet Management",
     previewImage: "/Assets/Images/thumbn-transpoco.jpg",
     previewVideo: "/Assets/Videos/transpoco.webm",
     description:
-      "Fleet management and logistics platform for transportation companies.",
+      "Transpoco is the leading fleet management and telematics platform for tracking and optimizing vehicles in Ireland and is operating changes to transform their business into a modern product driven company. As part of this change I'm leading product design effort to support this product and cultural transition. The prototype above is unsolicited and serves as a PoC for a future vision of Transpoco.",
   },
   {
-    year: "2025",
+    year: "2022 - 2025",
     projectName: "Rasayel",
     category: "Customer Support Platform",
     previewImage: "/Assets/Images/thumbn-rasayel.jpg",
     previewVideo: "/Assets/Videos/reporting-highquality.webm",
     description:
-      "Customer support platform integrating WhatsApp, email, and other channels.",
+      "Rasayel is one of the leading platform to sell and support customers over WhatsApp, used by hundreds of SMEs and mid-market companies. I've worked on all aspects of the product, from designing new features to improving our reporting to making the platform more reliable and scalable.",
   },
   {
     year: "2025",
     projectName: "Ravell",
-    category: "Product Design",
+    category: "Product Management & Planning Tool",
     previewImage: "/Assets/Images/thumbn-ravell.jpg",
     hoverPreviewImage: "/Assets/Images/ravell (1).jpg",
     description:
-      "Building Ravell, the non-linear planner for creative teams and individuals.",
+      "Ravell is the home for lean product teams, who are looking for a streamlined way to convert messy evidences and ideas into actionable plans. Using AI and deep integrations, these plans can then be pushed direction to Linear.app. I'm cofounding Ravell with Jonny O'Mahonny, ex-Intercom I worked with at Rasayel.",
   },
   {
-    year: "2024",
+    year: "2017 - 2021",
     projectName: "GoVocal",
     category: "Civic Engagement",
     previewImage: "/Assets/Images/thumbn-govocal.jpg",
     hoverPreviewImage: "/Assets/Images/govocal-preview.jpg",
     description:
-      "Citizen participation platform for democratic engagement and community feedback.",
+      "GoVocal is a citizen participation platform for democratic engagement and community feedback. I was the first employee at GoVocal, and worked on all aspects of the product, from designing new features to improving our reporting to making the platform more reliable and scalable. By the time I left, GoVocal had 10,000 organisations and 500,000 users and grew the business to a multi-millions ARR business.",
   },
   {
     year: "2025",
