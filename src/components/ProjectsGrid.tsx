@@ -149,7 +149,7 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
         {projectsWithMedia.map((project) => (
           <motion.div
             key={`${project.year}-${project.projectName}`}
-            className="relative aspect-[3/4] group cursor-pointer"
+            className="relative aspect-[3/4] group cursor-default"
             onMouseEnter={() => handleProjectHover(project)}
             onMouseLeave={() => handleProjectHover(null)}
             onClick={() => handleProjectClick(project)}
