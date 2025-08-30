@@ -19,9 +19,6 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [preloadedMedia, setPreloadedMedia] = useState<Set<string>>(new Set());
-  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>(
-    {}
-  );
   const { position, containerRef } = useCursorPosition();
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -44,33 +41,30 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Preload media on mobile after component mounts
+  // Aggressive preloading for seamless experience (all platforms)
   useEffect(() => {
-    if (!mounted || !isMobile) return;
+    if (!mounted) return;
 
     const preloadMedia = async () => {
-      const mediaToPreload = projectsWithMedia
-        .filter((project) => project.previewVideo || project.hoverPreviewImage)
-        .slice(0, 2); // Only preload first 2 to avoid overwhelming
-
-      for (const project of mediaToPreload) {
+      // Preload ALL media for mobile to ensure instant loading
+      for (const project of projectsWithMedia) {
         const mediaUrl = project.previewVideo || project.hoverPreviewImage;
         if (!mediaUrl || preloadedMedia.has(mediaUrl)) continue;
 
         try {
           if (project.previewVideo) {
-            // Preload video
+            // Preload video with higher quality settings
             const video = document.createElement("video");
-            video.preload = "metadata";
+            video.preload = "auto"; // Full preload instead of just metadata
             video.src = mediaUrl;
             video.load();
 
             await new Promise((resolve) => {
-              video.addEventListener("loadedmetadata", resolve, { once: true });
+              video.addEventListener("canplaythrough", resolve, { once: true });
               video.addEventListener("error", resolve, { once: true });
             });
           } else if (project.hoverPreviewImage) {
-            // Preload image
+            // Preload high-quality image
             const img = document.createElement("img");
             img.src = mediaUrl;
 
@@ -87,10 +81,10 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
       }
     };
 
-    // Delay preloading to not interfere with initial page load
-    const timer = setTimeout(preloadMedia, 1000);
+    // Start preloading immediately after mount
+    const timer = setTimeout(preloadMedia, 500);
     return () => clearTimeout(timer);
-  }, [mounted, isMobile, projectsWithMedia, preloadedMedia]);
+  }, [mounted, projectsWithMedia, preloadedMedia]);
 
   const handleProjectHover = (project: Project | null) => {
     if (isMobile) return; // No hover on mobile
@@ -114,16 +108,8 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
 
   const handleProjectClick = (project: Project) => {
     if (isMobile) {
-      const mediaUrl = project.previewVideo || project.hoverPreviewImage;
-      if (mediaUrl) {
-        setLoadingStates((prev) => ({ ...prev, [mediaUrl]: true }));
-      }
       setClickedProject(project);
     }
-  };
-
-  const handleMediaLoaded = (mediaUrl: string) => {
-    setLoadingStates((prev) => ({ ...prev, [mediaUrl]: false }));
   };
 
   const closeMobileModal = () => {
@@ -225,8 +211,16 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                         loop
                         muted
                         playsInline
+                        preload="auto"
                         className="w-full h-[30rem] object-cover"
-                        poster={hoveredProject.previewImage}
+                        style={{
+                          opacity: preloadedMedia.has(
+                            hoveredProject.previewVideo
+                          )
+                            ? 1
+                            : 0.7,
+                          transition: "opacity 0.2s ease-in-out",
+                        }}
                       >
                         <source
                           src={hoveredProject.previewVideo}
@@ -248,6 +242,16 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                           fill
                           className="object-cover"
                           sizes="640px"
+                          priority={true}
+                          style={{
+                            opacity: preloadedMedia.has(
+                              hoveredProject.hoverPreviewImage ||
+                                hoveredProject.previewImage!
+                            )
+                              ? 1
+                              : 0.7,
+                            transition: "opacity 0.2s ease-in-out",
+                          }}
                         />
                       </div>
                     )}
@@ -316,17 +320,6 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="relative w-full h-64 bg-slate-100">
-                      {/* Loading spinner */}
-                      {loadingStates[
-                        clickedProject.previewVideo ||
-                          clickedProject.hoverPreviewImage ||
-                          ""
-                      ] && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
-                          <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-300 border-t-slate-600"></div>
-                        </div>
-                      )}
-
                       {clickedProject.previewVideo ? (
                         <video
                           key={clickedProject.previewVideo}
@@ -334,15 +327,16 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                           loop
                           muted
                           playsInline
-                          preload="metadata"
+                          preload="auto"
                           className="w-full h-64 object-cover"
-                          poster={clickedProject.previewImage}
-                          onLoadedData={() =>
-                            handleMediaLoaded(clickedProject.previewVideo!)
-                          }
-                          onCanPlayThrough={() =>
-                            handleMediaLoaded(clickedProject.previewVideo!)
-                          }
+                          style={{
+                            opacity: preloadedMedia.has(
+                              clickedProject.previewVideo
+                            )
+                              ? 1
+                              : 0,
+                            transition: "opacity 0.3s ease-in-out",
+                          }}
                         >
                           <source
                             src={clickedProject.previewVideo}
@@ -363,17 +357,37 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
                           fill
                           className="object-cover"
                           sizes="400px"
-                          priority={preloadedMedia.has(
-                            clickedProject.hoverPreviewImage ||
-                              clickedProject.previewImage!
-                          )}
-                          onLoad={() =>
-                            handleMediaLoaded(
+                          priority={true}
+                          style={{
+                            opacity: preloadedMedia.has(
                               clickedProject.hoverPreviewImage ||
                                 clickedProject.previewImage!
                             )
-                          }
+                              ? 1
+                              : 0,
+                            transition: "opacity 0.3s ease-in-out",
+                          }}
                         />
+                      )}
+
+                      {/* Fallback: Show thumbnail while high-quality loads */}
+                      {!preloadedMedia.has(
+                        clickedProject.previewVideo ||
+                          clickedProject.hoverPreviewImage ||
+                          ""
+                      ) && (
+                        <div className="absolute inset-0">
+                          <Image
+                            src={clickedProject.previewImage!}
+                            alt={clickedProject.projectName}
+                            fill
+                            className="object-cover"
+                            sizes="400px"
+                          />
+                          <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-slate-400 border-t-slate-700"></div>
+                          </div>
+                        </div>
                       )}
                     </div>
                     <div className="p-4">
