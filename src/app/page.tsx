@@ -62,7 +62,7 @@ export default function Home() {
             <HeaderSection />
 
             {/* Photo Section */}
-            <AnimationWrapper
+            {/* <AnimationWrapper
               delay="100ms"
               className="flex justify-start relative z-50"
             >
@@ -87,7 +87,7 @@ export default function Home() {
                     className="rounded-2xl object-cover max-w-[180px] sm:max-w-[200px]"
                   />
                   {/* Contextual overlay */}
-                  <motion.div
+                  {/* <motion.div
                     className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent rounded-2xl flex items-end p-4"
                     initial={{ opacity: 0 }}
                     whileHover={{ opacity: 1 }}
@@ -99,10 +99,10 @@ export default function Home() {
                       </p>
                       <p className="text-xs text-white/80">Antoine & Olivia</p>
                     </div>
-                  </motion.div>
-                </motion.div>
+                  </motion.div> */}
+                {/* </motion.div>
               </div>
-            </AnimationWrapper>
+            </AnimationWrapper> */}
 
             {/* Main Content */}
             <div className="flex flex-col gap-6 max-w-2xl">
