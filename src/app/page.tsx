@@ -171,16 +171,22 @@ export default function Home() {
 
             {/* Highlights Section */}
             <div className="max-w-4xl">
-              <ListItem
-                items={staticHighlights}
-                title="Work"
-                animationDelay="400ms"
-              />
+              {/* Highlights Title */}
+              <div className="animate-fade-in-up" style={{ animationDelay: "400ms" }}>
+                <h2 className="text-lg font-medium text-slate-900 mb-6">Highlights</h2>
+              </div>
 
-              {/* Projects Grid under Work section */}
-              <AnimationWrapper delay="450ms" className="mt-20">
+              {/* Projects Grid */}
+              <AnimationWrapper delay="420ms" className="mb-12">
                 <ProjectsGrid />
               </AnimationWrapper>
+
+              {/* Highlights List */}
+              <ListItem
+                items={staticHighlights}
+                title=""
+                animationDelay="450ms"
+              />
             </div>
 
             {/* Company Logos Section */}
