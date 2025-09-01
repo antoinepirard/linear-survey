@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
@@ -20,7 +20,6 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [preloadedMedia, setPreloadedMedia] = useState<Set<string>>(new Set());
   const { position, containerRef } = useCursorPosition();
-  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get first 4 projects with preview images or videos
   const projectsWithMedia = projects
@@ -86,24 +85,14 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
     return () => clearTimeout(timer);
   }, [mounted, projectsWithMedia, preloadedMedia]);
 
-  const handleProjectHover = (project: Project | null) => {
+  const handleProjectHover = (project: Project) => {
     if (isMobile) return; // No hover on mobile
+    setHoveredProject(project);
+  };
 
-    // Clear any existing timeout
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
-    }
-
-    if (project) {
-      // Immediately show the new project
-      setHoveredProject(project);
-    } else {
-      // Delay closing by 250ms
-      closeTimeoutRef.current = setTimeout(() => {
-        setHoveredProject(null);
-      }, 250);
-    }
+  const handleGridLeave = () => {
+    if (isMobile) return; // No hover on mobile
+    setHoveredProject(null);
   };
 
   const handleProjectClick = (project: Project) => {
@@ -116,14 +105,6 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
     setClickedProject(null);
   };
 
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (closeTimeoutRef.current) {
-        clearTimeout(closeTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div
@@ -131,13 +112,15 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
       className={`relative ${className}`}
     >
       {/* Projects Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+      <div 
+        className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 p-3 sm:p-4 -m-3 sm:-m-4"
+        onMouseLeave={handleGridLeave}
+      >
         {projectsWithMedia.map((project) => (
           <motion.div
             key={`${project.year}-${project.projectName}`}
             className="relative aspect-[3/4] group cursor-default"
-            onMouseEnter={() => handleProjectHover(project)}
-            onMouseLeave={() => handleProjectHover(null)}
+            onMouseOver={() => handleProjectHover(project)}
             onClick={() => handleProjectClick(project)}
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
