@@ -137,10 +137,10 @@ export default function Home() {
                 <p className="text-slate-600 mb-4">
                   Reach out to me at{" "}
                   <a
-                    href="mailto:antoine@ravell.io"
+                    href="mailto:contact@antoinepirard.be"
                     className="text-slate-600 hover:text-slate-700 transition-colors duration-150 border-b border-slate-100 hover:border-slate-300 pb-0.5"
                   >
-                    antoine@ravell.io
+                    contact@antoinepirard.be
                   </a>{" "}
                   or{" "}
                   <a
