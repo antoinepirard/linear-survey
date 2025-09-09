@@ -82,8 +82,5 @@ class Logger {
 
 // Export default logger instances for different parts of the app
 export const logger = new Logger();
-export const planStorageLogger = new Logger('PlanStorage');
-export const syncLogger = new Logger('Sync');
-export const teamPlanLogger = new Logger('TeamPlan');
 
 export default Logger;
