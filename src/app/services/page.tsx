@@ -109,7 +109,7 @@ export default function Services() {
                       Book a 15 min call
                     </a>
                   </Button>
-                  <DualEmailButton email="antoine@ravell.io" />
+                  <DualEmailButton email="contact@antoinepirard.com" />
                 </div>
               </AnimationWrapper>
 
