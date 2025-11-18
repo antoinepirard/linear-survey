@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
-import { Project, projects } from "@/data/projects";
+import { Project, highlightProjects } from "@/data/projects";
 import { useCursorPosition } from "@/hooks/useCursorPosition";
 
 interface ProjectsGridProps {
@@ -21,8 +21,8 @@ export default function ProjectsGrid({ className = "" }: ProjectsGridProps) {
   const [preloadedMedia, setPreloadedMedia] = useState<Set<string>>(new Set());
   const { position, containerRef } = useCursorPosition();
 
-  // Get first 4 projects with preview images or videos
-  const projectsWithMedia = projects
+  // Get first 4 highlight projects with preview images or videos
+  const projectsWithMedia = highlightProjects
     .filter((project) => project.previewImage || project.previewVideo)
     .slice(0, 4);
 
