@@ -26,16 +26,17 @@ export default function HowIWork() {
                       product direction is still being shaped.
                     </span>{" "}
                     I focus on choosing the right problems to solve, validating
-                    with users, and keeping customers,product and engineering
-                    aligned to deliver meaningful outcomes.
+                    with users, and keeping product and engineering aligned to
+                    deliver meaningful outcomes.
                   </p>
 
                   <p>
                     My work is hands-on product and design. I work directly with
-                    product and engineering leads. Each week, I run outcome
-                    loops: set a goal → prototype & test → write a decision memo
-                    → next steps. I work closely with engineers, prioritizing,
-                    scoping, and jumping in with small PRs when needed.
+                    customers, product and engineering leads. Each week, I run
+                    outcome loops: set a goal → prototype & test → write a
+                    decision memo → next steps. I work closely with engineers,
+                    prioritizing, scoping, and jumping in with small PRs when
+                    needed.
                   </p>
 
                   <p>
