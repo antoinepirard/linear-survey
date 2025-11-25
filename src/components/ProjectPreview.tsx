@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Project } from '@/data/projects';
+import React from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Project } from "@/data/projects";
 
 interface ProjectPreviewProps {
   project: Project | null;
@@ -20,10 +20,14 @@ export default function ProjectPreview({ project }: ProjectPreviewProps) {
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="text-center"
             >
-              <div className="text-lg font-medium text-slate-900">{project.projectName}</div>
+              <div className="text-lg font-medium text-slate-900">
+                {project.projectName}
+              </div>
               <p className="text-sm text-slate-500">{project.year}</p>
               {project.category && (
-                <p className="text-sm text-slate-400 mt-1">{project.category}</p>
+                <p className="text-sm text-slate-400 mt-1">
+                  {project.category}
+                </p>
               )}
             </motion.div>
           ) : (
