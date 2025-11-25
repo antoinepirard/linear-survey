@@ -26,8 +26,8 @@ export default function HowIWork() {
                       product direction is still being shaped.
                     </span>{" "}
                     I focus on choosing the right problems to solve, validating
-                    with users, and keeping product and engineering aligned to
-                    deliver meaningful outcomes.
+                    with users, and keeping customers,product and engineering
+                    aligned to deliver meaningful outcomes.
                   </p>
 
                   <p>
