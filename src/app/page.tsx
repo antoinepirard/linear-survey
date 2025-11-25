@@ -8,6 +8,7 @@ import Image from "next/image";
 import ListItem from "@/components/ListItem";
 import HeaderSection from "@/components/HeaderSection";
 import ProjectsGrid from "@/components/ProjectsGrid";
+import CaseStudyGate from "@/components/CaseStudyGate";
 import { AnimationWrapper } from "@/hooks/useAnimation";
 import { staticHighlights } from "@/data/staticData";
 import { Button } from "@/components/ui/button";
@@ -191,6 +192,11 @@ export default function Home() {
                 title=""
                 animationDelay="450ms"
               />
+
+              {/* Case Study Gate */}
+              <AnimationWrapper delay="500ms">
+                <CaseStudyGate />
+              </AnimationWrapper>
             </div>
 
             {/* Company Logos Section */}
