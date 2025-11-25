@@ -5,10 +5,7 @@ import { AnimationWrapper } from "@/hooks/useAnimation";
 import HeaderSection from "@/components/HeaderSection";
 import { Button } from "@/components/ui/button";
 import { DualEmailButton } from "@/components/ui/dual-email-button";
-import {
-  CalendarDaysIcon,
-  BookOpenIcon,
-} from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, BookOpenIcon } from "@heroicons/react/24/outline";
 
 export default function HowIWork() {
   return (
@@ -23,7 +20,7 @@ export default function HowIWork() {
             <div className="flex flex-col gap-6 max-w-2xl">
               <AnimationWrapper delay="150ms">
                 <h1 className="text-base font-medium leading-relaxed text-slate-950">
-                  My approach.
+                  My focus.
                 </h1>
               </AnimationWrapper>
 
@@ -40,8 +37,8 @@ export default function HowIWork() {
                   </p>
 
                   <p>
-                    My approach is hands-on product and design. I work directly
-                    with product and engineering leads. Each week, I run outcome
+                    My work is hands-on product and design. I work directly with
+                    product and engineering leads. Each week, I run outcome
                     loops: set a goal → prototype & test → write a decision memo
                     → next steps. I work closely with engineers, prioritizing,
                     scoping, and jumping in with small PRs when needed.
@@ -58,11 +55,10 @@ export default function HowIWork() {
 
                   <p>
                     <span className="font-medium text-slate-900">
-                      My process:
+                      What I&apos;m not looking for:
                     </span>{" "}
-                    Frame the problem → define success → validate experience &
-                    design with users → build specs, acceptance criteria, and a
-                    clean handoff to development.
+                    Slow decision making, make it pretty work, little autonomy,
+                    hands-off the codebase, too many layers of leadership orgs.
                   </p>
                 </div>
               </AnimationWrapper>
