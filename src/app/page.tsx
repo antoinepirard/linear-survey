@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import Image from "next/image";
 
 import ListItem from "@/components/ListItem";
 import HeaderSection from "@/components/HeaderSection";
@@ -211,6 +212,32 @@ export default function Home() {
 
             {/* Quotes Section */}
             <QuotesSection />
+
+            {/* LinkedIn Recommendations */}
+            <AnimationWrapper delay="500ms">
+              <div className="flex justify-center">
+                <Button
+                  asChild
+                  variant="secondary"
+                  size="sm"
+                  className="bg-white hover:bg-slate-100 text-slate-600"
+                >
+                  <a
+                    href="https://www.linkedin.com/in/antoinepirard/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Image
+                      src="/Assets/Logos/linkedin-logo.svg"
+                      alt="LinkedIn"
+                      width={16}
+                      height={16}
+                    />
+                    Read recommendations
+                  </a>
+                </Button>
+              </div>
+            </AnimationWrapper>
 
             {/* Footer footnote */}
             <div className="text-center">
