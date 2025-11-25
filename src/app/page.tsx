@@ -109,7 +109,7 @@ export default function Home() {
             <div className="flex flex-col gap-6 max-w-2xl">
               <AnimationWrapper delay="150ms">
                 <p className="text-base font-medium leading-relaxed text-slate-950">
-                  Product Designer.
+                  Product & Design.
                 </p>
                 <p className="text-base leading-relaxed text-slate-700">
                   I craft thoughtful experiences with product teams—from
