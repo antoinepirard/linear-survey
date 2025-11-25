@@ -32,11 +32,11 @@ export default function HowIWork() {
 
                   <p>
                     My work is hands-on product and design. I work directly with
-                    customers, product and engineering leads. Each week, I run
-                    outcome loops: set a goal → prototype & test → write a
-                    decision memo → next steps. I work closely with engineers,
-                    prioritizing, scoping, and jumping in with small PRs when
-                    needed.
+                    customers, product and engineering leads. I enjoy running
+                    fast-paced, outcome loops: set a goal → prototype & test →
+                    write a decision memo → next steps. I work closely with
+                    engineers, prioritizing, scoping, and jumping in with small
+                    PRs when needed.
                   </p>
 
                   <p>
