@@ -31,8 +31,8 @@ export default function HowIWork() {
                 <div className="flex flex-col gap-4 text-base leading-relaxed text-slate-600">
                   <p>
                     <span className="font-medium text-slate-900">
-                      I thrive in early-stage environments where product
-                      direction is still being shaped.
+                      I thrive in fast-moving, ambiguous environments where
+                      product direction is still being shaped.
                     </span>{" "}
                     I focus on choosing the right problems to solve, validating
                     with users, and keeping product and engineering aligned to

@@ -118,11 +118,10 @@ export default function Home() {
 
               <AnimationWrapper delay="200ms">
                 <p className="text-base leading-relaxed text-slate-700">
-                  I&apos;ve spent the last decade working at early stage
-                  startups and collaborating with brillant engineers. I enjoy
-                  finding my way through the chaos to figure out the most
-                  valuable problems to solve, and solving them from first
-                  principles.
+                  I&apos;ve spent the last decade in fast-moving, ambiguous
+                  environments—collaborating with brilliant engineers to find
+                  the most valuable problems to solve, and solving them from
+                  first principles.
                 </p>
               </AnimationWrapper>
             </div>
