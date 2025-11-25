@@ -19,12 +19,6 @@ export default function HowIWork() {
             {/* Main Content */}
             <div className="flex flex-col gap-6 max-w-2xl">
               <AnimationWrapper delay="150ms">
-                <h1 className="text-base font-medium leading-relaxed text-slate-950">
-                  My focus.
-                </h1>
-              </AnimationWrapper>
-
-              <AnimationWrapper delay="200ms">
                 <div className="flex flex-col gap-4 text-base leading-relaxed text-slate-600">
                   <p>
                     <span className="font-medium text-slate-900">
