@@ -40,7 +40,7 @@ export default function Home() {
     ██║     ╚██████╔╝███████╗██║╚██████╔╝
     ╚═╝      ╚═════╝ ╚══════╝╚═╝ ╚═════╝
 
-    Antoine Pirard - System Thinker & Product Designer
+    Antoine Pirard - Product Designer
 
     🧠 Systems Thinker
     🎨 Product Crafter
@@ -87,7 +87,7 @@ export default function Home() {
                     className="rounded-2xl object-cover max-w-[180px] sm:max-w-[200px]"
                   />
                   {/* Contextual overlay */}
-                  {/* <motion.div
+            {/* <motion.div
                     className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent rounded-2xl flex items-end p-4"
                     initial={{ opacity: 0 }}
                     whileHover={{ opacity: 1 }}
@@ -100,7 +100,7 @@ export default function Home() {
                       <p className="text-xs text-white/80">Antoine & Olivia</p>
                     </div>
                   </motion.div> */}
-                {/* </motion.div>
+            {/* </motion.div>
               </div>
             </AnimationWrapper> */}
 
@@ -108,12 +108,11 @@ export default function Home() {
             <div className="flex flex-col gap-6 max-w-2xl">
               <AnimationWrapper delay="150ms">
                 <p className="text-base font-medium leading-relaxed text-slate-950">
-                  Product & design partner for founders.
+                  Product Designer.
                 </p>
                 <p className="text-base leading-relaxed text-slate-700">
-                  I partner with founders to validate the next bet and craft
-                  thoughtful experiences with engineers. From research to code
-                  handover.
+                  I craft thoughtful experiences with product teams—from
+                  research and validation to design and engineering handover.
                 </p>
               </AnimationWrapper>
 
@@ -163,7 +162,7 @@ export default function Home() {
                     rel="noopener noreferrer"
                   >
                     <CalendarDaysIcon className="w-4 h-4" />
-                    Book a call
+                    Let&apos;s chat
                   </a>
                 </Button>
               </AnimationWrapper>
@@ -172,8 +171,13 @@ export default function Home() {
             {/* Highlights Section */}
             <div className="max-w-4xl">
               {/* Highlights Title */}
-              <div className="animate-fade-in-up" style={{ animationDelay: "400ms" }}>
-                <h2 className="text-lg font-medium text-slate-900 mb-6">Highlights</h2>
+              <div
+                className="animate-fade-in-up"
+                style={{ animationDelay: "400ms" }}
+              >
+                <h2 className="text-lg font-medium text-slate-900 mb-6">
+                  Highlights
+                </h2>
               </div>
 
               {/* Projects Grid */}

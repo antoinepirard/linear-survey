@@ -22,11 +22,11 @@ export const highlightProjects: Project[] = [
   {
     year: "2025",
     projectName: "Ravell",
-    category: "Product Management & Planning Tool",
+    category: "Side Project",
     previewImage: "/Assets/Images/thumbn-ravell.jpg",
     hoverPreviewImage: "/Assets/Images/ravell (1).jpg",
     description:
-      "Ravell is the home for lean product teams, who are looking for a streamlined way to convert messy evidences and ideas into actionable plans. Using AI and deep integrations, these plans can then be pushed direction to Linear.app. I'm cofounding Ravell with Jonny O'Mahonny, ex-Intercom I worked with at Rasayel.",
+      "Ravell is a non-linear planner for lean product teams, helping them convert messy evidence and ideas into actionable plans. Using AI and deep integrations, these plans can be pushed directly to Linear.app. I'm building this with Jonny O'Mahony, ex-Intercom engineer I worked with at Rasayel.",
   },
   {
     year: "2022 - 2025",

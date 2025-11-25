@@ -7,12 +7,10 @@ import { Button } from "@/components/ui/button";
 import { DualEmailButton } from "@/components/ui/dual-email-button";
 import {
   CalendarDaysIcon,
-  CheckCircleIcon,
-  XCircleIcon,
   BookOpenIcon,
 } from "@heroicons/react/24/outline";
 
-export default function Services() {
+export default function HowIWork() {
   return (
     <div className="bg-white min-h-screen relative overflow-x-hidden">
       <main className="overflow-x-hidden">
@@ -25,7 +23,7 @@ export default function Services() {
             <div className="flex flex-col gap-6 max-w-2xl">
               <AnimationWrapper delay="150ms">
                 <h1 className="text-base font-medium leading-relaxed text-slate-950">
-                  A product & design partner for 0→1 and pivots.
+                  My approach.
                 </h1>
               </AnimationWrapper>
 
@@ -33,17 +31,17 @@ export default function Services() {
                 <div className="flex flex-col gap-4 text-base leading-relaxed text-slate-600">
                   <p>
                     <span className="font-medium text-slate-900">
-                      I partner with early-stage founders building their first
-                      product, and with teams making product pivots.
+                      I thrive in early-stage environments where product
+                      direction is still being shaped.
                     </span>{" "}
-                    As an embedded partner, I work with you to choose the next
-                    priority, validate it with users, and make sure product and
-                    engineering stay aligned so we deliver meaningful outcomes.
+                    I focus on choosing the right problems to solve, validating
+                    with users, and keeping product and engineering aligned to
+                    deliver meaningful outcomes.
                   </p>
 
                   <p>
                     My approach is hands-on product and design. I work directly
-                    with your founder and tech lead. Each week, we run outcome
+                    with product and engineering leads. Each week, I run outcome
                     loops: set a goal → prototype & test → write a decision memo
                     → next steps. I work closely with engineers, prioritizing,
                     scoping, and jumping in with small PRs when needed.
@@ -51,7 +49,7 @@ export default function Services() {
 
                   <p>
                     <span className="font-medium text-slate-900">
-                      What we achieve together:
+                      What I bring to a team:
                     </span>{" "}
                     Faster decisions (days, not months), lower risk (testing top
                     assumptions before code), and team alignment (prototypes and
@@ -60,36 +58,12 @@ export default function Services() {
 
                   <p>
                     <span className="font-medium text-slate-900">
-                      In practise:
+                      My process:
                     </span>{" "}
                     Frame the problem → define success → validate experience &
                     design with users → build specs, acceptance criteria, and a
                     clean handoff to development.
                   </p>
-
-                  <div className="flex flex-col gap-2 mt-6">
-                    <div className="flex items-start gap-2">
-                      <CheckCircleIcon className="w-4 h-4 text-green-600 mt-1 flex-shrink-0" />
-                      <span>
-                        <span className="font-medium text-slate-900">
-                          Best fit:
-                        </span>{" "}
-                        Engaged founders, a technical core, and access to users.
-                        Multi-month or longer term collaborations.
-                      </span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <XCircleIcon className="w-4 h-4 text-red-500 mt-1 flex-shrink-0" />
-                      <span>
-                        <span className="font-medium text-slate-900">
-                          Not a fit:
-                        </span>{" "}
-                        Pixel-only work, &quot;just make it pretty&quot;, or
-                        having no access to decision makers. Single day or week
-                        engagements.
-                      </span>
-                    </div>
-                  </div>
                 </div>
               </AnimationWrapper>
 
@@ -106,7 +80,7 @@ export default function Services() {
                       rel="noopener noreferrer"
                     >
                       <CalendarDaysIcon className="w-4 h-4" />
-                      Book a 15 min call
+                      Let&apos;s chat
                     </a>
                   </Button>
                   <DualEmailButton email="contact@antoinepirard.com" />

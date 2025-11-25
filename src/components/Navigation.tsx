@@ -24,7 +24,7 @@ export default function Navigation({ className, showDot = true }: NavigationProp
 
   const items = [
     { href: '/', label: 'Work' },
-    { href: '/services', label: 'Services' },
+    { href: '/services', label: 'Approach' },
     // { href: '/feed', label: 'Feed' }
   ];
 

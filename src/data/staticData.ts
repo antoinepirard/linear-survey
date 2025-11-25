@@ -1,8 +1,8 @@
 export const staticHighlights = [
   {
     title: "Ravell.io",
-    description: "Building Ravell, the non-linear planner.",
-    category: "STARTUP",
+    description: "Side project: Building Ravell, a non-linear planner.",
+    category: "SIDE PROJECT",
     href: "https://www.ravell.io",
   },
   {
