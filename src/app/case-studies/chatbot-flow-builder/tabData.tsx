@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { TabItem } from '@/components/ui/tabs';
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 const NodeDesignContent = () => {
