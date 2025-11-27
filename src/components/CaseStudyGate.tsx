@@ -56,7 +56,7 @@ export default function CaseStudyGate() {
       </div>
 
       {/* Inner white container - actions */}
-      <div className="bg-white rounded-2xl mx-px mb-px py-6 px-6 ring-1 ring-slate-100">
+      <div className="bg-white rounded-2xl mx-px mb-px py-6 px-6 ring-1 ring-slate-100/70 shadow-2xl/25">
         <AnimatePresence mode="wait">
           {!isUnlocked ? (
             <motion.div
