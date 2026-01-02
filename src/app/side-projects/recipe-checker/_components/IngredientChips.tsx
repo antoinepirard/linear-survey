@@ -73,7 +73,7 @@ export function IngredientChips({
           onKeyDown={handleKeyDown}
           onBlur={addIngredient}
           placeholder={ingredients.length === 0 ? placeholder : ''}
-          className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400"
+          className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-slate-900 placeholder:text-slate-400"
         />
       )}
     </div>
