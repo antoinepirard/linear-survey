@@ -1,61 +1,72 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Button } from '@/components/ui/button';
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Button } from "@/components/ui/button";
 import {
   PlusIcon,
   XMarkIcon,
   ArrowLeftIcon,
-} from '@heroicons/react/24/outline';
-import { generateRoomId } from '../_utils/calculations';
-import { CreateVoteConfig } from '../_types';
+} from "@heroicons/react/24/outline";
+import { generateRoomId } from "../_utils/calculations";
+import { addRecentRoom } from "../_utils/recentRooms";
+import { CreateVoteConfig } from "../_types";
+
+interface OptionItem {
+  id: string;
+  value: string;
+}
+
+let optionIdCounter = 0;
+function generateOptionId(): string {
+  return `option-${++optionIdCounter}`;
+}
 
 interface CreateVoteFormProps {
   onBack: () => void;
 }
 
 export function CreateVoteForm({ onBack }: CreateVoteFormProps) {
-  const [topic, setTopic] = useState('');
-  const [options, setOptions] = useState<string[]>(['', '']);
+  const [topic, setTopic] = useState("");
+  const [options, setOptions] = useState<OptionItem[]>(() => [
+    { id: generateOptionId(), value: "" },
+    { id: generateOptionId(), value: "" },
+  ]);
   const [expectedVoters, setExpectedVoters] = useState(2);
-  const [hostName, setHostName] = useState('');
+  const [hostName, setHostName] = useState("");
 
   const addOption = useCallback(() => {
     if (options.length < 6) {
-      setOptions([...options, '']);
+      setOptions([...options, { id: generateOptionId(), value: "" }]);
     }
   }, [options]);
 
   const removeOption = useCallback(
-    (index: number) => {
+    (id: string) => {
       if (options.length > 2) {
-        setOptions(options.filter((_, i) => i !== index));
+        setOptions(options.filter((opt) => opt.id !== id));
       }
     },
     [options]
   );
 
-  const updateOption = useCallback(
-    (index: number, value: string) => {
-      const newOptions = [...options];
-      newOptions[index] = value;
-      setOptions(newOptions);
-    },
-    [options]
-  );
+  const updateOption = useCallback((id: string, value: string) => {
+    setOptions((prev) =>
+      prev.map((opt) => (opt.id === id ? { ...opt, value } : opt))
+    );
+  }, []);
 
   const isValid =
-    topic.trim() !== '' &&
-    options.every((o) => o.trim() !== '') &&
-    hostName.trim() !== '';
+    topic.trim() !== "" &&
+    options.every((o) => o.value.trim() !== "") &&
+    hostName.trim() !== "";
 
   const handleSubmit = useCallback(() => {
     if (!isValid) return;
 
     const config: CreateVoteConfig = {
       topic: topic.trim(),
-      options: options.map((o) => o.trim()),
+      options: options.map((o) => o.value.trim()),
       expectedVoters,
     };
 
@@ -70,6 +81,14 @@ export function CreateVoteForm({ onBack }: CreateVoteFormProps) {
         hostName: hostName.trim(),
       })
     );
+
+    // Store in recent rooms for the landing page
+    addRecentRoom({
+      roomId,
+      topic: config.topic,
+      createdAt: Date.now(),
+      role: "host",
+    });
 
     // Redirect to room
     window.location.href = `/side-projects/conviction/room/${roomId}`;
@@ -129,7 +148,7 @@ export function CreateVoteForm({ onBack }: CreateVoteFormProps) {
               <AnimatePresence mode="popLayout">
                 {options.map((option, index) => (
                   <motion.div
-                    key={index}
+                    key={option.id}
                     layout
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -137,8 +156,8 @@ export function CreateVoteForm({ onBack }: CreateVoteFormProps) {
                     className="flex gap-2"
                   >
                     <input
-                      value={option}
-                      onChange={(e) => updateOption(index, e.target.value)}
+                      value={option.value}
+                      onChange={(e) => updateOption(option.id, e.target.value)}
                       placeholder={`Option ${index + 1}`}
                       className="flex-1 h-14 px-4 text-lg rounded-xl border-2 border-slate-200 focus:border-slate-900 focus:outline-none transition-colors"
                     />
@@ -146,7 +165,7 @@ export function CreateVoteForm({ onBack }: CreateVoteFormProps) {
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => removeOption(index)}
+                        onClick={() => removeOption(option.id)}
                         className="w-14 h-14 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors"
                       >
                         <XMarkIcon className="w-5 h-5 text-slate-500" />
@@ -183,8 +202,8 @@ export function CreateVoteForm({ onBack }: CreateVoteFormProps) {
                   onClick={() => setExpectedVoters(num)}
                   className={`w-14 h-14 rounded-xl text-xl font-bold transition-all ${
                     expectedVoters === num
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
                   {num}

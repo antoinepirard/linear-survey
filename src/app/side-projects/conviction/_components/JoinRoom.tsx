@@ -4,20 +4,30 @@ import { useState, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { useUpdateMyPresence } from '../liveblocks.config';
+import { addRecentRoom } from '../_utils/recentRooms';
 
 interface JoinRoomProps {
+  roomId: string;
   topic: string;
 }
 
-export function JoinRoom({ topic }: JoinRoomProps) {
+export function JoinRoom({ roomId, topic }: JoinRoomProps) {
   const [name, setName] = useState('');
   const updateMyPresence = useUpdateMyPresence();
 
   const handleJoin = useCallback(() => {
     if (name.trim()) {
+      // Store in recent rooms for the landing page
+      addRecentRoom({
+        roomId,
+        topic,
+        createdAt: Date.now(),
+        role: 'participant',
+      });
+      
       updateMyPresence({ name: name.trim() });
     }
-  }, [name, updateMyPresence]);
+  }, [name, roomId, topic, updateMyPresence]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {

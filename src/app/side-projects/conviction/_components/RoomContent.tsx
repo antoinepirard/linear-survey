@@ -10,10 +10,11 @@ import { RoomPhase } from '../_types';
 import { motion } from 'motion/react';
 
 interface RoomContentProps {
+  roomId: string;
   hostName: string | null;
 }
 
-export function RoomContent({ hostName }: RoomContentProps) {
+export function RoomContent({ roomId, hostName }: RoomContentProps) {
   const config = useStorage((root) => root.config);
   const votes = useStorage((root) => root.votes);
   const self = useSelf();
@@ -65,7 +66,7 @@ export function RoomContent({ hostName }: RoomContentProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      {phase === 'join' && <JoinRoom topic={config.topic} />}
+      {phase === 'join' && <JoinRoom roomId={roomId} topic={config.topic} />}
       {phase === 'voting' && (
         <VotingPhase config={config} userId={String(self?.connectionId)} />
       )}

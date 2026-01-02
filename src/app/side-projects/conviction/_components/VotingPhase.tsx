@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useCallback, useRef } from 'react';
-import { motion } from 'motion/react';
-import { Button } from '@/components/ui/button';
-import { TwoOptionSlider } from './TwoOptionSlider';
-import { RadarVote } from './RadarVote';
-import { useMutation, useSelf } from '../liveblocks.config';
-import type { RoomConfig } from '../liveblocks.config';
+import { useCallback, useRef } from "react";
+import { motion } from "motion/react";
+import { Button } from "@/components/ui/button";
+import { TwoOptionSlider } from "./TwoOptionSlider";
+import { RadarVote } from "./RadarVote";
+import { useMutation, useSelf } from "../liveblocks.config";
+import type { RoomConfig } from "../liveblocks.config";
 
 interface VotingPhaseProps {
   config: RoomConfig;
@@ -16,16 +16,16 @@ interface VotingPhaseProps {
 // Normalize values to sum to 100
 function normalizeToHundred(values: number[]): number[] {
   const sum = values.reduce((acc, v) => acc + v, 0);
-  if (sum === 0) {
-    // Equal distribution if all zeros
-    return values.map(() => Math.round(100 / values.length));
-  }
-  const normalized = values.map((v) => (v / sum) * 100);
+  const normalized =
+    sum === 0
+      ? values.map(() => 100 / values.length) // Equal distribution if all zeros
+      : values.map((v) => (v / sum) * 100);
+
   // Round and adjust to ensure sum is exactly 100
   const rounded = normalized.map((v) => Math.round(v));
   const diff = 100 - rounded.reduce((acc, v) => acc + v, 0);
   if (diff !== 0) {
-    // Add/subtract diff from largest value
+    // Add/subtract diff from largest value (or first if equal)
     const maxIndex = rounded.indexOf(Math.max(...rounded));
     rounded[maxIndex] += diff;
   }
@@ -38,7 +38,7 @@ export function VotingPhase({ config, userId }: VotingPhaseProps) {
 
   const submitVote = useMutation(
     ({ storage }, allocations: number[], name: string) => {
-      const votes = storage.get('votes');
+      const votes = storage.get("votes");
       votes.set(userId, {
         name,
         allocations,

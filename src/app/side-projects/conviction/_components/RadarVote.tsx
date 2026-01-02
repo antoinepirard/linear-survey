@@ -36,14 +36,30 @@ export function RadarVote({ options, onValuesChange }: RadarVoteProps) {
     };
   };
 
-  // Get label position (slightly outside max radius)
-  const getLabelPoint = (index: number) => {
+  // Get label position and anchor based on position around the radar
+  const getLabelConfig = (index: number) => {
     const angle = getAngle(index);
-    const radius = MAX_RADIUS + 50;
-    return {
-      x: CENTER + radius * Math.cos(angle),
-      y: CENTER + radius * Math.sin(angle),
-    };
+    const radius = MAX_RADIUS + 40;
+    const x = CENTER + radius * Math.cos(angle);
+    const y = CENTER + radius * Math.sin(angle);
+
+    // Determine text anchor based on horizontal position
+    // Use a threshold to identify left/right sides vs top/bottom
+    const normalizedX = Math.cos(angle);
+    let textAnchor: 'start' | 'middle' | 'end' = 'middle';
+    let dx = 0;
+
+    if (normalizedX < -0.3) {
+      // Left side - align text to the right (end)
+      textAnchor = 'end';
+      dx = -8;
+    } else if (normalizedX > 0.3) {
+      // Right side - align text to the left (start)
+      textAnchor = 'start';
+      dx = 8;
+    }
+
+    return { x, y, textAnchor, dx };
   };
 
   // Calculate the distance from center for a touch point relative to vertex angle
@@ -173,13 +189,13 @@ export function RadarVote({ options, onValuesChange }: RadarVoteProps) {
 
         {/* Labels */}
         {options.map((option, index) => {
-          const labelPoint = getLabelPoint(index);
+          const { x, y, textAnchor, dx } = getLabelConfig(index);
           return (
             <text
               key={index}
-              x={labelPoint.x}
-              y={labelPoint.y}
-              textAnchor="middle"
+              x={x + dx}
+              y={y}
+              textAnchor={textAnchor}
               dominantBaseline="middle"
               className="text-sm font-semibold fill-slate-900"
             >

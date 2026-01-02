@@ -53,7 +53,7 @@ export default function RoomPage() {
 
   return (
     <ConvictionRoomProvider roomId={roomId} initialConfig={initialConfig}>
-      <RoomContent hostName={hostName} />
+      <RoomContent roomId={roomId} hostName={hostName} />
     </ConvictionRoomProvider>
   );
 }
