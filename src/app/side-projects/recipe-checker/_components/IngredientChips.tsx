@@ -2,7 +2,6 @@
 
 import { useState, useCallback, KeyboardEvent } from 'react';
 import { XMarkIcon } from '@heroicons/react/20/solid';
-import { motion, AnimatePresence } from 'motion/react';
 
 interface IngredientChipsProps {
   ingredients: string[];
@@ -47,44 +46,36 @@ export function IngredientChips({
   );
 
   return (
-    <div className="w-full">
-      <div className="flex flex-wrap gap-2 p-3 bg-stone-50 rounded-xl border border-stone-200 focus-within:border-stone-400 focus-within:ring-1 focus-within:ring-stone-400 transition-all min-h-[52px]">
-        <AnimatePresence mode="popLayout">
-          {ingredients.map((ingredient) => (
-            <motion.span
-              key={ingredient}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              layout
-              className="inline-flex items-center gap-1 px-3 py-1.5 bg-white rounded-lg border border-stone-200 text-sm text-stone-700 shadow-sm"
+    <div className="flex flex-wrap items-center gap-2 px-4 py-3 bg-slate-50 rounded-xl focus-within:bg-slate-100 transition-colors min-h-[48px]">
+      {ingredients.map((ingredient) => (
+        <span
+          key={ingredient}
+          className="inline-flex items-center gap-1 px-2.5 py-1 bg-white rounded-lg text-sm text-stone-700"
+        >
+          {ingredient}
+          {!disabled && (
+            <button
+              type="button"
+              onClick={() => removeIngredient(ingredient)}
+              className="p-0.5 hover:bg-slate-100 rounded transition-colors"
             >
-              {ingredient}
-              {!disabled && (
-                <button
-                  type="button"
-                  onClick={() => removeIngredient(ingredient)}
-                  className="ml-0.5 p-0.5 hover:bg-stone-100 rounded transition-colors"
-                >
-                  <XMarkIcon className="w-3.5 h-3.5 text-stone-400 hover:text-stone-600" />
-                </button>
-              )}
-            </motion.span>
-          ))}
-        </AnimatePresence>
+              <XMarkIcon className="w-3.5 h-3.5 text-stone-400 hover:text-stone-600" />
+            </button>
+          )}
+        </span>
+      ))}
 
-        {!disabled && (
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={addIngredient}
-            placeholder={ingredients.length === 0 ? placeholder : ''}
-            className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400"
-          />
-        )}
-      </div>
+      {!disabled && (
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={addIngredient}
+          placeholder={ingredients.length === 0 ? placeholder : ''}
+          className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-stone-900 placeholder:text-stone-400"
+        />
+      )}
     </div>
   );
 }

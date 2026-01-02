@@ -48,24 +48,24 @@ export function RecipesTab({
     <div className="space-y-4">
       {/* Add New Recipe */}
       {isAdding ? (
-        <div className="p-4 bg-stone-50 rounded-xl border border-stone-200">
+        <div className="space-y-3">
           <input
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Recipe name"
-            className="w-full px-3 py-2 mb-3 text-lg font-medium bg-white rounded-lg border border-stone-200 focus:outline-none focus:border-stone-400"
+            className="w-full px-4 py-3 text-sm bg-slate-50 rounded-xl focus:outline-none focus:bg-slate-100 transition-colors text-slate-900 placeholder:text-slate-400"
             autoFocus
           />
           <IngredientChips
             ingredients={newIngredients}
             onChange={setNewIngredients}
-            placeholder="Add key ingredients (Enter to add)"
+            placeholder="Add ingredients (Enter to add)"
           />
-          <div className="flex justify-end gap-2 mt-4">
+          <div className="flex justify-end gap-2 pt-1">
             <button
               onClick={handleCancel}
-              className="px-4 py-2 text-sm text-stone-600 hover:bg-stone-200 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm text-stone-500 hover:text-stone-700 transition-colors"
             >
               Cancel
             </button>
