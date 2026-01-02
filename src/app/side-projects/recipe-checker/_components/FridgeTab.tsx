@@ -130,7 +130,7 @@ export function FridgeTab({ fridge, recipeIngredients, onUpdateFridge, isSaving 
             onFocus={() => setShowSuggestions(true)}
             onKeyDown={handleKeyDown}
             placeholder="What's in your fridge?"
-            className="flex-1 px-4 py-3 bg-stone-50 rounded-xl border border-stone-200 focus:outline-none focus:border-stone-400 focus:ring-1 focus:ring-stone-400 transition-all text-stone-900 placeholder:text-stone-400"
+            className="flex-1 px-4 py-3 bg-white rounded-xl border border-border shadow-sm focus:outline-none focus:border-stone-400 focus:ring-1 focus:ring-stone-400 transition-all text-stone-900 placeholder:text-stone-400"
             disabled={isSaving}
             autoComplete="off"
           />

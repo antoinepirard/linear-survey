@@ -76,10 +76,10 @@ export function RecipeCard({ recipe, onUpdate, onDelete }: RecipeCardProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="p-4 bg-white rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow"
+      className="p-4 bg-white rounded-xl border border-stone-200"
     >
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-lg font-medium text-stone-900">{recipe.name}</h3>
+        <h3 className="text-base font-semibold text-stone-900">{recipe.name}</h3>
         <div className="flex gap-1">
           <button
             onClick={() => setIsEditing(true)}

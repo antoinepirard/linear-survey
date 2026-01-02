@@ -21,11 +21,25 @@
         "Parmesan"
       ],
       "tags": []
+    },
+    {
+      "id": "recipe_1767349864943_5y87ne4p5",
+      "name": "Spaghetti bolognese",
+      "ingredients": [
+        "Celery",
+        "Carrots",
+        "Haché",
+        "Passata",
+        "Onions",
+        "Garlic"
+      ],
+      "tags": []
     }
   ],
   "fridge": {
     "ingredients": [
-      "Carrots"
+      "Carrots",
+      "Pasta"
     ]
   }
 }

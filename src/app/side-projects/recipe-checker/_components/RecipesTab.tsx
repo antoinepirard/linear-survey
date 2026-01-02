@@ -89,7 +89,7 @@ export function RecipesTab({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsAdding(true)}
-            className="w-full p-4 flex items-center justify-center gap-2 text-stone-500 bg-stone-50 hover:bg-stone-100 rounded-xl border border-dashed border-stone-300 transition-colors"
+            className="w-full p-4 flex items-center justify-center gap-2 text-sm font-medium text-slate-500 bg-white hover:bg-stone-100 rounded-xl border border-dashed border-stone-300 transition-colors"
           >
             <PlusIcon className="w-5 h-5" />
             Add Recipe
