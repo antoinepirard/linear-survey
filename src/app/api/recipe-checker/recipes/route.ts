@@ -1,21 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
-import type { RecipeCheckerData, Recipe } from '@/app/side-projects/recipe-checker/_types';
+import { kv } from '@vercel/kv';
+import type { Recipe } from '@/app/side-projects/recipe-checker/_types';
 
-const DATA_FILE = path.join(process.cwd(), 'data', 'recipe-checker.json');
+const RECIPES_KEY = 'recipe-checker:recipes';
 
-async function readData(): Promise<RecipeCheckerData> {
-  try {
-    const content = await fs.readFile(DATA_FILE, 'utf-8');
-    return JSON.parse(content);
-  } catch {
-    return { recipes: [], fridge: { ingredients: [] } };
-  }
+async function getRecipes(): Promise<Recipe[]> {
+  const recipes = await kv.get<Recipe[]>(RECIPES_KEY);
+  return recipes || [];
 }
 
-async function writeData(data: RecipeCheckerData): Promise<void> {
-  await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2));
+async function setRecipes(recipes: Recipe[]): Promise<void> {
+  await kv.set(RECIPES_KEY, recipes);
 }
 
 function generateId(): string {
@@ -24,8 +19,8 @@ function generateId(): string {
 
 // GET all recipes
 export async function GET() {
-  const data = await readData();
-  return NextResponse.json(data.recipes);
+  const recipes = await getRecipes();
+  return NextResponse.json(recipes);
 }
 
 // POST create new recipe
@@ -40,7 +35,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const data = await readData();
+  const recipes = await getRecipes();
   const newRecipe: Recipe = {
     id: generateId(),
     name,
@@ -48,8 +43,8 @@ export async function POST(request: NextRequest) {
     tags: tags || [],
   };
 
-  data.recipes.push(newRecipe);
-  await writeData(data);
+  recipes.push(newRecipe);
+  await setRecipes(recipes);
 
   return NextResponse.json(newRecipe, { status: 201 });
 }
@@ -63,22 +58,22 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Recipe ID is required' }, { status: 400 });
   }
 
-  const data = await readData();
-  const recipeIndex = data.recipes.findIndex((r) => r.id === id);
+  const recipes = await getRecipes();
+  const recipeIndex = recipes.findIndex((r) => r.id === id);
 
   if (recipeIndex === -1) {
     return NextResponse.json({ error: 'Recipe not found' }, { status: 404 });
   }
 
-  data.recipes[recipeIndex] = {
-    ...data.recipes[recipeIndex],
+  recipes[recipeIndex] = {
+    ...recipes[recipeIndex],
     ...(name && { name }),
     ...(ingredients && { ingredients }),
     ...(tags !== undefined && { tags }),
   };
 
-  await writeData(data);
-  return NextResponse.json(data.recipes[recipeIndex]);
+  await setRecipes(recipes);
+  return NextResponse.json(recipes[recipeIndex]);
 }
 
 // DELETE recipe
@@ -90,16 +85,15 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Recipe ID is required' }, { status: 400 });
   }
 
-  const data = await readData();
-  const recipeIndex = data.recipes.findIndex((r) => r.id === id);
+  const recipes = await getRecipes();
+  const recipeIndex = recipes.findIndex((r) => r.id === id);
 
   if (recipeIndex === -1) {
     return NextResponse.json({ error: 'Recipe not found' }, { status: 404 });
   }
 
-  data.recipes.splice(recipeIndex, 1);
-  await writeData(data);
+  recipes.splice(recipeIndex, 1);
+  await setRecipes(recipes);
 
   return NextResponse.json({ success: true });
 }
-

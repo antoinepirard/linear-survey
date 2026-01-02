@@ -1,27 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
-import type { RecipeCheckerData } from '@/app/side-projects/recipe-checker/_types';
+import { kv } from '@vercel/kv';
+import type { Fridge } from '@/app/side-projects/recipe-checker/_types';
 
-const DATA_FILE = path.join(process.cwd(), 'data', 'recipe-checker.json');
+const FRIDGE_KEY = 'recipe-checker:fridge';
 
-async function readData(): Promise<RecipeCheckerData> {
-  try {
-    const content = await fs.readFile(DATA_FILE, 'utf-8');
-    return JSON.parse(content);
-  } catch {
-    return { recipes: [], fridge: { ingredients: [] } };
-  }
+async function getFridge(): Promise<Fridge> {
+  const fridge = await kv.get<Fridge>(FRIDGE_KEY);
+  return fridge || { ingredients: [] };
 }
 
-async function writeData(data: RecipeCheckerData): Promise<void> {
-  await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2));
+async function setFridge(fridge: Fridge): Promise<void> {
+  await kv.set(FRIDGE_KEY, fridge);
 }
 
 // GET fridge contents
 export async function GET() {
-  const data = await readData();
-  return NextResponse.json(data.fridge);
+  const fridge = await getFridge();
+  return NextResponse.json(fridge);
 }
 
 // PUT update fridge contents
@@ -36,10 +31,8 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  const data = await readData();
-  data.fridge.ingredients = ingredients;
-  await writeData(data);
+  const fridge: Fridge = { ingredients };
+  await setFridge(fridge);
 
-  return NextResponse.json(data.fridge);
+  return NextResponse.json(fridge);
 }
-
