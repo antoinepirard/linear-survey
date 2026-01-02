@@ -56,7 +56,7 @@ export default function HeaderSection() {
                         Antoine Pirard
                       </h1>
                       <p className="text-base font-normal text-slate-600 leading-tight">
-                        Product Designer
+                        Product & Design
                       </p>
                     </div>
                   </div>
