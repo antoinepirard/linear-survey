@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Button } from "@/components/ui/button";
 import {
   PlusIcon,
   XMarkIcon,
@@ -214,13 +213,20 @@ export function CreateVoteForm({ onBack }: CreateVoteFormProps) {
 
           {/* Create Room Button */}
           <div className="pt-4">
-            <Button
+            <motion.button
               onClick={handleSubmit}
               disabled={!isValid}
-              className="w-full h-16 text-lg rounded-2xl"
+              whileHover={isValid ? { scale: 1.02, y: -2 } : {}}
+              whileTap={isValid ? { scale: 0.98 } : {}}
+              className={`w-full h-14 text-lg font-bold rounded-full text-white shadow-lg transition-all ${
+                isValid
+                  ? "cursor-pointer"
+                  : "opacity-50 cursor-not-allowed"
+              }`}
+              style={{ backgroundColor: isValid ? "#FF6B5B" : "#94A3B8" }}
             >
               Create Room
-            </Button>
+            </motion.button>
             <p className="mt-3 text-center text-sm text-slate-500">
               You&apos;ll get a link to share with your friends
             </p>

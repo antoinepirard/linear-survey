@@ -2,7 +2,6 @@
 
 import { useCallback, useRef } from "react";
 import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
 import { TwoOptionSlider } from "./TwoOptionSlider";
 import { RadarVote } from "./RadarVote";
 import { useMutation, useSelf } from "../liveblocks.config";
@@ -67,7 +66,7 @@ export function VotingPhase({ config, userId }: VotingPhaseProps) {
   const isTwoOptions = config.options.length === 2;
 
   return (
-    <div className="min-h-screen px-6 py-8 pb-32">
+    <div className="min-h-screen px-6 py-8 pb-32 bg-amber-50">
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <motion.div
@@ -75,6 +74,9 @@ export function VotingPhase({ config, userId }: VotingPhaseProps) {
           animate={{ opacity: 1 }}
           className="text-center mb-6 pt-8"
         >
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+            Your vote
+          </p>
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
             {config.topic}
           </h2>
@@ -105,15 +107,18 @@ export function VotingPhase({ config, userId }: VotingPhaseProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="fixed bottom-0 left-0 right-0 p-6 bg-white/90 backdrop-blur-sm"
+          className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-amber-50 via-amber-50/95 to-transparent"
         >
           <div className="max-w-lg mx-auto">
-            <Button
+            <motion.button
               onClick={handleSubmit}
-              className="w-full h-16 text-lg rounded-2xl"
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full h-14 text-lg font-bold rounded-full text-white shadow-lg transition-all"
+              style={{ backgroundColor: '#FF6B5B' }}
             >
               Submit Vote
-            </Button>
+            </motion.button>
           </div>
         </motion.div>
       </div>

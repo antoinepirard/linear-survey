@@ -160,9 +160,9 @@ export function RadarVote({ options, onValuesChange }: RadarVoteProps) {
         {/* Filled polygon showing current shape */}
         <motion.polygon
           points={polygonPoints}
-          fill="rgba(249, 115, 22, 0.3)"
-          stroke="#f97316"
-          strokeWidth={2}
+          fill="rgba(255, 107, 91, 0.15)"
+          stroke="#FF6B5B"
+          strokeWidth={3}
           initial={false}
         />
 
@@ -175,12 +175,13 @@ export function RadarVote({ options, onValuesChange }: RadarVoteProps) {
               cx={point.x}
               cy={point.y}
               r={16}
-              fill="#f97316"
+              fill="#FF6B5B"
               stroke="white"
               strokeWidth={3}
               className="cursor-grab active:cursor-grabbing"
+              style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
               onPointerDown={(e) => handlePointerDown(e, index)}
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.15 }}
               whileTap={{ scale: 0.95 }}
               initial={false}
             />
@@ -206,15 +207,16 @@ export function RadarVote({ options, onValuesChange }: RadarVoteProps) {
       </svg>
 
       {/* Values display */}
-      <div className="flex flex-wrap justify-center gap-4 mt-4">
+      <div className="flex flex-wrap justify-center gap-3 mt-4">
         {options.map((option, index) => (
-          <div key={index} className="text-center">
+          <div key={index} className="text-center px-4 py-2 rounded-lg bg-white border-2 border-slate-100">
             <span className="text-sm text-slate-500">{option}</span>
             <motion.div
               className="text-xl font-bold tabular-nums text-slate-900"
               key={Math.round(values[index] * 100)}
-              initial={{ scale: 1.1 }}
+              initial={{ scale: 1.15 }}
               animate={{ scale: 1 }}
+              transition={{ type: "spring", bounce: 0.5 }}
             >
               {Math.round(values[index] * 100)}
             </motion.div>

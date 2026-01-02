@@ -21,7 +21,7 @@ export function WaitingRoom({ config, votes }: WaitingRoomProps) {
   const votesRemaining = config.expectedVoters - votes.size;
 
   return (
-    <div className="min-h-screen px-6 py-12 flex flex-col items-center justify-center">
+    <div className="min-h-screen px-6 py-12 flex flex-col items-center justify-center bg-amber-50">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -30,11 +30,12 @@ export function WaitingRoom({ config, votes }: WaitingRoomProps) {
       >
         {/* Waiting animation */}
         <div className="mb-8">
-          <div className="w-24 h-24 mx-auto rounded-full bg-slate-100 flex items-center justify-center">
+          <div className="w-24 h-24 mx-auto rounded-full bg-white border-2 border-slate-100 flex items-center justify-center">
             <motion.div
               animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-              className="w-16 h-16 border-4 border-slate-200 border-t-slate-900 rounded-full"
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              className="w-16 h-16 border-4 border-slate-100 rounded-full"
+              style={{ borderTopColor: '#FF6B5B' }}
             />
           </div>
         </div>
@@ -63,7 +64,7 @@ export function WaitingRoom({ config, votes }: WaitingRoomProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-slate-50 rounded-2xl p-6"
+          className="bg-white border-2 border-slate-100 rounded-xl p-6"
         >
           <p className="text-sm font-medium text-slate-500 mb-4">
             {votes.size} of {config.expectedVoters} have voted
