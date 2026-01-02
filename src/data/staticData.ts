@@ -1,10 +1,4 @@
-export const staticHighlights = [
-  {
-    title: "Ravell.io",
-    description: "Side project: Building Ravell, a non-linear planner.",
-    category: "SIDE PROJECT",
-    href: "https://www.ravell.io",
-  },
+export const workHighlights = [
   {
     title: "Chatbot Flow Builder",
     description: "Building and iterating over Rasayel's chatbot flow builder.",
@@ -37,6 +31,30 @@ export const staticHighlights = [
     href: "https://www.centralapp.com/en",
   },
 ];
+
+export const sideProjectHighlights = [
+  {
+    title: "Ravell.io",
+    description: "An AI assistant for problem and insights discovery.",
+    category: "SIDE PROJECT",
+    href: "https://www.ravell.io",
+  },
+  {
+    title: "Conviction",
+    description: "Real-time voting rooms for quick team decisions. Timeboxed 2h project.",
+    category: "SIDE PROJECT",
+    href: "/side-projects/conviction",
+  },
+  {
+    title: "Recipe Checker",
+    description: "Match your fridge ingredients to recipes. Timeboxed 2h project.",
+    category: "SIDE PROJECT",
+    href: "/side-projects/recipe-checker",
+  },
+];
+
+// Combined for backward compatibility
+export const staticHighlights = [...workHighlights, ...sideProjectHighlights];
 
 export const quotes = [
   {
