@@ -34,6 +34,17 @@
         "Garlic"
       ],
       "tags": []
+    },
+    {
+      "id": "recipe_1767351276856_afiv35i5x",
+      "name": "Meat Loaf",
+      "ingredients": [
+        "Haché",
+        "Onions",
+        "Eggs",
+        "Milk"
+      ],
+      "tags": []
     }
   ],
   "fridge": {
