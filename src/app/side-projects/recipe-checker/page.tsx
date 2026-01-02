@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
@@ -23,7 +23,15 @@ function generateUserId(): string {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
-export default function RecipeCheckerPage() {
+function LoadingSpinner() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-stone-100">
+      <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin" />
+    </div>
+  );
+}
+
+function RecipeCheckerContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
@@ -40,17 +48,21 @@ export default function RecipeCheckerPage() {
   }, [searchParams, router]);
 
   if (!userId) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-100">
-        <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
     <div className="min-h-screen bg-stone-100">
       <RecipeCheckerApp userId={userId} />
     </div>
+  );
+}
+
+export default function RecipeCheckerPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <RecipeCheckerContent />
+    </Suspense>
   );
 }
 
