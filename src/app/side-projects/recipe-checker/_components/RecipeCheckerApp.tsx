@@ -53,9 +53,9 @@ export function RecipeCheckerApp() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-100 pt-16 md:pt-24">
-      {/* Fixed Tab Navigation */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-stone-100 pt-3 pb-2 md:pt-16 md:pb-4">
+    <div className="min-h-screen bg-stone-100 pt-20 md:pt-0">
+      {/* Fixed Tab Navigation (mobile only) */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-stone-100 pt-3 pb-3 md:relative md:pt-16 md:pb-6">
         <div className="max-w-2xl mx-auto px-3 md:px-4">
           <div className="flex gap-1 p-1 bg-white rounded-2xl shadow-sm">
             {tabs.map((tab) => {
