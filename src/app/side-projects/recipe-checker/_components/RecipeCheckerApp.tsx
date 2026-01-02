@@ -1,22 +1,26 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { BookOpenIcon, ArchiveBoxIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import { useRecipeChecker } from '../_hooks/useRecipeChecker';
-import { RecipesTab } from './RecipesTab';
-import { FridgeTab } from './FridgeTab';
-import { MatchesTab } from './MatchesTab';
+import { useState, useMemo } from "react";
+import {
+  BookOpenIcon,
+  ArchiveBoxIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/outline";
+import { useRecipeChecker } from "../_hooks/useRecipeChecker";
+import { RecipesTab } from "./RecipesTab";
+import { FridgeTab } from "./FridgeTab";
+import { MatchesTab } from "./MatchesTab";
 
-type Tab = 'recipes' | 'fridge' | 'matches';
+type Tab = "recipes" | "fridge" | "matches";
 
 const tabs: { id: Tab; label: string; icon: typeof BookOpenIcon }[] = [
-  { id: 'recipes', label: 'Recipes', icon: BookOpenIcon },
-  { id: 'fridge', label: 'Fridge', icon: ArchiveBoxIcon },
-  { id: 'matches', label: 'Matches', icon: SparklesIcon },
+  { id: "recipes", label: "Recipes", icon: BookOpenIcon },
+  { id: "fridge", label: "Fridge", icon: ArchiveBoxIcon },
+  { id: "matches", label: "Matches", icon: SparklesIcon },
 ];
 
 export function RecipeCheckerApp() {
-  const [activeTab, setActiveTab] = useState<Tab>('recipes');
+  const [activeTab, setActiveTab] = useState<Tab>("recipes");
   const {
     recipes,
     fridge,
@@ -37,7 +41,7 @@ export function RecipeCheckerApp() {
 
   // Count cookable recipes for badge
   const cookableCount = matchResults.filter(
-    (r) => r.matchType === 'exact' || r.matchType === 'almost'
+    (r) => r.matchType === "exact" || r.matchType === "almost"
   ).length;
 
   if (isLoading) {
@@ -49,15 +53,15 @@ export function RecipeCheckerApp() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-stone-100 pt-16 md:pt-24">
       {/* Fixed Tab Navigation */}
-      <div className="sticky top-0 z-50 bg-stone-100 pt-3 pb-2 md:pt-16 md:pb-4">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-stone-100 pt-3 pb-2 md:pt-16 md:pb-4">
         <div className="max-w-2xl mx-auto px-3 md:px-4">
           <div className="flex gap-1 p-1 bg-white rounded-2xl shadow-sm">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
-              const showBadge = tab.id === 'matches' && cookableCount > 0;
+              const showBadge = tab.id === "matches" && cookableCount > 0;
 
               return (
                 <button
@@ -65,8 +69,8 @@ export function RecipeCheckerApp() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all relative ${
                     isActive
-                      ? 'bg-stone-900 text-white shadow-md'
-                      : 'text-stone-600 hover:bg-stone-50'
+                      ? "bg-stone-900 text-white shadow-md"
+                      : "text-stone-600 hover:bg-stone-50"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -74,7 +78,9 @@ export function RecipeCheckerApp() {
                   {showBadge && (
                     <span
                       className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs font-bold rounded-full ${
-                        isActive ? 'bg-emerald-400 text-white' : 'bg-emerald-500 text-white'
+                        isActive
+                          ? "bg-emerald-400 text-white"
+                          : "bg-emerald-500 text-white"
                       }`}
                     >
                       {cookableCount}
@@ -90,7 +96,7 @@ export function RecipeCheckerApp() {
       <div className="max-w-2xl mx-auto px-3 pb-6 md:px-4 md:pb-8">
         {/* Tab Content */}
         <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6">
-          {activeTab === 'recipes' && (
+          {activeTab === "recipes" && (
             <RecipesTab
               recipes={recipes}
               onAddRecipe={addRecipe}
@@ -99,7 +105,7 @@ export function RecipeCheckerApp() {
               isSaving={isSaving}
             />
           )}
-          {activeTab === 'fridge' && (
+          {activeTab === "fridge" && (
             <FridgeTab
               fridge={fridge}
               recipeIngredients={recipeIngredients}
@@ -107,7 +113,7 @@ export function RecipeCheckerApp() {
               isSaving={isSaving}
             />
           )}
-          {activeTab === 'matches' && (
+          {activeTab === "matches" && (
             <MatchesTab
               matchResults={matchResults}
               fridgeCount={fridge.ingredients.length}
@@ -124,4 +130,3 @@ export function RecipeCheckerApp() {
     </div>
   );
 }
-
