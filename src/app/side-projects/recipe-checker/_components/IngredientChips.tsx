@@ -50,7 +50,7 @@ export function IngredientChips({
       {ingredients.map((ingredient) => (
         <span
           key={ingredient}
-          className="inline-flex items-center gap-1 px-2.5 py-1 bg-white rounded-lg text-sm text-stone-700"
+          className="inline-flex items-center gap-1 px-2.5 py-1 bg-white rounded-lg text-sm text-slate-700"
         >
           {ingredient}
           {!disabled && (
@@ -59,7 +59,7 @@ export function IngredientChips({
               onClick={() => removeIngredient(ingredient)}
               className="p-0.5 hover:bg-slate-100 rounded transition-colors"
             >
-              <XMarkIcon className="w-3.5 h-3.5 text-stone-400 hover:text-stone-600" />
+              <XMarkIcon className="w-3.5 h-3.5 text-slate-400 hover:text-slate-600" />
             </button>
           )}
         </span>
