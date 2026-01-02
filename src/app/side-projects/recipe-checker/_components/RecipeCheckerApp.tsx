@@ -52,16 +52,6 @@ export function RecipeCheckerApp() {
   return (
     <div className="min-h-screen bg-stone-100 pt-16 pb-8">
       <div className="max-w-2xl mx-auto px-4">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-3xl font-bold text-stone-900 mb-2">Recipe Checker</h1>
-          <p className="text-stone-500">What can you cook with what you have?</p>
-        </motion.div>
-
         {/* Tab Navigation */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
