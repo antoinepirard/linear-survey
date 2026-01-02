@@ -45,7 +45,8 @@ export function RoomContent({ roomId, hostName }: RoomContentProps) {
     }
 
     // If user has already voted, show waiting room
-    if (votes && self?.connectionId && votes.has(String(self.connectionId))) {
+    // Note: use !== undefined because connectionId can be 0 (falsy)
+    if (votes && self?.connectionId !== undefined && votes.has(String(self.connectionId))) {
       return 'waiting';
     }
 
@@ -73,12 +74,7 @@ export function RoomContent({ roomId, hostName }: RoomContentProps) {
     <div className="min-h-screen bg-white">
       {phase === 'join' && <JoinRoom roomId={roomId} topic={config.topic} />}
       {phase === 'voting' && (
-        <>
-          {/* #region agent log */}
-          {(() => { fetch('http://127.0.0.1:7244/ingest/ff556c7b-d4f1-4122-b021-816caaf35c67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RoomContent.tsx:voting-render',message:'Rendering VotingPhase',data:{connectionId:self?.connectionId,effectiveName,hostName,hostNameSet,presenceName:self?.presence?.name},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{}); return null; })()}
-          {/* #endregion */}
-          <VotingPhase config={config} userId={String(self?.connectionId)} userName={effectiveName!} />
-        </>
+        <VotingPhase config={config} userId={String(self?.connectionId)} userName={effectiveName!} />
       )}
       {phase === 'waiting' && <WaitingRoom config={config} votes={votes} />}
       {phase === 'results' && <ResultsView config={config} votes={votes} />}

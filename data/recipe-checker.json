@@ -1,0 +1,31 @@
+{
+  "recipes": [
+    {
+      "id": "recipe_1767348871928_vpcdxr8sw",
+      "name": "Chicon Gratin",
+      "ingredients": [
+        "Chicon",
+        "Milk",
+        "Butter",
+        "Ham"
+      ],
+      "tags": []
+    },
+    {
+      "id": "recipe_1767348871929_test123",
+      "name": "Pasta Carbonara",
+      "ingredients": [
+        "Pasta",
+        "Eggs",
+        "Bacon",
+        "Parmesan"
+      ],
+      "tags": []
+    }
+  ],
+  "fridge": {
+    "ingredients": [
+      "Carrots"
+    ]
+  }
+}

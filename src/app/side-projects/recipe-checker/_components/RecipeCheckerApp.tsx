@@ -1,0 +1,172 @@
+'use client';
+
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { BookOpenIcon, ArchiveBoxIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { useRecipeChecker } from '../_hooks/useRecipeChecker';
+import { RecipesTab } from './RecipesTab';
+import { FridgeTab } from './FridgeTab';
+import { MatchesTab } from './MatchesTab';
+
+type Tab = 'recipes' | 'fridge' | 'matches';
+
+const tabs: { id: Tab; label: string; icon: typeof BookOpenIcon }[] = [
+  { id: 'recipes', label: 'Recipes', icon: BookOpenIcon },
+  { id: 'fridge', label: 'Fridge', icon: ArchiveBoxIcon },
+  { id: 'matches', label: 'Matches', icon: SparklesIcon },
+];
+
+export function RecipeCheckerApp() {
+  const [activeTab, setActiveTab] = useState<Tab>('recipes');
+  const {
+    recipes,
+    fridge,
+    matchResults,
+    isLoading,
+    isSaving,
+    addRecipe,
+    updateRecipe,
+    deleteRecipe,
+    updateFridge,
+  } = useRecipeChecker();
+
+  // Get all unique ingredients from recipes for autocomplete
+  const recipeIngredients = useMemo(() => {
+    const allIngredients = recipes.flatMap((r) => r.ingredients);
+    return [...new Set(allIngredients)].sort();
+  }, [recipes]);
+
+  // Count cookable recipes for badge
+  const cookableCount = matchResults.filter(
+    (r) => r.matchType === 'exact' || r.matchType === 'almost'
+  ).length;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-900 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-stone-100 pt-16 pb-8">
+      <div className="max-w-2xl mx-auto px-4">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-3xl font-bold text-stone-900 mb-2">Recipe Checker</h1>
+          <p className="text-stone-500">What can you cook with what you have?</p>
+        </motion.div>
+
+        {/* Tab Navigation */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex gap-1 p-1 bg-white rounded-2xl shadow-sm mb-6"
+        >
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            const showBadge = tab.id === 'matches' && cookableCount > 0;
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all relative ${
+                  isActive
+                    ? 'bg-stone-900 text-white shadow-md'
+                    : 'text-stone-600 hover:bg-stone-50'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {tab.label}
+                {showBadge && (
+                  <span
+                    className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs font-bold rounded-full ${
+                      isActive ? 'bg-emerald-400 text-white' : 'bg-emerald-500 text-white'
+                    }`}
+                  >
+                    {cookableCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </motion.div>
+
+        {/* Tab Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-sm p-6"
+        >
+          <AnimatePresence mode="wait">
+            {activeTab === 'recipes' && (
+              <motion.div
+                key="recipes"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+              >
+                <RecipesTab
+                  recipes={recipes}
+                  onAddRecipe={addRecipe}
+                  onUpdateRecipe={updateRecipe}
+                  onDeleteRecipe={deleteRecipe}
+                  isSaving={isSaving}
+                />
+              </motion.div>
+            )}
+            {activeTab === 'fridge' && (
+              <motion.div
+                key="fridge"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+              >
+                <FridgeTab
+                  fridge={fridge}
+                  recipeIngredients={recipeIngredients}
+                  onUpdateFridge={updateFridge}
+                  isSaving={isSaving}
+                />
+              </motion.div>
+            )}
+            {activeTab === 'matches' && (
+              <motion.div
+                key="matches"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+              >
+                <MatchesTab
+                  matchResults={matchResults}
+                  fridgeCount={fridge.ingredients.length}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Stats Footer */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6 flex justify-center gap-6 text-xs text-stone-400"
+        >
+          <span>{recipes.length} recipes</span>
+          <span>{fridge.ingredients.length} ingredients</span>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+

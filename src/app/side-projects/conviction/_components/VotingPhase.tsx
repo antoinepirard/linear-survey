@@ -57,24 +57,9 @@ export function VotingPhase({ config, userId, userName }: VotingPhaseProps) {
   }, []);
 
   const handleSubmit = useCallback(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7244/ingest/ff556c7b-d4f1-4122-b021-816caaf35c67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VotingPhase.tsx:handleSubmit',message:'handleSubmit called',data:{userId,userName,valuesRefCurrent:valuesRef.current},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B,D,E'})}).catch(()=>{});
-    // #endregion
     const normalized = normalizeToHundred(valuesRef.current);
-    // #region agent log
-    fetch('http://127.0.0.1:7244/ingest/ff556c7b-d4f1-4122-b021-816caaf35c67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VotingPhase.tsx:handleSubmit',message:'normalized values',data:{normalized},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
-    try {
-      submitVote(normalized, userName);
-      // #region agent log
-      fetch('http://127.0.0.1:7244/ingest/ff556c7b-d4f1-4122-b021-816caaf35c67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VotingPhase.tsx:handleSubmit',message:'submitVote called successfully',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-      // #endregion
-    } catch (err) {
-      // #region agent log
-      fetch('http://127.0.0.1:7244/ingest/ff556c7b-d4f1-4122-b021-816caaf35c67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VotingPhase.tsx:handleSubmit',message:'submitVote error',data:{error:String(err)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-      // #endregion
-    }
-  }, [submitVote, userName, userId]);
+    submitVote(normalized, userName);
+  }, [submitVote, userName]);
 
   const isTwoOptions = config.options.length === 2;
 
