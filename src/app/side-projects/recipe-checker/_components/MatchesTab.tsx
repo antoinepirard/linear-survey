@@ -1,11 +1,26 @@
 'use client';
 
-import { CheckCircleIcon, ExclamationTriangleIcon, ShoppingCartIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, ExclamationTriangleIcon, SparklesIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 import type { MatchResult } from '../_types';
 
 interface MatchesTabProps {
   matchResults: MatchResult[];
   fridgeCount: number;
+}
+
+// Consistent tag component for ingredients
+function IngredientTag({ ingredient, hasIt }: { ingredient: string; hasIt: boolean }) {
+  return (
+    <span
+      className={`px-2.5 py-1 text-xs rounded-md ${
+        hasIt
+          ? 'bg-emerald-50 text-emerald-700'
+          : 'bg-stone-100 text-stone-400'
+      }`}
+    >
+      {ingredient}
+    </span>
+  );
 }
 
 export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
@@ -50,19 +65,14 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
             {exactMatches.map((result) => (
               <div
                 key={result.recipe.id}
-                className="p-4 bg-emerald-50 rounded-xl border border-emerald-200"
+                className="p-4 bg-emerald-50 rounded-xl"
               >
-                <h3 className="text-lg font-medium text-stone-900 mb-2">
+                <h3 className="text-base font-semibold text-stone-900 mb-3">
                   {result.recipe.name}
                 </h3>
                 <div className="flex flex-wrap gap-1.5">
                   {result.recipe.ingredients.map((ingredient) => (
-                    <span
-                      key={ingredient}
-                      className="px-2.5 py-1 text-xs bg-white text-emerald-700 rounded-md border border-emerald-200"
-                    >
-                      {ingredient}
-                    </span>
+                    <IngredientTag key={ingredient} ingredient={ingredient} hasIt={true} />
                   ))}
                 </div>
               </div>
@@ -85,38 +95,18 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
             {almostMatches.map((result) => (
               <div
                 key={result.recipe.id}
-                className="p-4 bg-amber-50 rounded-xl border border-amber-200"
+                className="p-4 bg-amber-50 rounded-xl"
               >
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-medium text-stone-900">
-                    {result.recipe.name}
-                  </h3>
-                  <span className="text-xs text-amber-600 font-medium">
-                    Missing {result.missingIngredients.length}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-1.5 mb-3">
+                <h3 className="text-base font-semibold text-stone-900 mb-3">
+                  {result.recipe.name}
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
                   {result.recipe.ingredients.map((ingredient) => {
-                    const isMissing = result.missingIngredients.includes(ingredient);
+                    const hasIt = !result.missingIngredients.includes(ingredient);
                     return (
-                      <span
-                        key={ingredient}
-                        className={`px-2.5 py-1 text-xs rounded-md border ${
-                          isMissing
-                            ? 'bg-red-50 text-red-600 border-red-200 line-through'
-                            : 'bg-white text-stone-600 border-amber-200'
-                        }`}
-                      >
-                        {ingredient}
-                      </span>
+                      <IngredientTag key={ingredient} ingredient={ingredient} hasIt={hasIt} />
                     );
                   })}
-                </div>
-                <div className="pt-2 border-t border-amber-200">
-                  <p className="text-xs text-amber-700">
-                    <span className="font-medium">Need:</span>{' '}
-                    {result.missingIngredients.join(', ')}
-                  </p>
                 </div>
               </div>
             ))}
@@ -124,12 +114,12 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
         </section>
       )}
 
-      {/* Partial Matches - Need More Ingredients */}
+      {/* Partial Matches */}
       {partialMatches.length > 0 && (
         <section>
           <div className="flex items-center gap-2 mb-4">
             <SparklesIcon className="w-5 h-5 text-violet-500" />
-            <h2 className="text-lg font-medium text-stone-900">Need More Ingredients</h2>
+            <h2 className="text-lg font-medium text-stone-900">Need More</h2>
             <span className="px-2 py-0.5 text-xs font-medium bg-violet-100 text-violet-700 rounded-full">
               {partialMatches.length}
             </span>
@@ -138,30 +128,21 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
             {partialMatches.map((result) => (
               <div
                 key={result.recipe.id}
-                className="p-4 bg-stone-50 rounded-xl border border-stone-200"
+                className="p-4 bg-stone-50 rounded-xl"
               >
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-medium text-stone-900">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-base font-semibold text-stone-900">
                     {result.recipe.name}
                   </h3>
-                  <span className="text-xs text-stone-500 font-medium bg-white px-2 py-1 rounded-md">
-                    {result.matchPercentage}% match
+                  <span className="text-xs text-stone-500 font-medium">
+                    {result.matchPercentage}%
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {result.recipe.ingredients.map((ingredient) => {
-                    const isMissing = result.missingIngredients.includes(ingredient);
+                    const hasIt = !result.missingIngredients.includes(ingredient);
                     return (
-                      <span
-                        key={ingredient}
-                        className={`px-2.5 py-1 text-xs rounded-md border ${
-                          isMissing
-                            ? 'bg-red-50 text-red-500 border-red-200'
-                            : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                        }`}
-                      >
-                        {isMissing ? '✗' : '✓'} {ingredient}
-                      </span>
+                      <IngredientTag key={ingredient} ingredient={ingredient} hasIt={hasIt} />
                     );
                   })}
                 </div>
@@ -176,17 +157,17 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
         <section>
           <div className="flex items-center gap-2 mb-4">
             <ShoppingCartIcon className="w-5 h-5 text-stone-500" />
-            <h2 className="text-lg font-medium text-stone-900">Quick Shopping List</h2>
+            <h2 className="text-lg font-medium text-stone-900">Shopping List</h2>
           </div>
-          <div className="p-4 bg-stone-50 rounded-xl border border-stone-200">
-            <p className="text-sm text-stone-600 mb-3">
-              Get these to unlock {almostMatches.length} more recipe{almostMatches.length !== 1 ? 's' : ''}:
+          <div className="p-4 bg-stone-50 rounded-xl">
+            <p className="text-sm text-stone-500 mb-3">
+              Get these to unlock {almostMatches.length} recipe{almostMatches.length !== 1 ? 's' : ''}
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {shoppingList.map((ingredient) => (
                 <span
                   key={ingredient}
-                  className="px-3 py-1.5 text-sm bg-white text-stone-700 rounded-lg border border-stone-200 shadow-sm"
+                  className="px-2.5 py-1 text-xs bg-white text-stone-700 rounded-md border border-stone-200"
                 >
                   {ingredient}
                 </span>
@@ -198,4 +179,3 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
     </div>
   );
 }
-
