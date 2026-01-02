@@ -19,7 +19,11 @@ const tabs: { id: Tab; label: string; icon: typeof BookOpenIcon }[] = [
   { id: "matches", label: "Matches", icon: SparklesIcon },
 ];
 
-export function RecipeCheckerApp() {
+interface RecipeCheckerAppProps {
+  userId: string;
+}
+
+export function RecipeCheckerApp({ userId }: RecipeCheckerAppProps) {
   const [activeTab, setActiveTab] = useState<Tab>("recipes");
   const {
     recipes,
@@ -31,7 +35,7 @@ export function RecipeCheckerApp() {
     updateRecipe,
     deleteRecipe,
     updateFridge,
-  } = useRecipeChecker();
+  } = useRecipeChecker(userId);
 
   // Get all unique ingredients from recipes for autocomplete
   const recipeIngredients = useMemo(() => {

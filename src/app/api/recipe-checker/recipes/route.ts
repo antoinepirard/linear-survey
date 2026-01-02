@@ -2,15 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { kv } from '@vercel/kv';
 import type { Recipe } from '@/app/side-projects/recipe-checker/_types';
 
-const RECIPES_KEY = 'recipe-checker:recipes';
+function getRecipesKey(userId: string): string {
+  return `recipe-checker:${userId}:recipes`;
+}
 
-async function getRecipes(): Promise<Recipe[]> {
-  const recipes = await kv.get<Recipe[]>(RECIPES_KEY);
+async function getRecipes(userId: string): Promise<Recipe[]> {
+  const recipes = await kv.get<Recipe[]>(getRecipesKey(userId));
   return recipes || [];
 }
 
-async function setRecipes(recipes: Recipe[]): Promise<void> {
-  await kv.set(RECIPES_KEY, recipes);
+async function setRecipes(userId: string, recipes: Recipe[]): Promise<void> {
+  await kv.set(getRecipesKey(userId), recipes);
 }
 
 function generateId(): string {
@@ -18,13 +20,27 @@ function generateId(): string {
 }
 
 // GET all recipes
-export async function GET() {
-  const recipes = await getRecipes();
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get('userId');
+
+  if (!userId) {
+    return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+  }
+
+  const recipes = await getRecipes(userId);
   return NextResponse.json(recipes);
 }
 
 // POST create new recipe
 export async function POST(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get('userId');
+
+  if (!userId) {
+    return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+  }
+
   const body = await request.json();
   const { name, ingredients, tags } = body;
 
@@ -35,7 +51,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const recipes = await getRecipes();
+  const recipes = await getRecipes(userId);
   const newRecipe: Recipe = {
     id: generateId(),
     name,
@@ -44,13 +60,20 @@ export async function POST(request: NextRequest) {
   };
 
   recipes.push(newRecipe);
-  await setRecipes(recipes);
+  await setRecipes(userId, recipes);
 
   return NextResponse.json(newRecipe, { status: 201 });
 }
 
 // PUT update existing recipe
 export async function PUT(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get('userId');
+
+  if (!userId) {
+    return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+  }
+
   const body = await request.json();
   const { id, name, ingredients, tags } = body;
 
@@ -58,7 +81,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Recipe ID is required' }, { status: 400 });
   }
 
-  const recipes = await getRecipes();
+  const recipes = await getRecipes(userId);
   const recipeIndex = recipes.findIndex((r) => r.id === id);
 
   if (recipeIndex === -1) {
@@ -72,7 +95,7 @@ export async function PUT(request: NextRequest) {
     ...(tags !== undefined && { tags }),
   };
 
-  await setRecipes(recipes);
+  await setRecipes(userId, recipes);
   return NextResponse.json(recipes[recipeIndex]);
 }
 
@@ -80,12 +103,17 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
+  const userId = searchParams.get('userId');
+
+  if (!userId) {
+    return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+  }
 
   if (!id) {
     return NextResponse.json({ error: 'Recipe ID is required' }, { status: 400 });
   }
 
-  const recipes = await getRecipes();
+  const recipes = await getRecipes(userId);
   const recipeIndex = recipes.findIndex((r) => r.id === id);
 
   if (recipeIndex === -1) {
@@ -93,7 +121,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   recipes.splice(recipeIndex, 1);
-  await setRecipes(recipes);
+  await setRecipes(userId, recipes);
 
   return NextResponse.json({ success: true });
 }

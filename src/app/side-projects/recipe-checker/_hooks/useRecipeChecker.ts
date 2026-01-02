@@ -32,7 +32,7 @@ interface UseRecipeCheckerReturn {
   refresh: () => Promise<void>;
 }
 
-export function useRecipeChecker(): UseRecipeCheckerReturn {
+export function useRecipeChecker(userId: string): UseRecipeCheckerReturn {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [fridge, setFridge] = useState<Fridge>({ ingredients: [] });
   const [isLoading, setIsLoading] = useState(true);
@@ -46,8 +46,8 @@ export function useRecipeChecker(): UseRecipeCheckerReturn {
     setIsLoading(true);
     try {
       const [recipesRes, fridgeRes] = await Promise.all([
-        fetch('/api/recipe-checker/recipes'),
-        fetch('/api/recipe-checker/fridge'),
+        fetch(`/api/recipe-checker/recipes?userId=${userId}`),
+        fetch(`/api/recipe-checker/fridge?userId=${userId}`),
       ]);
 
       if (recipesRes.ok) {
@@ -64,7 +64,7 @@ export function useRecipeChecker(): UseRecipeCheckerReturn {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   // Initial load
   useEffect(() => {
@@ -76,7 +76,7 @@ export function useRecipeChecker(): UseRecipeCheckerReturn {
     async (name: string, ingredients: string[], tags?: string[]) => {
       setIsSaving(true);
       try {
-        const res = await fetch('/api/recipe-checker/recipes', {
+        const res = await fetch(`/api/recipe-checker/recipes?userId=${userId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, ingredients, tags }),
@@ -92,13 +92,13 @@ export function useRecipeChecker(): UseRecipeCheckerReturn {
         setIsSaving(false);
       }
     },
-    []
+    [userId]
   );
 
   const updateRecipe = useCallback(async (recipe: Recipe) => {
     setIsSaving(true);
     try {
-      const res = await fetch('/api/recipe-checker/recipes', {
+      const res = await fetch(`/api/recipe-checker/recipes?userId=${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(recipe),
@@ -115,12 +115,12 @@ export function useRecipeChecker(): UseRecipeCheckerReturn {
     } finally {
       setIsSaving(false);
     }
-  }, []);
+  }, [userId]);
 
   const deleteRecipe = useCallback(async (id: string) => {
     setIsSaving(true);
     try {
-      const res = await fetch(`/api/recipe-checker/recipes?id=${id}`, {
+      const res = await fetch(`/api/recipe-checker/recipes?id=${id}&userId=${userId}`, {
         method: 'DELETE',
       });
 
@@ -132,13 +132,13 @@ export function useRecipeChecker(): UseRecipeCheckerReturn {
     } finally {
       setIsSaving(false);
     }
-  }, []);
+  }, [userId]);
 
   // Fridge operations
   const updateFridge = useCallback(async (ingredients: string[]) => {
     setIsSaving(true);
     try {
-      const res = await fetch('/api/recipe-checker/fridge', {
+      const res = await fetch(`/api/recipe-checker/fridge?userId=${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ingredients }),
@@ -153,7 +153,7 @@ export function useRecipeChecker(): UseRecipeCheckerReturn {
     } finally {
       setIsSaving(false);
     }
-  }, []);
+  }, [userId]);
 
   const addFridgeIngredient = useCallback(
     async (ingredient: string) => {
