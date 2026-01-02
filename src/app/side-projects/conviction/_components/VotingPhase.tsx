@@ -4,12 +4,13 @@ import { useCallback, useRef } from "react";
 import { motion } from "motion/react";
 import { TwoOptionSlider } from "./TwoOptionSlider";
 import { RadarVote } from "./RadarVote";
-import { useMutation, useSelf } from "../liveblocks.config";
+import { useMutation } from "../liveblocks.config";
 import type { RoomConfig } from "../liveblocks.config";
 
 interface VotingPhaseProps {
   config: RoomConfig;
   userId: string;
+  userName: string;
 }
 
 // Normalize values to sum to 100
@@ -31,8 +32,7 @@ function normalizeToHundred(values: number[]): number[] {
   return rounded;
 }
 
-export function VotingPhase({ config, userId }: VotingPhaseProps) {
-  const self = useSelf();
+export function VotingPhase({ config, userId, userName }: VotingPhaseProps) {
   const valuesRef = useRef<number[]>(config.options.map(() => 50));
 
   const submitVote = useMutation(
@@ -57,11 +57,24 @@ export function VotingPhase({ config, userId }: VotingPhaseProps) {
   }, []);
 
   const handleSubmit = useCallback(() => {
-    if (self?.presence?.name) {
-      const normalized = normalizeToHundred(valuesRef.current);
-      submitVote(normalized, self.presence.name);
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/ff556c7b-d4f1-4122-b021-816caaf35c67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VotingPhase.tsx:handleSubmit',message:'handleSubmit called',data:{userId,userName,valuesRefCurrent:valuesRef.current},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B,D,E'})}).catch(()=>{});
+    // #endregion
+    const normalized = normalizeToHundred(valuesRef.current);
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/ff556c7b-d4f1-4122-b021-816caaf35c67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VotingPhase.tsx:handleSubmit',message:'normalized values',data:{normalized},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
+    try {
+      submitVote(normalized, userName);
+      // #region agent log
+      fetch('http://127.0.0.1:7244/ingest/ff556c7b-d4f1-4122-b021-816caaf35c67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VotingPhase.tsx:handleSubmit',message:'submitVote called successfully',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
+    } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7244/ingest/ff556c7b-d4f1-4122-b021-816caaf35c67',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VotingPhase.tsx:handleSubmit',message:'submitVote error',data:{error:String(err)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
     }
-  }, [submitVote, self?.presence?.name]);
+  }, [submitVote, userName, userId]);
 
   const isTwoOptions = config.options.length === 2;
 
