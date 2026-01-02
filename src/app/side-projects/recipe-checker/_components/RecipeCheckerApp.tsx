@@ -51,8 +51,8 @@ export function RecipeCheckerApp() {
   return (
     <div className="min-h-screen bg-stone-100">
       {/* Fixed Tab Navigation */}
-      <div className="sticky top-0 z-50 bg-stone-100 px-3 pt-3 pb-2 md:px-4 md:pt-16 md:pb-4">
-        <div className="max-w-2xl mx-auto">
+      <div className="sticky top-0 z-50 bg-stone-100 pt-3 pb-2 md:pt-16 md:pb-4">
+        <div className="max-w-2xl mx-auto px-3 md:px-4">
           <div className="flex gap-1 p-1 bg-white rounded-2xl shadow-sm">
             {tabs.map((tab) => {
               const Icon = tab.icon;
