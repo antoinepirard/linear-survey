@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useStorage, useSelf, useUpdateMyPresence } from '../liveblocks.config';
 import { JoinRoom } from './JoinRoom';
 import { VotingPhase } from './VotingPhase';
@@ -19,18 +19,23 @@ export function RoomContent({ roomId, hostName }: RoomContentProps) {
   const votes = useStorage((root) => root.votes);
   const self = useSelf();
   const updateMyPresence = useUpdateMyPresence();
+  const [hostNameSet, setHostNameSet] = useState(false);
 
   // Auto-set host name if provided
   useEffect(() => {
-    if (hostName && !self?.presence?.name) {
+    if (hostName && !hostNameSet) {
       updateMyPresence({ name: hostName });
+      setHostNameSet(true);
     }
-  }, [hostName, self?.presence?.name, updateMyPresence]);
+  }, [hostName, hostNameSet, updateMyPresence]);
+
+  // The effective name - either from presence or from hostName prop (before presence syncs)
+  const effectiveName = self?.presence?.name || (hostName && hostNameSet ? hostName : null);
 
   // Derive the current phase based on state
   const phase = useMemo<RoomPhase>(() => {
     // If user hasn't entered their name yet, show join screen
-    if (!self?.presence?.name) {
+    if (!effectiveName) {
       return 'join';
     }
 
@@ -46,7 +51,7 @@ export function RoomContent({ roomId, hostName }: RoomContentProps) {
 
     // Otherwise, show voting
     return 'voting';
-  }, [self?.presence?.name, self?.connectionId, votes, config]);
+  }, [effectiveName, self?.connectionId, votes, config]);
 
   // Loading state
   if (!config || votes === null) {
