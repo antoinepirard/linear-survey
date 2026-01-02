@@ -49,43 +49,47 @@ export function RecipeCheckerApp() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-100 pt-16 pb-8">
-      <div className="max-w-2xl mx-auto px-4">
-        {/* Tab Navigation */}
-        <div className="flex gap-1 p-1 bg-white rounded-2xl shadow-sm mb-6">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            const showBadge = tab.id === 'matches' && cookableCount > 0;
+    <div className="min-h-screen bg-stone-100">
+      {/* Fixed Tab Navigation */}
+      <div className="sticky top-0 z-50 bg-stone-100 px-3 pt-3 pb-2 md:px-4 md:pt-16 md:pb-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex gap-1 p-1 bg-white rounded-2xl shadow-sm">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              const showBadge = tab.id === 'matches' && cookableCount > 0;
 
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all relative ${
-                  isActive
-                    ? 'bg-stone-900 text-white shadow-md'
-                    : 'text-stone-600 hover:bg-stone-50'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-                {showBadge && (
-                  <span
-                    className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs font-bold rounded-full ${
-                      isActive ? 'bg-emerald-400 text-white' : 'bg-emerald-500 text-white'
-                    }`}
-                  >
-                    {cookableCount}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all relative ${
+                    isActive
+                      ? 'bg-stone-900 text-white shadow-md'
+                      : 'text-stone-600 hover:bg-stone-50'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                  {showBadge && (
+                    <span
+                      className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs font-bold rounded-full ${
+                        isActive ? 'bg-emerald-400 text-white' : 'bg-emerald-500 text-white'
+                      }`}
+                    >
+                      {cookableCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
+      </div>
 
+      <div className="max-w-2xl mx-auto px-3 pb-6 md:px-4 md:pb-8">
         {/* Tab Content */}
-        <div className="bg-white rounded-2xl shadow-sm p-6">
+        <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6">
           {activeTab === 'recipes' && (
             <RecipesTab
               recipes={recipes}
@@ -112,7 +116,7 @@ export function RecipeCheckerApp() {
         </div>
 
         {/* Stats Footer */}
-        <div className="mt-6 flex justify-center gap-6 text-xs text-stone-400">
+        <div className="mt-4 md:mt-6 flex justify-center gap-6 text-xs text-stone-400">
           <span>{recipes.length} recipes</span>
           <span>{fridge.ingredients.length} ingredients</span>
         </div>
