@@ -163,7 +163,7 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
                       {result.matchPercentage}% match
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5 mb-3">
+                  <div className="flex flex-wrap gap-1.5">
                     {result.recipe.ingredients.map((ingredient) => {
                       const isMissing = result.missingIngredients.includes(ingredient);
                       return (
