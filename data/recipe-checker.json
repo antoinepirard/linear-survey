@@ -45,6 +45,21 @@
         "Milk"
       ],
       "tags": []
+    },
+    {
+      "id": "recipe_1767351481627_u7abn4bxz",
+      "name": "Stoemp",
+      "ingredients": [
+        "Potatoes",
+        "Milk",
+        "Carrots",
+        "Leeks",
+        "Butter",
+        "Onions",
+        "Garlic",
+        "Lardons"
+      ],
+      "tags": []
     }
   ],
   "fridge": {
