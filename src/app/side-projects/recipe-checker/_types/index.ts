@@ -17,6 +17,8 @@ export interface RecipeCheckerData {
 export interface MatchResult {
   recipe: Recipe;
   missingIngredients: string[];
-  matchType: 'exact' | 'almost' | 'no-match';
+  matchedIngredients: string[];
+  matchType: 'exact' | 'almost' | 'partial' | 'no-match';
+  matchPercentage: number;
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircleIcon, ExclamationTriangleIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, ExclamationTriangleIcon, ShoppingCartIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import type { MatchResult } from '../_types';
 
 interface MatchesTabProps {
@@ -12,8 +12,9 @@ interface MatchesTabProps {
 export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
   const exactMatches = matchResults.filter((r) => r.matchType === 'exact');
   const almostMatches = matchResults.filter((r) => r.matchType === 'almost');
+  const partialMatches = matchResults.filter((r) => r.matchType === 'partial');
 
-  // Collect all missing ingredients for shopping list
+  // Collect all missing ingredients for shopping list (from almost matches only)
   const shoppingList = [...new Set(almostMatches.flatMap((r) => r.missingIngredients))];
 
   if (fridgeCount === 0) {
@@ -24,7 +25,9 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
     );
   }
 
-  if (matchResults.length === 0 || (exactMatches.length === 0 && almostMatches.length === 0)) {
+  const hasAnyMatches = exactMatches.length > 0 || almostMatches.length > 0 || partialMatches.length > 0;
+
+  if (matchResults.length === 0 || !hasAnyMatches) {
     return (
       <div className="text-center py-12 text-stone-400">
         <p>No matching recipes found. Add more recipes or ingredients!</p>
@@ -124,6 +127,58 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
                       <span className="font-medium">Need:</span>{' '}
                       {result.missingIngredients.join(', ')}
                     </p>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        </section>
+      )}
+
+      {/* Partial Matches - Need More Ingredients */}
+      {partialMatches.length > 0 && (
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <SparklesIcon className="w-5 h-5 text-violet-500" />
+            <h2 className="text-lg font-medium text-stone-900">Need More Ingredients</h2>
+            <span className="px-2 py-0.5 text-xs font-medium bg-violet-100 text-violet-700 rounded-full">
+              {partialMatches.length}
+            </span>
+          </div>
+          <div className="space-y-3">
+            <AnimatePresence>
+              {partialMatches.map((result) => (
+                <motion.div
+                  key={result.recipe.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="p-4 bg-stone-50 rounded-xl border border-stone-200"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-lg font-medium text-stone-900">
+                      {result.recipe.name}
+                    </h3>
+                    <span className="text-xs text-stone-500 font-medium bg-white px-2 py-1 rounded-md">
+                      {result.matchPercentage}% match
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {result.recipe.ingredients.map((ingredient) => {
+                      const isMissing = result.missingIngredients.includes(ingredient);
+                      return (
+                        <span
+                          key={ingredient}
+                          className={`px-2.5 py-1 text-xs rounded-md border ${
+                            isMissing
+                              ? 'bg-red-50 text-red-500 border-red-200'
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          }`}
+                        >
+                          {isMissing ? '✗' : '✓'} {ingredient}
+                        </span>
+                      );
+                    })}
                   </div>
                 </motion.div>
               ))}

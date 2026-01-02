@@ -42,8 +42,23 @@ export function findMissingIngredients(
 }
 
 /**
+ * Find which recipe ingredients are in the fridge
+ */
+export function findMatchedIngredients(
+  recipe: Recipe,
+  fridge: Fridge
+): string[] {
+  const normalizedFridge = fridge.ingredients.map(normalizeIngredient);
+
+  return recipe.ingredients.filter((recipeIngredient) => {
+    const normalizedRecipe = normalizeIngredient(recipeIngredient);
+    return normalizedFridge.includes(normalizedRecipe);
+  });
+}
+
+/**
  * Get match results for all recipes against fridge contents
- * Returns recipes sorted by: exact matches first, then by fewest missing ingredients
+ * Returns recipes sorted by: exact matches first, then by match percentage
  */
 export function getMatchResults(
   recipes: Recipe[],
@@ -51,13 +66,21 @@ export function getMatchResults(
 ): MatchResult[] {
   const results: MatchResult[] = recipes.map((recipe) => {
     const missingIngredients = findMissingIngredients(recipe, fridge);
+    const matchedIngredients = findMatchedIngredients(recipe, fridge);
     const missingCount = missingIngredients.length;
+    const totalIngredients = recipe.ingredients.length;
+    const matchPercentage = totalIngredients > 0 
+      ? Math.round((matchedIngredients.length / totalIngredients) * 100)
+      : 0;
 
     let matchType: MatchResult['matchType'];
     if (missingCount === 0) {
       matchType = 'exact';
     } else if (missingCount <= 2) {
       matchType = 'almost';
+    } else if (matchedIngredients.length > 0) {
+      // Has at least 1 matching ingredient
+      matchType = 'partial';
     } else {
       matchType = 'no-match';
     }
@@ -65,17 +88,22 @@ export function getMatchResults(
     return {
       recipe,
       missingIngredients,
+      matchedIngredients,
       matchType,
+      matchPercentage,
     };
   });
 
-  // Sort by match quality: exact first, then almost (sorted by missing count), then no-match
+  // Sort by match quality: exact first, then almost, then partial (sorted by match %), then no-match
   return results.sort((a, b) => {
-    const order = { exact: 0, almost: 1, 'no-match': 2 };
+    const order = { exact: 0, almost: 1, partial: 2, 'no-match': 3 };
     if (order[a.matchType] !== order[b.matchType]) {
       return order[a.matchType] - order[b.matchType];
     }
-    // Within same category, sort by fewer missing ingredients
+    // Within same category, sort by higher match percentage (or fewer missing)
+    if (a.matchPercentage !== b.matchPercentage) {
+      return b.matchPercentage - a.matchPercentage;
+    }
     return a.missingIngredients.length - b.missingIngredients.length;
   });
 }
