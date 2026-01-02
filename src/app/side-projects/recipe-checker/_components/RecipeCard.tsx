@@ -1,10 +1,14 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'motion/react';
-import { PencilIcon, TrashIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
-import type { Recipe } from '../_types';
-import { IngredientChips } from './IngredientChips';
+import { useState } from "react";
+import {
+  PencilIcon,
+  TrashIcon,
+  XMarkIcon,
+  CheckIcon,
+} from "@heroicons/react/24/outline";
+import type { Recipe } from "../_types";
+import { IngredientChips } from "./IngredientChips";
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -36,10 +40,7 @@ export function RecipeCard({ recipe, onUpdate, onDelete }: RecipeCardProps) {
 
   if (isEditing) {
     return (
-      <motion.div
-        layout
-        className="p-4 bg-white rounded-xl border border-amber-200 shadow-sm"
-      >
+      <div className="p-4 bg-slate-100 rounded-xl ring-2 ring-amber-300">
         <input
           type="text"
           value={editName}
@@ -66,20 +67,16 @@ export function RecipeCard({ recipe, onUpdate, onDelete }: RecipeCardProps) {
             <CheckIcon className="w-4 h-4" />
           </button>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className="p-4 bg-white rounded-xl border border-stone-200"
-    >
+    <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl">
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-base font-semibold text-stone-900">{recipe.name}</h3>
+        <h3 className="text-base font-semibold text-stone-900">
+          {recipe.name}
+        </h3>
         <div className="flex gap-1">
           <button
             onClick={() => setIsEditing(true)}
@@ -99,14 +96,14 @@ export function RecipeCard({ recipe, onUpdate, onDelete }: RecipeCardProps) {
         {recipe.ingredients.map((ingredient) => (
           <span
             key={ingredient}
-            className="px-2.5 py-1 text-xs bg-stone-100 text-stone-600 rounded-md"
+            className="px-2.5 py-1 text-xs bg-slate-100 text-stone-600 rounded-md"
           >
             {ingredient}
           </span>
         ))}
       </div>
       {recipe.tags && recipe.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-stone-100">
+        <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-slate-200">
           {recipe.tags.map((tag) => (
             <span
               key={tag}
@@ -117,7 +114,6 @@ export function RecipeCard({ recipe, onUpdate, onDelete }: RecipeCardProps) {
           ))}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
-

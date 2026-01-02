@@ -1,15 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { PlusIcon } from '@heroicons/react/24/outline';
-import type { Recipe } from '../_types';
-import { IngredientChips } from './IngredientChips';
-import { RecipeCard } from './RecipeCard';
+import { useState } from "react";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import type { Recipe } from "../_types";
+import { IngredientChips } from "./IngredientChips";
+import { RecipeCard } from "./RecipeCard";
 
 interface RecipesTabProps {
   recipes: Recipe[];
-  onAddRecipe: (name: string, ingredients: string[], tags?: string[]) => Promise<void>;
+  onAddRecipe: (
+    name: string,
+    ingredients: string[],
+    tags?: string[]
+  ) => Promise<void>;
   onUpdateRecipe: (recipe: Recipe) => Promise<void>;
   onDeleteRecipe: (id: string) => Promise<void>;
   isSaving: boolean;
@@ -23,20 +26,20 @@ export function RecipesTab({
   isSaving,
 }: RecipesTabProps) {
   const [isAdding, setIsAdding] = useState(false);
-  const [newName, setNewName] = useState('');
+  const [newName, setNewName] = useState("");
   const [newIngredients, setNewIngredients] = useState<string[]>([]);
 
   const handleAdd = async () => {
     if (newName.trim() && newIngredients.length > 0) {
       await onAddRecipe(newName.trim(), newIngredients);
-      setNewName('');
+      setNewName("");
       setNewIngredients([]);
       setIsAdding(false);
     }
   };
 
   const handleCancel = () => {
-    setNewName('');
+    setNewName("");
     setNewIngredients([]);
     setIsAdding(false);
   };
@@ -44,71 +47,59 @@ export function RecipesTab({
   return (
     <div className="space-y-4">
       {/* Add New Recipe */}
-      <AnimatePresence mode="wait">
-        {isAdding ? (
-          <motion.div
-            key="add-form"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="p-4 bg-stone-50 rounded-xl border border-stone-200"
-          >
-            <input
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder="Recipe name"
-              className="w-full px-3 py-2 mb-3 text-lg font-medium bg-white rounded-lg border border-stone-200 focus:outline-none focus:border-stone-400"
-              autoFocus
-            />
-            <IngredientChips
-              ingredients={newIngredients}
-              onChange={setNewIngredients}
-              placeholder="Add key ingredients (Enter to add)"
-            />
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={handleCancel}
-                className="px-4 py-2 text-sm text-stone-600 hover:bg-stone-200 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAdd}
-                disabled={!newName.trim() || newIngredients.length === 0 || isSaving}
-                className="px-4 py-2 text-sm text-white bg-stone-800 hover:bg-stone-900 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSaving ? 'Saving...' : 'Add Recipe'}
-              </button>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.button
-            key="add-button"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsAdding(true)}
-            className="w-full p-4 flex items-center justify-center gap-2 text-sm font-medium text-slate-500 bg-white hover:bg-stone-100 rounded-xl border border-dashed border-stone-300 transition-colors"
-          >
-            <PlusIcon className="w-5 h-5" />
-            Add Recipe
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {isAdding ? (
+        <div className="p-4 bg-stone-50 rounded-xl border border-stone-200">
+          <input
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="Recipe name"
+            className="w-full px-3 py-2 mb-3 text-lg font-medium bg-white rounded-lg border border-stone-200 focus:outline-none focus:border-stone-400"
+            autoFocus
+          />
+          <IngredientChips
+            ingredients={newIngredients}
+            onChange={setNewIngredients}
+            placeholder="Add key ingredients (Enter to add)"
+          />
+          <div className="flex justify-end gap-2 mt-4">
+            <button
+              onClick={handleCancel}
+              className="px-4 py-2 text-sm text-stone-600 hover:bg-stone-200 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleAdd}
+              disabled={
+                !newName.trim() || newIngredients.length === 0 || isSaving
+              }
+              className="px-4 py-2 text-sm text-white bg-stone-800 hover:bg-stone-900 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSaving ? "Saving..." : "Add Recipe"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => setIsAdding(true)}
+          className="w-full p-4 flex items-center justify-center gap-2 text-sm font-medium text-slate-500 bg-white hover:bg-slate-50 rounded-xl border border-dashed border-stone-300 transition-colors"
+        >
+          <PlusIcon className="w-5 h-5" />
+          Add Recipe
+        </button>
+      )}
 
       {/* Recipe List */}
       <div className="space-y-3">
-        <AnimatePresence>
-          {recipes.map((recipe) => (
-            <RecipeCard
-              key={recipe.id}
-              recipe={recipe}
-              onUpdate={onUpdateRecipe}
-              onDelete={onDeleteRecipe}
-            />
-          ))}
-        </AnimatePresence>
+        {recipes.map((recipe) => (
+          <RecipeCard
+            key={recipe.id}
+            recipe={recipe}
+            onUpdate={onUpdateRecipe}
+            onDelete={onDeleteRecipe}
+          />
+        ))}
       </div>
 
       {recipes.length === 0 && !isAdding && (
@@ -119,4 +110,3 @@ export function RecipesTab({
     </div>
   );
 }
-

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { BookOpenIcon, ArchiveBoxIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { useRecipeChecker } from '../_hooks/useRecipeChecker';
 import { RecipesTab } from './RecipesTab';
@@ -53,12 +52,7 @@ export function RecipeCheckerApp() {
     <div className="min-h-screen bg-stone-100 pt-16 pb-8">
       <div className="max-w-2xl mx-auto px-4">
         {/* Tab Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="flex gap-1 p-1 bg-white rounded-2xl shadow-sm mb-6"
-        >
+        <div className="flex gap-1 p-1 bg-white rounded-2xl shadow-sm mb-6">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -88,73 +82,40 @@ export function RecipeCheckerApp() {
               </button>
             );
           })}
-        </motion.div>
+        </div>
 
         {/* Tab Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-sm p-6"
-        >
-          <AnimatePresence mode="wait">
-            {activeTab === 'recipes' && (
-              <motion.div
-                key="recipes"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-              >
-                <RecipesTab
-                  recipes={recipes}
-                  onAddRecipe={addRecipe}
-                  onUpdateRecipe={updateRecipe}
-                  onDeleteRecipe={deleteRecipe}
-                  isSaving={isSaving}
-                />
-              </motion.div>
-            )}
-            {activeTab === 'fridge' && (
-              <motion.div
-                key="fridge"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-              >
-                <FridgeTab
-                  fridge={fridge}
-                  recipeIngredients={recipeIngredients}
-                  onUpdateFridge={updateFridge}
-                  isSaving={isSaving}
-                />
-              </motion.div>
-            )}
-            {activeTab === 'matches' && (
-              <motion.div
-                key="matches"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-              >
-                <MatchesTab
-                  matchResults={matchResults}
-                  fridgeCount={fridge.ingredients.length}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+        <div className="bg-white rounded-2xl shadow-sm p-6">
+          {activeTab === 'recipes' && (
+            <RecipesTab
+              recipes={recipes}
+              onAddRecipe={addRecipe}
+              onUpdateRecipe={updateRecipe}
+              onDeleteRecipe={deleteRecipe}
+              isSaving={isSaving}
+            />
+          )}
+          {activeTab === 'fridge' && (
+            <FridgeTab
+              fridge={fridge}
+              recipeIngredients={recipeIngredients}
+              onUpdateFridge={updateFridge}
+              isSaving={isSaving}
+            />
+          )}
+          {activeTab === 'matches' && (
+            <MatchesTab
+              matchResults={matchResults}
+              fridgeCount={fridge.ingredients.length}
+            />
+          )}
+        </div>
 
         {/* Stats Footer */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-6 flex justify-center gap-6 text-xs text-stone-400"
-        >
+        <div className="mt-6 flex justify-center gap-6 text-xs text-stone-400">
           <span>{recipes.length} recipes</span>
           <span>{fridge.ingredients.length} ingredients</span>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
