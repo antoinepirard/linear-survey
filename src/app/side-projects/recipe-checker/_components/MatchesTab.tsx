@@ -1,7 +1,14 @@
-'use client';
+"use client";
 
-import { CheckCircleIcon, ExclamationTriangleIcon, SparklesIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
-import type { MatchResult } from '../_types';
+import {
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  SparklesIcon,
+  ShoppingCartIcon,
+  CheckIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
+import type { MatchResult } from "../_types";
 
 interface MatchesTabProps {
   matchResults: MatchResult[];
@@ -9,27 +16,45 @@ interface MatchesTabProps {
 }
 
 // Consistent tag component for ingredients
-function IngredientTag({ ingredient, hasIt }: { ingredient: string; hasIt: boolean }) {
+function IngredientTag({
+  ingredient,
+  hasIt,
+}: {
+  ingredient: string;
+  hasIt: boolean;
+}) {
   return (
     <span
-      className={`px-2.5 py-1 text-xs rounded-md ${
-        hasIt
-          ? 'bg-emerald-50 text-emerald-700'
-          : 'bg-stone-100 text-stone-400'
+      className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-lg ${
+        hasIt ? "bg-white text-stone-700 shadow-sm" : "bg-red-50 text-red-600"
       }`}
     >
+      {hasIt ? (
+        <CheckIcon className="w-3 h-3 text-emerald-500" />
+      ) : (
+        <XMarkIcon className="w-3 h-3 text-red-400" />
+      )}
       {ingredient}
     </span>
   );
 }
 
+// Sort ingredients: have first, then missing
+function sortIngredients(ingredients: string[], missingIngredients: string[]) {
+  const have = ingredients.filter((i) => !missingIngredients.includes(i));
+  const missing = ingredients.filter((i) => missingIngredients.includes(i));
+  return [...have, ...missing];
+}
+
 export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
-  const exactMatches = matchResults.filter((r) => r.matchType === 'exact');
-  const almostMatches = matchResults.filter((r) => r.matchType === 'almost');
-  const partialMatches = matchResults.filter((r) => r.matchType === 'partial');
+  const exactMatches = matchResults.filter((r) => r.matchType === "exact");
+  const almostMatches = matchResults.filter((r) => r.matchType === "almost");
+  const partialMatches = matchResults.filter((r) => r.matchType === "partial");
 
   // Collect all missing ingredients for shopping list (from almost matches only)
-  const shoppingList = [...new Set(almostMatches.flatMap((r) => r.missingIngredients))];
+  const shoppingList = [
+    ...new Set(almostMatches.flatMap((r) => r.missingIngredients)),
+  ];
 
   if (fridgeCount === 0) {
     return (
@@ -39,7 +64,10 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
     );
   }
 
-  const hasAnyMatches = exactMatches.length > 0 || almostMatches.length > 0 || partialMatches.length > 0;
+  const hasAnyMatches =
+    exactMatches.length > 0 ||
+    almostMatches.length > 0 ||
+    partialMatches.length > 0;
 
   if (matchResults.length === 0 || !hasAnyMatches) {
     return (
@@ -72,7 +100,11 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
                 </h3>
                 <div className="flex flex-wrap gap-1.5">
                   {result.recipe.ingredients.map((ingredient) => (
-                    <IngredientTag key={ingredient} ingredient={ingredient} hasIt={true} />
+                    <IngredientTag
+                      key={ingredient}
+                      ingredient={ingredient}
+                      hasIt={true}
+                    />
                   ))}
                 </div>
               </div>
@@ -101,10 +133,18 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
                   {result.recipe.name}
                 </h3>
                 <div className="flex flex-wrap gap-1.5">
-                  {result.recipe.ingredients.map((ingredient) => {
-                    const hasIt = !result.missingIngredients.includes(ingredient);
+                  {sortIngredients(
+                    result.recipe.ingredients,
+                    result.missingIngredients
+                  ).map((ingredient) => {
+                    const hasIt =
+                      !result.missingIngredients.includes(ingredient);
                     return (
-                      <IngredientTag key={ingredient} ingredient={ingredient} hasIt={hasIt} />
+                      <IngredientTag
+                        key={ingredient}
+                        ingredient={ingredient}
+                        hasIt={hasIt}
+                      />
                     );
                   })}
                 </div>
@@ -139,10 +179,18 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {result.recipe.ingredients.map((ingredient) => {
-                    const hasIt = !result.missingIngredients.includes(ingredient);
+                  {sortIngredients(
+                    result.recipe.ingredients,
+                    result.missingIngredients
+                  ).map((ingredient) => {
+                    const hasIt =
+                      !result.missingIngredients.includes(ingredient);
                     return (
-                      <IngredientTag key={ingredient} ingredient={ingredient} hasIt={hasIt} />
+                      <IngredientTag
+                        key={ingredient}
+                        ingredient={ingredient}
+                        hasIt={hasIt}
+                      />
                     );
                   })}
                 </div>
@@ -157,11 +205,14 @@ export function MatchesTab({ matchResults, fridgeCount }: MatchesTabProps) {
         <section>
           <div className="flex items-center gap-2 mb-4">
             <ShoppingCartIcon className="w-5 h-5 text-stone-500" />
-            <h2 className="text-lg font-medium text-stone-900">Shopping List</h2>
+            <h2 className="text-lg font-medium text-stone-900">
+              Shopping List
+            </h2>
           </div>
           <div className="p-4 bg-stone-50 rounded-xl">
             <p className="text-sm text-stone-500 mb-3">
-              Get these to unlock {almostMatches.length} recipe{almostMatches.length !== 1 ? 's' : ''}
+              Get these to unlock {almostMatches.length} recipe
+              {almostMatches.length !== 1 ? "s" : ""}
             </p>
             <div className="flex flex-wrap gap-1.5">
               {shoppingList.map((ingredient) => (
