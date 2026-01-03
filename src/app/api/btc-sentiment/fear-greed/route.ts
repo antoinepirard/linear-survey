@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 
 const ALTERNATIVE_ME_BASE_URL = "https://api.alternative.me/fng";
 
+// Fear & Greed Index started Feb 1, 2018 - max ~2500 days of data
+const MAX_FNG_DAYS = 2500;
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const limit = searchParams.get("limit") || "90";
+  const requestedLimit = parseInt(searchParams.get("limit") || "90", 10);
+  
+  // Cap at max available data
+  const limit = Math.min(requestedLimit, MAX_FNG_DAYS);
 
   try {
     const response = await fetch(
@@ -18,6 +24,8 @@ export async function GET(request: Request) {
     );
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Alternative.me error response:", errorText);
       throw new Error(`Alternative.me API error: ${response.status}`);
     }
 
@@ -31,4 +39,3 @@ export async function GET(request: Request) {
     );
   }
 }
-

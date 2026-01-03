@@ -16,9 +16,34 @@ function getDaysForRange(range: TimeRange): number {
       return 90;
     case "1y":
       return 365;
-    case "all":
-      return 2000; // Max available data
+    case "2y":
+      return 730;
+    case "3y":
+      return 1095;
+    case "5y":
+      return 1825;
+    case "max":
+      return 3650; // ~10 years, CoinGecko will return all available
   }
+}
+
+// Sample data to reduce points for longer time ranges
+function sampleData<T>(data: T[], maxPoints: number): T[] {
+  if (data.length <= maxPoints) return data;
+  
+  const step = Math.ceil(data.length / maxPoints);
+  const sampled: T[] = [];
+  
+  for (let i = 0; i < data.length; i += step) {
+    sampled.push(data[i]);
+  }
+  
+  // Always include the last point
+  if (sampled[sampled.length - 1] !== data[data.length - 1]) {
+    sampled.push(data[data.length - 1]);
+  }
+  
+  return sampled;
 }
 
 // Fetch Bitcoin price history via internal API route
@@ -34,10 +59,13 @@ export async function fetchBitcoinPrices(
 
   const data: CoinGeckoMarketChartResponse = await response.json();
 
-  return data.prices.map(([timestamp, price]) => ({
+  const prices = data.prices.map(([timestamp, price]) => ({
     timestamp,
     price,
   }));
+
+  // Sample to max 500 points for performance
+  return sampleData(prices, 500);
 }
 
 // Fetch Fear & Greed Index history via internal API route

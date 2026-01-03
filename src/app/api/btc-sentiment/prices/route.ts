@@ -7,8 +7,13 @@ export async function GET(request: Request) {
   const days = searchParams.get("days") || "90";
 
   try {
+    // CoinGecko auto-adjusts granularity based on days:
+    // 1-2 days: 5-minute intervals
+    // 3-90 days: hourly
+    // 90+ days: daily
+    // Don't specify interval param - let it auto-adjust
     const response = await fetch(
-      `${COINGECKO_BASE_URL}/coins/bitcoin/market_chart?vs_currency=usd&days=${days}&interval=daily`,
+      `${COINGECKO_BASE_URL}/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`,
       {
         headers: {
           Accept: "application/json",
@@ -18,6 +23,8 @@ export async function GET(request: Request) {
     );
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("CoinGecko error response:", errorText);
       throw new Error(`CoinGecko API error: ${response.status}`);
     }
 
@@ -31,4 +38,3 @@ export async function GET(request: Request) {
     );
   }
 }
-

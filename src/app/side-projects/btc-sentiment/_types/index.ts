@@ -36,7 +36,7 @@ export interface AlternativeMeFngResponse {
 }
 
 // Time range options
-export type TimeRange = "30d" | "90d" | "1y" | "all";
+export type TimeRange = "30d" | "90d" | "1y" | "2y" | "3y" | "5y" | "max";
 
 export interface TimeRangeOption {
   value: TimeRange;
@@ -51,4 +51,3 @@ export type SentimentLevel =
   | "neutral"
   | "greed"
   | "extreme-greed";
-
