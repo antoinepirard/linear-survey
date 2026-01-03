@@ -2,14 +2,11 @@
 
 import { TimeRange, TimeRangeOption } from "../_types";
 
+// CoinGecko free tier is limited to 365 days of historical data
 const TIME_RANGE_OPTIONS: TimeRangeOption[] = [
   { value: "30d", label: "30D", days: 30 },
   { value: "90d", label: "90D", days: 90 },
   { value: "1y", label: "1Y", days: 365 },
-  { value: "2y", label: "2Y", days: 730 },
-  { value: "3y", label: "3Y", days: 1095 },
-  { value: "5y", label: "5Y", days: 1825 },
-  { value: "max", label: "MAX", days: 3650 },
 ];
 
 interface TimeRangeSelectorProps {

@@ -35,8 +35,8 @@ export interface AlternativeMeFngResponse {
   }[];
 }
 
-// Time range options
-export type TimeRange = "30d" | "90d" | "1y" | "2y" | "3y" | "5y" | "max";
+// Time range options (CoinGecko free tier: max 365 days)
+export type TimeRange = "30d" | "90d" | "1y";
 
 export interface TimeRangeOption {
   value: TimeRange;
