@@ -144,7 +144,7 @@ export function BitcoinChart({ data, allData }: BitcoinChartProps) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" className="outline-none focus:outline-none">
       <AreaChart
         data={data}
         margin={{ top: 10, right: 0, bottom: 30, left: 0 }}

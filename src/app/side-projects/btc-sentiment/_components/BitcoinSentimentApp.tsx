@@ -106,7 +106,7 @@ export function BitcoinSentimentApp() {
       </header>
 
       {/* Chart area - takes remaining space, full width */}
-      <main className="flex-1 min-h-0">
+      <main className="flex-1 min-h-0 [&_*]:outline-none">
         <BitcoinChart data={chartData} allData={allChartData} />
       </main>
 
