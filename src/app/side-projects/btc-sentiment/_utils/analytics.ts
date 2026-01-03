@@ -50,13 +50,29 @@ export function calculateForwardReturn(
   return ((futurePrice - currentPrice) / currentPrice) * 100;
 }
 
+// Find closest index in data to a given timestamp
+function findClosestIndex(data: ChartDataPoint[], targetTimestamp: number): number {
+  let closest = 0;
+  let minDiff = Math.abs(data[0].timestamp - targetTimestamp);
+  
+  for (let i = 1; i < data.length; i++) {
+    const diff = Math.abs(data[i].timestamp - targetTimestamp);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closest = i;
+    }
+  }
+  
+  return closest;
+}
+
 // Get forward returns for a specific data point
 export function getForwardReturns(
   allData: ChartDataPoint[],
   pointDate: string
 ): ForwardReturn {
-  const index = allData.findIndex((d) => d.date === pointDate);
-  if (index === -1) return { return30d: null, return90d: null, return1y: null };
+  const targetTimestamp = new Date(pointDate).getTime();
+  const index = findClosestIndex(allData, targetTimestamp);
 
   return {
     return30d: calculateForwardReturn(allData, index, 30),
