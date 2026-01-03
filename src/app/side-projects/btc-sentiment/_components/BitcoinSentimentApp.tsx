@@ -3,8 +3,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { BitcoinChart } from "./BitcoinChart";
 import { TimeRangeSelector } from "./TimeRangeSelector";
+import { SentimentStats, HistoricalContext } from "./SentimentStats";
 import { ChartDataPoint, TimeRange } from "../_types";
 import { getChartData, fetchCurrentPrice } from "../_utils/api";
+import { getHistoricalReturnForSentiment } from "../_utils/analytics";
 import {
   formatPrice,
   formatChange,
@@ -18,13 +20,23 @@ export function BitcoinSentimentApp() {
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [priceChange, setPriceChange] = useState<number | null>(null);
 
-  // Chart data is synchronous - from static files, instant!
+  // Get all data (for forward return calculations)
+  const allChartData = useMemo(() => getChartData("max"), []);
+
+  // Chart data filtered by time range
   const chartData = useMemo(() => getChartData(timeRange), [timeRange]);
 
   // Get the most recent Fear & Greed value
-  const currentFearGreed = chartData.length > 0 
-    ? chartData[chartData.length - 1].fearGreedValue 
-    : null;
+  const currentFearGreed =
+    chartData.length > 0
+      ? chartData[chartData.length - 1].fearGreedValue
+      : null;
+
+  // Get historical context for current sentiment
+  const historicalContext = useMemo(() => {
+    if (currentFearGreed === null) return null;
+    return getHistoricalReturnForSentiment(allChartData, currentFearGreed, 90);
+  }, [allChartData, currentFearGreed]);
 
   // Only fetch current price (the one API call we need)
   useEffect(() => {
@@ -37,9 +49,10 @@ export function BitcoinSentimentApp() {
   }, []);
 
   // Get date range for footer
-  const dateRange = chartData.length > 0
-    ? `${chartData[0].date} — ${chartData[chartData.length - 1].date}`
-    : "";
+  const dateRange =
+    chartData.length > 0
+      ? `${chartData[0].date} — ${chartData[chartData.length - 1].date}`
+      : "";
 
   return (
     <div className="h-screen bg-zinc-950 flex flex-col overflow-hidden">
@@ -74,22 +87,33 @@ export function BitcoinSentimentApp() {
 
         {/* Right: Fear & Greed + Time selector */}
         <div className="flex flex-col items-end gap-3">
-          {/* Fear & Greed indicator */}
+          {/* Fear & Greed indicator with historical context */}
           {currentFearGreed !== null && (
-            <div className="flex items-center gap-2">
-              <span className="text-white/40 text-xs font-mono uppercase tracking-wider">
-                F&G
-              </span>
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: getColorFromValue(currentFearGreed) }}
-              />
-              <span
-                className="text-sm font-mono font-medium"
-                style={{ color: getColorFromValue(currentFearGreed) }}
-              >
-                {currentFearGreed} · {getSentimentLabel(getSentimentLevel(currentFearGreed))}
-              </span>
+            <div className="flex flex-col items-end">
+              <div className="flex items-center gap-2">
+                <span className="text-white/40 text-xs font-mono uppercase tracking-wider">
+                  F&G
+                </span>
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: getColorFromValue(currentFearGreed) }}
+                />
+                <span
+                  className="text-sm font-mono font-medium"
+                  style={{ color: getColorFromValue(currentFearGreed) }}
+                >
+                  {currentFearGreed} ·{" "}
+                  {getSentimentLabel(getSentimentLevel(currentFearGreed))}
+                </span>
+              </div>
+              {/* Historical context */}
+              {historicalContext && (
+                <HistoricalContext
+                  currentFearGreed={currentFearGreed}
+                  historicalReturn={historicalContext.avgReturn}
+                  sampleCount={historicalContext.sampleCount}
+                />
+              )}
             </div>
           )}
 
@@ -100,17 +124,18 @@ export function BitcoinSentimentApp() {
 
       {/* Chart area - takes remaining space, full width */}
       <main className="flex-1 min-h-0">
-        <BitcoinChart data={chartData} />
+        <BitcoinChart data={chartData} allData={allChartData} />
       </main>
 
       {/* Footer */}
-      <footer className="flex-shrink-0 px-4 md:px-6 py-3 flex items-center justify-between border-t border-white/5">
-        <span className="text-white/20 text-xs font-mono">
-          {dateRange}
-        </span>
-        <span className="text-white/20 text-xs font-mono">
-          Data: CryptoCompare · Alternative.me
-        </span>
+      <footer className="flex-shrink-0 px-4 md:px-6 py-3 border-t border-white/5">
+        <div className="flex items-center justify-between">
+          <SentimentStats data={allChartData} />
+          <div className="flex items-center gap-1.5 text-[10px] font-mono text-white/30">
+            <div className="w-3 h-2 bg-red-600/20 rounded-sm" />
+            <span>Extreme fear zones</span>
+          </div>
+        </div>
       </footer>
     </div>
   );

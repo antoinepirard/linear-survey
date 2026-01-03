@@ -8,6 +8,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  ReferenceArea,
 } from "recharts";
 import { ChartDataPoint } from "../_types";
 import {
@@ -18,26 +19,33 @@ import {
   getSentimentLevel,
   getSentimentLabel,
 } from "../_utils/sentiment";
+import { findExtremeFearZones, getForwardReturns } from "../_utils/analytics";
 
 interface BitcoinChartProps {
   data: ChartDataPoint[];
+  allData: ChartDataPoint[]; // Full dataset for forward return calculations
 }
 
-// Custom tooltip component
+// Custom tooltip component with forward returns
 function CustomTooltip({
   active,
   payload,
+  allData,
 }: {
   active?: boolean;
   payload?: Array<{
     payload: ChartDataPoint;
   }>;
+  allData: ChartDataPoint[];
 }) {
   if (!active || !payload?.length) return null;
 
   const data = payload[0].payload;
   const sentimentColor = getColorFromValue(data.fearGreedValue);
   const sentimentLevel = getSentimentLevel(data.fearGreedValue);
+  
+  // Calculate forward returns
+  const forwardReturns = getForwardReturns(allData, data.date);
 
   return (
     <div className="bg-zinc-900/95 border border-white/10 rounded-lg px-3 py-2 shadow-xl backdrop-blur-sm">
@@ -56,11 +64,44 @@ function CustomTooltip({
           {getSentimentLabel(sentimentLevel)} ({data.fearGreedValue})
         </span>
       </div>
+      
+      {/* Forward returns */}
+      {(forwardReturns.return30d !== null || forwardReturns.return90d !== null) && (
+        <div className="mt-2 pt-2 border-t border-white/10">
+          <p className="text-white/30 text-[10px] font-mono mb-1">Return after:</p>
+          <div className="flex gap-3 text-xs font-mono">
+            {forwardReturns.return30d !== null && (
+              <div>
+                <span className="text-white/40">30d: </span>
+                <span className={forwardReturns.return30d >= 0 ? "text-green-400" : "text-red-400"}>
+                  {forwardReturns.return30d >= 0 ? "+" : ""}{forwardReturns.return30d.toFixed(0)}%
+                </span>
+              </div>
+            )}
+            {forwardReturns.return90d !== null && (
+              <div>
+                <span className="text-white/40">90d: </span>
+                <span className={forwardReturns.return90d >= 0 ? "text-green-400" : "text-red-400"}>
+                  {forwardReturns.return90d >= 0 ? "+" : ""}{forwardReturns.return90d.toFixed(0)}%
+                </span>
+              </div>
+            )}
+            {forwardReturns.return1y !== null && (
+              <div>
+                <span className="text-white/40">1y: </span>
+                <span className={forwardReturns.return1y >= 0 ? "text-green-400" : "text-red-400"}>
+                  {forwardReturns.return1y >= 0 ? "+" : ""}{forwardReturns.return1y.toFixed(0)}%
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-export function BitcoinChart({ data }: BitcoinChartProps) {
+export function BitcoinChart({ data, allData }: BitcoinChartProps) {
   // Calculate gradient stops based on sentiment values
   const gradientStops = useMemo(() => {
     if (data.length === 0) return [];
@@ -95,6 +136,9 @@ export function BitcoinChart({ data }: BitcoinChartProps) {
     return [Math.floor(min - padding), Math.ceil(max + padding)];
   }, [data]);
 
+  // Find extreme fear zones for highlighting
+  const extremeFearZones = useMemo(() => findExtremeFearZones(data), [data]);
+
   if (data.length === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -126,6 +170,18 @@ export function BitcoinChart({ data }: BitcoinChartProps) {
           </linearGradient>
         </defs>
 
+        {/* Extreme fear zones as background highlights */}
+        {extremeFearZones.map((zone, index) => (
+          <ReferenceArea
+            key={index}
+            x1={zone.start}
+            x2={zone.end}
+            fill="#dc2626"
+            fillOpacity={0.08}
+            stroke="none"
+          />
+        ))}
+
         <XAxis
           dataKey="date"
           axisLine={false}
@@ -139,7 +195,7 @@ export function BitcoinChart({ data }: BitcoinChartProps) {
         <YAxis domain={yDomain} hide />
 
         <Tooltip
-          content={<CustomTooltip />}
+          content={<CustomTooltip allData={allData} />}
           cursor={{
             stroke: "rgba(255,255,255,0.1)",
             strokeWidth: 1,
