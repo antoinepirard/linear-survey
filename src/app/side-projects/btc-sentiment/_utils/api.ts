@@ -2,17 +2,26 @@ import {
   BitcoinPricePoint,
   FearGreedDataPoint,
   ChartDataPoint,
-  CoinGeckoMarketChartResponse,
-  AlternativeMeFngResponse,
   TimeRange,
 } from "../_types";
 
-// CoinGecko free tier: max 365 days
-function getDaysForRange(range: TimeRange): number {
+// Import static historical data (no API calls needed!)
+import btcPricesData from "../_data/btc-prices.json";
+import fearGreedData from "../_data/fear-greed.json";
+
+const btcPrices: BitcoinPricePoint[] = btcPricesData;
+const fearGreed: FearGreedDataPoint[] = fearGreedData;
+
+// Get days count for each time range
+function getDaysForRange(range: TimeRange): number | "max" {
   switch (range) {
     case "30d": return 30;
     case "90d": return 90;
     case "1y": return 365;
+    case "2y": return 730;
+    case "3y": return 1095;
+    case "5y": return 1825;
+    case "max": return "max";
   }
 }
 
@@ -36,107 +45,35 @@ function sampleData<T>(data: T[], maxPoints: number): T[] {
 }
 
 // Filter data to a specific number of days from now
-function filterByDays<T extends { timestamp: number }>(data: T[], days: number): T[] {
+function filterByDays<T extends { timestamp: number }>(data: T[], days: number | "max"): T[] {
+  if (days === "max") return data;
   const cutoffTime = Date.now() - days * 24 * 60 * 60 * 1000;
   return data.filter((d) => d.timestamp >= cutoffTime);
 }
 
-// In-memory cache - stores max range (1Y) and filters for shorter ranges
-interface DataCache {
-  prices: BitcoinPricePoint[];
-  fearGreed: FearGreedDataPoint[];
-  timestamp: number;
-}
-
-let dataCache: DataCache | null = null;
-const CACHE_DURATION = 60 * 60 * 1000; // 1 hour (data is historical, doesn't change)
-
-function isCacheValid(): boolean {
-  return dataCache !== null && Date.now() - dataCache.timestamp < CACHE_DURATION;
-}
-
-// Fetch Bitcoin prices - always fetches 1Y and filters client-side
-async function fetchRawBitcoinPrices(): Promise<BitcoinPricePoint[]> {
-  const response = await fetch("/api/btc-sentiment/prices?days=365");
-  
-  if (!response.ok) {
-    if (response.status === 429) {
-      throw new Error("429: Rate limited. Please wait a moment.");
-    }
-    throw new Error(`API error: ${response.status}`);
-  }
-
-  const data: CoinGeckoMarketChartResponse = await response.json();
-  
-  if ('error' in data) {
-    throw new Error(data.error as string);
-  }
-
-  return data.prices.map(([timestamp, price]) => ({
-    timestamp,
-    price,
-  }));
-}
-
-// Fetch Fear & Greed - always fetches 1Y and filters client-side
-async function fetchRawFearGreed(): Promise<FearGreedDataPoint[]> {
-  const response = await fetch("/api/btc-sentiment/fear-greed?limit=365");
-  
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status}`);
-  }
-
-  const data: AlternativeMeFngResponse = await response.json();
-
-  return data.data.map((item) => ({
-    timestamp: parseInt(item.timestamp) * 1000,
-    value: parseInt(item.value),
-    classification: item.value_classification,
-  }));
-}
-
-// Load all data into cache (once per hour)
-async function ensureCacheLoaded(): Promise<void> {
-  if (isCacheValid()) return;
-
-  const [prices, fearGreed] = await Promise.all([
-    fetchRawBitcoinPrices(),
-    fetchRawFearGreed(),
-  ]);
-
-  dataCache = {
-    prices,
-    fearGreed,
-    timestamp: Date.now(),
-  };
-}
-
-// Get Bitcoin prices for a time range (filters from cache)
-export async function fetchBitcoinPrices(range: TimeRange): Promise<BitcoinPricePoint[]> {
-  await ensureCacheLoaded();
-  
+// Get Bitcoin prices for a time range (from static data - instant!)
+export function fetchBitcoinPrices(range: TimeRange): BitcoinPricePoint[] {
   const days = getDaysForRange(range);
-  const filtered = filterByDays(dataCache!.prices, days);
-  const maxPoints = days <= 90 ? days : 200;
+  const filtered = filterByDays(btcPrices, days);
   
+  // Sample for chart performance
+  const maxPoints = typeof days === "number" && days <= 90 ? days : 300;
   return sampleData(filtered, maxPoints);
 }
 
-// Get Fear & Greed for a time range (filters from cache)
-export async function fetchFearGreedIndex(range: TimeRange): Promise<FearGreedDataPoint[]> {
-  await ensureCacheLoaded();
-  
+// Get Fear & Greed for a time range (from static data - instant!)
+export function fetchFearGreedIndex(range: TimeRange): FearGreedDataPoint[] {
   const days = getDaysForRange(range);
-  return filterByDays(dataCache!.fearGreed, days);
+  return filterByDays(fearGreed, days);
 }
 
 // Merge Bitcoin prices with Fear & Greed data by date
 export function mergeChartData(
   prices: BitcoinPricePoint[],
-  fearGreed: FearGreedDataPoint[]
+  fearGreedPoints: FearGreedDataPoint[]
 ): ChartDataPoint[] {
   const fgMap = new Map<string, FearGreedDataPoint>();
-  fearGreed.forEach((fg) => {
+  fearGreedPoints.forEach((fg) => {
     const dateKey = new Date(fg.timestamp).toISOString().split("T")[0];
     fgMap.set(dateKey, fg);
   });
@@ -157,17 +94,14 @@ export function mergeChartData(
     .sort((a, b) => a.timestamp - b.timestamp);
 }
 
-// Fetch chart data for a specific range
-export async function fetchChartData(range: TimeRange): Promise<ChartDataPoint[]> {
-  const [prices, fearGreed] = await Promise.all([
-    fetchBitcoinPrices(range),
-    fetchFearGreedIndex(range),
-  ]);
-
-  return mergeChartData(prices, fearGreed);
+// Get chart data for a specific range (synchronous - no API calls!)
+export function getChartData(range: TimeRange): ChartDataPoint[] {
+  const prices = fetchBitcoinPrices(range);
+  const fg = fetchFearGreedIndex(range);
+  return mergeChartData(prices, fg);
 }
 
-// Get current Bitcoin price and 24h change
+// Get current Bitcoin price (only API call needed - for live price)
 export async function fetchCurrentPrice(): Promise<{
   price: number;
   change24h: number;
@@ -183,9 +117,4 @@ export async function fetchCurrentPrice(): Promise<{
     price: data.bitcoin.usd,
     change24h: data.bitcoin.usd_24h_change,
   };
-}
-
-// Clear cache (for manual refresh)
-export function clearCache() {
-  dataCache = null;
 }

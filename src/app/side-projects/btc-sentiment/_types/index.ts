@@ -1,10 +1,10 @@
-// Bitcoin price data point from CoinGecko
+// Bitcoin price data point
 export interface BitcoinPricePoint {
   timestamp: number;
   price: number;
 }
 
-// Fear & Greed data point from Alternative.me
+// Fear & Greed data point
 export interface FearGreedDataPoint {
   timestamp: number;
   value: number;
@@ -35,13 +35,13 @@ export interface AlternativeMeFngResponse {
   }[];
 }
 
-// Time range options (CoinGecko free tier: max 365 days)
-export type TimeRange = "30d" | "90d" | "1y";
+// Time range options (full history available via static data)
+export type TimeRange = "30d" | "90d" | "1y" | "2y" | "3y" | "5y" | "max";
 
 export interface TimeRangeOption {
   value: TimeRange;
   label: string;
-  days: number;
+  days: number | "max";
 }
 
 // Sentiment classification

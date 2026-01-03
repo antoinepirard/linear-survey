@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { BitcoinChart } from "./BitcoinChart";
 import { TimeRangeSelector } from "./TimeRangeSelector";
 import { ChartDataPoint, TimeRange } from "../_types";
-import { fetchChartData, fetchCurrentPrice, clearCache } from "../_utils/api";
+import { getChartData, fetchCurrentPrice } from "../_utils/api";
 import {
   formatPrice,
   formatChange,
@@ -15,51 +15,26 @@ import {
 
 export function BitcoinSentimentApp() {
   const [timeRange, setTimeRange] = useState<TimeRange>("1y");
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [priceChange, setPriceChange] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Get the most recent Fear & Greed value from chart data
+  // Chart data is synchronous - from static files, instant!
+  const chartData = useMemo(() => getChartData(timeRange), [timeRange]);
+
+  // Get the most recent Fear & Greed value
   const currentFearGreed = chartData.length > 0 
     ? chartData[chartData.length - 1].fearGreedValue 
     : null;
 
-  const loadData = useCallback(async (forceRefresh = false) => {
-    if (forceRefresh) {
-      clearCache();
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Fetch chart data (uses internal cache - only hits API on first load)
-      const data = await fetchChartData(timeRange);
-      setChartData(data);
-
-      // Fetch current price
-      const priceData = await fetchCurrentPrice();
-      setCurrentPrice(priceData.price);
-      setPriceChange(priceData.change24h);
-    } catch (err) {
-      console.error("Failed to fetch data:", err);
-      const errorMessage = err instanceof Error ? err.message : "Failed to load data";
-      
-      if (errorMessage.includes("429")) {
-        setError("Rate limited. Please wait a moment and try again.");
-      } else {
-        setError("Failed to load data. Please try again.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }, [timeRange]);
-
+  // Only fetch current price (the one API call we need)
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    fetchCurrentPrice()
+      .then((data) => {
+        setCurrentPrice(data.price);
+        setPriceChange(data.change24h);
+      })
+      .catch(console.error);
+  }, []);
 
   // Get date range for footer
   const dateRange = chartData.length > 0
@@ -125,28 +100,7 @@ export function BitcoinSentimentApp() {
 
       {/* Chart area - takes remaining space, full width */}
       <main className="flex-1 min-h-0">
-        {isLoading ? (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-              <span className="text-white/30 text-xs font-mono">Loading data...</span>
-            </div>
-          </div>
-        ) : error ? (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="flex flex-col items-center gap-3">
-              <span className="text-red-500/80 text-sm font-mono text-center max-w-xs">{error}</span>
-              <button
-                onClick={() => loadData(true)}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/60 text-xs font-mono rounded transition-colors"
-              >
-                Retry
-              </button>
-            </div>
-          </div>
-        ) : (
-          <BitcoinChart data={chartData} />
-        )}
+        <BitcoinChart data={chartData} />
       </main>
 
       {/* Footer */}
@@ -155,7 +109,7 @@ export function BitcoinSentimentApp() {
           {dateRange}
         </span>
         <span className="text-white/20 text-xs font-mono">
-          Data: CoinGecko · Alternative.me
+          Data: CryptoCompare · Alternative.me
         </span>
       </footer>
     </div>
