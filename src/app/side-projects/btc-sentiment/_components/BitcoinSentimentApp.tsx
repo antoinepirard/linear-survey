@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BitcoinChart } from "./BitcoinChart";
 import { TimeRangeSelector } from "./TimeRangeSelector";
 import { ChartDataPoint, TimeRange } from "../_types";
-import { fetchChartData, fetchCurrentPrice } from "../_utils/api";
+import { fetchChartData, fetchCurrentPrice, clearCache } from "../_utils/api";
 import {
   formatPrice,
   formatChange,
@@ -21,36 +21,26 @@ export function BitcoinSentimentApp() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Cache for different time ranges
-  const dataCache = useRef<Map<TimeRange, ChartDataPoint[]>>(new Map());
-
   // Get the most recent Fear & Greed value from chart data
   const currentFearGreed = chartData.length > 0 
     ? chartData[chartData.length - 1].fearGreedValue 
     : null;
 
   const loadData = useCallback(async (forceRefresh = false) => {
-    // Check cache first
-    if (!forceRefresh && dataCache.current.has(timeRange)) {
-      setChartData(dataCache.current.get(timeRange)!);
-      setIsLoading(false);
-      setError(null);
-      return;
+    if (forceRefresh) {
+      clearCache();
     }
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const [data, priceData] = await Promise.all([
-        fetchChartData(timeRange),
-        fetchCurrentPrice(),
-      ]);
-
-      // Cache the data
-      dataCache.current.set(timeRange, data);
-      
+      // Fetch chart data (uses internal cache - only hits API on first load)
+      const data = await fetchChartData(timeRange);
       setChartData(data);
+
+      // Fetch current price
+      const priceData = await fetchCurrentPrice();
       setCurrentPrice(priceData.price);
       setPriceChange(priceData.change24h);
     } catch (err) {
