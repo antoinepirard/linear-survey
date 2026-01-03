@@ -41,8 +41,28 @@ function formatAxisDate(date: string, timeRange: TimeRange): string {
       return d.toLocaleDateString("en-US", { month: "short", year: "2-digit" }).replace(" ", " '");
     case "5y":
     case "max":
-      // Long ranges: "2024" or "Q1 '24"
-      return d.toLocaleDateString("en-US", { year: "numeric" });
+      // Long ranges: "Q1 '24"
+      const quarter = Math.floor(d.getMonth() / 3) + 1;
+      const year = d.getFullYear().toString().slice(-2);
+      return `Q${quarter} '${year}`;
+  }
+}
+
+// Get appropriate tick gap based on time range
+function getMinTickGap(timeRange: TimeRange): number {
+  switch (timeRange) {
+    case "30d":
+      return 50;
+    case "90d":
+      return 60;
+    case "1y":
+      return 70;
+    case "2y":
+    case "3y":
+      return 80;
+    case "5y":
+    case "max":
+      return 100;
   }
 }
 
@@ -194,7 +214,7 @@ export function BitcoinChart({ data, allData, timeRange }: BitcoinChartProps) {
           tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "monospace" }}
           tickFormatter={(date) => formatAxisDate(date, timeRange)}
           interval="preserveStartEnd"
-          minTickGap={80}
+          minTickGap={getMinTickGap(timeRange)}
         />
 
         <YAxis domain={yDomain} hide />
