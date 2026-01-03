@@ -106,37 +106,41 @@ function CustomTooltip({
       </div>
       
       {/* Forward returns */}
-      {(forwardReturns.return30d !== null || forwardReturns.return90d !== null) && (
-        <div className="mt-2 pt-2 border-t border-white/10">
-          <p className="text-white/30 text-[10px] font-mono mb-1">Return after:</p>
-          <div className="flex gap-3 text-xs font-mono">
-            {forwardReturns.return30d !== null && (
-              <div>
-                <span className="text-white/40">30d: </span>
-                <span className={forwardReturns.return30d >= 0 ? "text-green-400" : "text-red-400"}>
-                  {forwardReturns.return30d >= 0 ? "+" : ""}{forwardReturns.return30d.toFixed(0)}%
-                </span>
-              </div>
+      <div className="mt-2 pt-2 border-t border-white/10">
+        <p className="text-white/30 text-[10px] font-mono mb-1">Return after:</p>
+        <div className="flex gap-3 text-xs font-mono">
+          <div>
+            <span className="text-white/40">30d: </span>
+            {forwardReturns.return30d !== null ? (
+              <span className={forwardReturns.return30d >= 0 ? "text-green-400" : "text-red-400"}>
+                {forwardReturns.return30d >= 0 ? "+" : ""}{forwardReturns.return30d.toFixed(0)}%
+              </span>
+            ) : (
+              <span className="text-white/20">—</span>
             )}
-            {forwardReturns.return90d !== null && (
-              <div>
-                <span className="text-white/40">90d: </span>
-                <span className={forwardReturns.return90d >= 0 ? "text-green-400" : "text-red-400"}>
-                  {forwardReturns.return90d >= 0 ? "+" : ""}{forwardReturns.return90d.toFixed(0)}%
-                </span>
-              </div>
+          </div>
+          <div>
+            <span className="text-white/40">90d: </span>
+            {forwardReturns.return90d !== null ? (
+              <span className={forwardReturns.return90d >= 0 ? "text-green-400" : "text-red-400"}>
+                {forwardReturns.return90d >= 0 ? "+" : ""}{forwardReturns.return90d.toFixed(0)}%
+              </span>
+            ) : (
+              <span className="text-white/20">—</span>
             )}
-            {forwardReturns.return1y !== null && (
-              <div>
-                <span className="text-white/40">1y: </span>
-                <span className={forwardReturns.return1y >= 0 ? "text-green-400" : "text-red-400"}>
-                  {forwardReturns.return1y >= 0 ? "+" : ""}{forwardReturns.return1y.toFixed(0)}%
-                </span>
-              </div>
+          </div>
+          <div>
+            <span className="text-white/40">1y: </span>
+            {forwardReturns.return1y !== null ? (
+              <span className={forwardReturns.return1y >= 0 ? "text-green-400" : "text-red-400"}>
+                {forwardReturns.return1y >= 0 ? "+" : ""}{forwardReturns.return1y.toFixed(0)}%
+              </span>
+            ) : (
+              <span className="text-white/20">—</span>
             )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
