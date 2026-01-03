@@ -26,9 +26,13 @@ export async function GET(request: Request) {
     );
 
     if (response.status === 429) {
+      // Don't cache rate limit errors
       return NextResponse.json(
         { error: "Rate limited. Please wait a moment and try again." },
-        { status: 429 }
+        { 
+          status: 429,
+          headers: { 'Cache-Control': 'no-store' }
+        }
       );
     }
 
