@@ -40,6 +40,12 @@ export const sideProjectHighlights = [
     href: "https://www.ravell.io",
   },
   {
+    title: "BTC Sentiment",
+    description: "Bitcoin price chart colored by Fear & Greed sentiment.",
+    category: "SIDE PROJECT",
+    href: "/side-projects/btc-sentiment",
+  },
+  {
     title: "Conviction",
     description: "Real-time voting rooms for quick team decisions. Timeboxed 2h project.",
     category: "SIDE PROJECT",
