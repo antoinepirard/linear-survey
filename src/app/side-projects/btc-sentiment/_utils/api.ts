@@ -23,14 +23,8 @@ function getDaysForRange(range: TimeRange): number {
     case "5y":
       return 1825;
     case "max":
-      return 3650;
+      return 2500; // ~7 years, safe for CoinGecko
   }
-}
-
-// Filter data to a specific time range
-function filterByDays<T extends { timestamp: number }>(data: T[], days: number): T[] {
-  const cutoffTime = Date.now() - days * 24 * 60 * 60 * 1000;
-  return data.filter((d) => d.timestamp >= cutoffTime);
 }
 
 // Sample data to reduce points for chart performance
@@ -52,21 +46,31 @@ function sampleData<T>(data: T[], maxPoints: number): T[] {
   return sampled;
 }
 
-// Cache for the full dataset (fetched once)
-let pricesCache: BitcoinPricePoint[] | null = null;
-let fearGreedCache: FearGreedDataPoint[] | null = null;
-let cacheTimestamp: number = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+// Per-range cache
+const cache = new Map<TimeRange, {
+  prices: BitcoinPricePoint[];
+  fearGreed: FearGreedDataPoint[];
+  timestamp: number;
+}>();
 
-// Fetch all Bitcoin price history (max range) - called once
-async function fetchAllBitcoinPrices(): Promise<BitcoinPricePoint[]> {
-  // Return cached if fresh
-  if (pricesCache && Date.now() - cacheTimestamp < CACHE_DURATION) {
-    return pricesCache;
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
+// Check if cache is valid
+function isCacheValid(range: TimeRange): boolean {
+  const cached = cache.get(range);
+  if (!cached) return false;
+  return Date.now() - cached.timestamp < CACHE_DURATION;
+}
+
+// Fetch Bitcoin prices for a specific range
+export async function fetchBitcoinPrices(range: TimeRange): Promise<BitcoinPricePoint[]> {
+  // Check cache
+  if (isCacheValid(range)) {
+    return cache.get(range)!.prices;
   }
 
-  // Fetch max range (will get ~2000 daily points)
-  const response = await fetch(`/api/btc-sentiment/prices?days=max`);
+  const days = getDaysForRange(range);
+  const response = await fetch(`/api/btc-sentiment/prices?days=${days}`);
   
   if (!response.ok) {
     if (response.status === 429) {
@@ -81,24 +85,25 @@ async function fetchAllBitcoinPrices(): Promise<BitcoinPricePoint[]> {
     throw new Error(data.error as string);
   }
 
-  pricesCache = data.prices.map(([timestamp, price]) => ({
+  const prices = data.prices.map(([timestamp, price]) => ({
     timestamp,
     price,
   }));
-  cacheTimestamp = Date.now();
-  
-  return pricesCache;
+
+  // Sample based on time range
+  const maxPoints = range === "30d" ? 30 : range === "90d" ? 90 : 200;
+  return sampleData(prices, maxPoints);
 }
 
-// Fetch all Fear & Greed history - called once
-async function fetchAllFearGreed(): Promise<FearGreedDataPoint[]> {
-  // Return cached if fresh
-  if (fearGreedCache && Date.now() - cacheTimestamp < CACHE_DURATION) {
-    return fearGreedCache;
+// Fetch Fear & Greed for a specific range
+export async function fetchFearGreedIndex(range: TimeRange): Promise<FearGreedDataPoint[]> {
+  // Check cache
+  if (isCacheValid(range)) {
+    return cache.get(range)!.fearGreed;
   }
 
-  // Fetch max available (~2500 days)
-  const response = await fetch(`/api/btc-sentiment/fear-greed?limit=2500`);
+  const days = getDaysForRange(range);
+  const response = await fetch(`/api/btc-sentiment/fear-greed?limit=${days}`);
   
   if (!response.ok) {
     throw new Error(`API error: ${response.status}`);
@@ -106,27 +111,11 @@ async function fetchAllFearGreed(): Promise<FearGreedDataPoint[]> {
 
   const data: AlternativeMeFngResponse = await response.json();
 
-  fearGreedCache = data.data.map((item) => ({
+  return data.data.map((item) => ({
     timestamp: parseInt(item.timestamp) * 1000,
     value: parseInt(item.value),
     classification: item.value_classification,
   }));
-  
-  return fearGreedCache;
-}
-
-// Get Bitcoin prices for a specific range (from cache)
-export async function fetchBitcoinPrices(range: TimeRange): Promise<BitcoinPricePoint[]> {
-  const allPrices = await fetchAllBitcoinPrices();
-  const days = getDaysForRange(range);
-  return filterByDays(allPrices, days);
-}
-
-// Get Fear & Greed for a specific range (from cache)
-export async function fetchFearGreedIndex(range: TimeRange): Promise<FearGreedDataPoint[]> {
-  const allFearGreed = await fetchAllFearGreed();
-  const days = getDaysForRange(range);
-  return filterByDays(allFearGreed, days);
 }
 
 // Merge Bitcoin prices with Fear & Greed data by date
@@ -142,7 +131,7 @@ export function mergeChartData(
   });
 
   // Merge with price data
-  const merged = prices
+  return prices
     .map((price) => {
       const dateKey = new Date(price.timestamp).toISOString().split("T")[0];
       const fg = fgMap.get(dateKey);
@@ -156,9 +145,6 @@ export function mergeChartData(
       };
     })
     .sort((a, b) => a.timestamp - b.timestamp);
-
-  // Sample for chart performance (max 300 points)
-  return sampleData(merged, 300);
 }
 
 // Fetch chart data for a specific range
@@ -167,6 +153,13 @@ export async function fetchChartData(range: TimeRange): Promise<ChartDataPoint[]
     fetchBitcoinPrices(range),
     fetchFearGreedIndex(range),
   ]);
+
+  // Cache the results
+  cache.set(range, {
+    prices,
+    fearGreed,
+    timestamp: Date.now(),
+  });
 
   return mergeChartData(prices, fearGreed);
 }
@@ -189,9 +182,7 @@ export async function fetchCurrentPrice(): Promise<{
   };
 }
 
-// Clear cache (useful for manual refresh)
+// Clear cache
 export function clearCache() {
-  pricesCache = null;
-  fearGreedCache = null;
-  cacheTimestamp = 0;
+  cache.clear();
 }
