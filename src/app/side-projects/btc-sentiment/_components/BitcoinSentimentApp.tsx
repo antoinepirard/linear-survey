@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { BitcoinChart } from "./BitcoinChart";
 import { TimeRangeSelector } from "./TimeRangeSelector";
 import { SentimentStats, BuySignal } from "./SentimentStats";
-import { ChartDataPoint, TimeRange } from "../_types";
+import { TimeRange } from "../_types";
 import { getChartData, fetchCurrentPrice } from "../_utils/api";
 import {
   formatPrice,
