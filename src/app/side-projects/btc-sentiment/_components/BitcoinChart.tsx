@@ -233,6 +233,9 @@ export function BitcoinChart({ data, allData, timeRange }: BitcoinChartProps) {
           stroke="url(#sentimentGradient)"
           strokeWidth={2}
           fill="url(#fillGradient)"
+          animationDuration={1000}
+          animationEasing="ease-out"
+          baseValue={yDomain[0]}
         />
       </AreaChart>
     </ResponsiveContainer>
