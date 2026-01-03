@@ -54,10 +54,17 @@ export async function fetchBitcoinPrices(
   const response = await fetch(`/api/btc-sentiment/prices?days=${days}`);
   
   if (!response.ok) {
+    if (response.status === 429) {
+      throw new Error("429: Rate limited");
+    }
     throw new Error(`API error: ${response.status}`);
   }
 
   const data: CoinGeckoMarketChartResponse = await response.json();
+  
+  if (data.error) {
+    throw new Error(data.error as string);
+  }
 
   const prices = data.prices.map(([timestamp, price]) => ({
     timestamp,

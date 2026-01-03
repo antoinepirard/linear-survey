@@ -5,6 +5,14 @@ const ALTERNATIVE_ME_BASE_URL = "https://api.alternative.me/fng";
 // Fear & Greed Index started Feb 1, 2018 - max ~2500 days of data
 const MAX_FNG_DAYS = 2500;
 
+// Cache duration based on limit
+function getCacheDuration(limit: number): number {
+  if (limit <= 30) return 300; // 5 minutes
+  if (limit <= 90) return 900; // 15 minutes
+  if (limit <= 365) return 3600; // 1 hour
+  return 7200; // 2 hours for long ranges
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const requestedLimit = parseInt(searchParams.get("limit") || "90", 10);
@@ -19,7 +27,7 @@ export async function GET(request: Request) {
         headers: {
           Accept: "application/json",
         },
-        next: { revalidate: 3600 }, // Cache for 1 hour
+        next: { revalidate: getCacheDuration(limit) },
       }
     );
 

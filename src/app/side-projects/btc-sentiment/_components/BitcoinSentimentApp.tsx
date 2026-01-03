@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { BitcoinChart } from "./BitcoinChart";
 import { TimeRangeSelector } from "./TimeRangeSelector";
 import { ChartDataPoint, TimeRange } from "../_types";
@@ -21,12 +21,23 @@ export function BitcoinSentimentApp() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Cache for different time ranges
+  const dataCache = useRef<Map<TimeRange, ChartDataPoint[]>>(new Map());
+
   // Get the most recent Fear & Greed value from chart data
   const currentFearGreed = chartData.length > 0 
     ? chartData[chartData.length - 1].fearGreedValue 
     : null;
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (forceRefresh = false) => {
+    // Check cache first
+    if (!forceRefresh && dataCache.current.has(timeRange)) {
+      setChartData(dataCache.current.get(timeRange)!);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -36,12 +47,21 @@ export function BitcoinSentimentApp() {
         fetchCurrentPrice(),
       ]);
 
+      // Cache the data
+      dataCache.current.set(timeRange, data);
+      
       setChartData(data);
       setCurrentPrice(priceData.price);
       setPriceChange(priceData.change24h);
     } catch (err) {
       console.error("Failed to fetch data:", err);
-      setError("Failed to load data. Please try again.");
+      const errorMessage = err instanceof Error ? err.message : "Failed to load data";
+      
+      if (errorMessage.includes("429")) {
+        setError("Rate limited. Please wait a moment and try again.");
+      } else {
+        setError("Failed to load data. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -125,9 +145,9 @@ export function BitcoinSentimentApp() {
         ) : error ? (
           <div className="w-full h-full flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
-              <span className="text-red-500/80 text-sm font-mono">{error}</span>
+              <span className="text-red-500/80 text-sm font-mono text-center max-w-xs">{error}</span>
               <button
-                onClick={loadData}
+                onClick={() => loadData(true)}
                 className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/60 text-xs font-mono rounded transition-colors"
               >
                 Retry
