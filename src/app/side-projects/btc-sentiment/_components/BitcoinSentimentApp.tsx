@@ -3,10 +3,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { BitcoinChart } from "./BitcoinChart";
 import { TimeRangeSelector } from "./TimeRangeSelector";
-import { SentimentStats, HistoricalContext } from "./SentimentStats";
+import { SentimentStats, BuySignal } from "./SentimentStats";
 import { ChartDataPoint, TimeRange } from "../_types";
 import { getChartData, fetchCurrentPrice } from "../_utils/api";
-import { getHistoricalReturnForSentiment } from "../_utils/analytics";
 import {
   formatPrice,
   formatChange,
@@ -32,12 +31,6 @@ export function BitcoinSentimentApp() {
       ? chartData[chartData.length - 1].fearGreedValue
       : null;
 
-  // Get historical context for current sentiment
-  const historicalContext = useMemo(() => {
-    if (currentFearGreed === null) return null;
-    return getHistoricalReturnForSentiment(allChartData, currentFearGreed, 90);
-  }, [allChartData, currentFearGreed]);
-
   // Only fetch current price (the one API call we need)
   useEffect(() => {
     fetchCurrentPrice()
@@ -48,17 +41,11 @@ export function BitcoinSentimentApp() {
       .catch(console.error);
   }, []);
 
-  // Get date range for footer
-  const dateRange =
-    chartData.length > 0
-      ? `${chartData[0].date} — ${chartData[chartData.length - 1].date}`
-      : "";
-
   return (
     <div className="h-screen bg-zinc-950 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="flex-shrink-0 flex items-start justify-between p-4 md:p-6">
-        {/* Left: Bitcoin price */}
+        {/* Left: Bitcoin price + Buy signal */}
         <div>
           <div className="flex items-baseline gap-2">
             <span className="text-white/40 text-xs font-mono uppercase tracking-wider">
@@ -66,20 +53,26 @@ export function BitcoinSentimentApp() {
             </span>
           </div>
           {currentPrice !== null ? (
-            <div className="flex items-baseline gap-3 mt-1">
-              <span className="text-white text-2xl md:text-3xl font-mono font-semibold">
-                {formatPrice(currentPrice)}
-              </span>
-              {priceChange !== null && (
-                <span
-                  className={`text-sm font-mono ${
-                    priceChange >= 0 ? "text-green-500" : "text-red-500"
-                  }`}
-                >
-                  {formatChange(priceChange)}
+            <>
+              <div className="flex items-baseline gap-3 mt-1">
+                <span className="text-white text-2xl md:text-3xl font-mono font-semibold">
+                  {formatPrice(currentPrice)}
                 </span>
+                {priceChange !== null && (
+                  <span
+                    className={`text-sm font-mono ${
+                      priceChange >= 0 ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {formatChange(priceChange)}
+                  </span>
+                )}
+              </div>
+              {/* Buy signal based on F&G */}
+              {currentFearGreed !== null && (
+                <BuySignal fearGreedValue={currentFearGreed} />
               )}
-            </div>
+            </>
           ) : (
             <div className="h-9 w-32 bg-white/5 rounded animate-pulse mt-1" />
           )}
@@ -87,33 +80,23 @@ export function BitcoinSentimentApp() {
 
         {/* Right: Fear & Greed + Time selector */}
         <div className="flex flex-col items-end gap-3">
-          {/* Fear & Greed indicator with historical context */}
+          {/* Fear & Greed indicator */}
           {currentFearGreed !== null && (
-            <div className="flex flex-col items-end">
-              <div className="flex items-center gap-2">
-                <span className="text-white/40 text-xs font-mono uppercase tracking-wider">
-                  F&G
-                </span>
-                <div
-                  className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: getColorFromValue(currentFearGreed) }}
-                />
-                <span
-                  className="text-sm font-mono font-medium"
-                  style={{ color: getColorFromValue(currentFearGreed) }}
-                >
-                  {currentFearGreed} ·{" "}
-                  {getSentimentLabel(getSentimentLevel(currentFearGreed))}
-                </span>
-              </div>
-              {/* Historical context */}
-              {historicalContext && (
-                <HistoricalContext
-                  currentFearGreed={currentFearGreed}
-                  historicalReturn={historicalContext.avgReturn}
-                  sampleCount={historicalContext.sampleCount}
-                />
-              )}
+            <div className="flex items-center gap-2">
+              <span className="text-white/40 text-xs font-mono uppercase tracking-wider">
+                F&G
+              </span>
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: getColorFromValue(currentFearGreed) }}
+              />
+              <span
+                className="text-sm font-mono font-medium"
+                style={{ color: getColorFromValue(currentFearGreed) }}
+              >
+                {currentFearGreed} ·{" "}
+                {getSentimentLabel(getSentimentLevel(currentFearGreed))}
+              </span>
             </div>
           )}
 
