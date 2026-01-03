@@ -14,7 +14,7 @@ import {
 } from "../_utils/sentiment";
 
 export function BitcoinSentimentApp() {
-  const [timeRange, setTimeRange] = useState<TimeRange>("90d");
+  const [timeRange, setTimeRange] = useState<TimeRange>("1y");
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [priceChange, setPriceChange] = useState<number | null>(null);

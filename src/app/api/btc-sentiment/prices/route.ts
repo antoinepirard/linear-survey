@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 
 const COINGECKO_BASE_URL = "https://api.coingecko.com/api/v3";
 
-// Cache duration based on time range
+// Cache duration based on time range (aggressive caching since data is daily)
 function getCacheDuration(days: number): number {
-  if (days <= 30) return 300; // 5 min for short ranges
-  if (days <= 90) return 600; // 10 min
-  if (days <= 365) return 1800; // 30 min
-  return 3600; // 1 hour for long ranges
+  if (days <= 30) return 600; // 10 min for short ranges
+  if (days <= 90) return 1800; // 30 min
+  if (days <= 365) return 3600; // 1 hour
+  return 7200; // 2 hours for long ranges (data is daily anyway)
 }
 
 export async function GET(request: Request) {
