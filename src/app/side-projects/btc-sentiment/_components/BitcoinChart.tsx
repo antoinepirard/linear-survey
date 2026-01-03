@@ -107,7 +107,7 @@ export function BitcoinChart({ data }: BitcoinChartProps) {
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart
         data={data}
-        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+        margin={{ top: 10, right: 0, bottom: 30, left: 0 }}
       >
         <defs>
           <linearGradient id="sentimentGradient" x1="0" y1="0" x2="1" y2="0">
@@ -133,17 +133,10 @@ export function BitcoinChart({ data }: BitcoinChartProps) {
           tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "monospace" }}
           tickFormatter={formatChartDate}
           interval="preserveStartEnd"
-          minTickGap={60}
+          minTickGap={80}
         />
 
-        <YAxis
-          domain={yDomain}
-          axisLine={false}
-          tickLine={false}
-          tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "monospace" }}
-          tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-          width={50}
-        />
+        <YAxis domain={yDomain} hide />
 
         <Tooltip
           content={<CustomTooltip />}

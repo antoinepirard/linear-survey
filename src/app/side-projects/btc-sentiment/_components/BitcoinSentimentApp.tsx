@@ -113,8 +113,8 @@ export function BitcoinSentimentApp() {
         </div>
       </header>
 
-      {/* Chart area - takes remaining space */}
-      <main className="flex-1 min-h-0 px-2 md:px-4 pb-2">
+      {/* Chart area - takes remaining space, full width */}
+      <main className="flex-1 min-h-0">
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
