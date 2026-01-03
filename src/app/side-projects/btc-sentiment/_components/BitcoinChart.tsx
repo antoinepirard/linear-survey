@@ -8,7 +8,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  ReferenceArea,
 } from "recharts";
 import { ChartDataPoint } from "../_types";
 import {
@@ -19,7 +18,7 @@ import {
   getSentimentLevel,
   getSentimentLabel,
 } from "../_utils/sentiment";
-import { findExtremeFearZones, getForwardReturns } from "../_utils/analytics";
+import { getForwardReturns } from "../_utils/analytics";
 
 interface BitcoinChartProps {
   data: ChartDataPoint[];
@@ -136,9 +135,6 @@ export function BitcoinChart({ data, allData }: BitcoinChartProps) {
     return [Math.floor(min - padding), Math.ceil(max + padding)];
   }, [data]);
 
-  // Find extreme fear zones for highlighting
-  const extremeFearZones = useMemo(() => findExtremeFearZones(data), [data]);
-
   if (data.length === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -169,18 +165,6 @@ export function BitcoinChart({ data, allData }: BitcoinChartProps) {
             <stop offset="100%" stopColor={dominantColor} stopOpacity={0} />
           </linearGradient>
         </defs>
-
-        {/* Extreme fear zones as background highlights */}
-        {extremeFearZones.map((zone, index) => (
-          <ReferenceArea
-            key={index}
-            x1={zone.start}
-            x2={zone.end}
-            fill="#dc2626"
-            fillOpacity={0.08}
-            stroke="none"
-          />
-        ))}
 
         <XAxis
           dataKey="date"
