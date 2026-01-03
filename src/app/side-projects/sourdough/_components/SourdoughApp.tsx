@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { ScaleIcon } from "@heroicons/react/24/outline";
+import { Bread } from "@phosphor-icons/react";
 import { FlourType, FLOUR_CONFIGS, DoughInputs } from "../_types";
 import { calculateDoughRecipe } from "../_utils/calculations";
 
@@ -10,7 +11,9 @@ const FLOUR_TYPES = Object.values(FLOUR_CONFIGS);
 export function SourdoughApp() {
   const [targetWeight, setTargetWeight] = useState(1000);
   const [flourType, setFlourType] = useState<FlourType>("t65");
-  const [hydration, setHydration] = useState(FLOUR_CONFIGS.t65.defaultHydration);
+  const [hydration, setHydration] = useState(
+    FLOUR_CONFIGS.t65.defaultHydration
+  );
   const [starterPercentage, setStarterPercentage] = useState(20);
   const [saltPercentage, setSaltPercentage] = useState(2);
 
@@ -45,14 +48,8 @@ export function SourdoughApp() {
       <div className="max-w-lg mx-auto px-4">
         {/* Header Icon */}
         <div className="flex justify-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-amber-100 flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-amber-700"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2C8.5 2 5.5 3.5 4 6c-1.5 2.5-1 5.5.5 7.5 1 1.5 2 2.5 2 4.5v2c0 1.1.9 2 2 2h7c1.1 0 2-.9 2-2v-2c0-2 1-3 2-4.5 1.5-2 2-5-.5-7.5C17.5 3.5 15.5 2 12 2zm-2.5 4c.83 0 1.5.67 1.5 1.5S10.33 9 9.5 9 8 8.33 8 7.5 8.67 6 9.5 6zm5 0c.83 0 1.5.67 1.5 1.5S15.33 9 14.5 9 13 8.33 13 7.5s.67-1.5 1.5-1.5zM12 11c1.38 0 2.5.9 2.5 2h-5c0-1.1 1.12-2 2.5-2z" />
-            </svg>
+          <div className="w-14 h-14 rounded-2xl bg-stone-900 flex items-center justify-center">
+            <Bread className="w-8 h-8 text-white" weight="fill" />
           </div>
         </div>
 
@@ -111,7 +108,8 @@ export function SourdoughApp() {
               Hydration
             </label>
             <p className="text-xs text-stone-400 mb-3">
-              Recommended: {flourConfig.minHydration}–{flourConfig.maxHydration}% for {flourConfig.label}
+              Recommended: {flourConfig.minHydration}–{flourConfig.maxHydration}
+              % for {flourConfig.label}
             </p>
             <div className="flex items-center gap-4">
               <input
@@ -192,7 +190,7 @@ export function SourdoughApp() {
           <h2 className="text-sm font-medium text-stone-500 mb-4 uppercase tracking-wide">
             Your Recipe
           </h2>
-          
+
           <div className="space-y-4">
             <RecipeRow label="Flour" value={recipe.flour} unit="g" accent />
             <RecipeRow label="Water" value={recipe.water} unit="g" />
@@ -241,11 +239,14 @@ function RecipeRow({ label, value, unit, accent }: RecipeRowProps) {
         >
           {value}
         </span>
-        <span className={`text-sm ml-0.5 ${accent ? "text-amber-600" : "text-stone-500"}`}>
+        <span
+          className={`text-sm ml-0.5 ${
+            accent ? "text-amber-600" : "text-stone-500"
+          }`}
+        >
           {unit}
         </span>
       </div>
     </div>
   );
 }
-
