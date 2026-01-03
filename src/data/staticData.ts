@@ -51,6 +51,12 @@ export const sideProjectHighlights = [
     category: "SIDE PROJECT",
     href: "/side-projects/recipe-checker",
   },
+  {
+    title: "Sourdough Calculator",
+    description: "Calculate flour, water, starter, and salt for your perfect loaf.",
+    category: "SIDE PROJECT",
+    href: "/side-projects/sourdough",
+  },
 ];
 
 // Combined for backward compatibility
