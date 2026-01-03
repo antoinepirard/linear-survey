@@ -7,7 +7,9 @@ export interface SentimentStats {
   avgReturn30d: number;
   avgReturn90d: number;
   avgReturn1y: number;
+  winRate1y: number; // % of times buying led to profit after 1 year
   sampleCount: number;
+  sampleCount1y: number; // Sample count for 1Y calculations
   color: string;
 }
 
@@ -92,6 +94,10 @@ export function calculateSentimentStats(data: ChartDataPoint[]): SentimentStats[
   const avg = (arr: number[]) =>
     arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
 
+  // Win rate = % of times return was positive
+  const winRate = (arr: number[]) =>
+    arr.length > 0 ? (arr.filter((r) => r > 0).length / arr.length) * 100 : 0;
+
   const colors: Record<SentimentLevel, string> = {
     "extreme-fear": "#dc2626",
     fear: "#f97316",
@@ -116,7 +122,9 @@ export function calculateSentimentStats(data: ChartDataPoint[]): SentimentStats[
     avgReturn30d: avg(buckets[level].returns30d),
     avgReturn90d: avg(buckets[level].returns90d),
     avgReturn1y: avg(buckets[level].returns1y),
+    winRate1y: winRate(buckets[level].returns1y),
     sampleCount: buckets[level].returns90d.length,
+    sampleCount1y: buckets[level].returns1y.length,
     color: colors[level],
   }));
 }

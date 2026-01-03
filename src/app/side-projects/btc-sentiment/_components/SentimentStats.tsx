@@ -5,7 +5,6 @@ import { ChartDataPoint } from "../_types";
 import {
   calculateSentimentStats,
   calculateCorrelation,
-  SentimentStats as Stats,
 } from "../_utils/analytics";
 
 interface SentimentStatsProps {
@@ -19,52 +18,79 @@ function formatReturn(value: number): string {
 
 export function SentimentStats({ data }: SentimentStatsProps) {
   const stats = useMemo(() => calculateSentimentStats(data), [data]);
-  const correlation = useMemo(() => calculateCorrelation(data, 90), [data]);
+  const correlation = useMemo(() => calculateCorrelation(data, 365), [data]);
 
-  // Only show extreme fear, fear, greed, extreme greed (skip neutral)
-  const relevantStats = stats.filter(
-    (s) => s.level !== "neutral" && s.sampleCount > 10
-  );
+  // Only show extreme fear and extreme greed for cleaner comparison
+  const fearStats = stats.find((s) => s.level === "extreme-fear");
+  const greedStats = stats.find((s) => s.level === "extreme-greed");
+
+  if (!fearStats || !greedStats) return null;
 
   return (
-    <div className="flex items-center gap-4">
-      {/* Stats by sentiment */}
-      <div className="flex items-center gap-1">
-        <span className="text-white/30 text-[10px] font-mono mr-1">
-          Avg 90d return:
-        </span>
-        {relevantStats.map((stat) => (
+    <div className="flex items-center gap-6 text-[10px] font-mono">
+      {/* Extreme Fear stats */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5">
           <div
-            key={stat.level}
-            className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5"
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: fearStats.color }}
+          />
+          <span className="text-white/50">Extreme Fear</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-white/30">1Y return:</span>
+          <span
+            className={`font-medium ${
+              fearStats.avgReturn1y >= 0 ? "text-green-400" : "text-red-400"
+            }`}
           >
-            <div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: stat.color }}
-            />
-            <span className="text-white/40 text-[10px] font-mono">
-              {stat.level === "extreme-fear"
-                ? "XF"
-                : stat.level === "fear"
-                ? "F"
-                : stat.level === "greed"
-                ? "G"
-                : "XG"}
-            </span>
-            <span
-              className={`text-[10px] font-mono font-medium ${
-                stat.avgReturn90d >= 0 ? "text-green-400" : "text-red-400"
-              }`}
-            >
-              {formatReturn(stat.avgReturn90d)}
-            </span>
-          </div>
-        ))}
+            {formatReturn(fearStats.avgReturn1y)}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-white/30">Win rate:</span>
+          <span className="font-medium text-green-400">
+            {fearStats.winRate1y.toFixed(0)}%
+          </span>
+        </div>
       </div>
 
-      {/* Correlation indicator */}
-      <div className="flex items-center gap-1.5 text-[10px] font-mono">
-        <span className="text-white/30">Correlation:</span>
+      <span className="text-white/20">vs</span>
+
+      {/* Extreme Greed stats */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5">
+          <div
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: greedStats.color }}
+          />
+          <span className="text-white/50">Extreme Greed</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-white/30">1Y return:</span>
+          <span
+            className={`font-medium ${
+              greedStats.avgReturn1y >= 0 ? "text-green-400" : "text-red-400"
+            }`}
+          >
+            {formatReturn(greedStats.avgReturn1y)}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-white/30">Win rate:</span>
+          <span
+            className={`font-medium ${
+              greedStats.winRate1y >= 50 ? "text-green-400" : "text-red-400"
+            }`}
+          >
+            {greedStats.winRate1y.toFixed(0)}%
+          </span>
+        </div>
+      </div>
+
+      {/* Correlation */}
+      <div className="flex items-center gap-1.5 text-white/30 border-l border-white/10 pl-4">
+        <span>1Y Correlation:</span>
         <span
           className={`font-medium ${
             correlation < -0.1
@@ -107,4 +133,3 @@ export function HistoricalContext({
     </div>
   );
 }
-
