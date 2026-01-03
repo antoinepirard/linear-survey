@@ -9,11 +9,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { ChartDataPoint } from "../_types";
+import { ChartDataPoint, TimeRange } from "../_types";
 import {
   getColorFromValue,
   formatPrice,
-  formatChartDate,
   formatTooltipDate,
   getSentimentLevel,
   getSentimentLabel,
@@ -23,6 +22,28 @@ import { getForwardReturns } from "../_utils/analytics";
 interface BitcoinChartProps {
   data: ChartDataPoint[];
   allData: ChartDataPoint[]; // Full dataset for forward return calculations
+  timeRange: TimeRange;
+}
+
+// Smart date formatter based on time range
+function formatAxisDate(date: string, timeRange: TimeRange): string {
+  const d = new Date(date);
+  
+  switch (timeRange) {
+    case "30d":
+    case "90d":
+    case "1y":
+      // Short ranges: "Jan 4"
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    case "2y":
+    case "3y":
+      // Medium ranges: "Jan '24"
+      return d.toLocaleDateString("en-US", { month: "short", year: "2-digit" }).replace(" ", " '");
+    case "5y":
+    case "max":
+      // Long ranges: "2024" or "Q1 '24"
+      return d.toLocaleDateString("en-US", { year: "numeric" });
+  }
 }
 
 // Custom tooltip component with forward returns
@@ -100,7 +121,7 @@ function CustomTooltip({
   );
 }
 
-export function BitcoinChart({ data, allData }: BitcoinChartProps) {
+export function BitcoinChart({ data, allData, timeRange }: BitcoinChartProps) {
   // Calculate gradient stops based on sentiment values
   const gradientStops = useMemo(() => {
     if (data.length === 0) return [];
@@ -171,7 +192,7 @@ export function BitcoinChart({ data, allData }: BitcoinChartProps) {
           axisLine={false}
           tickLine={false}
           tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "monospace" }}
-          tickFormatter={formatChartDate}
+          tickFormatter={(date) => formatAxisDate(date, timeRange)}
           interval="preserveStartEnd"
           minTickGap={80}
         />
