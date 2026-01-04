@@ -40,6 +40,12 @@ export const sideProjectHighlights = [
     href: "https://www.ravell.io",
   },
   {
+    title: "Antoine's Manual",
+    description: "An instruction manual for working with me.",
+    category: "SIDE PROJECT",
+    href: "/side-projects/antoines-manual",
+  },
+  {
     title: "BTC Sentiment",
     description: "Bitcoin price chart colored by Fear & Greed sentiment.",
     category: "SIDE PROJECT",
