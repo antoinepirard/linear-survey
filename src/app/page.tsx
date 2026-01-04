@@ -10,7 +10,7 @@ import HeaderSection from "@/components/HeaderSection";
 import ProjectsGrid from "@/components/ProjectsGrid";
 import CaseStudyGate from "@/components/CaseStudyGate";
 import { AnimationWrapper } from "@/hooks/useAnimation";
-import { workHighlights, sideProjectHighlights } from "@/data/staticData";
+import { workHighlights } from "@/data/staticData";
 import { Button } from "@/components/ui/button";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 
@@ -30,7 +30,6 @@ const PhotoModal = dynamic(() => import("@/components/PhotoModal"), {
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"work" | "sideProjects">("work");
 
   // Log folio info once on load
   useEffect(() => {
@@ -187,52 +186,14 @@ export default function Home() {
                 <ProjectsGrid />
               </AnimationWrapper>
 
-              {/* Tabs */}
-              <AnimationWrapper delay="440ms" className="mb-4">
-                <div className="flex gap-1 p-1 bg-slate-50 rounded-lg w-fit">
-                  <button
-                    onClick={() => setActiveTab("work")}
-                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-150 ${
-                      activeTab === "work"
-                        ? "bg-white text-slate-900 shadow-sm"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    Work
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("sideProjects")}
-                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-150 ${
-                      activeTab === "sideProjects"
-                        ? "bg-white text-slate-900 shadow-sm"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    Side Projects
-                  </button>
-                </div>
-              </AnimationWrapper>
-
               {/* Highlights List */}
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeTab}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  <ListItem
-                    items={
-                      activeTab === "work"
-                        ? workHighlights
-                        : sideProjectHighlights
-                    }
-                    title=""
-                    animationDelay="0ms"
-                  />
-                </motion.div>
-              </AnimatePresence>
+              <AnimationWrapper delay="440ms">
+                <ListItem
+                  items={workHighlights}
+                  title=""
+                  animationDelay="0ms"
+                />
+              </AnimationWrapper>
 
               {/* Case Study Gate */}
               <AnimationWrapper delay="500ms">
