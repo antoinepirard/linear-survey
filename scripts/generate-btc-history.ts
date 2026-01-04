@@ -31,8 +31,8 @@ async function fetchBtcHistory(): Promise<DailyPrice[]> {
   let toTs = Math.floor(Date.now() / 1000);
   
   // Bitcoin started trading ~2010, but meaningful price data from ~2013
-  // Fear & Greed index started Feb 2018, so let's get data from Jan 2018
-  const startDate = new Date("2018-01-01").getTime() / 1000;
+  // Fear & Greed index started Feb 2018, but we want BTC prices from 2016 for "max" view
+  const startDate = new Date("2016-01-01").getTime() / 1000;
   
   while (toTs > startDate) {
     const url = `https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=2000&toTs=${toTs}`;

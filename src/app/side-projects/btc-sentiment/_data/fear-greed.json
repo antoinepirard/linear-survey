@@ -14448,5 +14448,10 @@
     "timestamp": 1767398400000,
     "value": 29,
     "classification": "Fear"
+  },
+  {
+    "timestamp": 1767484800000,
+    "value": 25,
+    "classification": "Extreme Fear"
   }
 ]
