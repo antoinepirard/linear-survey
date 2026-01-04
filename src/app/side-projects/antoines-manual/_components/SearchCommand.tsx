@@ -2,11 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Chapter } from "../_types";
 
 interface SearchResult {
@@ -69,13 +65,14 @@ export function SearchCommand({
           // Extract heading if it's a heading line
           const isHeading = line.startsWith("#");
           const cleanLine = line.replace(/^#+\s*/, "").replace(/\*\*/g, "");
-          
+
           if (cleanLine.trim()) {
             searchResults.push({
               chapterId: chapter.id,
               chapterNumber: chapter.number,
               chapterTitle: chapter.title,
-              matchText: cleanLine.slice(0, 80) + (cleanLine.length > 80 ? "..." : ""),
+              matchText:
+                cleanLine.slice(0, 80) + (cleanLine.length > 80 ? "..." : ""),
               matchType: isHeading ? "heading" : "content",
             });
             break; // Only show first match per chapter
@@ -127,11 +124,11 @@ export function SearchCommand({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
-        className="p-0 gap-0 max-w-md overflow-hidden"
+        className="p-0 gap-0 max-w-md overflow-hidden rounded-2xl border-none shadow-none"
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">Search manual</DialogTitle>
-        
+
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-stone-100">
           <MagnifyingGlassIcon className="w-5 h-5 text-stone-400 shrink-0" />
@@ -144,7 +141,7 @@ export function SearchCommand({
             className="flex-1 text-sm bg-transparent outline-none placeholder:text-stone-400"
             autoFocus
           />
-          <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-stone-200 bg-stone-50 px-1.5 font-mono text-[10px] text-stone-500">
+          <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded-full bg-stone-100 px-1.5 font-mono text-[10px] text-stone-500">
             ESC
           </kbd>
         </div>
@@ -173,7 +170,11 @@ export function SearchCommand({
                     <span
                       className={`
                         w-5 h-5 rounded flex items-center justify-center text-xs font-medium shrink-0 mt-0.5
-                        ${index === selectedIndex ? "bg-[#0058A3] text-white" : "bg-stone-100 text-stone-500"}
+                        ${
+                          index === selectedIndex
+                            ? "bg-[#0058A3] text-white"
+                            : "bg-stone-100 text-stone-500"
+                        }
                       `}
                     >
                       {result.chapterNumber}
@@ -203,7 +204,9 @@ export function SearchCommand({
         {/* Footer hint */}
         <div className="px-4 py-2 border-t border-stone-100 bg-stone-50/50">
           <p className="text-[10px] text-stone-400">
-            <kbd className="font-mono">↑↓</kbd> to navigate · <kbd className="font-mono">↵</kbd> to select · <kbd className="font-mono">esc</kbd> to close
+            <kbd className="font-mono">↑↓</kbd> to navigate ·{" "}
+            <kbd className="font-mono">↵</kbd> to select ·{" "}
+            <kbd className="font-mono">esc</kbd> to close
           </p>
         </div>
       </DialogContent>
@@ -230,4 +233,3 @@ export function SearchTrigger({ onClick }: SearchTriggerProps) {
     </button>
   );
 }
-
