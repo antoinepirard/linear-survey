@@ -227,11 +227,7 @@ export function generateSummary(
 }
 
 // Generate "Why it matters" insights
-export function generateWhyItMatters(
-  changeType: ChangeType,
-  _addedLines: string[],
-  _removedLines: string[]
-): string[] {
+export function generateWhyItMatters(changeType: ChangeType): string[] {
   const templates: Record<ChangeType, string[]> = {
     pricing: [
       "Pricing changes can impact competitive positioning and sales conversations",
@@ -319,7 +315,7 @@ export function detectChanges(
 
   const changeType = classifyChange(added, removed, surfaceType);
   const summary = generateSummary(added, removed, changeType, competitorName);
-  const whyItMatters = generateWhyItMatters(changeType, added, removed);
+  const whyItMatters = generateWhyItMatters(changeType);
   const suggestedActions = generateSuggestedActions(changeType);
 
   const change: Change = {
