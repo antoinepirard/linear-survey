@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { ChapterSidebar } from "./ChapterSidebar";
 import { ChapterContent } from "./ChapterContent";
 import { manualConfig } from "../_content";
@@ -11,6 +11,7 @@ export function ManualApp() {
     manualConfig.chapters[0].id
   );
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const activeChapter = manualConfig.chapters.find(
     (c) => c.id === activeChapterId
@@ -18,7 +19,8 @@ export function ManualApp() {
 
   const handleSelectChapter = useCallback((chapterId: string) => {
     setActiveChapterId(chapterId);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Scroll content area to top
+    contentRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const handlePrevious = useCallback(() => {
@@ -52,8 +54,8 @@ export function ManualApp() {
   if (!activeChapter) return null;
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="flex min-h-screen">
+    <div className="h-screen bg-white overflow-hidden">
+      <div className="flex h-full">
         {/* Mobile header */}
         <header className="fixed top-0 left-0 right-0 z-30 lg:hidden bg-white/95 backdrop-blur-sm border-b border-stone-100">
           <div className="flex items-center justify-between px-4 py-3">
@@ -72,7 +74,7 @@ export function ManualApp() {
           </div>
         </header>
 
-        {/* Sidebar */}
+        {/* Sidebar - fixed */}
         <ChapterSidebar
           chapters={manualConfig.chapters}
           activeChapterId={activeChapterId}
@@ -81,8 +83,11 @@ export function ManualApp() {
           onClose={() => setSidebarOpen(false)}
         />
 
-        {/* Main content area */}
-        <main className="flex-1 pt-14 lg:pt-0">
+        {/* Main content area - scrollable */}
+        <main 
+          ref={contentRef}
+          className="flex-1 pt-14 lg:pt-0 overflow-y-auto flex flex-col"
+        >
           <ChapterContent
             chapter={activeChapter}
             totalChapters={manualConfig.chapters.length}
