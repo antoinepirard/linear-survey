@@ -11,21 +11,27 @@ interface ChapterContentProps {
   onNext: () => void;
 }
 
-// IKEA-style cover title
-function CoverTitle() {
+// Cover banner
+function CoverBanner() {
   return (
-    <div className="text-center py-8">
-      <div className="inline-block">
-        <h1 className="text-5xl lg:text-6xl font-black text-stone-900 tracking-tight leading-none">
-          ANTOINE
-        </h1>
-        <p className="text-lg lg:text-xl font-medium text-stone-600 mt-1">
-          INSTRUCTION MANUAL
-        </p>
-      </div>
-      <div className="flex items-center justify-center gap-2 mt-6">
-        <span className="w-12 h-1 rounded-full bg-[#0058A3]" />
-        <span className="w-3 h-3 rounded-full bg-[#FFDA1A]" />
+    <div className="bg-[#0058A3] rounded-xl p-6 flex items-center justify-between">
+      <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight leading-none">
+        MANUAL
+      </h1>
+      <div className="w-12 h-12 rounded-full border-2 border-white/30 flex items-center justify-center">
+        <svg
+          className="w-5 h-5 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+          />
+        </svg>
       </div>
     </div>
   );
@@ -48,8 +54,8 @@ export function ChapterContent({
         <div className="max-w-2xl mx-auto px-6 py-10 lg:py-16">
           {/* Cover - only on first chapter */}
           {isFirstChapter && (
-            <div className="mb-12 pb-10 border-b border-stone-100">
-              <CoverTitle />
+            <div className="mb-12">
+              <CoverBanner />
             </div>
           )}
 
