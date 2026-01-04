@@ -107,80 +107,80 @@ export function ManualApp() {
 
           {/* Bottom navigation - inside content column so it doesn't overlap sidebar */}
           <nav className="shrink-0 bg-white border-t border-stone-100">
-        <div className="max-w-2xl mx-auto px-6 py-3">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={handlePrevious}
-              disabled={!hasPrevious}
-              className={`
-                flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm
-                transition-colors duration-100
-                ${
-                  hasPrevious
-                    ? "text-stone-600 hover:bg-stone-50"
-                    : "opacity-30 cursor-not-allowed text-stone-400"
-                }
-              `}
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Previous
-            </button>
-
-            <div className="flex gap-1">
-              {manualConfig.chapters.map((_, i) => (
-                <span
-                  key={i}
+            <div className="max-w-2xl mx-auto px-6 py-3">
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={handlePrevious}
+                  disabled={!hasPrevious}
                   className={`
-                    w-1.5 h-1.5 rounded-full transition-all
-                    ${i === currentIndex ? "bg-[#0058A3]" : "bg-stone-200"}
+                    flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm
+                    transition-colors duration-100
+                    ${
+                      hasPrevious
+                        ? "text-stone-600 hover:bg-stone-50"
+                        : "opacity-30 cursor-not-allowed text-stone-400"
+                    }
                   `}
-                />
-              ))}
-            </div>
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                  Previous
+                </button>
 
-            <button
-              onClick={handleNext}
-              disabled={!hasNext}
-              className={`
-                flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm
-                transition-colors duration-100
-                ${
-                  hasNext
-                    ? "bg-[#0058A3] text-white hover:bg-[#004C8C]"
-                    : "opacity-30 cursor-not-allowed text-stone-400 bg-stone-100"
-                }
-              `}
-            >
-              Next
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </nav>
+                <div className="flex gap-1">
+                  {manualConfig.chapters.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`
+                        w-1.5 h-1.5 rounded-full transition-all
+                        ${i === currentIndex ? "bg-[#0058A3]" : "bg-stone-200"}
+                      `}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={handleNext}
+                  disabled={!hasNext}
+                  className={`
+                    flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm
+                    transition-colors duration-100
+                    ${
+                      hasNext
+                        ? "bg-[#0058A3] text-white hover:bg-[#004C8C]"
+                        : "opacity-30 cursor-not-allowed text-stone-400 bg-stone-100"
+                    }
+                  `}
+                >
+                  Next
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </nav>
         </div>
       </div>
 
