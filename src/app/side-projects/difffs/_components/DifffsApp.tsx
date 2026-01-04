@@ -6,18 +6,30 @@ import {
   XMarkIcon,
   BellIcon,
   ChartBarIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import { CompetitorList } from "./CompetitorList";
 import { ChangesFeed } from "./ChangesFeed";
 import { WeeklyDigest } from "./WeeklyDigest";
-import { mockCompetitors, mockChanges, mockWeeklyDigest } from "../_data/mock";
-import type { Competitor, Change } from "../_types";
+import { useDifffs } from "../_hooks/useDifffs";
+import type { WeeklyDigestData, ChangeType } from "../_types";
 
 type View = "feed" | "digest";
 
 export function DifffsApp() {
-  const [competitors, setCompetitors] = useState<Competitor[]>(mockCompetitors);
-  const [changes, setChanges] = useState<Change[]>(mockChanges);
+  const {
+    competitors,
+    changes,
+    isLoading,
+    isChecking,
+    checkingCompetitorId,
+    addCompetitor,
+    removeCompetitor,
+    checkCompetitor,
+    checkAllCompetitors,
+    markChangeAsRead,
+  } = useDifffs();
+
   const [selectedCompetitorId, setSelectedCompetitorId] = useState<string | null>(null);
   const [view, setView] = useState<View>("feed");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -43,17 +55,78 @@ export function DifffsApp() {
     return changes.filter((c) => new Date(c.detectedAt) >= sevenDaysAgo).length;
   }, [changes]);
 
-  // Add competitor handler
-  const handleAddCompetitor = (competitor: Competitor) => {
-    setCompetitors((prev) => [...prev, competitor]);
-  };
+  // Generate weekly digest from real data
+  const weeklyDigest = useMemo((): WeeklyDigestData => {
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - 7);
 
-  // Mark change as read
-  const handleMarkAsRead = (changeId: string) => {
-    setChanges((prev) =>
-      prev.map((c) => (c.id === changeId ? { ...c, isRead: true } : c))
+    const weekChanges = changes.filter(
+      (c) => new Date(c.detectedAt) >= weekStart
     );
-  };
+
+    // Group by competitor
+    const byCompetitor = new Map<string, { count: number; types: Set<ChangeType> }>();
+    
+    weekChanges.forEach((change) => {
+      const existing = byCompetitor.get(change.competitorId) || {
+        count: 0,
+        types: new Set<ChangeType>(),
+      };
+      existing.count++;
+      existing.types.add(change.changeType);
+      byCompetitor.set(change.competitorId, existing);
+    });
+
+    const summaries = Array.from(byCompetitor.entries()).map(([competitorId, data]) => ({
+      competitorId,
+      competitorName: competitors.find((c) => c.id === competitorId)?.name || "Unknown",
+      changeCount: data.count,
+      changeTypes: Array.from(data.types),
+    }));
+
+    // Find most common theme
+    const typeCounts: Record<ChangeType, number> = {
+      pricing: 0,
+      packaging: 0,
+      positioning: 0,
+      feature: 0,
+      trust: 0,
+      urgency: 0,
+    };
+    weekChanges.forEach((c) => typeCounts[c.changeType]++);
+    
+    const topType = Object.entries(typeCounts).sort(([, a], [, b]) => b - a)[0];
+    const themeLabels: Record<ChangeType, string> = {
+      pricing: "Pricing adjustments",
+      packaging: "Packaging changes",
+      positioning: "Messaging & positioning",
+      feature: "Feature announcements",
+      trust: "Trust signal updates",
+      urgency: "Promotional activity",
+    };
+
+    return {
+      weekStart: weekStart.toISOString(),
+      weekEnd: now.toISOString(),
+      summaries,
+      topTheme: topType && topType[1] > 0 ? themeLabels[topType[0] as ChangeType] : "No activity",
+      totalChanges: weekChanges.length,
+    };
+  }, [changes, competitors]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 rounded bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center animate-pulse">
+            <span className="text-sm font-bold text-white">D</span>
+          </div>
+          <div className="w-5 h-5 border-2 border-white/20 border-t-orange-500 rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -67,7 +140,13 @@ export function DifffsApp() {
             <Bars3Icon className="w-5 h-5" />
           </button>
           <span className="font-mono text-sm tracking-tight">difffs</span>
-          <div className="w-9" /> {/* Spacer */}
+          <button
+            onClick={() => checkAllCompetitors()}
+            disabled={isChecking || competitors.length === 0}
+            className="p-2 -mr-2 text-white/60 hover:text-white disabled:opacity-50 transition-colors"
+          >
+            <ArrowPathIcon className={`w-5 h-5 ${isChecking ? "animate-spin" : ""}`} />
+          </button>
         </div>
       </header>
 
@@ -122,7 +201,11 @@ export function DifffsApp() {
               setSelectedCompetitorId(id);
               setIsSidebarOpen(false);
             }}
-            onAddCompetitor={handleAddCompetitor}
+            onAddCompetitor={addCompetitor}
+            onRemoveCompetitor={removeCompetitor}
+            onCheckCompetitor={checkCompetitor}
+            isChecking={isChecking}
+            checkingCompetitorId={checkingCompetitorId}
           />
         </div>
       </aside>
@@ -161,36 +244,65 @@ export function DifffsApp() {
               </button>
             </div>
 
-            {/* Filter indicator */}
-            {selectedCompetitorId && (
+            {/* Right side actions */}
+            <div className="flex items-center gap-2">
+              {/* Filter indicator */}
+              {selectedCompetitorId && (
+                <button
+                  onClick={() => setSelectedCompetitorId(null)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <span>
+                    Filtering:{" "}
+                    {competitors.find((c) => c.id === selectedCompetitorId)?.name}
+                  </span>
+                  <XMarkIcon className="w-4 h-4" />
+                </button>
+              )}
+
+              {/* Check All button (desktop) */}
               <button
-                onClick={() => setSelectedCompetitorId(null)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                onClick={() => checkAllCompetitors()}
+                disabled={isChecking || competitors.length === 0}
+                className="hidden lg:flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white/60 hover:text-white bg-white/5 hover:bg-white/10 disabled:opacity-50 rounded-lg transition-colors"
               >
-                <span>
-                  Filtering:{" "}
-                  {competitors.find((c) => c.id === selectedCompetitorId)?.name}
-                </span>
-                <XMarkIcon className="w-4 h-4" />
+                <ArrowPathIcon className={`w-4 h-4 ${isChecking ? "animate-spin" : ""}`} />
+                <span>{isChecking ? "Checking..." : "Check All"}</span>
               </button>
-            )}
+            </div>
           </div>
         </header>
 
         {/* Content area */}
         <div className="p-4 lg:p-6">
           {view === "feed" ? (
-            <ChangesFeed
-              changes={filteredChanges}
-              competitors={competitors}
-              onMarkAsRead={handleMarkAsRead}
-            />
+            competitors.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+                  <BellIcon className="w-8 h-8 text-white/20" />
+                </div>
+                <h3 className="text-lg font-medium text-white/80 mb-2">
+                  No competitors yet
+                </h3>
+                <p className="text-sm text-white/40 max-w-sm mb-6">
+                  Add a competitor to start tracking changes on their website.
+                </p>
+              </div>
+            ) : (
+              <ChangesFeed
+                changes={filteredChanges}
+                competitors={competitors}
+                onMarkAsRead={markChangeAsRead}
+              />
+            )
           ) : (
-            <WeeklyDigest digest={mockWeeklyDigest} />
+            <WeeklyDigest
+              digest={weeklyDigest}
+              competitors={competitors}
+            />
           )}
         </div>
       </main>
     </div>
   );
 }
-

@@ -17,13 +17,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import type { Competitor, SurfaceType } from "../_types";
-import { generateId } from "../_utils/helpers";
 import { SURFACE_CONFIG } from "../_types";
 
 interface AddCompetitorDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (competitor: Competitor) => void;
+  onAdd: (competitor: Omit<Competitor, "id" | "addedAt">) => void;
 }
 
 const surfaceIcons: Record<SurfaceType, typeof HomeIcon> = {
@@ -65,18 +64,46 @@ export function AddCompetitorDialog({
       return;
     }
 
-    const cleanDomain = domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    let cleanDomain = domain.trim();
+    // Remove protocol if present
+    cleanDomain = cleanDomain.replace(/^https?:\/\//, "");
+    // Remove trailing slash
+    cleanDomain = cleanDomain.replace(/\/$/, "");
+    // Remove www. prefix
+    cleanDomain = cleanDomain.replace(/^www\./, "");
 
-    const competitor: Competitor = {
-      id: generateId(),
+    const competitor: Omit<Competitor, "id" | "addedAt"> = {
       name: name.trim(),
       domain: cleanDomain,
-      surfaces: selectedSurfaces.map((type) => ({
-        type,
-        url: `https://${cleanDomain}/${type === "homepage" ? "" : type}`,
-        lastChecked: new Date().toISOString(),
-      })),
-      addedAt: new Date().toISOString(),
+      surfaces: selectedSurfaces.map((type) => {
+        // Build appropriate URL for each surface type
+        let path = "";
+        switch (type) {
+          case "homepage":
+            path = "";
+            break;
+          case "pricing":
+            path = "/pricing";
+            break;
+          case "changelog":
+            path = "/changelog";
+            break;
+          case "product":
+            path = "/product";
+            break;
+          case "docs":
+            path = "/docs";
+            break;
+          case "careers":
+            path = "/careers";
+            break;
+        }
+        return {
+          type,
+          url: `https://${cleanDomain}${path}`,
+          lastChecked: "", // Not checked yet
+        };
+      }),
     };
 
     onAdd(competitor);
@@ -134,6 +161,9 @@ export function AddCompetitorDialog({
               placeholder="e.g., acme.com"
               className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 transition-colors"
             />
+            <p className="mt-1.5 text-xs text-white/30">
+              Enter the domain without https:// (e.g., stripe.com)
+            </p>
           </div>
 
           {/* Surface selection */}
@@ -233,4 +263,3 @@ export function AddCompetitorDialog({
     </Dialog>
   );
 }
-

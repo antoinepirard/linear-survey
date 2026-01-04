@@ -5,16 +5,18 @@ import {
   SparklesIcon,
   ArrowTrendingUpIcon,
   ChartBarIcon,
+  InboxIcon,
 } from "@heroicons/react/24/outline";
-import type { WeeklyDigestData, ChangeType } from "../_types";
+import type { WeeklyDigestData, Competitor, ChangeType } from "../_types";
 import { CHANGE_TYPE_CONFIG } from "../_types";
 import { getWeekRange } from "../_utils/helpers";
 
 interface WeeklyDigestProps {
   digest: WeeklyDigestData;
+  competitors: Competitor[];
 }
 
-export function WeeklyDigest({ digest }: WeeklyDigestProps) {
+export function WeeklyDigest({ digest, competitors }: WeeklyDigestProps) {
   // Calculate change type distribution
   const typeDistribution = useMemo(() => {
     const counts: Record<ChangeType, number> = {
@@ -37,7 +39,47 @@ export function WeeklyDigest({ digest }: WeeklyDigestProps) {
       .sort(([, a], [, b]) => b - a);
   }, [digest]);
 
-  const maxCount = Math.max(...typeDistribution.map(([, count]) => count));
+  const maxCount = Math.max(...typeDistribution.map(([, count]) => count), 1);
+
+  // Empty state
+  if (digest.totalChanges === 0) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-white mb-1">
+              Weekly Digest
+            </h2>
+            <p className="text-sm text-white/40">
+              {getWeekRange(digest.weekStart, digest.weekEnd)}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg">
+            <ChartBarIcon className="w-4 h-4 text-white/40" />
+            <span className="text-sm font-medium text-white/80">
+              0 changes
+            </span>
+          </div>
+        </div>
+
+        {/* Empty state */}
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+            <InboxIcon className="w-8 h-8 text-white/20" />
+          </div>
+          <h3 className="text-lg font-medium text-white/80 mb-2">
+            No changes this week
+          </h3>
+          <p className="text-sm text-white/40 max-w-sm">
+            {competitors.length === 0
+              ? "Add competitors to start tracking their website changes."
+              : "Click \"Check All\" to scan your competitors for changes."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -71,12 +113,13 @@ export function WeeklyDigest({ digest }: WeeklyDigestProps) {
       </div>
 
       {/* Competitor summaries */}
-      <div>
-        <h3 className="text-sm font-medium text-white/50 uppercase tracking-wider mb-3">
-          By Competitor
-        </h3>
-        <div className="space-y-3">
-          {digest.summaries.map((summary) => (
+      {digest.summaries.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-white/50 uppercase tracking-wider mb-3">
+            By Competitor
+          </h3>
+          <div className="space-y-3">
+            {digest.summaries.map((summary) => (
               <div
                 key={summary.competitorId}
                 className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-xl"
@@ -126,54 +169,55 @@ export function WeeklyDigest({ digest }: WeeklyDigestProps) {
                   </p>
                 </div>
               </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Change type distribution */}
-      <div>
-        <h3 className="text-sm font-medium text-white/50 uppercase tracking-wider mb-3">
-          Change Types
-        </h3>
-        <div className="space-y-3">
-          {typeDistribution.map(([type, count]) => {
-            const config = CHANGE_TYPE_CONFIG[type as ChangeType];
-            const percentage = (count / maxCount) * 100;
+      {typeDistribution.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-white/50 uppercase tracking-wider mb-3">
+            Change Types
+          </h3>
+          <div className="space-y-3">
+            {typeDistribution.map(([type, count]) => {
+              const config = CHANGE_TYPE_CONFIG[type as ChangeType];
+              const percentage = (count / maxCount) * 100;
 
-            return (
-              <div key={type}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className={`text-sm font-medium ${config.color}`}>
-                    {config.label}
-                  </span>
-                  <span className="text-sm text-white/40">{count}</span>
+              return (
+                <div key={type}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className={`text-sm font-medium ${config.color}`}>
+                      {config.label}
+                    </span>
+                    <span className="text-sm text-white/40">{count}</span>
+                  </div>
+                  <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${config.bgColor.replace("/10", "/50")}`}
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${config.bgColor.replace("/10", "/50")}`}
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Trend indicator */}
       <div className="flex items-center gap-3 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
         <ArrowTrendingUpIcon className="w-5 h-5 text-emerald-400" />
         <div>
           <p className="text-sm font-medium text-white/80">
-            Competitor activity is up
+            Competitor activity detected
           </p>
           <p className="text-xs text-white/40">
-            {digest.totalChanges} changes detected across{" "}
-            {digest.summaries.length} competitors
+            {digest.totalChanges} changes across {digest.summaries.length} competitor{digest.summaries.length !== 1 ? "s" : ""}
           </p>
         </div>
       </div>
     </div>
   );
 }
-
