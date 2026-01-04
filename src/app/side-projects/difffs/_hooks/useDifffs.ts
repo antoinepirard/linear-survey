@@ -159,7 +159,7 @@ export function useDifffs(): UseDifffsReturn {
             continue;
           }
 
-          const { content, title } = await response.json();
+          const { content } = await response.json();
 
           // Get the last snapshot for this surface
           const lastSnapshot = snapshots

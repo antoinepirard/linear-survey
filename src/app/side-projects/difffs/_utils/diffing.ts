@@ -229,8 +229,8 @@ export function generateSummary(
 // Generate "Why it matters" insights
 export function generateWhyItMatters(
   changeType: ChangeType,
-  addedLines: string[],
-  removedLines: string[]
+  _addedLines: string[],
+  _removedLines: string[]
 ): string[] {
   const templates: Record<ChangeType, string[]> = {
     pricing: [
