@@ -3,14 +3,16 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { ChapterSidebar } from "./ChapterSidebar";
 import { ChapterContent } from "./ChapterContent";
+import { SearchCommand } from "./SearchCommand";
 import { manualConfig } from "../_content";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import { Bars3Icon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export function ManualApp() {
   const [activeChapterId, setActiveChapterId] = useState(
     manualConfig.chapters[0].id
   );
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const activeChapter = manualConfig.chapters.find(
@@ -41,15 +43,22 @@ export function ManualApp() {
     }
   }, [activeChapterId, handleSelectChapter]);
 
+  // Handle keyboard shortcuts
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd/Ctrl + K to open search
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+      // Escape to close sidebar
+      if (e.key === "Escape" && !searchOpen) {
         setSidebarOpen(false);
       }
     };
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, []);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [searchOpen]);
 
   if (!activeChapter) return null;
 
@@ -70,7 +79,12 @@ export function ManualApp() {
                 Antoine Pirard
               </h1>
             </div>
-            <div className="w-9" />
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="p-2 -mr-2 rounded-lg hover:bg-stone-50 text-stone-500"
+            >
+              <MagnifyingGlassIcon className="w-5 h-5" />
+            </button>
           </div>
         </header>
 
@@ -81,6 +95,7 @@ export function ManualApp() {
           onSelectChapter={handleSelectChapter}
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
+          onOpenSearch={() => setSearchOpen(true)}
         />
 
         {/* Main content area - scrollable */}
@@ -96,6 +111,14 @@ export function ManualApp() {
           />
         </main>
       </div>
+
+      {/* Search command dialog */}
+      <SearchCommand
+        chapters={manualConfig.chapters}
+        onSelectChapter={handleSelectChapter}
+        isOpen={searchOpen}
+        onOpenChange={setSearchOpen}
+      />
     </div>
   );
 }

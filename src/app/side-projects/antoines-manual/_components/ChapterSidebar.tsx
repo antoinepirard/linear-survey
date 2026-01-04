@@ -1,7 +1,7 @@
 "use client";
 
 import { Chapter } from "../_types";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 interface ChapterSidebarProps {
   chapters: Chapter[];
@@ -9,6 +9,7 @@ interface ChapterSidebarProps {
   onSelectChapter: (chapterId: string) => void;
   isOpen: boolean;
   onClose: () => void;
+  onOpenSearch: () => void;
 }
 
 export function ChapterSidebar({
@@ -17,6 +18,7 @@ export function ChapterSidebar({
   onSelectChapter,
   isOpen,
   onClose,
+  onOpenSearch,
 }: ChapterSidebarProps) {
   return (
     <>
@@ -42,7 +44,7 @@ export function ChapterSidebar({
       >
         <div className="flex flex-col h-full p-4">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6 px-2">
+          <div className="flex items-center justify-between mb-4 px-2">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded bg-[#0058A3] flex items-center justify-center">
                 <span className="text-white text-xs font-bold">A</span>
@@ -58,6 +60,21 @@ export function ChapterSidebar({
               <XMarkIcon className="w-4 h-4" />
             </button>
           </div>
+
+          {/* Search trigger */}
+          <button
+            onClick={() => {
+              onOpenSearch();
+              onClose();
+            }}
+            className="flex items-center gap-2 px-2 py-2 mb-4 bg-stone-100 rounded-full text-left text-stone-500 hover:bg-stone-200 transition-colors"
+          >
+            <MagnifyingGlassIcon className="w-4 h-4" />
+            <span className="text-sm flex-1">Search...</span>
+            <kbd className="hidden sm:inline-flex h-5 items-center gap-0.5 rounded-full bg-white px-1.5 font-mono text-[10px] text-stone-400">
+              <span className="text-xs">⌘</span>K
+            </kbd>
+          </button>
 
           {/* Chapter list */}
           <nav className="flex-1 overflow-y-auto">
@@ -94,9 +111,7 @@ export function ChapterSidebar({
                       >
                         {chapter.number}
                       </span>
-                      <span className="text-sm truncate">
-                        {chapter.title}
-                      </span>
+                      <span className="text-sm truncate">{chapter.title}</span>
                     </button>
                   </li>
                 );
