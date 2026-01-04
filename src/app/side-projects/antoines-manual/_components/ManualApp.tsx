@@ -67,7 +67,7 @@ export function ManualApp() {
             </button>
             <div className="text-center">
               <h1 className="text-sm font-medium text-stone-800">
-                {manualConfig.title}
+                Antoine Pirard
               </h1>
             </div>
             <div className="w-9" />

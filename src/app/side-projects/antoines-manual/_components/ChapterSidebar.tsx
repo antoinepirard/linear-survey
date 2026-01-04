@@ -48,7 +48,7 @@ export function ChapterSidebar({
                 <span className="text-white text-xs font-bold">A</span>
               </div>
               <span className="text-sm font-medium text-stone-700">
-                Manual
+                Antoine Pirard
               </span>
             </div>
             <button
