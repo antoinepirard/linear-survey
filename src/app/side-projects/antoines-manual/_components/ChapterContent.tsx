@@ -198,11 +198,8 @@ export function ChapterContent({
       </div>
 
       {/* Sticky navigation */}
-      <div
-        className="sticky bottom-0 bg-white border-t border-stone-100"
-        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
-      >
-        <div className="max-w-2xl mx-auto px-6 py-4 pb-6 lg:pb-4">
+      <div className="sticky bottom-0 bg-white border-t border-stone-100 pb-[env(safe-area-inset-bottom)]">
+        <div className="max-w-2xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <button
               onClick={onPrevious}
