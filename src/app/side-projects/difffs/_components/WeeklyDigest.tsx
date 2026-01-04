@@ -6,16 +6,15 @@ import {
   ArrowTrendingUpIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
-import type { WeeklyDigestData, Competitor, ChangeType } from "../_types";
+import type { WeeklyDigestData, ChangeType } from "../_types";
 import { CHANGE_TYPE_CONFIG } from "../_types";
 import { getWeekRange } from "../_utils/helpers";
 
 interface WeeklyDigestProps {
   digest: WeeklyDigestData;
-  competitors: Competitor[];
 }
 
-export function WeeklyDigest({ digest, competitors }: WeeklyDigestProps) {
+export function WeeklyDigest({ digest }: WeeklyDigestProps) {
   // Calculate change type distribution
   const typeDistribution = useMemo(() => {
     const counts: Record<ChangeType, number> = {
@@ -77,12 +76,7 @@ export function WeeklyDigest({ digest, competitors }: WeeklyDigestProps) {
           By Competitor
         </h3>
         <div className="space-y-3">
-          {digest.summaries.map((summary) => {
-            const competitor = competitors.find(
-              (c) => c.id === summary.competitorId
-            );
-
-            return (
+          {digest.summaries.map((summary) => (
               <div
                 key={summary.competitorId}
                 className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-xl"
@@ -132,8 +126,7 @@ export function WeeklyDigest({ digest, competitors }: WeeklyDigestProps) {
                   </p>
                 </div>
               </div>
-            );
-          })}
+          ))}
         </div>
       </div>
 

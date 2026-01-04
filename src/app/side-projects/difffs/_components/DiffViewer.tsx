@@ -24,11 +24,6 @@ function computeDiff(before: string, after: string): DiffLine[] {
   const beforeSet = new Set(beforeLines);
   const afterSet = new Set(afterLines);
 
-  // Mark lines from before that don't exist in after as removed
-  const removedLines = beforeLines.filter((line) => !afterSet.has(line));
-  const addedLines = afterLines.filter((line) => !beforeSet.has(line));
-  const unchangedLines = beforeLines.filter((line) => afterSet.has(line));
-
   // Build result maintaining approximate order
   let beforeIdx = 0;
   let afterIdx = 0;

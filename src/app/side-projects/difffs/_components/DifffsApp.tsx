@@ -186,10 +186,7 @@ export function DifffsApp() {
               onMarkAsRead={handleMarkAsRead}
             />
           ) : (
-            <WeeklyDigest
-              digest={mockWeeklyDigest}
-              competitors={competitors}
-            />
+            <WeeklyDigest digest={mockWeeklyDigest} />
           )}
         </div>
       </main>
