@@ -11,56 +11,23 @@ interface ChapterContentProps {
   onNext: () => void;
 }
 
-// IKEA-style illustration of a person reading a manual
-function CoverIllustration() {
+// IKEA-style cover title
+function CoverTitle() {
   return (
-    <svg
-      viewBox="0 0 200 160"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full max-w-xs mx-auto"
-    >
-      {/* Person */}
-      <circle cx="100" cy="45" r="18" stroke="#0058A3" strokeWidth="2.5" fill="none" />
-      {/* Eyes */}
-      <circle cx="94" cy="43" r="2" fill="#0058A3" />
-      <circle cx="106" cy="43" r="2" fill="#0058A3" />
-      {/* Smile */}
-      <path d="M94 50 Q100 55 106 50" stroke="#0058A3" strokeWidth="2" strokeLinecap="round" fill="none" />
-      
-      {/* Body */}
-      <path d="M100 63 L100 95" stroke="#0058A3" strokeWidth="2.5" strokeLinecap="round" />
-      
-      {/* Arms holding book */}
-      <path d="M100 75 L75 85 L75 120" stroke="#0058A3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      <path d="M100 75 L125 85 L125 120" stroke="#0058A3" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      
-      {/* Book/Manual */}
-      <rect x="70" y="95" width="60" height="45" rx="2" stroke="#0058A3" strokeWidth="2" fill="white" />
-      <line x1="100" y1="95" x2="100" y2="140" stroke="#0058A3" strokeWidth="2" />
-      
-      {/* Book lines (left page) */}
-      <line x1="76" y1="103" x2="94" y2="103" stroke="#FFDA1A" strokeWidth="2" strokeLinecap="round" />
-      <line x1="76" y1="110" x2="92" y2="110" stroke="#0058A3" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
-      <line x1="76" y1="117" x2="94" y2="117" stroke="#0058A3" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
-      <line x1="76" y1="124" x2="90" y2="124" stroke="#0058A3" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
-      
-      {/* Book lines (right page) */}
-      <line x1="106" y1="103" x2="124" y2="103" stroke="#FFDA1A" strokeWidth="2" strokeLinecap="round" />
-      <line x1="106" y1="110" x2="122" y2="110" stroke="#0058A3" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
-      <line x1="106" y1="117" x2="124" y2="117" stroke="#0058A3" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
-      <line x1="106" y1="124" x2="120" y2="124" stroke="#0058A3" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
-      
-      {/* Legs */}
-      <path d="M100 95 L85 140" stroke="#0058A3" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M100 95 L115 140" stroke="#0058A3" strokeWidth="2.5" strokeLinecap="round" />
-      
-      {/* Decorative elements */}
-      <circle cx="45" cy="35" r="3" fill="#FFDA1A" />
-      <circle cx="155" cy="45" r="4" fill="#FFDA1A" />
-      <circle cx="160" cy="120" r="2.5" fill="#FFDA1A" />
-      <circle cx="40" cy="110" r="2" fill="#0058A3" opacity="0.3" />
-    </svg>
+    <div className="text-center py-8">
+      <div className="inline-block">
+        <h1 className="text-5xl lg:text-6xl font-black text-stone-900 tracking-tight leading-none">
+          ANTOINE
+        </h1>
+        <p className="text-lg lg:text-xl font-medium text-stone-600 mt-1">
+          INSTRUCTION MANUAL
+        </p>
+      </div>
+      <div className="flex items-center justify-center gap-2 mt-6">
+        <span className="w-12 h-1 rounded-full bg-[#0058A3]" />
+        <span className="w-3 h-3 rounded-full bg-[#FFDA1A]" />
+      </div>
+    </div>
   );
 }
 
@@ -82,19 +49,7 @@ export function ChapterContent({
           {/* Cover - only on first chapter */}
           {isFirstChapter && (
             <div className="mb-12 pb-10 border-b border-stone-100">
-              <CoverIllustration />
-              <div className="text-center mt-8">
-                <h1 className="text-2xl font-semibold text-stone-900 tracking-tight">
-                  Antoine&apos;s Manual
-                </h1>
-                <p className="text-stone-500 mt-2 text-sm">
-                  A practical guide to working together
-                </p>
-                <div className="flex items-center justify-center gap-1.5 mt-4">
-                  <span className="w-8 h-1 rounded-full bg-[#0058A3]" />
-                  <span className="w-2 h-1 rounded-full bg-[#FFDA1A]" />
-                </div>
-              </div>
+              <CoverTitle />
             </div>
           )}
 
@@ -119,10 +74,14 @@ export function ChapterContent({
                   </h3>
                 ),
                 p: ({ children }) => (
-                  <p className="text-stone-600 leading-relaxed mb-4 text-[15px]">{children}</p>
+                  <p className="text-stone-600 leading-relaxed mb-4 text-[15px]">
+                    {children}
+                  </p>
                 ),
                 ul: ({ children }) => (
-                  <ul className="space-y-1.5 my-4 text-stone-600 text-[15px]">{children}</ul>
+                  <ul className="space-y-1.5 my-4 text-stone-600 text-[15px]">
+                    {children}
+                  </ul>
                 ),
                 ol: ({ children }) => (
                   <ol className="space-y-1.5 my-4 text-stone-600 text-[15px] list-decimal list-inside">
@@ -180,11 +139,11 @@ export function ChapterContent({
                     {children}
                   </td>
                 ),
-                hr: () => (
-                  <hr className="my-8 border-stone-100" />
-                ),
+                hr: () => <hr className="my-8 border-stone-100" />,
                 strong: ({ children }) => (
-                  <strong className="font-medium text-stone-800">{children}</strong>
+                  <strong className="font-medium text-stone-800">
+                    {children}
+                  </strong>
                 ),
                 a: ({ href, children }) => (
                   <a
@@ -249,8 +208,18 @@ export function ChapterContent({
                 }
               `}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
               Previous
             </button>
@@ -261,7 +230,9 @@ export function ChapterContent({
                   key={i}
                   className={`
                     w-1.5 h-1.5 rounded-full transition-all
-                    ${i + 1 === chapter.number ? "bg-[#0058A3]" : "bg-stone-200"}
+                    ${
+                      i + 1 === chapter.number ? "bg-[#0058A3]" : "bg-stone-200"
+                    }
                   `}
                 />
               ))}
@@ -281,8 +252,18 @@ export function ChapterContent({
               `}
             >
               Next
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
