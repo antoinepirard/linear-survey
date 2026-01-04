@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Area,
   AreaChart,
@@ -146,6 +146,14 @@ function CustomTooltip({
 }
 
 export function BitcoinChart({ data, allData, timeRange }: BitcoinChartProps) {
+  // Delay render slightly to ensure animation triggers consistently
+  const [isReady, setIsReady] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setIsReady(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Calculate gradient stops based on sentiment values
   const gradientStops = useMemo(() => {
     if (data.length === 0) return [];
@@ -180,17 +188,21 @@ export function BitcoinChart({ data, allData, timeRange }: BitcoinChartProps) {
     return [Math.floor(min - padding), Math.ceil(max + padding)];
   }, [data]);
 
-  if (data.length === 0) {
+  if (data.length === 0 || !isReady) {
     return (
       <div className="w-full h-full flex items-center justify-center">
-        <p className="text-white/30 font-mono text-sm">No data available</p>
+        {data.length === 0 && <p className="text-white/30 font-mono text-sm">No data available</p>}
       </div>
     );
   }
 
+  // Key forces re-mount on data change, ensuring animation plays
+  const chartKey = `chart-${data.length}-${timeRange}`;
+
   return (
     <ResponsiveContainer width="100%" height="100%" className="outline-none focus:outline-none">
       <AreaChart
+        key={chartKey}
         data={data}
         margin={{ top: 10, right: 0, bottom: 30, left: 0 }}
       >
