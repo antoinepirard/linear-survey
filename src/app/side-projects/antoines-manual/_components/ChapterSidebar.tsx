@@ -42,7 +42,7 @@ export function ChapterSidebar({
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        <div className="flex flex-col h-full p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="flex flex-col h-full p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] lg:pt-4 lg:pb-4">
           {/* Header */}
           <div className="flex items-center justify-between mb-4 px-2">
             <div className="flex items-center gap-2">

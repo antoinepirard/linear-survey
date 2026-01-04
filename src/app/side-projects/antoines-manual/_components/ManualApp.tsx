@@ -95,17 +95,18 @@ export function ManualApp() {
           onOpenSearch={() => setSearchOpen(true)}
         />
 
-        {/* Content area */}
-        <main
-          ref={contentRef}
-          className="flex-1 overflow-y-auto"
-        >
-          <ChapterContent chapter={activeChapter} />
-        </main>
-      </div>
+        {/* Content column */}
+        <div className="flex-1 flex flex-col min-h-0">
+          {/* Scrollable content */}
+          <main
+            ref={contentRef}
+            className="flex-1 overflow-y-auto"
+          >
+            <ChapterContent chapter={activeChapter} />
+          </main>
 
-      {/* Bottom navigation - outside scroll area, offset for sidebar on desktop */}
-      <nav className="shrink-0 bg-white border-t border-stone-100 lg:ml-56">
+          {/* Bottom navigation - inside content column so it doesn't overlap sidebar */}
+          <nav className="shrink-0 bg-white border-t border-stone-100">
         <div className="max-w-2xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             <button
@@ -180,6 +181,8 @@ export function ManualApp() {
           </div>
         </div>
       </nav>
+        </div>
+      </div>
 
       {/* Search command dialog */}
       <SearchCommand
