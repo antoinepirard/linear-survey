@@ -34,7 +34,7 @@ export function ChapterSidebar({
       <aside
         className={`
           fixed lg:sticky top-0 left-0 z-50 lg:z-auto
-          h-screen w-60 lg:w-56
+          h-[100dvh] lg:h-auto lg:self-stretch w-60 lg:w-56
           bg-white lg:bg-stone-50/50
           border-r border-stone-100
           transform transition-transform duration-200 ease-out
@@ -42,7 +42,7 @@ export function ChapterSidebar({
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        <div className="flex flex-col h-full p-4">
+        <div className="flex flex-col h-full p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
           {/* Header */}
           <div className="flex items-center justify-between mb-4 px-2">
             <div className="flex items-center gap-2">
