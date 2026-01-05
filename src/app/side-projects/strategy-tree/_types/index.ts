@@ -57,6 +57,8 @@ export type StrategyNode = Node<StrategyNodeData, 'strategy'>;
 // Edge with optional label
 export interface StrategyEdgeData {
   label?: string;
+  // Index signature for React Flow compatibility
+  [key: string]: unknown;
 }
 
 export type StrategyEdge = Edge<StrategyEdgeData>;
