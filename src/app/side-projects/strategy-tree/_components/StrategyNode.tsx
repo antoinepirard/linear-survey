@@ -1,7 +1,7 @@
 "use client";
 
-import { memo, useCallback } from "react";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { memo } from "react";
+import { Handle, Position } from "@xyflow/react";
 import {
   FlagIcon,
   MapIcon,
@@ -10,7 +10,7 @@ import {
   CheckIcon,
 } from "@heroicons/react/24/outline";
 import type { StrategyNodeData, StrategyNodeType } from "../_types";
-import { STATUS_CONFIG, NODE_TYPE_CONFIG } from "../_types";
+import { STATUS_CONFIG, NODE_TYPE_CONFIG, calculateProgress } from "../_types";
 
 // Get the appropriate icon component for a node type
 function NodeTypeIcon({
@@ -36,17 +36,28 @@ function NodeTypeIcon({
   }
 }
 
+// Get progress bar color based on status
+function getProgressColor(status: string) {
+  if (status === "blocked") return "bg-rose-500";
+  if (status === "at-risk") return "bg-amber-500";
+  return "bg-emerald-500";
+}
+
 function StrategyNodeComponent({
-  id,
   data,
   selected,
-}: NodeProps<StrategyNodeData>) {
+}: {
+  data: StrategyNodeData;
+  selected?: boolean;
+}) {
   const statusConfig = STATUS_CONFIG[data.status];
   const nodeTypeConfig = NODE_TYPE_CONFIG[data.nodeType];
+  const progress = calculateProgress(data.metrics);
+  const hasProgress = data.metrics?.progress?.enabled && progress !== null;
 
   return (
     <div className="relative">
-      {/* Status badge - positioned in top right */}
+      {/* Status badge - positioned in top right, overlapping the edge */}
       {data.status !== "not-started" && (
         <div
           className={`absolute -top-2.5 right-4 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -58,7 +69,7 @@ function StrategyNodeComponent({
           }`}
         >
           {data.status === "on-track" && <CheckIcon className="w-3 h-3" />}
-          {statusConfig.label}
+          {hasProgress ? `${progress}%` : statusConfig.label}
         </div>
       )}
 
@@ -82,9 +93,9 @@ function StrategyNodeComponent({
         />
 
         {/* Content */}
-        <div className="px-4 py-4 pt-5">
+        <div className="px-4 py-3">
           {/* Title row with icon */}
-          <div className="flex items-start gap-2 mb-2">
+          <div className="flex items-start gap-2 mb-1.5">
             <div
               className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${nodeTypeConfig.bgColor}`}
             >
@@ -105,6 +116,20 @@ function StrategyNodeComponent({
             </p>
           )}
         </div>
+
+        {/* Separator + Progress section */}
+        {hasProgress && (
+          <div className="border-t border-slate-100 px-4 py-2.5">
+            <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${getProgressColor(
+                  data.status
+                )}`}
+                style={{ width: `${Math.min(progress!, 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Bottom handle */}
         <Handle
