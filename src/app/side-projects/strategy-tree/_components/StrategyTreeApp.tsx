@@ -55,6 +55,7 @@ function StrategyTreeContent() {
         <FlowCanvas
           nodes={nodes}
           edges={edges}
+          allEdges={allEdges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}

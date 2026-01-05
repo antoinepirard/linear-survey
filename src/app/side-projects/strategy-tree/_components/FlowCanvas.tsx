@@ -115,6 +115,7 @@ function ConnectionMenu({
 interface FlowCanvasProps {
   nodes: StrategyNodeType[];
   edges: StrategyEdge[];
+  allEdges: StrategyEdge[];
   onNodesChange: (changes: NodeChange<StrategyNodeType>[]) => void;
   onEdgesChange: (changes: EdgeChange<StrategyEdge>[]) => void;
   onConnect: (connection: Connection) => void;
@@ -131,6 +132,7 @@ interface FlowCanvasProps {
 export function FlowCanvas({
   nodes,
   edges,
+  allEdges,
   onNodesChange,
   onEdgesChange,
   onConnect,
@@ -265,6 +267,10 @@ export function FlowCanvas({
       menu.style.left = `${event.clientX}px`;
       menu.style.top = `${event.clientY}px`;
 
+      // Check if node has children (can be collapsed) - use allEdges to include hidden edges
+      const nodeHasChildren = allEdges.some((e) => e.source === node.id);
+      const isCollapsed = node.data.isCollapsed;
+
       const menuItems = [
         { 
           label: 'Change Status', 
@@ -273,6 +279,11 @@ export function FlowCanvas({
             onClick: () => onChangeStatus(node.id, status as NodeStatus),
           })),
         },
+        // Only show collapse option if node has children
+        ...(nodeHasChildren ? [{
+          label: isCollapsed ? 'Expand Branch' : 'Collapse Branch',
+          onClick: () => onToggleCollapse(node.id),
+        }] : []),
         { label: 'Duplicate', onClick: () => onDuplicateNode(node.id) },
         { type: 'separator' },
         { label: 'Delete', onClick: () => onDeleteNode(node.id), danger: true },
@@ -333,7 +344,7 @@ export function FlowCanvas({
       };
       setTimeout(() => document.addEventListener('click', removeMenu), 0);
     },
-    [onChangeStatus, onDeleteNode, onDuplicateNode]
+    [allEdges, onChangeStatus, onDeleteNode, onDuplicateNode, onToggleCollapse]
   );
 
   return (
