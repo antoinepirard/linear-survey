@@ -205,24 +205,9 @@ export default function MorphingTocDemo() {
             A React table of contents component that displays minimal vertical
             lines and morphs into a full navigation menu on hover.
           </p>
-          <div className="flex gap-4">
-            <a
-              href="https://npmjs.com/package/morphing-toc"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-slate-600 hover:text-slate-900 transition-colors underline underline-offset-2"
-            >
-              npm
-            </a>
-            <a
-              href="https://github.com/antoinepirard/morphing-toc"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-slate-600 hover:text-slate-900 transition-colors underline underline-offset-2"
-            >
-              GitHub
-            </a>
-          </div>
+          <p className="text-sm text-slate-400">
+            Coming soon to npm
+          </p>
         </motion.header>
 
         {/* Content sections */}
