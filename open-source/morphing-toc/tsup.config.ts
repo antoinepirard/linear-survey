@@ -1,12 +1,18 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  entry: {
+    index: 'src/index.ts',
+    MorphingToc: 'src/MorphingToc.tsx',
+    useTocItems: 'src/useTocItems.ts',
+    scrollToSection: 'src/scrollToSection.ts',
+  },
   format: ['cjs', 'esm'],
-  dts: false,
+  dts: true,
+  bundle: false,
   splitting: false,
   sourcemap: true,
-  clean: false,
+  clean: true,
   external: ['react', 'react-dom', 'motion', 'motion/react'],
   treeshake: true,
 });

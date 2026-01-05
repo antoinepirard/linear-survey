@@ -16,7 +16,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && node scripts/ensure-use-client.js",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run build"
@@ -48,7 +48,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/antoinepirard/morphing-toc"
+    "url": "git+https://github.com/antoinepirard/morphing-toc.git"
   },
   "homepage": "https://antoinepirard.com/open-source/morphing-toc"
 }

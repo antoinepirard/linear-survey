@@ -1,3 +1,5 @@
+'use client';
+
 export { MorphingToc } from './MorphingToc';
 export { useTocItems } from './useTocItems';
 export { scrollToSection } from './scrollToSection';
