@@ -84,7 +84,8 @@ export function useStrategyTree() {
           };
         }
         if (!nodeHasChildren && node.data.isCollapsed !== undefined) {
-          const { isCollapsed: _, ...restData } = node.data;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { isCollapsed: _unused, ...restData } = node.data;
           return {
             ...node,
             data: restData as StrategyNodeData,
@@ -150,8 +151,14 @@ export function useStrategyTree() {
         };
         
         setEdges((eds) => {
-          if (eds.some(e => e.id === newEdge.id)) return eds;
-          return addEdge(newEdge, eds);
+          // Double-check edge doesn't already exist in current state
+          const alreadyExists = eds.some(
+            e => e.id === newEdge.id || 
+                 (e.source === newEdge.source && e.target === newEdge.target && e.type === 'dependency') ||
+                 (e.source === newEdge.target && e.target === newEdge.source && e.type === 'dependency')
+          );
+          if (alreadyExists) return eds;
+          return [...eds, newEdge];
         });
         return;
       }
@@ -190,9 +197,14 @@ export function useStrategyTree() {
       
       // Use functional update with duplicate check to handle race conditions
       setEdges((eds) => {
-        // Double-check edge doesn't already exist in current state
-        if (eds.some(e => e.id === newEdge.id)) return eds;
-        return addEdge(newEdge, eds);
+        // Double-check edge doesn't already exist in current state (check both ID and source/target)
+        const alreadyExists = eds.some(
+          e => e.id === newEdge.id || 
+               (e.source === newEdge.source && e.target === newEdge.target) ||
+               (e.source === newEdge.target && e.target === newEdge.source)
+        );
+        if (alreadyExists) return eds;
+        return [...eds, newEdge];
       });
     },
     [setEdges, nodes, edges]

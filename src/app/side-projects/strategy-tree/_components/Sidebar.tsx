@@ -16,7 +16,7 @@ import {
   XCircleIcon,
 } from '@heroicons/react/24/outline';
 import type { StrategyNode, StrategyNodeType, NodeStatus, NodeMetrics, NodePeriod, StrategyEdge } from '../_types';
-import { STATUS_CONFIG, NODE_TYPE_CONFIG, calculateProgress, getDefaultPeriod } from '../_types';
+import { STATUS_CONFIG, NODE_TYPE_CONFIG } from '../_types';
 import { PeriodSelector } from './PeriodSelector';
 import { useBlockingDependencies, type BlockingDependency } from '../_hooks/useBlockingDependencies';
 
