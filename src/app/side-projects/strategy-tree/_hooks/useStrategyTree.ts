@@ -57,6 +57,21 @@ export function useStrategyTree() {
       const { nodes: initialNodes, edges: initialEdges } = getInitialState();
       setNodes(initialNodes);
       setEdges(initialEdges);
+      
+      // Initialize hiddenNodeIds based on collapsed nodes
+      const collapsedNodeIds = initialNodes
+        .filter((n) => n.data.isCollapsed === true)
+        .map((n) => n.id);
+      
+      if (collapsedNodeIds.length > 0) {
+        const allHiddenIds = new Set<string>();
+        collapsedNodeIds.forEach((nodeId) => {
+          const descendants = getDescendantIds(nodeId, initialEdges);
+          descendants.forEach((id) => allHiddenIds.add(id));
+        });
+        setHiddenNodeIds(allHiddenIds);
+      }
+      
       setIsInitialized(true);
     }
   }, [isInitialized, getInitialState, setNodes, setEdges]);

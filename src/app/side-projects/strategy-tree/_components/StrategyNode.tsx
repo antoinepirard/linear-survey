@@ -13,6 +13,7 @@ import {
   PlayIcon,
   ExclamationTriangleIcon,
   XCircleIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import type { StrategyNodeData, StrategyNodeType, NodeStatus } from "../_types";
 import {
@@ -223,6 +224,14 @@ function StrategyNodeComponent({
           className="!w-2.5 !h-2.5 !bg-white !border !border-slate-300 !rounded-full hover:!border-blue-400 transition-colors"
         />
       </div>
+
+      {/* Collapsed indicator */}
+      {data.isCollapsed && (
+        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-0.5 bg-slate-100 rounded-full border border-slate-200 text-slate-500">
+          <ChevronDownIcon className="w-3 h-3" />
+          <span className="text-[10px] font-medium">Collapsed</span>
+        </div>
+      )}
     </div>
   );
 }
