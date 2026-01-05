@@ -4,7 +4,7 @@ import { memo, useCallback } from "react";
 import {
   BaseEdge,
   EdgeLabelRenderer,
-  getBezierPath,
+  getSmoothStepPath,
   type Edge,
   type EdgeProps,
 } from "@xyflow/react";
@@ -28,13 +28,14 @@ function ButtonEdgeComponent({
   selected,
   data,
 }: EdgeProps<StrategyEdge>) {
-  const [edgePath, labelX, labelY] = getBezierPath({
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
     targetX,
     targetY,
     targetPosition,
+    borderRadius: 24,
   });
 
   const handleDelete = useCallback(
