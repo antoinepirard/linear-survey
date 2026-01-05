@@ -1,4 +1,51 @@
-import type { SerializedState, StrategyNode, StrategyEdge } from '../_types';
+import type { SerializedState, StrategyNode, StrategyEdge, NodeStatus, StrategyNodeData } from '../_types';
+
+// Map old status values to new ones for backward compatibility
+function migrateStatus(status: string): NodeStatus {
+  // 'on-track' was renamed to 'in-progress'
+  if (status === 'on-track') {
+    return 'in-progress';
+  }
+  // Validate it's a valid status
+  const validStatuses: NodeStatus[] = ['not-started', 'in-progress', 'at-risk', 'blocked', 'done'];
+  if (validStatuses.includes(status as NodeStatus)) {
+    return status as NodeStatus;
+  }
+  // Default to not-started if invalid
+  return 'not-started';
+}
+
+// Migrate old timeline format to new period format
+function migrateNodeData(data: StrategyNodeData): StrategyNodeData {
+  const migratedData = { ...data };
+  
+  // Migrate status
+  migratedData.status = migrateStatus(data.status);
+  
+  // Migrate timeline to period if period doesn't exist but timeline does
+  if (migratedData.metrics?.timeline?.enabled && migratedData.metrics.timeline.dueDate && !migratedData.metrics.period) {
+    const dueDate = new Date(migratedData.metrics.timeline.dueDate);
+    const year = dueDate.getFullYear();
+    const quarter = Math.ceil((dueDate.getMonth() + 1) / 3);
+    
+    migratedData.metrics = {
+      ...migratedData.metrics,
+      period: {
+        type: 'quarter',
+        year,
+        value: `Q${quarter}`,
+      },
+    };
+  }
+  
+  // Remove 'unit' from progress if it exists (simplified model)
+  if (migratedData.metrics?.progress && 'unit' in migratedData.metrics.progress) {
+    const { current, target, enabled } = migratedData.metrics.progress;
+    migratedData.metrics.progress = { enabled, current, target };
+  }
+  
+  return migratedData;
+}
 
 // Compress and encode state to URL-safe string
 export function encodeState(nodes: StrategyNode[], edges: StrategyEdge[]): string {
@@ -54,7 +101,8 @@ export function deserializeToFlow(state: SerializedState): {
     id: n.id,
     type: 'strategy',
     position: n.position,
-    data: n.data,
+    // Migrate data to new format
+    data: migrateNodeData(n.data),
   }));
 
   const edges: StrategyEdge[] = state.edges.map((e) => {

@@ -9,9 +9,16 @@ import {
   MapIcon,
   RocketLaunchIcon,
   CheckCircleIcon,
+  ExclamationTriangleIcon,
+  CheckIcon,
+  PlayIcon,
+  PauseIcon,
+  XCircleIcon,
 } from '@heroicons/react/24/outline';
-import type { StrategyNode, StrategyNodeType, NodeStatus, NodeMetrics } from '../_types';
-import { STATUS_CONFIG, NODE_TYPE_CONFIG } from '../_types';
+import type { StrategyNode, StrategyNodeType, NodeStatus, NodeMetrics, NodePeriod, StrategyEdge } from '../_types';
+import { STATUS_CONFIG, NODE_TYPE_CONFIG, calculateProgress, getDefaultPeriod } from '../_types';
+import { PeriodSelector } from './PeriodSelector';
+import { useBlockingDependencies, type BlockingDependency } from '../_hooks/useBlockingDependencies';
 
 // Get the appropriate icon component for a node type
 function NodeTypeIcon({ nodeType, className }: { nodeType: StrategyNodeType; className?: string }) {
@@ -31,8 +38,30 @@ function NodeTypeIcon({ nodeType, className }: { nodeType: StrategyNodeType; cla
   }
 }
 
+// Status icon component
+function StatusIcon({ status, className }: { status: NodeStatus; className?: string }) {
+  const iconClass = className || 'w-4 h-4';
+  
+  switch (status) {
+    case 'not-started':
+      return <PauseIcon className={iconClass} />;
+    case 'in-progress':
+      return <PlayIcon className={iconClass} />;
+    case 'at-risk':
+      return <ExclamationTriangleIcon className={iconClass} />;
+    case 'blocked':
+      return <XCircleIcon className={iconClass} />;
+    case 'done':
+      return <CheckIcon className={iconClass} />;
+    default:
+      return <PauseIcon className={iconClass} />;
+  }
+}
+
 interface SidebarProps {
   selectedNode: StrategyNode | null;
+  allNodes: StrategyNode[];
+  allEdges: StrategyEdge[];
   onAddNode: (nodeType: StrategyNodeType, position?: { x: number; y: number }) => void;
   onUpdateNode: (nodeId: string, data: Partial<StrategyNode['data']>) => void;
   onDeleteNode: (nodeId: string) => void;
@@ -64,14 +93,134 @@ function NodeTypeCard({
   );
 }
 
-// Node editor form
+// Status picker component
+function StatusPicker({ 
+  value, 
+  onChange 
+}: { 
+  value: NodeStatus; 
+  onChange: (status: NodeStatus) => void;
+}) {
+  const statuses: NodeStatus[] = ['not-started', 'in-progress', 'at-risk', 'blocked', 'done'];
+  
+  return (
+    <div className="grid grid-cols-5 gap-1 p-1 bg-slate-100 rounded-lg">
+      {statuses.map((status) => {
+        const config = STATUS_CONFIG[status];
+        const isActive = value === status;
+        
+        return (
+          <button
+            key={status}
+            onClick={() => onChange(status)}
+            className={`relative flex flex-col items-center gap-1 py-2 px-1 rounded-md transition-all ${
+              isActive 
+                ? `bg-white shadow-sm ${config.color}` 
+                : 'text-slate-400 hover:text-slate-600 hover:bg-white/50'
+            }`}
+            title={config.label}
+          >
+            <StatusIcon status={status} className="w-4 h-4" />
+            <span className="text-[9px] font-medium leading-none truncate w-full text-center">
+              {status === 'not-started' ? 'Not Started' : 
+               status === 'in-progress' ? 'Progress' :
+               status === 'at-risk' ? 'At Risk' :
+               status === 'blocked' ? 'Blocked' : 'Done'}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// Progress input component
+function ProgressInput({ 
+  current, 
+  target, 
+  onChange 
+}: { 
+  current: number;
+  target: number;
+  onChange: (current: number, target: number) => void;
+}) {
+  return (
+    <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
+      <div className="flex-1">
+        <label className="block text-[10px] font-medium text-blue-600 mb-1">Progress</label>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            value={current}
+            onChange={(e) => onChange(Number(e.target.value), target)}
+            min={0}
+            max={target}
+            className="w-16 px-2 py-1.5 text-sm border border-blue-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+          />
+          <span className="text-slate-400 text-sm">/</span>
+          <input
+            type="number"
+            value={target}
+            onChange={(e) => onChange(current, Number(e.target.value))}
+            min={1}
+            className="w-16 px-2 py-1.5 text-sm border border-blue-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+          />
+        </div>
+      </div>
+      <div className="text-right">
+        <div className="text-2xl font-semibold text-blue-600">
+          {target > 0 ? Math.round((current / target) * 100) : 0}%
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Blocking dependencies display
+function BlockingDependenciesDisplay({ 
+  dependencies 
+}: { 
+  dependencies: BlockingDependency[];
+}) {
+  if (dependencies.length === 0) return null;
+  
+  return (
+    <div className="p-3 bg-rose-50 rounded-lg border border-rose-100">
+      <div className="flex items-center gap-2 mb-2">
+        <XCircleIcon className="w-4 h-4 text-rose-500" />
+        <span className="text-xs font-medium text-rose-700">Blocked by</span>
+      </div>
+      <div className="space-y-1.5">
+        {dependencies.map((dep) => (
+          <div 
+            key={dep.nodeId}
+            className="flex items-center justify-between text-xs bg-white rounded px-2 py-1.5 border border-rose-100"
+          >
+            <span className="font-medium text-slate-700 truncate flex-1">
+              {dep.title}
+            </span>
+            <span className={`ml-2 ${STATUS_CONFIG[dep.status].color}`}>
+              {dep.progress !== null ? `${dep.progress}%` : STATUS_CONFIG[dep.status].label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Node editor form - all content visible
 function NodeEditor({
   node,
+  allNodes,
+  allEdges,
   onUpdate,
   onDelete,
   onBack,
 }: {
   node: StrategyNode;
+  allNodes: StrategyNode[];
+  allEdges: StrategyEdge[];
   onUpdate: (data: Partial<StrategyNode['data']>) => void;
   onDelete: () => void;
   onBack: () => void;
@@ -81,6 +230,9 @@ function NodeEditor({
   const [status, setStatus] = useState<NodeStatus>(node.data.status);
   const [nodeType, setNodeType] = useState<StrategyNodeType>(node.data.nodeType);
   const [metrics, setMetrics] = useState<NodeMetrics>(node.data.metrics || {});
+
+  // Get blocking dependencies
+  const blockingDeps = useBlockingDependencies(node.id, allNodes, allEdges);
 
   // Sync with selected node
   useEffect(() => {
@@ -120,16 +272,29 @@ function NodeEditor({
     onUpdate(updates);
   }, [onUpdate]);
 
-  const updateMetric = useCallback((
-    metricKey: keyof NodeMetrics,
+  const updateMetric = useCallback(<K extends keyof NodeMetrics>(
+    metricKey: K,
     field: string,
     value: unknown
   ) => {
     const newMetrics = { ...metrics };
     if (!newMetrics[metricKey]) {
-      newMetrics[metricKey] = { enabled: false } as NodeMetrics[typeof metricKey];
+      newMetrics[metricKey] = {} as NodeMetrics[K];
     }
     (newMetrics[metricKey] as Record<string, unknown>)[field] = value;
+    handleUpdate('metrics', newMetrics);
+  }, [metrics, handleUpdate]);
+
+  const handlePeriodChange = useCallback((period: NodePeriod) => {
+    const newMetrics = { ...metrics, period };
+    handleUpdate('metrics', newMetrics);
+  }, [metrics, handleUpdate]);
+
+  const handleProgressChange = useCallback((current: number, target: number) => {
+    const newMetrics = {
+      ...metrics,
+      progress: { enabled: true, current, target }
+    };
     handleUpdate('metrics', newMetrics);
   }, [metrics, handleUpdate]);
 
@@ -146,14 +311,17 @@ function NodeEditor({
         >
           <ChevronLeftIcon className="w-5 h-5 text-slate-500" />
         </button>
-        <div className="flex items-center gap-2">
-          <NodeTypeIcon nodeType={nodeType} className={`w-5 h-5 ${nodeTypeConfig.iconColor}`} />
-          <h2 className="text-sm font-semibold text-slate-900">Edit Node</h2>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${nodeTypeConfig.bgColor}`}>
+            <NodeTypeIcon nodeType={nodeType} className={`w-4 h-4 ${nodeTypeConfig.iconColor}`} />
+          </div>
+          <span className="text-sm font-semibold text-slate-900 truncate">{title || 'Untitled'}</span>
         </div>
       </div>
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto space-y-4 -mr-4 pr-4">
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto -mr-4 pr-4 space-y-5">
+        {/* === DETAILS SECTION === */}
         {/* Node Type */}
         <div>
           <label className="block text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">
@@ -162,7 +330,7 @@ function NodeEditor({
           <select
             value={nodeType}
             onChange={(e) => handleUpdate('nodeType', e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
             {(Object.keys(NODE_TYPE_CONFIG) as StrategyNodeType[]).map((type) => (
               <option key={type} value={type}>
@@ -200,144 +368,101 @@ function NodeEditor({
           />
         </div>
 
-        {/* Status */}
+        {/* Divider */}
+        <div className="border-t border-slate-100" />
+
+        {/* === STATUS SECTION === */}
+        {/* Status Picker */}
         <div>
           <label className="block text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">
             Status
           </label>
-          <div className="grid grid-cols-2 gap-1.5">
-            {(Object.entries(STATUS_CONFIG) as [NodeStatus, typeof STATUS_CONFIG[NodeStatus]][]).map(
-              ([statusKey, config]) => (
-                <button
-                  key={statusKey}
-                  onClick={() => handleUpdate('status', statusKey)}
-                  className={`
-                    flex items-center gap-1.5 px-2 py-1.5 rounded-md border text-xs font-medium transition-all
-                    ${status === statusKey
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-slate-200 hover:border-slate-300 text-slate-600'
-                    }
-                  `}
-                >
-                  <div className={`w-2 h-2 rounded-full ${config.bgColor}`} />
-                  {config.label}
-                </button>
-              )
-            )}
-          </div>
+          <StatusPicker 
+            value={status} 
+            onChange={(s) => handleUpdate('status', s)} 
+          />
         </div>
 
-        {/* Metrics Section */}
-        <div className="border-t border-slate-100 pt-4">
-          <h4 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">
-            Metrics
-          </h4>
-
-          {/* Progress */}
-          <div className="mb-3 p-2.5 rounded-lg bg-slate-50">
-            <label className="flex items-center gap-2 mb-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={metrics.progress?.enabled || false}
-                onChange={(e) => updateMetric('progress', 'enabled', e.target.checked)}
-                className="rounded border-slate-300 text-blue-500 focus:ring-blue-500"
-              />
-              <span className="text-xs font-medium text-slate-700">Progress</span>
+        {/* Progress (shown when in-progress) */}
+        {status === 'in-progress' && (
+          <div>
+            <label className="block text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">
+              Progress
             </label>
-            {metrics.progress?.enabled && (
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  value={metrics.progress?.current || 0}
-                  onChange={(e) => updateMetric('progress', 'current', Number(e.target.value))}
-                  placeholder="Current"
-                  className="w-16 px-2 py-1 text-xs border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-                <span className="text-slate-400">/</span>
-                <input
-                  type="number"
-                  value={metrics.progress?.target || 100}
-                  onChange={(e) => updateMetric('progress', 'target', Number(e.target.value))}
-                  placeholder="Target"
-                  className="w-16 px-2 py-1 text-xs border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  value={metrics.progress?.unit || '%'}
-                  onChange={(e) => updateMetric('progress', 'unit', e.target.value)}
-                  placeholder="Unit"
-                  className="w-12 px-2 py-1 text-xs border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-            )}
+            <ProgressInput
+              current={metrics.progress?.current || 0}
+              target={metrics.progress?.target || 100}
+              onChange={handleProgressChange}
+            />
           </div>
+        )}
 
-          {/* Timeline */}
-          <div className="mb-3 p-2.5 rounded-lg bg-slate-50">
-            <label className="flex items-center gap-2 mb-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={metrics.timeline?.enabled || false}
-                onChange={(e) => updateMetric('timeline', 'enabled', e.target.checked)}
-                className="rounded border-slate-300 text-blue-500 focus:ring-blue-500"
-              />
-              <span className="text-xs font-medium text-slate-700">Timeline</span>
-            </label>
-            {metrics.timeline?.enabled && (
-              <div className="flex items-center gap-2">
-                <div className="flex-1">
-                  <label className="text-[10px] text-slate-400 block mb-0.5">Start</label>
-                  <input
-                    type="date"
-                    value={metrics.timeline?.startDate || ''}
-                    onChange={(e) => updateMetric('timeline', 'startDate', e.target.value)}
-                    className="w-full px-2 py-1 text-xs border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="text-[10px] text-slate-400 block mb-0.5">Due</label>
-                  <input
-                    type="date"
-                    value={metrics.timeline?.dueDate || ''}
-                    onChange={(e) => updateMetric('timeline', 'dueDate', e.target.value)}
-                    className="w-full px-2 py-1 text-xs border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Blocking Dependencies (shown when blocked or has blockers) */}
+        {(status === 'blocked' || blockingDeps.length > 0) && (
+          <BlockingDependenciesDisplay dependencies={blockingDeps} />
+        )}
 
-          {/* Owner */}
-          <div className="p-2.5 rounded-lg bg-slate-50">
-            <label className="flex items-center gap-2 mb-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={metrics.owner?.enabled || false}
-                onChange={(e) => updateMetric('owner', 'enabled', e.target.checked)}
-                className="rounded border-slate-300 text-blue-500 focus:ring-blue-500"
-              />
-              <span className="text-xs font-medium text-slate-700">Owner</span>
-            </label>
-            {metrics.owner?.enabled && (
-              <input
-                type="text"
-                value={metrics.owner?.name || ''}
-                onChange={(e) => updateMetric('owner', 'name', e.target.value)}
-                placeholder="Enter owner name..."
-                className="w-full px-2 py-1 text-xs border border-slate-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            )}
+        {/* No blockers message */}
+        {status === 'blocked' && blockingDeps.length === 0 && (
+          <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center">
+            <p className="text-xs text-slate-500">
+              No dependency connections found.<br />
+              Connect nodes with dependency edges to track blockers.
+            </p>
           </div>
+        )}
+
+        {/* Divider */}
+        <div className="border-t border-slate-100" />
+
+        {/* === TIMELINE & OWNER SECTION === */}
+        {/* Period */}
+        <div>
+          <label className="block text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">
+            Period / Deadline
+          </label>
+          <PeriodSelector
+            value={metrics.period}
+            onChange={handlePeriodChange}
+          />
         </div>
+
+        {/* Owner */}
+        <div>
+          <label className="flex items-center gap-2 mb-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={metrics.owner?.enabled || false}
+              onChange={(e) => updateMetric('owner', 'enabled', e.target.checked)}
+              className="rounded border-slate-300 text-blue-500 focus:ring-blue-500"
+            />
+            <span className="text-xs font-medium text-slate-700">Owner</span>
+          </label>
+          {metrics.owner?.enabled && (
+            <input
+              type="text"
+              value={metrics.owner?.name || ''}
+              onChange={(e) => updateMetric('owner', 'name', e.target.value)}
+              placeholder="Enter owner name..."
+              className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          )}
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-slate-100" />
 
         {/* Delete button */}
         <button
           onClick={onDelete}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg transition-colors"
         >
           <TrashIcon className="w-4 h-4" />
           Delete Node
         </button>
+        
+        {/* Bottom padding for scroll */}
+        <div className="h-2" />
       </div>
     </div>
   );
@@ -380,6 +505,8 @@ function NodePalette({
 
 export function Sidebar({
   selectedNode,
+  allNodes,
+  allEdges,
   onAddNode,
   onUpdateNode,
   onDeleteNode,
@@ -416,6 +543,8 @@ export function Sidebar({
           >
             <NodeEditor
               node={selectedNode}
+              allNodes={allNodes}
+              allEdges={allEdges}
               onUpdate={(data) => onUpdateNode(selectedNode.id, data)}
               onDelete={handleDelete}
               onBack={onClearSelection}

@@ -10,12 +10,16 @@ import {
   CheckIcon,
   CalendarIcon,
   UserIcon,
+  PlayIcon,
+  ExclamationTriangleIcon,
+  XCircleIcon,
 } from "@heroicons/react/24/outline";
-import type { StrategyNodeData, StrategyNodeType } from "../_types";
+import type { StrategyNodeData, StrategyNodeType, NodeStatus } from "../_types";
 import {
   STATUS_CONFIG,
   NODE_TYPE_CONFIG,
   calculateProgress,
+  formatPeriod,
   formatDate,
 } from "../_types";
 
@@ -43,6 +47,46 @@ function NodeTypeIcon({
   }
 }
 
+// Get status icon
+function StatusBadgeIcon({
+  status,
+  className,
+}: {
+  status: NodeStatus;
+  className?: string;
+}) {
+  const iconClass = className || "w-3 h-3";
+
+  switch (status) {
+    case "in-progress":
+      return <PlayIcon className={iconClass} />;
+    case "at-risk":
+      return <ExclamationTriangleIcon className={iconClass} />;
+    case "blocked":
+      return <XCircleIcon className={iconClass} />;
+    case "done":
+      return <CheckIcon className={iconClass} />;
+    default:
+      return null;
+  }
+}
+
+// Get status badge styles
+function getStatusBadgeStyles(status: NodeStatus): string {
+  switch (status) {
+    case "in-progress":
+      return "bg-blue-50 text-blue-600 border-blue-200";
+    case "at-risk":
+      return "bg-amber-50 text-amber-600 border-amber-200";
+    case "blocked":
+      return "bg-rose-50 text-rose-600 border-rose-200";
+    case "done":
+      return "bg-emerald-50 text-emerald-600 border-emerald-200";
+    default:
+      return "bg-slate-50 text-slate-500 border-slate-200";
+  }
+}
+
 function StrategyNodeComponent({
   data,
   selected,
@@ -53,29 +97,36 @@ function StrategyNodeComponent({
   const statusConfig = STATUS_CONFIG[data.status];
   const nodeTypeConfig = NODE_TYPE_CONFIG[data.nodeType];
   const progress = calculateProgress(data.metrics);
-  const hasProgress = data.metrics?.progress?.enabled && progress !== null;
+  const hasProgress =
+    data.status === "in-progress" &&
+    data.metrics?.progress?.enabled &&
+    progress !== null;
 
   // Check if we have any metadata to show in footer
+  const hasPeriod = data.metrics?.period;
+  // Legacy timeline support
   const hasTimeline =
-    data.metrics?.timeline?.enabled && data.metrics.timeline.dueDate;
+    !hasPeriod &&
+    data.metrics?.timeline?.enabled &&
+    data.metrics.timeline.dueDate;
   const hasOwner = data.metrics?.owner?.enabled && data.metrics.owner.name;
-  const hasFooter = hasTimeline || hasOwner;
+  const hasFooter = hasPeriod || hasTimeline || hasOwner;
+
+  // Determine what to show in status badge
+  const showStatusBadge = data.status !== "not-started";
+  const statusBadgeText = hasProgress ? `${progress}%` : statusConfig.label;
 
   return (
     <div className="relative">
       {/* Status badge - positioned in top right, overlapping the edge */}
-      {data.status !== "not-started" && (
+      {showStatusBadge && (
         <div
-          className={`absolute -top-2.5 right-4 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-            data.status === "on-track"
-              ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
-              : data.status === "at-risk"
-              ? "bg-amber-50 text-amber-600 border border-amber-200"
-              : "bg-rose-50 text-rose-600 border border-rose-200"
-          }`}
+          className={`absolute -top-2.5 right-4 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeStyles(
+            data.status
+          )}`}
         >
-          {data.status === "on-track" && <CheckIcon className="w-3 h-3" />}
-          {hasProgress ? `${progress}%` : statusConfig.label}
+          <StatusBadgeIcon status={data.status} />
+          {statusBadgeText}
         </div>
       )}
 
@@ -135,6 +186,12 @@ function StrategyNodeComponent({
         {/* Footer with metadata */}
         {hasFooter && (
           <div className="border-t border-slate-100 px-4 py-2.5 flex items-center gap-3">
+            {hasPeriod && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-slate-400">
+                <CalendarIcon className="w-3.5 h-3.5" />
+                {formatPeriod(data.metrics!.period)}
+              </span>
+            )}
             {hasTimeline && (
               <span className="inline-flex items-center gap-1 text-[11px] text-slate-400">
                 <CalendarIcon className="w-3.5 h-3.5" />

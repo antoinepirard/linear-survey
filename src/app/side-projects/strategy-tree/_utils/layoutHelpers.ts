@@ -1,4 +1,5 @@
 import type { StrategyNode, StrategyEdge, StrategyNodeType } from '../_types';
+import { getDefaultPeriod } from '../_types';
 
 // Generate a unique ID for new nodes
 export function generateNodeId(): string {
@@ -72,13 +73,17 @@ export function createNode(
       description: '',
       nodeType,
       status: 'not-started',
-      metrics: {},
+      metrics: {
+        period: getDefaultPeriod(),
+      },
     },
   };
 }
 
 // Create default initial nodes for a new tree
 export function getInitialNodes(): StrategyNode[] {
+  const currentYear = new Date().getFullYear();
+  
   return [
     {
       id: 'company-goal-1',
@@ -88,10 +93,10 @@ export function getInitialNodes(): StrategyNode[] {
         title: 'Increase Revenue by 30%',
         description: 'Annual revenue growth target for FY2026',
         nodeType: 'company-goal',
-        status: 'on-track',
+        status: 'in-progress',
         metrics: {
-          progress: { enabled: true, current: 15, target: 30, unit: '%' },
-          timeline: { enabled: true, dueDate: '2026-12-31' },
+          progress: { enabled: true, current: 15, target: 30 },
+          period: { type: 'quarter', year: currentYear, value: 'Q4' },
         },
       },
     },
@@ -103,9 +108,10 @@ export function getInitialNodes(): StrategyNode[] {
         title: 'Expand Enterprise Segment',
         description: 'Focus on enterprise customers with ARR > $100k',
         nodeType: 'strategy',
-        status: 'on-track',
+        status: 'in-progress',
         metrics: {
           owner: { enabled: true, name: 'Sarah Chen' },
+          period: { type: 'half', year: currentYear, value: 'H2' },
         },
       },
     },
@@ -117,10 +123,10 @@ export function getInitialNodes(): StrategyNode[] {
         title: 'Enterprise Onboarding',
         description: 'Dedicated onboarding flow for enterprise',
         nodeType: 'initiative',
-        status: 'on-track',
+        status: 'in-progress',
         metrics: {
-          progress: { enabled: true, current: 60, target: 100, unit: '%' },
-          timeline: { enabled: true, startDate: '2026-01-01', dueDate: '2026-03-31' },
+          progress: { enabled: true, current: 60, target: 100 },
+          period: { type: 'quarter', year: currentYear, value: 'Q1' },
         },
       },
     },
@@ -134,8 +140,9 @@ export function getInitialNodes(): StrategyNode[] {
         nodeType: 'initiative',
         status: 'at-risk',
         metrics: {
-          progress: { enabled: true, current: 25, target: 100, unit: '%' },
+          progress: { enabled: true, current: 25, target: 100 },
           owner: { enabled: true, name: 'Mike Johnson' },
+          period: { type: 'quarter', year: currentYear, value: 'Q2' },
         },
       },
     },

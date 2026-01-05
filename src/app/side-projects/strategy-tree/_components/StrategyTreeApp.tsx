@@ -79,6 +79,8 @@ function StrategyTreeContent() {
       {/* Sidebar with node palette and editor */}
       <Sidebar
         selectedNode={selectedNode}
+        allNodes={allNodes}
+        allEdges={allEdges}
         onAddNode={addNode}
         onUpdateNode={updateNode}
         onDeleteNode={deleteNode}
