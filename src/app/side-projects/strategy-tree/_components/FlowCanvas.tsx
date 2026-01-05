@@ -1,21 +1,29 @@
 'use client';
 
-import { useCallback, useRef, useEffect, DragEvent } from 'react';
+import { useCallback, useRef, useEffect, useState, DragEvent } from 'react';
 import {
   ReactFlow,
   Background,
   BackgroundVariant,
   Controls,
+  useReactFlow,
   type ReactFlowInstance,
   type NodeTypes,
   type EdgeTypes,
+  type OnConnectEnd,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import {
+  FlagIcon,
+  MapIcon,
+  RocketLaunchIcon,
+  CheckCircleIcon,
+} from '@heroicons/react/24/outline';
 
 import { StrategyNode } from './StrategyNode';
 import { ButtonEdge } from './ButtonEdge';
 import type { StrategyNode as StrategyNodeType, StrategyEdge, NodeStatus, StrategyNodeType as NodeType } from '../_types';
-import { STATUS_CONFIG } from '../_types';
+import { STATUS_CONFIG, NODE_TYPE_CONFIG } from '../_types';
 
 // Register custom node types
 const nodeTypes: NodeTypes = {
@@ -27,6 +35,80 @@ const edgeTypes: EdgeTypes = {
   button: ButtonEdge,
 };
 
+// Icon component for node types
+function NodeTypeIcon({ nodeType, className }: { nodeType: NodeType; className?: string }) {
+  const iconClass = className || 'w-5 h-5';
+  switch (nodeType) {
+    case 'company-goal':
+      return <FlagIcon className={iconClass} />;
+    case 'strategy':
+      return <MapIcon className={iconClass} />;
+    case 'initiative':
+      return <RocketLaunchIcon className={iconClass} />;
+    case 'task':
+      return <CheckCircleIcon className={iconClass} />;
+    default:
+      return <FlagIcon className={iconClass} />;
+  }
+}
+
+// Connection drop menu for creating new nodes
+function ConnectionMenu({
+  position,
+  onSelect,
+  onClose,
+}: {
+  position: { x: number; y: number };
+  onSelect: (nodeType: NodeType) => void;
+  onClose: () => void;
+}) {
+  const nodeTypes: NodeType[] = ['company-goal', 'strategy', 'initiative', 'task'];
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.connection-menu')) {
+        onClose();
+      }
+    };
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    
+    setTimeout(() => document.addEventListener('click', handleClickOutside), 0);
+    document.addEventListener('keydown', handleEscape);
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="connection-menu fixed z-[9999] bg-white rounded-xl shadow-xl border border-slate-200 p-2 min-w-[180px]"
+      style={{ left: position.x, top: position.y }}
+    >
+      <p className="text-xs text-slate-400 px-2 py-1 mb-1">Add connected node</p>
+      <div className="grid grid-cols-2 gap-1">
+        {nodeTypes.map((type) => {
+          const config = NODE_TYPE_CONFIG[type];
+          return (
+            <button
+              key={type}
+              onClick={() => onSelect(type)}
+              className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-slate-50 transition-colors"
+            >
+              <NodeTypeIcon nodeType={type} className={`w-5 h-5 ${config.iconColor}`} />
+              <span className="text-[10px] text-slate-600">{config.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 interface FlowCanvasProps {
   nodes: StrategyNodeType[];
   edges: StrategyEdge[];
@@ -36,6 +118,7 @@ interface FlowCanvasProps {
   onToggleCollapse: (nodeId: string) => void;
   onDeleteEdge: (edgeId: string) => void;
   onAddNode: (nodeType: NodeType, position?: { x: number; y: number }) => void;
+  onAddNodeAndConnect: (nodeType: NodeType, position: { x: number; y: number }, sourceNodeId: string) => void;
   onChangeStatus: (nodeId: string, status: NodeStatus) => void;
   onDeleteNode: (nodeId: string) => void;
   onDuplicateNode: (nodeId: string) => void;
@@ -51,6 +134,7 @@ export function FlowCanvas({
   onToggleCollapse,
   onDeleteEdge,
   onAddNode,
+  onAddNodeAndConnect,
   onChangeStatus,
   onDeleteNode,
   onDuplicateNode,
@@ -58,6 +142,15 @@ export function FlowCanvas({
 }: FlowCanvasProps) {
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { screenToFlowPosition } = useReactFlow();
+  
+  // State for connection drop menu
+  const [connectionMenu, setConnectionMenu] = useState<{
+    position: { x: number; y: number };
+    flowPosition: { x: number; y: number };
+    sourceNodeId: string;
+  } | null>(null);
+  const connectingNodeId = useRef<string | null>(null);
 
   const onInit = useCallback((instance: ReactFlowInstance) => {
     reactFlowInstance.current = instance;
@@ -92,6 +185,47 @@ export function FlowCanvas({
       window.removeEventListener('deleteEdge', handleDeleteEdge as EventListener);
     };
   }, [onToggleCollapse, onDeleteEdge]);
+
+  // Track connection start
+  const onConnectStart = useCallback((_: unknown, { nodeId }: { nodeId: string | null }) => {
+    connectingNodeId.current = nodeId;
+  }, []);
+
+  // Handle connection end - show menu if dropped on empty space
+  const onConnectEnd: OnConnectEnd = useCallback(
+    (event) => {
+      const targetIsPane = (event.target as HTMLElement).classList.contains('react-flow__pane');
+      
+      if (targetIsPane && connectingNodeId.current) {
+        const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
+        
+        // Get flow position for the new node
+        const flowPosition = screenToFlowPosition({
+          x: clientX,
+          y: clientY,
+        });
+        
+        setConnectionMenu({
+          position: { x: clientX, y: clientY },
+          flowPosition: { x: flowPosition.x - 120, y: flowPosition.y - 20 }, // Center the node on cursor
+          sourceNodeId: connectingNodeId.current,
+        });
+      }
+      connectingNodeId.current = null;
+    },
+    [screenToFlowPosition]
+  );
+
+  // Handle node type selection from connection menu
+  const handleConnectionMenuSelect = useCallback(
+    (nodeType: NodeType) => {
+      if (connectionMenu) {
+        onAddNodeAndConnect(nodeType, connectionMenu.flowPosition, connectionMenu.sourceNodeId);
+        setConnectionMenu(null);
+      }
+    },
+    [connectionMenu, onAddNodeAndConnect]
+  );
 
   // Handle drag over for drop zone
   const onDragOver = useCallback((event: DragEvent) => {
@@ -212,6 +346,8 @@ export function FlowCanvas({
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onConnectStart={onConnectStart}
+        onConnectEnd={onConnectEnd}
         onInit={onInit}
         onNodeContextMenu={onNodeContextMenu}
         nodeTypes={nodeTypes}
@@ -238,6 +374,15 @@ export function FlowCanvas({
           showInteractive={false}
         />
       </ReactFlow>
+      
+      {/* Connection drop menu */}
+      {connectionMenu && (
+        <ConnectionMenu
+          position={connectionMenu.position}
+          onSelect={handleConnectionMenuSelect}
+          onClose={() => setConnectionMenu(null)}
+        />
+      )}
     </div>
   );
 }

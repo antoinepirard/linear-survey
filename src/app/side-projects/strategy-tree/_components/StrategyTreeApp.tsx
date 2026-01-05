@@ -19,6 +19,7 @@ function StrategyTreeContent() {
     onEdgesChange,
     onConnect,
     addNode,
+    addNodeAndConnect,
     updateNode,
     deleteNode,
     deleteEdge,
@@ -60,6 +61,7 @@ function StrategyTreeContent() {
           onToggleCollapse={toggleCollapse}
           onDeleteEdge={deleteEdge}
           onAddNode={addNode}
+          onAddNodeAndConnect={addNodeAndConnect}
           onChangeStatus={changeNodeStatus}
           onDeleteNode={deleteNode}
           onDuplicateNode={duplicateNode}

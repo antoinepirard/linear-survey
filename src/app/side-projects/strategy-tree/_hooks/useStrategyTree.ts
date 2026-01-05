@@ -150,6 +150,25 @@ export function useStrategyTree() {
     [setNodes]
   );
 
+  // Add a new node and connect it to a source node
+  const addNodeAndConnect = useCallback(
+    (nodeType: StrategyNodeType, position: { x: number; y: number }, sourceNodeId: string) => {
+      const newNode = createNode(nodeType, position);
+      setNodes((nds) => [...nds, newNode]);
+      
+      const newEdge: StrategyEdge = {
+        id: generateEdgeId(sourceNodeId, newNode.id),
+        source: sourceNodeId,
+        target: newNode.id,
+        type: 'button',
+      };
+      setEdges((eds) => [...eds, newEdge]);
+      setSelectedNodeId(newNode.id);
+      return newNode.id;
+    },
+    [setNodes, setEdges]
+  );
+
   // Update node data
   const updateNode = useCallback(
     (nodeId: string, data: Partial<StrategyNodeData>) => {
@@ -271,6 +290,7 @@ export function useStrategyTree() {
     onConnect,
 
     addNode,
+    addNodeAndConnect,
     updateNode,
     deleteNode,
     deleteEdge,
