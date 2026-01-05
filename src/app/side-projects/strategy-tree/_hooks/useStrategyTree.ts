@@ -4,7 +4,6 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   useNodesState,
   useEdgesState,
-  addEdge,
   type Connection,
   type NodeChange,
   type EdgeChange,
