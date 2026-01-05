@@ -205,9 +205,39 @@ export default function MorphingTocDemo() {
             A React table of contents component that displays minimal vertical
             lines and morphs into a full navigation menu on hover.
           </p>
-          <p className="text-sm text-slate-400">
-            Coming soon to npm
-          </p>
+          <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
+            <a
+              href="https://www.npmjs.com/package/morphing-toc"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 hover:border-slate-300 hover:text-slate-800 transition-colors"
+            >
+              <span className="inline-flex items-center rounded-full bg-slate-900 px-2 py-0.5 text-xs font-mono text-white">
+                npm
+              </span>
+              <span className="font-medium">morphing-toc</span>
+            </a>
+            <a
+              href="https://github.com/antoinepirard/morphing-toc"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 hover:border-slate-300 hover:text-slate-800 transition-colors"
+            >
+              <svg
+                aria-hidden
+                viewBox="0 0 24 24"
+                className="h-4 w-4 text-slate-500"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M12 2C6.48 2 2 6.58 2 12.23c0 4.51 2.87 8.33 6.84 9.68.5.1.68-.22.68-.48 0-.23-.01-.85-.01-1.66-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.1-1.5-1.1-1.5-.9-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.55 2.34 1.1 2.91.84.09-.66.35-1.1.63-1.35-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.04 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .85-.28 2.8 1.05a9.5 9.5 0 0 1 2.55-.35c.86 0 1.73.12 2.54.35 1.96-1.33 2.8-1.05 2.8-1.05.56 1.4.21 2.44.11 2.7.65.71 1.04 1.63 1.04 2.75 0 3.95-2.34 4.82-4.57 5.08.36.32.68.95.68 1.92 0 1.39-.01 2.51-.01 2.85 0 .26.18.58.68.48A10.26 10.26 0 0 0 22 12.23C22 6.58 17.52 2 12 2Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="font-medium">GitHub</span>
+            </a>
+          </div>
         </motion.header>
 
         {/* Content sections */}
@@ -262,7 +292,7 @@ export default function MorphingTocDemo() {
             <CodeBlock>{`npm install morphing-toc`}</CodeBlock>
             <p className="mt-4 text-sm text-slate-500">
               Peer dependencies: react {">"}= 18, react-dom {">"}= 18, motion{" "}
-              {">"}= 10
+              {">"}= 11
             </p>
           </section>
 
