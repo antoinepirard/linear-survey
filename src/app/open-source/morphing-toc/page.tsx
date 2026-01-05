@@ -147,6 +147,31 @@ function PropsTable() {
 export default function MorphingTocDemo() {
   return (
     <div className="bg-white min-h-screen relative">
+      {/* Animated glow behind the TOC */}
+      <motion.div
+        className="fixed left-0 top-1/2 -translate-y-1/2 z-30 hidden lg:block pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
+      >
+        <motion.div
+          className="w-20 h-32 rounded-full blur-2xl"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(59, 130, 246, 0.4), rgba(34, 197, 94, 0.3))",
+          }}
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.5, 0.8, 0.5],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </motion.div>
+
       {/* The component itself - demonstrating it on this page */}
       <MorphingToc scrollOffset={80} headingLevels={[2, 3]} />
 
