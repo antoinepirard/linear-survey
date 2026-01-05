@@ -8,9 +8,16 @@ import {
   RocketLaunchIcon,
   CheckCircleIcon,
   CheckIcon,
+  CalendarIcon,
+  UserIcon,
 } from "@heroicons/react/24/outline";
 import type { StrategyNodeData, StrategyNodeType } from "../_types";
-import { STATUS_CONFIG, NODE_TYPE_CONFIG, calculateProgress } from "../_types";
+import {
+  STATUS_CONFIG,
+  NODE_TYPE_CONFIG,
+  calculateProgress,
+  formatDate,
+} from "../_types";
 
 // Get the appropriate icon component for a node type
 function NodeTypeIcon({
@@ -36,13 +43,6 @@ function NodeTypeIcon({
   }
 }
 
-// Get progress bar color based on status
-function getProgressColor(status: string) {
-  if (status === "blocked") return "bg-rose-500";
-  if (status === "at-risk") return "bg-amber-500";
-  return "bg-emerald-500";
-}
-
 function StrategyNodeComponent({
   data,
   selected,
@@ -54,6 +54,12 @@ function StrategyNodeComponent({
   const nodeTypeConfig = NODE_TYPE_CONFIG[data.nodeType];
   const progress = calculateProgress(data.metrics);
   const hasProgress = data.metrics?.progress?.enabled && progress !== null;
+
+  // Check if we have any metadata to show in footer
+  const hasTimeline =
+    data.metrics?.timeline?.enabled && data.metrics.timeline.dueDate;
+  const hasOwner = data.metrics?.owner?.enabled && data.metrics.owner.name;
+  const hasFooter = hasTimeline || hasOwner;
 
   return (
     <div className="relative">
@@ -117,17 +123,21 @@ function StrategyNodeComponent({
           )}
         </div>
 
-        {/* Separator + Progress section */}
-        {hasProgress && (
-          <div className="border-t border-slate-100 px-4 py-2.5">
-            <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${getProgressColor(
-                  data.status
-                )}`}
-                style={{ width: `${Math.min(progress!, 100)}%` }}
-              />
-            </div>
+        {/* Footer with metadata */}
+        {hasFooter && (
+          <div className="border-t border-slate-100 px-4 py-2.5 flex items-center gap-3">
+            {hasTimeline && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-slate-400">
+                <CalendarIcon className="w-3.5 h-3.5" />
+                {formatDate(data.metrics!.timeline!.dueDate)}
+              </span>
+            )}
+            {hasOwner && (
+              <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 truncate">
+                <UserIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                {data.metrics!.owner!.name}
+              </span>
+            )}
           </div>
         )}
 
