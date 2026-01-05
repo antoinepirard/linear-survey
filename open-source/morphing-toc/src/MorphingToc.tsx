@@ -4,7 +4,35 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTocItems } from './useTocItems';
 import { scrollToSection } from './scrollToSection';
-import type { MorphingTocProps, MorphingTocColors, MorphingTocSizes } from './types';
+import type { MorphingTocProps, MorphingTocColors, MorphingTocSizes, TocItem } from './types';
+
+interface MenuItemProps {
+  item: TocItem;
+  indent: number;
+  colors: NonNullable<MorphingTocColors['menu']>;
+  onClick: () => void;
+}
+
+function MenuItem({ item, indent, colors, onClick }: MenuItemProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="block w-full text-left px-2 py-1 rounded text-sm cursor-pointer"
+      style={{
+        paddingLeft: `${8 + indent}px`,
+        color: isHovered ? colors.textHover : colors.text,
+        backgroundColor: isHovered ? colors.itemHover : 'transparent',
+      }}
+      tabIndex={-1}
+    >
+      <span className="block truncate">{item.title}</span>
+    </button>
+  );
+}
 
 const defaultColors: Required<MorphingTocColors> = {
   line: {
@@ -203,18 +231,13 @@ export function MorphingToc({
                       const indent = (item.level - baseLevel) * 12;
 
                       return (
-                        <button
+                        <MenuItem
                           key={item.id}
+                          item={item}
+                          indent={indent}
+                          colors={mergedColors.menu}
                           onClick={() => handleClick(item.id)}
-                          className="block w-full text-left px-2 py-1 rounded text-sm cursor-pointer hover:bg-slate-50 hover:text-slate-950"
-                          style={{
-                            paddingLeft: `${8 + indent}px`,
-                            color: mergedColors.menu.text,
-                          }}
-                          tabIndex={-1}
-                        >
-                          <span className="block truncate">{item.title}</span>
-                        </button>
+                        />
                       );
                     })}
                   </nav>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { TocItem, UseTocItemsOptions } from './types';
 
 const defaultOptions: Required<UseTocItemsOptions> = {
@@ -14,6 +14,9 @@ export function useTocItems(options: UseTocItemsOptions = {}): TocItem[] {
     ...defaultOptions,
     ...options,
   };
+
+  // Stable reference for headingLevels to avoid unnecessary re-renders
+  const headingLevelsKey = useMemo(() => headingLevels.join(','), [headingLevels]);
 
   useEffect(() => {
     const container = containerSelector
@@ -70,7 +73,7 @@ export function useTocItems(options: UseTocItemsOptions = {}): TocItem[] {
     });
 
     setTocItems(items);
-  }, [headingLevels, skipFirstH1, containerSelector]);
+  }, [headingLevelsKey, skipFirstH1, containerSelector]);
 
   return tocItems;
 }
