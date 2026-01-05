@@ -86,25 +86,22 @@ function ConnectionMenu({
 
   return (
     <div
-      className="connection-menu fixed z-[9999] bg-white rounded-xl shadow-xl border border-slate-200 p-2 min-w-[180px]"
+      className="connection-menu fixed z-[9999] bg-white rounded-md shadow-md border border-slate-200 py-1 min-w-[160px]"
       style={{ left: position.x, top: position.y }}
     >
-      <p className="text-xs text-slate-400 px-2 py-1 mb-1">Add connected node</p>
-      <div className="grid grid-cols-2 gap-1">
-        {nodeTypes.map((type) => {
-          const config = NODE_TYPE_CONFIG[type];
-          return (
-            <button
-              key={type}
-              onClick={() => onSelect(type)}
-              className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-slate-50 transition-colors"
-            >
-              <NodeTypeIcon nodeType={type} className={`w-5 h-5 ${config.iconColor}`} />
-              <span className="text-[10px] text-slate-600">{config.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {nodeTypes.map((type) => {
+        const config = NODE_TYPE_CONFIG[type];
+        return (
+          <button
+            key={type}
+            onClick={() => onSelect(type)}
+            className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-100 transition-colors"
+          >
+            <NodeTypeIcon nodeType={type} className={`w-4 h-4 ${config.iconColor}`} />
+            {config.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
