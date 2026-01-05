@@ -56,17 +56,10 @@ function NodeTypeCard({
       draggable
       onDragStart={(e) => onDragStart(e, nodeType)}
       onClick={onAdd}
-      className={`
-        p-3 rounded-lg border-2 cursor-grab active:cursor-grabbing
-        transition-all hover:shadow-md hover:scale-[1.02]
-        ${config.bgColor} ${config.borderColor}
-      `}
+      className="p-4 rounded-lg border border-dashed border-slate-300 bg-white cursor-grab active:cursor-grabbing transition-all hover:border-slate-400 hover:shadow-sm flex flex-col items-center text-center"
     >
-      <div className="flex items-center gap-2 mb-1">
-        <NodeTypeIcon nodeType={nodeType} className={`w-4 h-4 ${config.iconColor}`} />
-        <span className={`text-sm font-medium ${config.color}`}>{config.label}</span>
-      </div>
-      <p className="text-xs text-slate-500">{config.description}</p>
+      <NodeTypeIcon nodeType={nodeType} className={`w-6 h-6 mb-2 ${config.iconColor}`} />
+      <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
     </div>
   );
 }
@@ -365,7 +358,7 @@ function NodePalette({
       <h2 className="text-sm font-semibold text-slate-900 mb-1">Add Nodes</h2>
       <p className="text-xs text-slate-500 mb-4">Click or drag onto canvas</p>
       
-      <div className="grid gap-2">
+      <div className="grid grid-cols-2 gap-2">
         {nodeTypes.map((type) => (
           <NodeTypeCard
             key={type}

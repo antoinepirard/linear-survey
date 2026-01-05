@@ -71,10 +71,9 @@ function StrategyNodeComponent({
       <div className="p-3">
         {/* Header with type badge and collapse */}
         <div className="flex items-center gap-2 mb-1.5">
-          {/* Type badge */}
-          <span className={`inline-flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded ${nodeTypeConfig.bgColor} ${nodeTypeConfig.color}`}>
-            <NodeTypeIcon nodeType={data.nodeType} className={`w-3 h-3 ${nodeTypeConfig.iconColor}`} />
-            {nodeTypeConfig.label}
+          {/* Type icon */}
+          <span className={`inline-flex items-center justify-center w-6 h-6 rounded ${nodeTypeConfig.bgColor}`}>
+            <NodeTypeIcon nodeType={data.nodeType} className={`w-3.5 h-3.5 ${nodeTypeConfig.iconColor}`} />
           </span>
           
           <div className="flex-1" />

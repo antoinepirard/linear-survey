@@ -81,16 +81,6 @@ export function Toolbar({ nodes, edges, onFitView }: ToolbarProps) {
           </AnimatePresence>
         </button>
       </motion.div>
-
-      {/* Hint text */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="text-xs text-slate-400 mt-2"
-      >
-        Drag nodes from sidebar • Right-click for options
-      </motion.p>
     </div>
   );
 }
