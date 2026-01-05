@@ -47,6 +47,8 @@ export interface StrategyNodeData {
   status: NodeStatus;
   metrics?: NodeMetrics;
   isCollapsed?: boolean;
+  // Index signature for React Flow compatibility
+  [key: string]: unknown;
 }
 
 // Typed node for our strategy tree
