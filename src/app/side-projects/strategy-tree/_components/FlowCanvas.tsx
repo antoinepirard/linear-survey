@@ -310,7 +310,7 @@ export function FlowCanvas({
           btn.className = `w-full px-3 py-1.5 text-left text-sm ${
             item.danger ? 'text-rose-600 hover:bg-rose-50' : 'text-slate-700 hover:bg-slate-50'
           }`;
-          btn.textContent = item.label;
+          btn.textContent = item.label ?? '';
           btn.onclick = () => {
             item.onClick?.();
             menu.remove();
