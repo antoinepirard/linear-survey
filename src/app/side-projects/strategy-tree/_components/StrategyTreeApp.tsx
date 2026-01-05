@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback } from 'react';
-import { ReactFlowProvider } from '@xyflow/react';
+import { ReactFlowProvider, useReactFlow, getNodesBounds } from '@xyflow/react';
 import { FlowCanvas } from './FlowCanvas';
 import { Sidebar } from './Sidebar';
 import { Toolbar } from './Toolbar';
@@ -30,10 +30,17 @@ function StrategyTreeContent() {
   } = useStrategyTree();
 
   const fitViewRef = useRef<(() => void) | null>(null);
+  const { getNodes } = useReactFlow();
 
   const handleFitView = useCallback(() => {
     fitViewRef.current?.();
   }, []);
+
+  const handleGetNodesBounds = useCallback(() => {
+    const flowNodes = getNodes();
+    if (flowNodes.length === 0) return null;
+    return getNodesBounds(flowNodes);
+  }, [getNodes]);
 
   if (!isInitialized) {
     return (
@@ -75,6 +82,7 @@ function StrategyTreeContent() {
         nodes={allNodes}
         edges={allEdges}
         onFitView={handleFitView}
+        onGetNodesBounds={handleGetNodesBounds}
       />
 
       {/* Sidebar with node palette and editor */}

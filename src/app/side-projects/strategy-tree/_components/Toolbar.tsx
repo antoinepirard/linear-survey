@@ -6,7 +6,10 @@ import {
   ArrowsPointingOutIcon,
   LinkIcon,
   CheckIcon,
+  PhotoIcon,
 } from '@heroicons/react/24/outline';
+import { toPng } from 'html-to-image';
+import { getViewportForBounds } from '@xyflow/react';
 import type { StrategyNode, StrategyEdge } from '../_types';
 import { copyShareableUrl } from '../_utils/urlState';
 
@@ -14,10 +17,22 @@ interface ToolbarProps {
   nodes: StrategyNode[];
   edges: StrategyEdge[];
   onFitView: () => void;
+  onGetNodesBounds: () => { x: number; y: number; width: number; height: number } | null;
 }
 
-export function Toolbar({ nodes, edges, onFitView }: ToolbarProps) {
+const IMAGE_WIDTH = 1920;
+const IMAGE_HEIGHT = 1080;
+
+function downloadImage(dataUrl: string) {
+  const a = document.createElement('a');
+  a.setAttribute('download', 'strategy-tree.png');
+  a.setAttribute('href', dataUrl);
+  a.click();
+}
+
+export function Toolbar({ nodes, edges, onFitView, onGetNodesBounds }: ToolbarProps) {
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const handleShare = useCallback(async () => {
     const success = await copyShareableUrl(nodes, edges);
@@ -26,6 +41,46 @@ export function Toolbar({ nodes, edges, onFitView }: ToolbarProps) {
       setTimeout(() => setCopied(false), 2000);
     }
   }, [nodes, edges]);
+
+  const handleDownloadImage = useCallback(async () => {
+    const nodesBounds = onGetNodesBounds();
+    if (!nodesBounds) return;
+
+    setDownloading(true);
+    
+    try {
+      // Get the viewport element
+      const viewport = document.querySelector('.react-flow__viewport') as HTMLElement;
+      if (!viewport) return;
+
+      // Calculate the viewport transform to fit all nodes
+      const transform = getViewportForBounds(
+        nodesBounds,
+        IMAGE_WIDTH,
+        IMAGE_HEIGHT,
+        0.5,
+        2,
+        0.2
+      );
+
+      const dataUrl = await toPng(viewport, {
+        backgroundColor: '#ffffff',
+        width: IMAGE_WIDTH,
+        height: IMAGE_HEIGHT,
+        style: {
+          width: `${IMAGE_WIDTH}px`,
+          height: `${IMAGE_HEIGHT}px`,
+          transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.zoom})`,
+        },
+      });
+
+      downloadImage(dataUrl);
+    } catch (error) {
+      console.error('Failed to download image:', error);
+    } finally {
+      setDownloading(false);
+    }
+  }, [onGetNodesBounds]);
 
   return (
     <div className="absolute top-4 left-4 z-40">
@@ -79,6 +134,20 @@ export function Toolbar({ nodes, edges, onFitView }: ToolbarProps) {
               </motion.div>
             )}
           </AnimatePresence>
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-5 bg-slate-200" />
+
+        {/* Download as Image */}
+        <button
+          onClick={handleDownloadImage}
+          disabled={downloading}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+          title="Download as image"
+        >
+          <PhotoIcon className={`w-4 h-4 ${downloading ? 'animate-pulse' : ''}`} />
+          <span className="hidden sm:inline">{downloading ? 'Saving...' : 'Image'}</span>
         </button>
       </motion.div>
     </div>
