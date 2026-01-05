@@ -1,36 +1,46 @@
-'use client';
+"use client";
 
-import { useCallback, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useCallback, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   ArrowsPointingOutIcon,
   LinkIcon,
   CheckIcon,
   PhotoIcon,
-} from '@heroicons/react/24/outline';
-import { toPng } from 'html-to-image';
-import { getViewportForBounds } from '@xyflow/react';
-import type { StrategyNode, StrategyEdge } from '../_types';
-import { copyShareableUrl } from '../_utils/urlState';
+} from "@heroicons/react/24/outline";
+import { toPng } from "html-to-image";
+import { getViewportForBounds } from "@xyflow/react";
+import type { StrategyNode, StrategyEdge } from "../_types";
+import { copyShareableUrl } from "../_utils/urlState";
 
 interface ToolbarProps {
   nodes: StrategyNode[];
   edges: StrategyEdge[];
   onFitView: () => void;
-  onGetNodesBounds: () => { x: number; y: number; width: number; height: number } | null;
+  onGetNodesBounds: () => {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null;
 }
 
 const IMAGE_WIDTH = 1920;
 const IMAGE_HEIGHT = 1080;
 
 function downloadImage(dataUrl: string) {
-  const a = document.createElement('a');
-  a.setAttribute('download', 'strategy-tree.png');
-  a.setAttribute('href', dataUrl);
+  const a = document.createElement("a");
+  a.setAttribute("download", "strategy-tree.png");
+  a.setAttribute("href", dataUrl);
   a.click();
 }
 
-export function Toolbar({ nodes, edges, onFitView, onGetNodesBounds }: ToolbarProps) {
+export function Toolbar({
+  nodes,
+  edges,
+  onFitView,
+  onGetNodesBounds,
+}: ToolbarProps) {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
 
@@ -47,10 +57,12 @@ export function Toolbar({ nodes, edges, onFitView, onGetNodesBounds }: ToolbarPr
     if (!nodesBounds) return;
 
     setDownloading(true);
-    
+
     try {
       // Get the viewport element
-      const viewport = document.querySelector('.react-flow__viewport') as HTMLElement;
+      const viewport = document.querySelector(
+        ".react-flow__viewport"
+      ) as HTMLElement;
       if (!viewport) return;
 
       // Calculate the viewport transform to fit all nodes
@@ -64,7 +76,7 @@ export function Toolbar({ nodes, edges, onFitView, onGetNodesBounds }: ToolbarPr
       );
 
       const dataUrl = await toPng(viewport, {
-        backgroundColor: '#ffffff',
+        backgroundColor: "#ffffff",
         width: IMAGE_WIDTH,
         height: IMAGE_HEIGHT,
         style: {
@@ -76,7 +88,7 @@ export function Toolbar({ nodes, edges, onFitView, onGetNodesBounds }: ToolbarPr
 
       downloadImage(dataUrl);
     } catch (error) {
-      console.error('Failed to download image:', error);
+      console.error("Failed to download image:", error);
     } finally {
       setDownloading(false);
     }
@@ -146,8 +158,12 @@ export function Toolbar({ nodes, edges, onFitView, onGetNodesBounds }: ToolbarPr
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
           title="Download as image"
         >
-          <PhotoIcon className={`w-4 h-4 ${downloading ? 'animate-pulse' : ''}`} />
-          <span className="hidden sm:inline">{downloading ? 'Saving...' : 'Image'}</span>
+          <PhotoIcon
+            className={`w-4 h-4 ${downloading ? "animate-pulse" : ""}`}
+          />
+          <span className="hidden sm:inline">
+            {downloading ? "Saving..." : "Download"}
+          </span>
         </button>
       </motion.div>
     </div>
