@@ -27,6 +27,12 @@ const featuredProjects = [
 
 const sideProjects = [
   {
+    slug: "strategy-tree",
+    title: "Strategy Tree",
+    description: "Visualize goals and how product work contributes to strategy.",
+    date: "2026",
+  },
+  {
     slug: "difffs",
     title: "Difffs",
     description: "Track competitor website changes.",
