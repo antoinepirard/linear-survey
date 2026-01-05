@@ -109,6 +109,7 @@ export function useStrategyTree() {
 
   // Handle new connections - normalize direction based on node hierarchy
   // Higher level nodes (company-goal) should be sources, lower level nodes (task) should be targets
+  // Horizontal connections (left/right handles) create dependency edges
   const onConnect = useCallback(
     (connection: Connection) => {
       const sourceNode = nodes.find(n => n.id === connection.source);
@@ -119,6 +120,43 @@ export function useStrategyTree() {
       // Don't allow self-connections
       if (connection.source === connection.target) return;
       
+      // Detect if this is a horizontal (dependency) connection
+      const isHorizontalConnection = 
+        connection.sourceHandle === 'right' || 
+        connection.sourceHandle === 'left' ||
+        connection.targetHandle === 'right' || 
+        connection.targetHandle === 'left';
+      
+      if (isHorizontalConnection) {
+        // Create dependency edge (horizontal, dotted line)
+        const edgeId = `dep-${connection.source}-${connection.target}`;
+        
+        // Check if a dependency edge already exists between these nodes
+        const edgeExists = edges.some(
+          (e) => 
+            (e.source === connection.source && e.target === connection.target && e.type === 'dependency') ||
+            (e.source === connection.target && e.target === connection.source && e.type === 'dependency')
+        );
+        
+        if (edgeExists) return;
+        
+        const newEdge: StrategyEdge = {
+          id: edgeId,
+          source: connection.source!,
+          target: connection.target!,
+          sourceHandle: connection.sourceHandle || 'right',
+          targetHandle: connection.targetHandle || 'left',
+          type: 'dependency',
+        };
+        
+        setEdges((eds) => {
+          if (eds.some(e => e.id === newEdge.id)) return eds;
+          return addEdge(newEdge, eds);
+        });
+        return;
+      }
+      
+      // Hierarchy connection logic (vertical, solid line)
       const sourceHierarchy = NODE_HIERARCHY[sourceNode.data.nodeType];
       const targetHierarchy = NODE_HIERARCHY[targetNode.data.nodeType];
       
@@ -132,8 +170,8 @@ export function useStrategyTree() {
       // Check if an edge already exists between these two nodes (in either direction)
       const edgeExists = edges.some(
         (e) => 
-          (e.source === normalizedSource && e.target === normalizedTarget) ||
-          (e.source === normalizedTarget && e.target === normalizedSource)
+          (e.source === normalizedSource && e.target === normalizedTarget && e.type === 'button') ||
+          (e.source === normalizedTarget && e.target === normalizedSource && e.type === 'button')
       );
       
       if (edgeExists) return; // Don't create duplicate edges

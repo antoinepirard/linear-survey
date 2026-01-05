@@ -57,13 +57,22 @@ export function deserializeToFlow(state: SerializedState): {
     data: n.data,
   }));
 
-  const edges: StrategyEdge[] = state.edges.map((e) => ({
-    id: e.id,
-    source: e.source,
-    target: e.target,
-    type: 'button',
-    data: e.data,
-  }));
+  const edges: StrategyEdge[] = state.edges.map((e) => {
+    // Determine edge type from id prefix or default to button
+    const isDependency = e.id.startsWith('dep-');
+    
+    return {
+      id: e.id,
+      source: e.source,
+      target: e.target,
+      // Set appropriate type and handles based on edge type
+      type: isDependency ? 'dependency' : 'button',
+      // Ensure proper handle IDs for hierarchy edges (top/bottom)
+      sourceHandle: isDependency ? 'right' : 'bottom',
+      targetHandle: isDependency ? 'left' : 'top',
+      data: e.data,
+    };
+  });
 
   return { nodes, edges };
 }

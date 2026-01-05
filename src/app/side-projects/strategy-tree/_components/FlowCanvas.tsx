@@ -22,6 +22,7 @@ import {
 
 import { StrategyNode } from './StrategyNode';
 import { ButtonEdge } from './ButtonEdge';
+import { DependencyEdge } from './DependencyEdge';
 import type { StrategyNode as StrategyNodeType, StrategyEdge, NodeStatus, StrategyNodeType as NodeType } from '../_types';
 import { STATUS_CONFIG, NODE_TYPE_CONFIG } from '../_types';
 
@@ -33,6 +34,7 @@ const nodeTypes: NodeTypes = {
 // Register custom edge types
 const edgeTypes: EdgeTypes = {
   button: ButtonEdge,
+  dependency: DependencyEdge,
 };
 
 // Icon component for node types
@@ -364,6 +366,7 @@ export function FlowCanvas({
         {/* Arrow markers for edges */}
         <svg>
           <defs>
+            {/* Hierarchy edge arrows */}
             <marker
               id="arrow"
               viewBox="0 0 10 10"
@@ -385,6 +388,29 @@ export function FlowCanvas({
               orient="auto-start-reverse"
             >
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6" />
+            </marker>
+            {/* Dependency edge arrows */}
+            <marker
+              id="arrow-dependency"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="5"
+              markerHeight="5"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8" />
+            </marker>
+            <marker
+              id="arrow-dependency-selected"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="5"
+              markerHeight="5"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b" />
             </marker>
           </defs>
         </svg>

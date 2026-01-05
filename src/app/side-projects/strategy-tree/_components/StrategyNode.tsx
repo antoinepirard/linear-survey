@@ -91,12 +91,20 @@ function StrategyNodeComponent({
           }
         `}
       >
-        {/* Top handle */}
+        {/* Top handle - for hierarchy connections */}
         <Handle
           type="target"
           id="top"
           position={Position.Top}
           className="!w-2.5 !h-2.5 !bg-white !border !border-slate-300 !rounded-full hover:!border-blue-400 transition-colors"
+        />
+
+        {/* Left handle - for dependency connections */}
+        <Handle
+          type="target"
+          id="left"
+          position={Position.Left}
+          className="!w-2 !h-2 !bg-white !border !border-slate-300 !rounded-full hover:!border-amber-400 transition-colors"
         />
 
         {/* Content */}
@@ -142,7 +150,15 @@ function StrategyNodeComponent({
           </div>
         )}
 
-        {/* Bottom handle */}
+        {/* Right handle - for dependency connections */}
+        <Handle
+          type="source"
+          id="right"
+          position={Position.Right}
+          className="!w-2 !h-2 !bg-white !border !border-slate-300 !rounded-full hover:!border-amber-400 transition-colors"
+        />
+
+        {/* Bottom handle - for hierarchy connections */}
         <Handle
           type="source"
           id="bottom"
