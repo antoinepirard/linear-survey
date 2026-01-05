@@ -7,10 +7,14 @@ import {
   BackgroundVariant,
   Controls,
   useReactFlow,
+  ConnectionMode,
   type ReactFlowInstance,
   type NodeTypes,
   type EdgeTypes,
   type OnConnectEnd,
+  type NodeChange,
+  type EdgeChange,
+  type Connection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import {
@@ -111,9 +115,9 @@ function ConnectionMenu({
 interface FlowCanvasProps {
   nodes: StrategyNodeType[];
   edges: StrategyEdge[];
-  onNodesChange: (changes: unknown) => void;
-  onEdgesChange: (changes: unknown) => void;
-  onConnect: (connection: unknown) => void;
+  onNodesChange: (changes: NodeChange<StrategyNodeType>[]) => void;
+  onEdgesChange: (changes: EdgeChange<StrategyEdge>[]) => void;
+  onConnect: (connection: Connection) => void;
   onToggleCollapse: (nodeId: string) => void;
   onDeleteEdge: (edgeId: string) => void;
   onAddNode: (nodeType: NodeType, position?: { x: number; y: number }) => void;
@@ -139,7 +143,7 @@ export function FlowCanvas({
   onDuplicateNode,
   onFitViewRef,
 }: FlowCanvasProps) {
-  const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
+  const reactFlowInstance = useRef<ReactFlowInstance<StrategyNodeType, StrategyEdge> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition } = useReactFlow();
   
@@ -152,7 +156,7 @@ export function FlowCanvas({
   const connectingNodeId = useRef<string | null>(null);
 
   const onInit = useCallback((instance: ReactFlowInstance<StrategyNodeType, StrategyEdge>) => {
-    reactFlowInstance.current = instance as ReactFlowInstance;
+    reactFlowInstance.current = instance;
     setTimeout(() => {
       instance.fitView({ padding: 0.2 });
     }, 100);
@@ -359,7 +363,7 @@ export function FlowCanvas({
           animated: false,
         }}
         connectionLineStyle={{ stroke: '#d4d4d8', strokeWidth: 1 }}
-        connectionMode="loose"
+        connectionMode={ConnectionMode.Loose}
         proOptions={{ hideAttribution: true }}
         className="bg-white"
       >
