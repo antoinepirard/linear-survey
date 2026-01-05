@@ -89,9 +89,11 @@ function getStatusBadgeStyles(status: NodeStatus): string {
 }
 
 function StrategyNodeComponent({
+  id,
   data,
   selected,
 }: {
+  id: string;
   data: StrategyNodeData;
   selected?: boolean;
 }) {
@@ -225,12 +227,21 @@ function StrategyNodeComponent({
         />
       </div>
 
-      {/* Collapsed indicator */}
+      {/* Collapsed indicator - clickable to expand */}
       {data.isCollapsed && (
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-0.5 bg-slate-100 rounded-full border border-slate-200 text-slate-500">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            const event = new CustomEvent("toggleCollapse", {
+              detail: { nodeId: id },
+            });
+            window.dispatchEvent(event);
+          }}
+          className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2.5 py-1 bg-slate-200/60 rounded-full text-slate-500 hover:bg-slate-200 transition-colors cursor-pointer"
+        >
           <ChevronDownIcon className="w-3 h-3" />
-          <span className="text-[10px] font-medium">Collapsed</span>
-        </div>
+          <span className="text-[10px] font-medium">Expand</span>
+        </button>
       )}
     </div>
   );
