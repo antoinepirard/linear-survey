@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect, DragEvent } from 'react';
 import {
   ReactFlow,
   Background,
@@ -12,14 +12,14 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { GoalNode } from './GoalNode';
+import { StrategyNode } from './StrategyNode';
 import { ButtonEdge } from './ButtonEdge';
-import type { GoalNode as GoalNodeType, StrategyEdge, NodeStatus } from '../_types';
+import type { StrategyNode as StrategyNodeType, StrategyEdge, NodeStatus, StrategyNodeType as NodeType } from '../_types';
 import { STATUS_CONFIG } from '../_types';
 
 // Register custom node types
 const nodeTypes: NodeTypes = {
-  goal: GoalNode,
+  strategy: StrategyNode,
 };
 
 // Register custom edge types
@@ -28,14 +28,14 @@ const edgeTypes: EdgeTypes = {
 };
 
 interface FlowCanvasProps {
-  nodes: GoalNodeType[];
+  nodes: StrategyNodeType[];
   edges: StrategyEdge[];
-  onNodesChange: (changes: any) => void;
-  onEdgesChange: (changes: any) => void;
-  onConnect: (connection: any) => void;
+  onNodesChange: (changes: unknown) => void;
+  onEdgesChange: (changes: unknown) => void;
+  onConnect: (connection: unknown) => void;
   onToggleCollapse: (nodeId: string) => void;
   onDeleteEdge: (edgeId: string) => void;
-  onAddNode: (position: { x: number; y: number }) => void;
+  onAddNode: (nodeType: NodeType, position?: { x: number; y: number }) => void;
   onChangeStatus: (nodeId: string, status: NodeStatus) => void;
   onDeleteNode: (nodeId: string) => void;
   onDuplicateNode: (nodeId: string) => void;
@@ -59,16 +59,13 @@ export function FlowCanvas({
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Handle init
   const onInit = useCallback((instance: ReactFlowInstance) => {
     reactFlowInstance.current = instance;
-    // Fit view on init
     setTimeout(() => {
       instance.fitView({ padding: 0.2 });
     }, 100);
   }, []);
 
-  // Expose fitView function
   useEffect(() => {
     if (onFitViewRef) {
       onFitViewRef.current = () => {
@@ -96,14 +93,19 @@ export function FlowCanvas({
     };
   }, [onToggleCollapse, onDeleteEdge]);
 
-  // Handle double-click to add node
-  const onDoubleClick = useCallback(
-    (event: React.MouseEvent) => {
-      if (!reactFlowInstance.current || !containerRef.current) return;
+  // Handle drag over for drop zone
+  const onDragOver = useCallback((event: DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
 
-      // Check if clicking on the pane (not a node)
-      const target = event.target as HTMLElement;
-      if (target.closest('.react-flow__node')) return;
+  // Handle drop from sidebar
+  const onDrop = useCallback(
+    (event: DragEvent) => {
+      event.preventDefault();
+
+      const nodeType = event.dataTransfer.getData('application/reactflow') as NodeType;
+      if (!nodeType || !reactFlowInstance.current || !containerRef.current) return;
 
       const bounds = containerRef.current.getBoundingClientRect();
       const position = reactFlowInstance.current.screenToFlowPosition({
@@ -111,17 +113,16 @@ export function FlowCanvas({
         y: event.clientY - bounds.top,
       });
 
-      onAddNode(position);
+      onAddNode(nodeType, position);
     },
     [onAddNode]
   );
 
   // Context menu for nodes
   const onNodeContextMenu = useCallback(
-    (event: React.MouseEvent, node: GoalNodeType) => {
+    (event: React.MouseEvent, node: StrategyNodeType) => {
       event.preventDefault();
 
-      // Create a simple context menu
       const menu = document.createElement('div');
       menu.className = 'fixed z-[9999] bg-white rounded-lg shadow-xl border border-slate-200 py-1 min-w-[160px]';
       menu.style.left = `${event.clientX}px`;
@@ -187,7 +188,6 @@ export function FlowCanvas({
 
       document.body.appendChild(menu);
 
-      // Remove menu on click outside
       const removeMenu = (e: MouseEvent) => {
         if (!menu.contains(e.target as Node)) {
           menu.remove();
@@ -200,7 +200,12 @@ export function FlowCanvas({
   );
 
   return (
-    <div ref={containerRef} className="w-full h-full" onDoubleClick={onDoubleClick}>
+    <div 
+      ref={containerRef} 
+      className="w-full h-full"
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -236,4 +241,3 @@ export function FlowCanvas({
     </div>
   );
 }
-

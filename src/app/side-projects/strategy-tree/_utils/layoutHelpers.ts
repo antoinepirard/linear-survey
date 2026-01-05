@@ -1,4 +1,4 @@
-import type { GoalNode, StrategyEdge } from '../_types';
+import type { StrategyNode, StrategyEdge, StrategyNodeType } from '../_types';
 
 // Generate a unique ID for new nodes
 export function generateNodeId(): string {
@@ -13,8 +13,8 @@ export function generateEdgeId(source: string, target: string): string {
 // Calculate center position for a new node
 export function getCenterPosition(viewportWidth: number, viewportHeight: number): { x: number; y: number } {
   return {
-    x: viewportWidth / 2 - 100, // Offset by half node width
-    y: viewportHeight / 2 - 40, // Offset by half node height
+    x: viewportWidth / 2 - 100,
+    y: viewportHeight / 2 - 40,
   };
 }
 
@@ -51,47 +51,92 @@ export function getParentIds(nodeId: string, edges: StrategyEdge[]): string[] {
   return edges.filter((e) => e.target === nodeId).map((e) => e.source);
 }
 
+// Create a new node with given type
+export function createNode(
+  nodeType: StrategyNodeType,
+  position: { x: number; y: number }
+): StrategyNode {
+  const titles: Record<StrategyNodeType, string> = {
+    'company-goal': 'New Company Goal',
+    'strategy': 'New Strategy',
+    'initiative': 'New Initiative',
+    'task': 'New Task',
+  };
+
+  return {
+    id: generateNodeId(),
+    type: 'strategy',
+    position,
+    data: {
+      title: titles[nodeType],
+      description: '',
+      nodeType,
+      status: 'not-started',
+      metrics: {},
+    },
+  };
+}
+
 // Create default initial nodes for a new tree
-export function getInitialNodes(): GoalNode[] {
+export function getInitialNodes(): StrategyNode[] {
   return [
     {
-      id: 'company-goal',
-      type: 'goal',
-      position: { x: 250, y: 50 },
+      id: 'company-goal-1',
+      type: 'strategy',
+      position: { x: 300, y: 50 },
       data: {
-        title: 'Company Goal',
-        description: 'What is the high-level business objective?',
-        status: 'not-started',
+        title: 'Increase Revenue by 30%',
+        description: 'Annual revenue growth target for FY2026',
+        nodeType: 'company-goal',
+        status: 'on-track',
+        metrics: {
+          progress: { enabled: true, current: 15, target: 30, unit: '%' },
+          timeline: { enabled: true, dueDate: '2026-12-31' },
+        },
       },
     },
     {
-      id: 'product-strategy',
-      type: 'goal',
-      position: { x: 250, y: 200 },
+      id: 'strategy-1',
+      type: 'strategy',
+      position: { x: 300, y: 220 },
       data: {
-        title: 'Product Strategy',
-        description: 'How does product contribute to this goal?',
-        status: 'not-started',
+        title: 'Expand Enterprise Segment',
+        description: 'Focus on enterprise customers with ARR > $100k',
+        nodeType: 'strategy',
+        status: 'on-track',
+        metrics: {
+          owner: { enabled: true, name: 'Sarah Chen' },
+        },
       },
     },
     {
       id: 'initiative-1',
-      type: 'goal',
-      position: { x: 100, y: 350 },
+      type: 'strategy',
+      position: { x: 120, y: 400 },
       data: {
-        title: 'Initiative 1',
-        description: 'First key initiative',
+        title: 'Enterprise Onboarding',
+        description: 'Dedicated onboarding flow for enterprise',
+        nodeType: 'initiative',
         status: 'on-track',
+        metrics: {
+          progress: { enabled: true, current: 60, target: 100, unit: '%' },
+          timeline: { enabled: true, startDate: '2026-01-01', dueDate: '2026-03-31' },
+        },
       },
     },
     {
       id: 'initiative-2',
-      type: 'goal',
-      position: { x: 400, y: 350 },
+      type: 'strategy',
+      position: { x: 480, y: 400 },
       data: {
-        title: 'Initiative 2',
-        description: 'Second key initiative',
+        title: 'SOC2 Compliance',
+        description: 'Security certification for enterprise sales',
+        nodeType: 'initiative',
         status: 'at-risk',
+        metrics: {
+          progress: { enabled: true, current: 25, target: 100, unit: '%' },
+          owner: { enabled: true, name: 'Mike Johnson' },
+        },
       },
     },
   ];
@@ -101,23 +146,22 @@ export function getInitialNodes(): GoalNode[] {
 export function getInitialEdges(): StrategyEdge[] {
   return [
     {
-      id: 'edge-company-product',
-      source: 'company-goal',
-      target: 'product-strategy',
+      id: 'edge-goal-strategy',
+      source: 'company-goal-1',
+      target: 'strategy-1',
       type: 'button',
     },
     {
-      id: 'edge-product-init1',
-      source: 'product-strategy',
+      id: 'edge-strategy-init1',
+      source: 'strategy-1',
       target: 'initiative-1',
       type: 'button',
     },
     {
-      id: 'edge-product-init2',
-      source: 'product-strategy',
+      id: 'edge-strategy-init2',
+      source: 'strategy-1',
       target: 'initiative-2',
       type: 'button',
     },
   ];
 }
-

@@ -9,7 +9,7 @@ import {
   type NodeChange,
   type EdgeChange,
 } from '@xyflow/react';
-import type { GoalNode, StrategyEdge, NodeStatus, GoalNodeData } from '../_types';
+import type { StrategyNode, StrategyEdge, NodeStatus, StrategyNodeData, StrategyNodeType } from '../_types';
 import {
   getStateFromUrl,
   deserializeToFlow,
@@ -18,17 +18,16 @@ import {
 import {
   getInitialNodes,
   getInitialEdges,
-  generateNodeId,
   generateEdgeId,
   getDescendantIds,
   hasChildren,
+  createNode,
 } from '../_utils/layoutHelpers';
 
 export function useStrategyTree() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   
-  // Initialize from URL or defaults
   const getInitialState = useCallback(() => {
     const urlState = getStateFromUrl();
     if (urlState) {
@@ -40,10 +39,8 @@ export function useStrategyTree() {
     };
   }, []);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<GoalNode>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<StrategyNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<StrategyEdge>([]);
-
-  // Track hidden node IDs (collapsed children)
   const [hiddenNodeIds, setHiddenNodeIds] = useState<Set<string>>(new Set());
 
   // Initialize state from URL or defaults
@@ -81,7 +78,7 @@ export function useStrategyTree() {
           const { isCollapsed: _, ...restData } = node.data;
           return {
             ...node,
-            data: restData as GoalNodeData,
+            data: restData as StrategyNodeData,
           };
         }
         return node;
@@ -94,7 +91,7 @@ export function useStrategyTree() {
     return nodes.filter((n) => !hiddenNodeIds.has(n.id));
   }, [nodes, hiddenNodeIds]);
 
-  // Visible edges (filter out edges connected to hidden nodes)
+  // Visible edges
   const visibleEdges = useMemo(() => {
     return edges.filter(
       (e) => !hiddenNodeIds.has(e.source) && !hiddenNodeIds.has(e.target)
@@ -116,10 +113,9 @@ export function useStrategyTree() {
 
   // Handle node changes with selection tracking
   const handleNodesChange = useCallback(
-    (changes: NodeChange<GoalNode>[]) => {
+    (changes: NodeChange<StrategyNode>[]) => {
       onNodesChange(changes);
       
-      // Track selection
       const selectionChange = changes.find(
         (c) => c.type === 'select' && 'selected' in c
       );
@@ -142,19 +138,11 @@ export function useStrategyTree() {
     [onEdgesChange]
   );
 
-  // Add a new node
+  // Add a new node with specific type
   const addNode = useCallback(
-    (position: { x: number; y: number }) => {
-      const newNode: GoalNode = {
-        id: generateNodeId(),
-        type: 'goal',
-        position,
-        data: {
-          title: 'New Goal',
-          description: '',
-          status: 'not-started',
-        },
-      };
+    (nodeType: StrategyNodeType, position?: { x: number; y: number }) => {
+      const pos = position || { x: 300, y: 200 };
+      const newNode = createNode(nodeType, pos);
       setNodes((nds) => [...nds, newNode]);
       setSelectedNodeId(newNode.id);
       return newNode.id;
@@ -164,7 +152,7 @@ export function useStrategyTree() {
 
   // Update node data
   const updateNode = useCallback(
-    (nodeId: string, data: Partial<GoalNodeData>) => {
+    (nodeId: string, data: Partial<StrategyNodeData>) => {
       setNodes((nds) =>
         nds.map((node) =>
           node.id === nodeId
@@ -215,7 +203,6 @@ export function useStrategyTree() {
       const isCollapsed = !node.data.isCollapsed;
       const descendants = getDescendantIds(nodeId, edges);
 
-      // Update node's collapsed state
       setNodes((nds) =>
         nds.map((n) =>
           n.id === nodeId
@@ -224,7 +211,6 @@ export function useStrategyTree() {
         )
       );
 
-      // Update hidden nodes
       setHiddenNodeIds((prev) => {
         const next = new Set(prev);
         if (isCollapsed) {
@@ -249,18 +235,14 @@ export function useStrategyTree() {
       const node = nodes.find((n) => n.id === nodeId);
       if (!node) return;
 
-      const newNode: GoalNode = {
-        ...node,
-        id: generateNodeId(),
-        position: {
-          x: node.position.x + 50,
-          y: node.position.y + 50,
-        },
-        data: {
-          ...node.data,
-          title: `${node.data.title} (copy)`,
-          isCollapsed: undefined,
-        },
+      const newNode = createNode(node.data.nodeType, {
+        x: node.position.x + 50,
+        y: node.position.y + 50,
+      });
+      newNode.data = {
+        ...node.data,
+        title: `${node.data.title} (copy)`,
+        isCollapsed: undefined,
       };
       setNodes((nds) => [...nds, newNode]);
     },
@@ -276,7 +258,6 @@ export function useStrategyTree() {
   }, [setNodes]);
 
   return {
-    // State
     nodes: visibleNodes,
     edges: visibleEdges,
     allNodes: nodes,
@@ -285,12 +266,10 @@ export function useStrategyTree() {
     selectedNodeId,
     isInitialized,
 
-    // Handlers for React Flow
     onNodesChange: handleNodesChange,
     onEdgesChange: handleEdgesChange,
     onConnect,
 
-    // Actions
     addNode,
     updateNode,
     deleteNode,
@@ -302,4 +281,3 @@ export function useStrategyTree() {
     setSelectedNodeId,
   };
 }
-

@@ -1,7 +1,7 @@
-import type { SerializedState, GoalNode, StrategyEdge } from '../_types';
+import type { SerializedState, StrategyNode, StrategyEdge } from '../_types';
 
 // Compress and encode state to URL-safe string
-export function encodeState(nodes: GoalNode[], edges: StrategyEdge[]): string {
+export function encodeState(nodes: StrategyNode[], edges: StrategyEdge[]): string {
   const state: SerializedState = {
     nodes: nodes.map((n) => ({
       id: n.id,
@@ -18,7 +18,6 @@ export function encodeState(nodes: GoalNode[], edges: StrategyEdge[]): string {
 
   try {
     const json = JSON.stringify(state);
-    // Use base64 encoding (works in browser)
     const encoded = btoa(encodeURIComponent(json));
     return encoded;
   } catch {
@@ -35,7 +34,6 @@ export function decodeState(encoded: string): SerializedState | null {
     const json = decodeURIComponent(atob(encoded));
     const state = JSON.parse(json) as SerializedState;
     
-    // Basic validation
     if (!state.nodes || !state.edges) {
       return null;
     }
@@ -49,12 +47,12 @@ export function decodeState(encoded: string): SerializedState | null {
 
 // Convert serialized state back to React Flow format
 export function deserializeToFlow(state: SerializedState): {
-  nodes: GoalNode[];
+  nodes: StrategyNode[];
   edges: StrategyEdge[];
 } {
-  const nodes: GoalNode[] = state.nodes.map((n) => ({
+  const nodes: StrategyNode[] = state.nodes.map((n) => ({
     id: n.id,
-    type: 'goal',
+    type: 'strategy',
     position: n.position,
     data: n.data,
   }));
@@ -74,7 +72,7 @@ export function deserializeToFlow(state: SerializedState): {
 export function getStateFromUrl(): SerializedState | null {
   if (typeof window === 'undefined') return null;
   
-  const hash = window.location.hash.slice(1); // Remove #
+  const hash = window.location.hash.slice(1);
   if (!hash) return null;
   
   const params = new URLSearchParams(hash);
@@ -86,20 +84,18 @@ export function getStateFromUrl(): SerializedState | null {
 }
 
 // Update URL with state (without page reload)
-export function updateUrlWithState(nodes: GoalNode[], edges: StrategyEdge[]): void {
+export function updateUrlWithState(nodes: StrategyNode[], edges: StrategyEdge[]): void {
   if (typeof window === 'undefined') return;
   
   const encoded = encodeState(nodes, edges);
   if (!encoded) return;
   
   const newHash = `#s=${encoded}`;
-  
-  // Update URL without triggering navigation
   window.history.replaceState(null, '', newHash);
 }
 
 // Generate shareable URL
-export function getShareableUrl(nodes: GoalNode[], edges: StrategyEdge[]): string {
+export function getShareableUrl(nodes: StrategyNode[], edges: StrategyEdge[]): string {
   if (typeof window === 'undefined') return '';
   
   const encoded = encodeState(nodes, edges);
@@ -109,7 +105,7 @@ export function getShareableUrl(nodes: GoalNode[], edges: StrategyEdge[]): strin
 }
 
 // Copy URL to clipboard
-export async function copyShareableUrl(nodes: GoalNode[], edges: StrategyEdge[]): Promise<boolean> {
+export async function copyShareableUrl(nodes: StrategyNode[], edges: StrategyEdge[]): Promise<boolean> {
   const url = getShareableUrl(nodes, edges);
   
   try {
@@ -120,4 +116,3 @@ export async function copyShareableUrl(nodes: GoalNode[], edges: StrategyEdge[])
     return false;
   }
 }
-
