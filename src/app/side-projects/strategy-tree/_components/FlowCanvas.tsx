@@ -158,14 +158,14 @@ export function FlowCanvas({
   const onInit = useCallback((instance: ReactFlowInstance<StrategyNodeType, StrategyEdge>) => {
     reactFlowInstance.current = instance;
     setTimeout(() => {
-      instance.fitView({ padding: 0.2 });
+      instance.fitView({ padding: 0.4, maxZoom: 1 });
     }, 100);
   }, []);
 
   useEffect(() => {
     if (onFitViewRef) {
       onFitViewRef.current = () => {
-        reactFlowInstance.current?.fitView({ padding: 0.2, duration: 300 });
+        reactFlowInstance.current?.fitView({ padding: 0.4, maxZoom: 1, duration: 300 });
       };
     }
   }, [onFitViewRef]);
@@ -356,6 +356,7 @@ export function FlowCanvas({
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
+        fitViewOptions={{ padding: 0.4, maxZoom: 1 }}
         snapToGrid
         snapGrid={[16, 16]}
         defaultEdgeOptions={{
