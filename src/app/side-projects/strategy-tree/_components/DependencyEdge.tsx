@@ -57,7 +57,11 @@ function DependencyEdgeComponent({
           strokeWidth: selected ? 1.5 : 1,
           strokeDasharray: "5 3",
         }}
-        markerEnd={selected ? "url(#arrow-dependency-selected)" : "url(#arrow-dependency)"}
+        markerEnd={
+          selected
+            ? "url(#arrow-dependency-selected)"
+            : "url(#arrow-dependency)"
+        }
       />
 
       {/* Edge label and delete button */}
@@ -92,4 +96,3 @@ function DependencyEdgeComponent({
 }
 
 export const DependencyEdge = memo(DependencyEdgeComponent);
-
