@@ -357,6 +357,7 @@ export function FlowCanvas({
           animated: false,
         }}
         connectionLineStyle={{ stroke: '#d4d4d8', strokeWidth: 1 }}
+        connectionMode="loose"
         proOptions={{ hideAttribution: true }}
         className="bg-white"
       >

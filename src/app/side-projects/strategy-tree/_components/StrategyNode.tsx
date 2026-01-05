@@ -94,6 +94,7 @@ function StrategyNodeComponent({
         {/* Top handle */}
         <Handle
           type="target"
+          id="top"
           position={Position.Top}
           className="!w-2.5 !h-2.5 !bg-white !border !border-slate-300 !rounded-full hover:!border-blue-400 transition-colors"
         />
@@ -144,6 +145,7 @@ function StrategyNodeComponent({
         {/* Bottom handle */}
         <Handle
           type="source"
+          id="bottom"
           position={Position.Bottom}
           className="!w-2.5 !h-2.5 !bg-white !border !border-slate-300 !rounded-full hover:!border-blue-400 transition-colors"
         />

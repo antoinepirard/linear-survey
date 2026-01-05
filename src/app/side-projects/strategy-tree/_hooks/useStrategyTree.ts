@@ -10,6 +10,15 @@ import {
   type EdgeChange,
 } from '@xyflow/react';
 import type { StrategyNode, StrategyEdge, NodeStatus, StrategyNodeData, StrategyNodeType } from '../_types';
+
+// Hierarchy order for node types (lower number = higher in hierarchy)
+// Goals are at the top, tasks are at the bottom
+const NODE_HIERARCHY: Record<StrategyNodeType, number> = {
+  'company-goal': 0,
+  'strategy': 1,
+  'initiative': 2,
+  'task': 3,
+};
 import {
   getStateFromUrl,
   deserializeToFlow,
@@ -98,17 +107,57 @@ export function useStrategyTree() {
     );
   }, [edges, hiddenNodeIds]);
 
-  // Handle new connections
+  // Handle new connections - normalize direction based on node hierarchy
+  // Higher level nodes (company-goal) should be sources, lower level nodes (task) should be targets
   const onConnect = useCallback(
     (connection: Connection) => {
+      const sourceNode = nodes.find(n => n.id === connection.source);
+      const targetNode = nodes.find(n => n.id === connection.target);
+      
+      if (!sourceNode || !targetNode) return;
+      
+      // Don't allow self-connections
+      if (connection.source === connection.target) return;
+      
+      const sourceHierarchy = NODE_HIERARCHY[sourceNode.data.nodeType];
+      const targetHierarchy = NODE_HIERARCHY[targetNode.data.nodeType];
+      
+      // Determine if we need to swap source and target based on hierarchy
+      // Edge should flow from higher level (lower number) to lower level (higher number)
+      const shouldSwap = sourceHierarchy > targetHierarchy;
+      
+      const normalizedSource = shouldSwap ? connection.target! : connection.source!;
+      const normalizedTarget = shouldSwap ? connection.source! : connection.target!;
+      
+      // Check if an edge already exists between these two nodes (in either direction)
+      const edgeExists = edges.some(
+        (e) => 
+          (e.source === normalizedSource && e.target === normalizedTarget) ||
+          (e.source === normalizedTarget && e.target === normalizedSource)
+      );
+      
+      if (edgeExists) return; // Don't create duplicate edges
+      
+      // When swapped, the arrow should point the right direction:
+      // - source uses bottom handle
+      // - target uses top handle
       const newEdge: StrategyEdge = {
-        ...connection,
-        id: generateEdgeId(connection.source!, connection.target!),
+        id: generateEdgeId(normalizedSource, normalizedTarget),
+        source: normalizedSource,
+        target: normalizedTarget,
+        sourceHandle: 'bottom',
+        targetHandle: 'top',
         type: 'button',
       };
-      setEdges((eds) => addEdge(newEdge, eds));
+      
+      // Use functional update with duplicate check to handle race conditions
+      setEdges((eds) => {
+        // Double-check edge doesn't already exist in current state
+        if (eds.some(e => e.id === newEdge.id)) return eds;
+        return addEdge(newEdge, eds);
+      });
     },
-    [setEdges]
+    [setEdges, nodes, edges]
   );
 
   // Handle node changes with selection tracking
@@ -151,22 +200,46 @@ export function useStrategyTree() {
   );
 
   // Add a new node and connect it to a source node
+  // Respects hierarchy: higher level nodes are sources, lower level nodes are targets
   const addNodeAndConnect = useCallback(
     (nodeType: StrategyNodeType, position: { x: number; y: number }, sourceNodeId: string) => {
       const newNode = createNode(nodeType, position);
+      const existingNode = nodes.find(n => n.id === sourceNodeId);
+      
+      if (!existingNode) {
+        setNodes((nds) => [...nds, newNode]);
+        setSelectedNodeId(newNode.id);
+        return newNode.id;
+      }
+      
+      const existingHierarchy = NODE_HIERARCHY[existingNode.data.nodeType];
+      const newHierarchy = NODE_HIERARCHY[nodeType];
+      
+      // Determine edge direction based on hierarchy
+      // Edge flows from higher level (lower number) to lower level (higher number)
+      const edgeSource = existingHierarchy <= newHierarchy ? sourceNodeId : newNode.id;
+      const edgeTarget = existingHierarchy <= newHierarchy ? newNode.id : sourceNodeId;
+      
       setNodes((nds) => [...nds, newNode]);
       
       const newEdge: StrategyEdge = {
-        id: generateEdgeId(sourceNodeId, newNode.id),
-        source: sourceNodeId,
-        target: newNode.id,
+        id: generateEdgeId(edgeSource, edgeTarget),
+        source: edgeSource,
+        target: edgeTarget,
+        sourceHandle: 'bottom',
+        targetHandle: 'top',
         type: 'button',
       };
-      setEdges((eds) => [...eds, newEdge]);
+      
+      // Use functional update with duplicate check
+      setEdges((eds) => {
+        if (eds.some(e => e.id === newEdge.id)) return eds;
+        return [...eds, newEdge];
+      });
       setSelectedNodeId(newNode.id);
       return newNode.id;
     },
-    [setNodes, setEdges]
+    [setNodes, setEdges, nodes]
   );
 
   // Update node data
