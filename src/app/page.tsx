@@ -42,7 +42,7 @@ export default function Home() {
     ██║     ╚██████╔╝███████╗██║╚██████╔╝
     ╚═╝      ╚═════╝ ╚══════╝╚═╝ ╚═════╝
 
-    Antoine Pirard - Product Designer
+    Antoine Pirard - Product
 
     🧠 Systems Thinker
     🎨 Product Crafter
@@ -113,7 +113,7 @@ export default function Home() {
                   Product & Design.
                 </p>
                 <p className="text-base leading-relaxed text-slate-700">
-                  I craft thoughtful experiences with product teams—from
+                  I lead product teams to craft thoughtful experiences—from
                   research and validation to design and engineering handover.
                 </p>
               </AnimationWrapper>

@@ -25,6 +25,17 @@ const featuredProjects = [
   },
 ];
 
+const openSourceProjects = [
+  {
+    slug: "morphing-toc",
+    title: "morphing-toc",
+    description: "Table of contents that morphs from lines to menu on hover.",
+    date: "2026",
+    href: "/open-source/morphing-toc",
+    isExternal: false,
+  },
+];
+
 const sideProjects = [
   {
     slug: "strategy-tree",
@@ -82,7 +93,60 @@ export default function SideProjectsPage() {
               {/* Projects List */}
               <AnimationWrapper delay="200ms">
                 <div className="flex flex-col">
+                  {/* Open Source */}
+                  <div className="mb-2 mt-4">
+                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">
+                      Open Source
+                    </span>
+                  </div>
+                  {openSourceProjects.map((project) => (
+                    <motion.div key={project.slug} whileHover="hover">
+                      <Link
+                        href={project.href}
+                        className="group block py-4 px-2 -mx-2 border-b border-slate-100 transition-colors duration-150 hover:border-slate-200"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h3 className="text-sm font-medium text-slate-900 font-mono transition-colors duration-150 group-hover:text-slate-700">
+                              {project.title}
+                            </h3>
+                            <p className="text-sm text-slate-600">
+                              {project.description}
+                            </p>
+                          </div>
+                          <div className="flex items-center min-w-0">
+                            <motion.span
+                              className="text-xs font-mono uppercase text-slate-500 whitespace-nowrap"
+                              animate={{ x: 0 }}
+                              variants={{
+                                hover: { x: -16 },
+                              }}
+                              transition={{ duration: 0.15, ease: "easeOut" }}
+                            >
+                              {project.date}
+                            </motion.span>
+                            <motion.div
+                              className="flex items-center"
+                              initial={{ x: 16, opacity: 0 }}
+                              variants={{
+                                hover: { x: 0, opacity: 1 },
+                              }}
+                              transition={{ duration: 0.15, ease: "easeOut" }}
+                            >
+                              <span className="text-xs text-slate-400 -ml-2">→</span>
+                            </motion.div>
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+
                   {/* Featured Projects */}
+                  <div className="mb-2 mt-6">
+                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">
+                      Featured
+                    </span>
+                  </div>
                   {featuredProjects.map((project) => (
                     <motion.div key={project.slug} whileHover="hover">
                       {project.isExternal ? (
@@ -174,6 +238,11 @@ export default function SideProjectsPage() {
                   ))}
 
                   {/* Other Projects */}
+                  <div className="mb-2 mt-6">
+                    <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">
+                      Experiments
+                    </span>
+                  </div>
                   {sideProjects.map((project, index) => (
                     <motion.div
                       key={project.slug}
