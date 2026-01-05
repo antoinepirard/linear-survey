@@ -220,16 +220,16 @@ export function FlowCanvas({
         }}
         connectionLineStyle={{ stroke: '#94a3b8', strokeWidth: 2 }}
         proOptions={{ hideAttribution: true }}
-        className="bg-slate-900"
+        className="bg-slate-50"
       >
         <Background 
           variant={BackgroundVariant.Dots} 
           gap={20} 
           size={1} 
-          color="#334155"
+          color="#cbd5e1"
         />
         <Controls 
-          className="!bg-white/10 !border-white/20 !shadow-lg [&>button]:!bg-white/10 [&>button]:!border-white/10 [&>button]:!text-white [&>button:hover]:!bg-white/20"
+          className="!bg-white !border-slate-200 !shadow-md [&>button]:!bg-white [&>button]:!border-slate-200 [&>button]:!text-slate-600 [&>button:hover]:!bg-slate-50"
           showInteractive={false}
         />
       </ReactFlow>

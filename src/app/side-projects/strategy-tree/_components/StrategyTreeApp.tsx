@@ -42,12 +42,12 @@ function StrategyTreeContent() {
 
   if (!isInitialized) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-slate-900">
+      <div className="w-full h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
             <span className="text-lg font-bold text-white">S</span>
           </div>
-          <div className="w-5 h-5 border-2 border-white/20 border-t-blue-500 rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-slate-200 border-t-blue-500 rounded-full animate-spin" />
         </div>
       </div>
     );

@@ -13,12 +13,12 @@ const StrategyTreeApp = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
             <span className="text-lg font-bold text-white">S</span>
           </div>
-          <div className="w-5 h-5 border-2 border-white/20 border-t-blue-500 rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-slate-200 border-t-blue-500 rounded-full animate-spin" />
         </div>
       </div>
     ),
@@ -27,7 +27,7 @@ const StrategyTreeApp = dynamic(
 
 export default function StrategyTreePage() {
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-slate-50">
       {/* Back Navigation */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -37,7 +37,7 @@ export default function StrategyTreePage() {
       >
         <Link
           href="/side-projects"
-          className="inline-flex items-center text-white/60 text-sm hover:text-white transition-colors"
+          className="inline-flex items-center text-slate-500 text-sm hover:text-slate-900 transition-colors"
         >
           <ChevronLeftIcon className="w-4 h-4 mr-1" />
           Back

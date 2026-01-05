@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback } from "react";
 import {
   BaseEdge,
   EdgeLabelRenderer,
   getSmoothStepPath,
   type Edge,
   type EdgeProps,
-} from '@xyflow/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+} from "@xyflow/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 interface StrategyEdgeData {
   label?: string;
   [key: string]: unknown;
 }
 
-type StrategyEdge = Edge<StrategyEdgeData, 'button'>;
+type StrategyEdge = Edge<StrategyEdgeData, "button">;
 
 function ButtonEdgeComponent({
   id,
@@ -38,30 +38,33 @@ function ButtonEdgeComponent({
     borderRadius: 8,
   });
 
-  const handleDelete = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    const event = new CustomEvent('deleteEdge', { detail: { edgeId: id } });
-    window.dispatchEvent(event);
-  }, [id]);
+  const handleDelete = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const event = new CustomEvent("deleteEdge", { detail: { edgeId: id } });
+      window.dispatchEvent(event);
+    },
+    [id]
+  );
 
   return (
     <>
-      <BaseEdge 
-        id={id} 
-        path={edgePath} 
+      <BaseEdge
+        id={id}
+        path={edgePath}
         style={{
-          stroke: selected ? '#3b82f6' : '#cbd5e1',
+          stroke: selected ? "#3b82f6" : "#cbd5e1",
           strokeWidth: selected ? 2 : 1.5,
         }}
       />
-      
+
       {/* Delete button - appears on hover/select */}
       <EdgeLabelRenderer>
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-            pointerEvents: 'all',
+            pointerEvents: "all",
           }}
           className="nodrag nopan"
         >
@@ -71,7 +74,7 @@ function ButtonEdgeComponent({
               {data.label}
             </span>
           )}
-          
+
           {/* Delete button - only show when selected */}
           {selected && (
             <button

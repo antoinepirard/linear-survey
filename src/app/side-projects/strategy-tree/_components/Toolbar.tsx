@@ -102,7 +102,7 @@ export function Toolbar({ nodes, edges, onAddNode, onFitView }: ToolbarProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="text-center text-xs text-white/50 mt-2"
+        className="text-center text-xs text-slate-400 mt-2"
       >
         Double-click to add • Drag handles to connect • Right-click for options
       </motion.p>
