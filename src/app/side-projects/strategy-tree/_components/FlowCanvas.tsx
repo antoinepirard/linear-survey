@@ -151,8 +151,8 @@ export function FlowCanvas({
   } | null>(null);
   const connectingNodeId = useRef<string | null>(null);
 
-  const onInit = useCallback((instance: ReactFlowInstance) => {
-    reactFlowInstance.current = instance;
+  const onInit = useCallback((instance: ReactFlowInstance<StrategyNodeType, StrategyEdge>) => {
+    reactFlowInstance.current = instance as ReactFlowInstance;
     setTimeout(() => {
       instance.fitView({ padding: 0.2 });
     }, 100);
