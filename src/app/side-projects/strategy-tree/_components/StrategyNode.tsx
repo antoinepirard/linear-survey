@@ -1,181 +1,118 @@
-'use client';
+"use client";
 
-import { memo, useCallback } from 'react';
-import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { 
-  ChevronDownIcon, 
-  ChevronRightIcon,
+import { memo, useCallback } from "react";
+import { Handle, Position, type NodeProps } from "@xyflow/react";
+import {
   FlagIcon,
   MapIcon,
   RocketLaunchIcon,
   CheckCircleIcon,
-  CalendarIcon,
-  UserIcon,
-} from '@heroicons/react/24/outline';
-import type { StrategyNodeData, StrategyNodeType } from '../_types';
-import { STATUS_CONFIG, NODE_TYPE_CONFIG, calculateProgress, formatDate } from '../_types';
+  CheckIcon,
+} from "@heroicons/react/24/outline";
+import type { StrategyNodeData, StrategyNodeType } from "../_types";
+import { STATUS_CONFIG, NODE_TYPE_CONFIG } from "../_types";
 
 // Get the appropriate icon component for a node type
-function NodeTypeIcon({ nodeType, className }: { nodeType: StrategyNodeType; className?: string }) {
-  const iconClass = className || 'w-3.5 h-3.5';
-  
+function NodeTypeIcon({
+  nodeType,
+  className,
+}: {
+  nodeType: StrategyNodeType;
+  className?: string;
+}) {
+  const iconClass = className || "w-4 h-4";
+
   switch (nodeType) {
-    case 'company-goal':
+    case "company-goal":
       return <FlagIcon className={iconClass} />;
-    case 'strategy':
+    case "strategy":
       return <MapIcon className={iconClass} />;
-    case 'initiative':
+    case "initiative":
       return <RocketLaunchIcon className={iconClass} />;
-    case 'task':
+    case "task":
       return <CheckCircleIcon className={iconClass} />;
     default:
       return <FlagIcon className={iconClass} />;
   }
 }
 
-function StrategyNodeComponent({ 
-  id, 
-  data, 
+function StrategyNodeComponent({
+  id,
+  data,
   selected,
 }: NodeProps<StrategyNodeData>) {
   const statusConfig = STATUS_CONFIG[data.status];
   const nodeTypeConfig = NODE_TYPE_CONFIG[data.nodeType];
-  const hasChildren = data.isCollapsed !== undefined;
-  const progress = calculateProgress(data.metrics);
-
-  const handleCollapseClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    const event = new CustomEvent('toggleCollapse', { detail: { nodeId: id } });
-    window.dispatchEvent(event);
-  }, [id]);
 
   return (
-    <div
-      className={`
-        relative bg-white rounded-lg shadow-md border transition-all duration-150
-        w-[240px]
-        ${selected 
-          ? 'border-blue-500 shadow-lg shadow-blue-500/20' 
-          : `${nodeTypeConfig.borderColor} hover:border-slate-300`
-        }
-      `}
-    >
-      {/* Top handle for incoming connections */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="!w-3 !h-3 !bg-slate-300 !border-2 !border-white hover:!bg-blue-500 transition-colors"
-      />
+    <div className="relative">
+      {/* Status badge - positioned in top right */}
+      {data.status !== "not-started" && (
+        <div
+          className={`absolute -top-2.5 right-4 z-10 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+            data.status === "on-track"
+              ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+              : data.status === "at-risk"
+              ? "bg-amber-50 text-amber-600 border border-amber-200"
+              : "bg-rose-50 text-rose-600 border border-rose-200"
+          }`}
+        >
+          {data.status === "on-track" && <CheckIcon className="w-3 h-3" />}
+          {statusConfig.label}
+        </div>
+      )}
 
-      {/* Node content */}
-      <div className="p-3">
-        {/* Header with type badge and collapse */}
-        <div className="flex items-center gap-2 mb-1.5">
-          {/* Type icon */}
-          <span className={`inline-flex items-center justify-center w-6 h-6 rounded ${nodeTypeConfig.bgColor}`}>
-            <NodeTypeIcon nodeType={data.nodeType} className={`w-3.5 h-3.5 ${nodeTypeConfig.iconColor}`} />
-          </span>
-          
-          <div className="flex-1" />
+      {/* Main card */}
+      <div
+        className={`
+          bg-white rounded-xl ring-1 transition-all duration-150
+          w-[280px] shadow-sm
+          ${
+            selected
+              ? "ring-blue-400 shadow-md shadow-blue-500/10"
+              : "ring-slate-300/40"
+          }
+        `}
+      >
+        {/* Top handle */}
+        <Handle
+          type="target"
+          position={Position.Top}
+          className="!w-2.5 !h-2.5 !bg-white !border !border-slate-300 !rounded-full hover:!border-blue-400 transition-colors"
+        />
 
-          {/* Collapse button */}
-          {hasChildren && (
-            <button
-              onClick={handleCollapseClick}
-              className="p-0.5 rounded hover:bg-slate-100 transition-colors"
-              title={data.isCollapsed ? 'Expand' : 'Collapse'}
+        {/* Content */}
+        <div className="px-4 py-4 pt-5">
+          {/* Title row with icon */}
+          <div className="flex items-start gap-2 mb-2">
+            <div
+              className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${nodeTypeConfig.bgColor}`}
             >
-              {data.isCollapsed ? (
-                <ChevronRightIcon className="w-4 h-4 text-slate-400" />
-              ) : (
-                <ChevronDownIcon className="w-4 h-4 text-slate-400" />
-              )}
-            </button>
+              <NodeTypeIcon
+                nodeType={data.nodeType}
+                className={`w-3.5 h-3.5 ${nodeTypeConfig.iconColor}`}
+              />
+            </div>
+            <h3 className="text-sm font-semibold text-slate-800 leading-tight pt-0.5">
+              {data.title || "Untitled"}
+            </h3>
+          </div>
+
+          {/* Description */}
+          {data.description && (
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {data.description}
+            </p>
           )}
         </div>
 
-        {/* Title */}
-        <h3 className="text-sm font-semibold text-slate-900 mb-1">
-          {data.title || 'Untitled'}
-        </h3>
-
-        {/* Description */}
-        {data.description && (
-          <p className="text-xs text-slate-500 line-clamp-2 mb-2">
-            {data.description}
-          </p>
-        )}
-
-        {/* Metrics row */}
-        {data.metrics && (
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            {/* Progress */}
-            {data.metrics.progress?.enabled && progress !== null && (
-              <div className="flex items-center gap-1.5">
-                <div className="w-12 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full rounded-full transition-all ${
-                      progress >= 100 ? 'bg-emerald-500' : 
-                      progress >= 50 ? 'bg-blue-500' : 'bg-amber-500'
-                    }`}
-                    style={{ width: `${Math.min(progress, 100)}%` }}
-                  />
-                </div>
-                <span className="text-[10px] font-medium text-slate-500">
-                  {progress}%
-                </span>
-              </div>
-            )}
-
-            {/* Timeline */}
-            {data.metrics.timeline?.enabled && data.metrics.timeline.dueDate && (
-              <span className="inline-flex items-center gap-0.5 text-[10px] text-slate-400">
-                <CalendarIcon className="w-3 h-3" />
-                {formatDate(data.metrics.timeline.dueDate)}
-              </span>
-            )}
-
-            {/* Owner */}
-            {data.metrics.owner?.enabled && data.metrics.owner.name && (
-              <span className="inline-flex items-center gap-0.5 text-[10px] text-slate-400 truncate max-w-[80px]">
-                <UserIcon className="w-3 h-3 flex-shrink-0" />
-                {data.metrics.owner.name}
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Status */}
-        <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100">
-          <div className={`w-2 h-2 rounded-full ${statusConfig.bgColor}`} />
-          <span className={`text-[10px] uppercase tracking-wide font-medium ${statusConfig.color}`}>
-            {statusConfig.label}
-          </span>
-        </div>
+        {/* Bottom handle */}
+        <Handle
+          type="source"
+          position={Position.Bottom}
+          className="!w-2.5 !h-2.5 !bg-white !border !border-slate-300 !rounded-full hover:!border-blue-400 transition-colors"
+        />
       </div>
-
-      {/* Bottom handle for outgoing connections */}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!w-3 !h-3 !bg-slate-300 !border-2 !border-white hover:!bg-blue-500 transition-colors"
-      />
-
-      {/* Left handle for cross-links */}
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="left"
-        className="!w-2.5 !h-2.5 !bg-slate-200 !border-2 !border-white hover:!bg-blue-400 transition-colors"
-      />
-
-      {/* Right handle for cross-links */}
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="right"
-        className="!w-2.5 !h-2.5 !bg-slate-200 !border-2 !border-white hover:!bg-blue-400 transition-colors"
-      />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { memo, useCallback } from "react";
 import {
   BaseEdge,
   EdgeLabelRenderer,
-  getSmoothStepPath,
+  getBezierPath,
   type Edge,
   type EdgeProps,
 } from "@xyflow/react";
@@ -28,14 +28,13 @@ function ButtonEdgeComponent({
   selected,
   data,
 }: EdgeProps<StrategyEdge>) {
-  const [edgePath, labelX, labelY] = getSmoothStepPath({
+  const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
     sourcePosition,
     targetX,
     targetY,
     targetPosition,
-    borderRadius: 8,
   });
 
   const handleDelete = useCallback(
@@ -53,12 +52,13 @@ function ButtonEdgeComponent({
         id={id}
         path={edgePath}
         style={{
-          stroke: selected ? "#3b82f6" : "#cbd5e1",
-          strokeWidth: selected ? 2 : 1.5,
+          stroke: selected ? "#3b82f6" : "#d4d4d8",
+          strokeWidth: selected ? 1.5 : 1,
         }}
+        markerEnd={selected ? "url(#arrow-selected)" : "url(#arrow)"}
       />
 
-      {/* Delete button - appears on hover/select */}
+      {/* Edge label and delete button */}
       <EdgeLabelRenderer>
         <div
           style={{
@@ -66,11 +66,11 @@ function ButtonEdgeComponent({
             transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
             pointerEvents: "all",
           }}
-          className="nodrag nopan"
+          className="nodrag nopan flex flex-col items-center gap-1"
         >
           {/* Optional label */}
           {data?.label && (
-            <span className="text-[10px] text-slate-500 bg-white px-1.5 py-0.5 rounded shadow-sm mb-1 block">
+            <span className="text-[11px] text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200 whitespace-nowrap">
               {data.label}
             </span>
           )}

@@ -356,18 +356,45 @@ export function FlowCanvas({
           type: 'button',
           animated: false,
         }}
-        connectionLineStyle={{ stroke: '#94a3b8', strokeWidth: 2 }}
+        connectionLineStyle={{ stroke: '#d4d4d8', strokeWidth: 1 }}
         proOptions={{ hideAttribution: true }}
-        className="bg-slate-50"
+        className="bg-white"
       >
+        {/* Arrow markers for edges */}
+        <svg>
+          <defs>
+            <marker
+              id="arrow"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="5"
+              markerHeight="5"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#d4d4d8" />
+            </marker>
+            <marker
+              id="arrow-selected"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="5"
+              markerHeight="5"
+              orient="auto-start-reverse"
+            >
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6" />
+            </marker>
+          </defs>
+        </svg>
         <Background 
           variant={BackgroundVariant.Dots} 
-          gap={20} 
+          gap={24} 
           size={1} 
-          color="#cbd5e1"
+          color="#e2e8f0"
         />
         <Controls 
-          className="!bg-white !border-slate-200 !shadow-md [&>button]:!bg-white [&>button]:!border-slate-200 [&>button]:!text-slate-600 [&>button:hover]:!bg-slate-50"
+          className="!bg-white !border-slate-200 !shadow-sm [&>button]:!bg-white [&>button]:!border-slate-200 [&>button]:!text-slate-500 [&>button:hover]:!bg-slate-50"
           showInteractive={false}
         />
       </ReactFlow>
