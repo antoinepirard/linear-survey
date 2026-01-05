@@ -100,7 +100,7 @@ export function Toolbar({
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="flex items-center gap-1 px-2 py-1.5 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200"
+        className="flex items-center gap-1 px-1 py-1 bg-white/95 backdrop-blur-sm rounded-xl shadow-sm ring-1 ring-slate-200/50"
       >
         {/* Fit View */}
         <button
