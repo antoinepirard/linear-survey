@@ -12,7 +12,7 @@ const featuredProjects = [
     title: "Ravell",
     description: "Team planning tool for product teams.",
     date: "2025",
-    href: "https://ravell.app",
+    href: "https://ravell.io",
     isExternal: true,
   },
   {
