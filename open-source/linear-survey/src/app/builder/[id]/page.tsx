@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/Label";
 import { QuestionEditor } from "@/components/builder/QuestionEditor";
 import { LinearConfigPanel } from "@/components/builder/LinearConfigPanel";
 import { GroupManager } from "@/components/builder/GroupManager";
+import { StepSeparator } from "@/components/builder/StepSeparator";
 import {
   ArrowLeft,
   Plus,
@@ -84,12 +85,53 @@ export default function BuilderPage() {
     setHasChanges(true);
   }
 
-  function addQuestion(type: QuestionType) {
+  // Organize questions into sections (steps) for display
+  const questionSections = useMemo(() => {
+    if (!survey) return [];
+
+    // Build ordered list of questions with their step positions
+    // Questions are stored flat but we display them grouped by step
+    const sections: Array<{
+      group: QuestionGroup | null;
+      questions: Array<{ question: Question; globalIndex: number }>;
+    }> = [];
+
+    // First, collect all questions by group
+    const ungrouped: Array<{ question: Question; globalIndex: number }> = [];
+    const byGroup = new Map<string, Array<{ question: Question; globalIndex: number }>>();
+
+    survey.questions.forEach((question, globalIndex) => {
+      if (question.groupId) {
+        const existing = byGroup.get(question.groupId) || [];
+        existing.push({ question, globalIndex });
+        byGroup.set(question.groupId, existing);
+      } else {
+        ungrouped.push({ question, globalIndex });
+      }
+    });
+
+    // Add ungrouped questions first (before any step)
+    if (ungrouped.length > 0) {
+      sections.push({ group: null, questions: ungrouped });
+    }
+
+    // Add questions for each group in order
+    for (const group of survey.groups) {
+      const questions = byGroup.get(group.id) || [];
+      sections.push({ group, questions });
+    }
+
+    return sections;
+  }, [survey]);
+
+  function addQuestion(type: QuestionType, groupId?: string) {
     if (!survey) return;
     const newQuestion = createDefaultQuestion(type);
 
-    // If there are groups and questions, assign to the last group by default
-    if (survey.groups.length > 0) {
+    // Assign to the specified group, or last group if no group specified
+    if (groupId) {
+      newQuestion.groupId = groupId;
+    } else if (survey.groups.length > 0) {
       newQuestion.groupId = survey.groups[survey.groups.length - 1].id;
     }
 
@@ -121,8 +163,62 @@ export default function BuilderPage() {
     if (newIndex < 0 || newIndex >= survey.questions.length) return;
 
     const updated = [...survey.questions];
-    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
+    const movingQuestion = updated[index];
+    const targetQuestion = updated[newIndex];
+
+    // When moving, inherit the groupId from the target position
+    // This makes questions automatically belong to the step they're moved into
+    const updatedMovingQuestion = {
+      ...movingQuestion,
+      groupId: targetQuestion.groupId,
+    } as Question;
+
+    updated[index] = targetQuestion;
+    updated[newIndex] = updatedMovingQuestion;
+
     setSurvey({ ...survey, questions: updated });
+    setHasChanges(true);
+  }
+
+  function addStepSeparator() {
+    if (!survey) return;
+    const newGroup: QuestionGroup = {
+      id: crypto.randomUUID(),
+      title: `Step ${survey.groups.length + 1}`,
+    };
+    setSurvey({
+      ...survey,
+      groups: [...survey.groups, newGroup],
+    });
+    setHasChanges(true);
+  }
+
+  function updateStepSeparator(groupId: string, updates: Partial<QuestionGroup>) {
+    if (!survey) return;
+    const updatedGroups = survey.groups.map((g) =>
+      g.id === groupId ? { ...g, ...updates } : g
+    );
+    setSurvey({ ...survey, groups: updatedGroups });
+    setHasChanges(true);
+  }
+
+  function deleteStepSeparator(groupId: string) {
+    if (!survey) return;
+    // Remove the group and unassign all questions from it
+    const updatedGroups = survey.groups.filter((g) => g.id !== groupId);
+    const updatedQuestions = survey.questions.map((q) => {
+      if (q.groupId === groupId) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { groupId: _unused, ...rest } = q;
+        return rest as Question;
+      }
+      return q;
+    });
+    setSurvey({
+      ...survey,
+      groups: updatedGroups,
+      questions: updatedQuestions,
+    });
     setHasChanges(true);
   }
 
@@ -225,21 +321,76 @@ export default function BuilderPage() {
               />
             </Card>
 
-            {/* Questions List */}
+            {/* Questions List with Step Separators */}
             <div className="space-y-4">
-              {survey.questions.map((question, index) => (
-                <QuestionEditor
-                  key={question.id}
-                  question={question}
-                  index={index}
-                  totalQuestions={survey.questions.length}
-                  groups={survey.groups}
-                  onChange={(q) => updateQuestion(index, q)}
-                  onDelete={() => deleteQuestion(index)}
-                  onMove={(dir) => moveQuestion(index, dir)}
-                />
+              {questionSections.map((section) => (
+                <div key={section.group?.id || "ungrouped"}>
+                  {/* Step separator (only show if there's a group) */}
+                  {section.group && (
+                    <StepSeparator
+                      group={section.group}
+                      stepNumber={survey.groups.indexOf(section.group) + 1}
+                      onUpdate={(updates) =>
+                        updateStepSeparator(section.group!.id, updates)
+                      }
+                      onDelete={() => deleteStepSeparator(section.group!.id)}
+                    />
+                  )}
+
+                  {/* Questions in this section */}
+                  <div className="space-y-4">
+                    {section.questions.map(({ question, globalIndex }) => {
+                      // Calculate if we can move up/down
+                      const canMoveUp = globalIndex > 0;
+                      const canMoveDown = globalIndex < survey.questions.length - 1;
+
+                      return (
+                        <QuestionEditor
+                          key={question.id}
+                          question={question}
+                          index={globalIndex}
+                          totalQuestions={survey.questions.length}
+                          canMoveUp={canMoveUp}
+                          canMoveDown={canMoveDown}
+                          onChange={(q) => updateQuestion(globalIndex, q)}
+                          onDelete={() => deleteQuestion(globalIndex)}
+                          onMove={(dir) => moveQuestion(globalIndex, dir)}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  {/* Add question button for this section */}
+                  {section.questions.length === 0 && section.group && (
+                    <p className="text-center text-sm text-text-tertiary py-4">
+                      Move questions below this line to add them to {section.group.title}
+                    </p>
+                  )}
+                </div>
               ))}
+
+              {/* Show message if no questions at all */}
+              {survey.questions.length === 0 && (
+                <div className="text-center py-8 text-text-secondary">
+                  <p className="text-sm">No questions yet. Add your first question below.</p>
+                </div>
+              )}
             </div>
+
+            {/* Add Step Separator */}
+            {survey.groups.length > 0 && (
+              <div className="flex justify-center mt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={addStepSeparator}
+                  className="text-text-tertiary hover:text-text-secondary"
+                >
+                  <Plus className="mr-1 h-3 w-3" />
+                  Add Step
+                </Button>
+              </div>
+            )}
 
             {/* Add Question */}
             <Card className="mt-4 p-4">

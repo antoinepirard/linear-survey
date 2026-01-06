@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
-import { Select } from "@/components/ui/Select";
 import { Checkbox } from "@/components/ui/Checkbox";
 import {
   ChevronUp,
@@ -17,7 +16,6 @@ import {
 } from "lucide-react";
 import {
   Question,
-  QuestionGroup,
   QUESTION_TYPE_LABELS,
   ChoiceQuestion,
   RatingQuestion,
@@ -29,7 +27,8 @@ interface QuestionEditorProps {
   question: Question;
   index: number;
   totalQuestions: number;
-  groups: QuestionGroup[];
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
   onChange: (question: Question) => void;
   onDelete: () => void;
   onMove: (direction: "up" | "down") => void;
@@ -39,7 +38,8 @@ export function QuestionEditor({
   question,
   index,
   totalQuestions,
-  groups,
+  canMoveUp = true,
+  canMoveDown = true,
   onChange,
   onDelete,
   onMove,
@@ -78,9 +78,6 @@ export function QuestionEditor({
     onChange({ ...question, options } as ChoiceQuestion);
   }
 
-  // Get group name for display
-  const groupName = groups.find((g) => g.id === question.groupId)?.title;
-
   return (
     <Card className="overflow-hidden">
       {/* Header */}
@@ -89,18 +86,13 @@ export function QuestionEditor({
         <span className="text-xs font-medium text-text-secondary">
           {index + 1}. {QUESTION_TYPE_LABELS[question.type]}
         </span>
-        {groupName && (
-          <span className="text-xs text-accent bg-accent/10 px-1.5 py-0.5 rounded">
-            {groupName}
-          </span>
-        )}
         <div className="ml-auto flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
             className="h-7 w-7"
             onClick={() => onMove("up")}
-            disabled={index === 0}
+            disabled={!canMoveUp}
           >
             <ChevronUp className="h-4 w-4" />
           </Button>
@@ -109,7 +101,7 @@ export function QuestionEditor({
             size="icon"
             className="h-7 w-7"
             onClick={() => onMove("down")}
-            disabled={index === totalQuestions - 1}
+            disabled={!canMoveDown}
           >
             <ChevronDown className="h-4 w-4" />
           </Button>
@@ -257,25 +249,6 @@ export function QuestionEditor({
               Required
             </Label>
           </div>
-
-          {/* Group selector - only show if groups exist */}
-          {groups.length > 0 && (
-            <div className="flex items-center gap-2 ml-auto">
-              <Label className="text-xs text-text-secondary">Step:</Label>
-              <Select
-                value={question.groupId || ""}
-                onChange={(e) => updateField("groupId", e.target.value || undefined)}
-                className="h-8 text-sm w-auto min-w-[120px]"
-              >
-                <option value="">No step</option>
-                {groups.map((group) => (
-                  <option key={group.id} value={group.id}>
-                    {group.title}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          )}
         </div>
       </div>
     </Card>
