@@ -87,7 +87,7 @@ export default function LinearSurveyPage() {
           </p>
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <a
-              href="https://linear-survey.vercel.app"
+              href="https://linear-survey-3xhw6vaji-ravell.vercel.app"
               target="_blank"
               rel="noreferrer noopener"
               className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 transition-colors font-medium"
@@ -419,7 +419,7 @@ export default function LinearSurveyPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <a
-              href="https://linear-survey.vercel.app"
+              href="https://linear-survey-3xhw6vaji-ravell.vercel.app"
               target="_blank"
               rel="noreferrer noopener"
               className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-white hover:bg-indigo-700 transition-colors font-medium"
