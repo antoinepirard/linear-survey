@@ -26,17 +26,9 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Card } from "@/components/ui/Card";
 import { Label } from "@/components/ui/Label";
 import { QuestionEditor } from "@/components/builder/QuestionEditor";
-import { LinearConfigPanel } from "@/components/builder/LinearConfigPanel";
 import { GroupManager } from "@/components/builder/GroupManager";
 import { StepSeparator } from "@/components/builder/StepSeparator";
-import {
-  ArrowLeft,
-  Plus,
-  ExternalLink,
-  Save,
-  Settings,
-  Eye,
-} from "lucide-react";
+import { ArrowLeft, Plus, ExternalLink, Save, Eye } from "lucide-react";
 import {
   Survey,
   Question,
@@ -140,7 +132,6 @@ export default function BuilderPage() {
   const [survey, setSurvey] = useState<Survey | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [showConfig, setShowConfig] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
@@ -464,14 +455,6 @@ export default function BuilderPage() {
               </Button>
             </Link>
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowConfig(!showConfig)}
-            >
-              <Settings className="mr-1.5 h-4 w-4" />
-              Linear
-            </Button>
-            <Button
               onClick={handleSave}
               size="sm"
               disabled={!hasChanges || saving}
@@ -613,13 +596,6 @@ export default function BuilderPage() {
             {/* Group Manager */}
             <GroupManager groups={survey.groups} onChange={updateGroups} />
 
-            {showConfig && (
-              <LinearConfigPanel
-                config={survey.linear_config}
-                onChange={(config) => updateField("linear_config", config)}
-              />
-            )}
-
             {/* Quick Stats */}
             <Card className="p-4">
               <p className="mb-3 text-sm font-medium text-text-primary">
@@ -654,14 +630,6 @@ export default function BuilderPage() {
                     )}
                   </>
                 )}
-                <div className="flex justify-between">
-                  <span className="text-text-secondary">Linear</span>
-                  <span className="text-text-primary">
-                    {survey.linear_config?.team_id
-                      ? "Connected"
-                      : "Not configured"}
-                  </span>
-                </div>
               </div>
               <div className="mt-4 pt-4 border-t border-border">
                 <Link
