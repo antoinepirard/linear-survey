@@ -8,4 +8,6 @@ export { Checkbox } from "./Checkbox";
 export { Radio } from "./Radio";
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "./Table";
 export { Badge, badgeVariants } from "./Badge";
+export { Dialog, ConfirmDialog } from "./Dialog";
+export { Dropdown, DropdownItem, DropdownSeparator } from "./Dropdown";
 

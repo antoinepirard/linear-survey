@@ -14,6 +14,7 @@ export interface BaseQuestion {
   title: string;
   description?: string;
   required: boolean;
+  groupId?: string; // Reference to a QuestionGroup for multi-step forms
 }
 
 // Text questions (short and long)
@@ -50,14 +51,23 @@ export type Question =
   | RatingQuestion
   | EmailQuestion;
 
-// Linear configuration for a survey
+// Linear configuration for a survey (team/project only, API key is app-level)
 export interface LinearConfig {
-  api_key: string;
   team_id: string;
   project_id?: string;
   labels?: string[];
   title_template?: string; // e.g., "Survey Response: {{short_text_1}}"
 }
+
+// Question group for multi-step forms
+export interface QuestionGroup {
+  id: string;
+  title: string;
+  description?: string;
+}
+
+// Survey status
+export type SurveyStatus = "active" | "archived";
 
 // Survey definition
 export interface Survey {
@@ -65,7 +75,9 @@ export interface Survey {
   title: string;
   description: string;
   questions: Question[];
+  groups: QuestionGroup[];
   linear_config: LinearConfig | null;
+  status: SurveyStatus;
   created_at: string;
   updated_at?: string;
 }
@@ -82,11 +94,16 @@ export interface SurveyResponse {
 // Individual answer value
 export type Answer = string | string[] | number;
 
-// For creating new surveys (without id and timestamps)
-export type CreateSurveyInput = Omit<Survey, "id" | "created_at" | "updated_at">;
+// For creating new surveys (without id, status and timestamps)
+export type CreateSurveyInput = Omit<Survey, "id" | "status" | "created_at" | "updated_at"> & {
+  groups?: QuestionGroup[];
+};
 
 // For updating surveys
-export type UpdateSurveyInput = Partial<Omit<Survey, "id" | "created_at">>;
+export type UpdateSurveyInput = Partial<Omit<Survey, "id" | "created_at">> & {
+  groups?: QuestionGroup[];
+  status?: SurveyStatus;
+};
 
 // For submitting responses
 export interface SubmitResponseInput {

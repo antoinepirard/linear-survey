@@ -22,10 +22,17 @@ import {
   FileText,
   RefreshCw,
   Send,
+  AlertCircle,
+  Settings,
 } from "lucide-react";
 import { Survey, SurveyResponse, Question, Answer } from "@/lib/types";
-import { getSurvey, getResponses } from "@/lib/supabase";
+import { getSurvey, getResponses, getSetting } from "@/lib/supabase";
 import { pushResponseToLinear, formatResponseAsMarkdown } from "@/lib/linear";
+
+interface LinearSettings {
+  api_key: string;
+  verified: boolean;
+}
 
 export default function ResponsesPage() {
   const params = useParams();
@@ -37,6 +44,7 @@ export default function ResponsesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [pushing, setPushing] = useState<Set<string>>(new Set());
+  const [apiKey, setApiKey] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -44,9 +52,10 @@ export default function ResponsesPage() {
 
   async function loadData() {
     try {
-      const [surveyData, responsesData] = await Promise.all([
+      const [surveyData, responsesData, linearSettings] = await Promise.all([
         getSurvey(surveyId),
         getResponses(surveyId),
+        getSetting<LinearSettings>("linear"),
       ]);
 
       if (!surveyData) {
@@ -56,6 +65,7 @@ export default function ResponsesPage() {
 
       setSurvey(surveyData);
       setResponses(responsesData);
+      setApiKey(linearSettings?.verified ? linearSettings.api_key : null);
     } catch (error) {
       console.error("Failed to load data:", error);
       router.push("/");
@@ -85,7 +95,7 @@ export default function ResponsesPage() {
   }
 
   async function handlePushToLinear(responseId: string) {
-    if (!survey?.linear_config) return;
+    if (!survey?.linear_config || !apiKey) return;
 
     setPushing((prev) => new Set(prev).add(responseId));
 
@@ -94,7 +104,7 @@ export default function ResponsesPage() {
       if (!response) return;
 
       const issue = await pushResponseToLinear(
-        survey.linear_config.api_key,
+        apiKey,
         survey.linear_config.team_id,
         survey.linear_config.title_template || "Survey Response",
         survey.questions,
@@ -121,7 +131,7 @@ export default function ResponsesPage() {
   }
 
   async function handleBulkPush() {
-    if (!survey?.linear_config) return;
+    if (!survey?.linear_config || !apiKey) return;
 
     const unpushedSelected = responses.filter(
       (r) => selectedIds.has(r.id) && !r.linear_issue_id
@@ -200,6 +210,9 @@ export default function ResponsesPage() {
   const selectedUnpushed = responses.filter(
     (r) => selectedIds.has(r.id) && !r.linear_issue_id
   ).length;
+  
+  // Check if Linear integration is fully configured
+  const isLinearReady = apiKey && survey.linear_config?.team_id;
 
   return (
     <div className="min-h-screen bg-surface-secondary">
@@ -235,7 +248,7 @@ export default function ResponsesPage() {
               <Download className="mr-1.5 h-4 w-4" />
               Export CSV
             </Button>
-            {survey.linear_config && selectedUnpushed > 0 && (
+            {isLinearReady && selectedUnpushed > 0 && (
               <Button size="sm" onClick={handleBulkPush}>
                 <Send className="mr-1.5 h-4 w-4" />
                 Push {selectedUnpushed} to Linear
@@ -247,6 +260,42 @@ export default function ResponsesPage() {
 
       {/* Main Content */}
       <main className="mx-auto max-w-6xl px-6 py-8">
+        {/* Linear Warning Banner */}
+        {!isLinearReady && responses.length > 0 && (
+          <Card className="mb-6 p-4 bg-amber-50 border-amber-200">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-amber-800">
+                  Linear integration not configured
+                </p>
+                <p className="text-sm text-amber-700 mt-1">
+                  {!apiKey
+                    ? "Set up your Linear API key in settings to push responses as issues."
+                    : "Configure the team in the survey builder to push responses."}
+                </p>
+                <div className="mt-3 flex gap-2">
+                  {!apiKey && (
+                    <Link href="/settings">
+                      <Button size="sm" variant="secondary">
+                        <Settings className="mr-1.5 h-4 w-4" />
+                        Go to Settings
+                      </Button>
+                    </Link>
+                  )}
+                  {apiKey && !survey.linear_config?.team_id && (
+                    <Link href={`/builder/${survey.id}`}>
+                      <Button size="sm" variant="secondary">
+                        Configure Survey
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {responses.length === 0 ? (
           <Card className="flex flex-col items-center justify-center py-12">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-surface-secondary">
@@ -268,7 +317,7 @@ export default function ResponsesPage() {
         ) : (
           <Card>
             {/* Stats Bar */}
-            {survey.linear_config && (
+            {isLinearReady && (
               <div className="flex items-center gap-4 border-b border-border px-4 py-3">
                 <Badge variant="secondary">
                   {responses.length - unpushedCount} pushed to Linear
@@ -316,7 +365,7 @@ export default function ResponsesPage() {
                     selected={selectedIds.has(response.id)}
                     pushing={pushing.has(response.id)}
                     onToggleSelect={() => toggleSelect(response.id)}
-                    onPushToLinear={() => handlePushToLinear(response.id)}
+                    onPushToLinear={isLinearReady ? () => handlePushToLinear(response.id) : undefined}
                     getAnswerDisplay={getAnswerDisplay}
                   />
                 ))}
@@ -328,4 +377,3 @@ export default function ResponsesPage() {
     </div>
   );
 }
-

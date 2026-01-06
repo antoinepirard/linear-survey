@@ -14,7 +14,7 @@ interface ResponseRowProps {
   selected: boolean;
   pushing: boolean;
   onToggleSelect: () => void;
-  onPushToLinear: () => void;
+  onPushToLinear?: () => void;
   getAnswerDisplay: (question: Question, answer: Answer | undefined) => string;
 }
 
@@ -28,7 +28,7 @@ export function ResponseRow({
   getAnswerDisplay,
 }: ResponseRowProps) {
   const [expanded, setExpanded] = useState(false);
-  const hasLinearConfig = !!survey.linear_config;
+  const canPush = !!onPushToLinear;
   const isPushed = !!response.linear_issue_id;
 
   return (
@@ -79,7 +79,7 @@ export function ResponseRow({
         </TableCell>
         <TableCell>
           <div className="flex items-center gap-1">
-            {hasLinearConfig && !isPushed && (
+            {canPush && !isPushed && (
               <Button
                 variant="ghost"
                 size="sm"

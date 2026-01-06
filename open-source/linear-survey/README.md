@@ -10,10 +10,13 @@ An open-source, minimalistic survey builder that integrates with Linear. Create 
 
 - **Survey Builder** — Create surveys with multiple question types
 - **Question Types** — Short text, long text, single choice, multiple choice, rating (1-5), email
+- **Multi-Step Forms** — Group questions into steps for wizard-style surveys
 - **Public Survey Links** — Share surveys via a clean, accessible URL
 - **Responses Dashboard** — View all responses in a table format
 - **Linear Integration** — Push responses to Linear as issues with one click
 - **CSV Export** — Export responses for further analysis
+- **Survey Management** — Archive or delete surveys when done
+- **Multiple Database Backends** — Supabase, PostgreSQL, SQLite, or localStorage
 
 ## Deploy Your Own
 
@@ -70,11 +73,23 @@ cd linear-survey
 pnpm install
 ```
 
-#### 2. Set up Supabase
+#### 2. Set up Database
 
+Choose one of the supported database backends:
+
+**Supabase (recommended):**
 1. Create a new project at [supabase.com](https://supabase.com)
 2. Run the SQL from `schema.sql` in the Supabase SQL editor
 3. Copy your project URL and anon key from Settings > API
+
+**PostgreSQL:**
+1. Create a PostgreSQL database
+2. Set `DATABASE_URL` environment variable
+3. The app will auto-run migrations on first connection
+
+**SQLite:**
+1. Set `SQLITE_PATH` to your database file path (e.g., `./data/survey.db`)
+2. The app will create the file and run migrations automatically
 
 #### 3. Configure Environment
 
@@ -82,11 +97,21 @@ pnpm install
 cp .env.example .env.local
 ```
 
-Edit `.env.local` with your Supabase credentials:
+Edit `.env.local` with your database credentials:
 
-```
+```bash
+# For Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# OR for PostgreSQL
+DATABASE_URL=postgresql://user:pass@localhost:5432/linear_survey
+
+# OR for SQLite
+SQLITE_PATH=./data/survey.db
+
+# Optional: Explicitly set adapter (auto-detected if not set)
+# NEXT_PUBLIC_DATABASE_ADAPTER=supabase|postgres|sqlite|local
 ```
 
 #### 4. Run the App
@@ -107,12 +132,25 @@ Open [http://localhost:3001](http://localhost:3001)
 4. Configure each question (title, description, required, etc.)
 5. Save your survey
 
+### Multi-Step Surveys
+
+1. In the builder sidebar, add Steps using the "Add First Step" button
+2. Assign questions to steps using the dropdown in each question
+3. Questions assigned to steps will appear in wizard format
+4. Ungrouped questions appear at the end
+
 ### Configuring Linear Integration
 
-1. In the survey builder, click "Linear" in the header
+1. Go to Settings (gear icon in header)
 2. Enter your Linear API key (get it from [Linear Settings > API](https://linear.app/settings/api))
-3. Select your team and optionally a project
+3. In each survey builder, select your team and optionally a project
 4. Set a title template for issues
+
+### Managing Surveys
+
+- **Archive**: Move surveys to the "Archived" tab without deleting
+- **Restore**: Move archived surveys back to active
+- **Delete**: Permanently delete a survey and all its responses
 
 ### Collecting Responses
 
@@ -124,11 +162,24 @@ Share your survey using the public link: `/s/[survey-id]`
 2. Select responses you want to push
 3. Click "Push to Linear" or push individually
 
+## Database Adapters
+
+The app supports multiple database backends through an adapter system:
+
+| Adapter | Best For | Configuration |
+|---------|----------|---------------|
+| **Supabase** | Production, hosted | `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| **PostgreSQL** | Self-hosted, existing DB | `DATABASE_URL` |
+| **SQLite** | Simple self-hosting | `SQLITE_PATH` |
+| **localStorage** | Demo, development | No config needed |
+
+The adapter is auto-detected based on which environment variables are set, or you can explicitly set `NEXT_PUBLIC_DATABASE_ADAPTER`.
+
 ## Tech Stack
 
 - [Next.js 15](https://nextjs.org) — React framework
 - [Tailwind CSS](https://tailwindcss.com) — Styling
-- [Supabase](https://supabase.com) — Database
+- [Supabase](https://supabase.com) — Database (default)
 - [Linear API](https://linear.app/docs/graphql) — Issue tracking integration
 
 ## Database Schema
@@ -137,7 +188,7 @@ See `schema.sql` for the complete database schema.
 
 ## Local Development (No Database)
 
-The app includes a localStorage fallback for quick testing without Supabase. Just run `pnpm dev` without setting environment variables.
+The app includes a localStorage fallback for quick testing without a database. Just run `pnpm dev` without setting environment variables.
 
 ## License
 

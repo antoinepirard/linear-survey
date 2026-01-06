@@ -19,6 +19,7 @@ import {
 import {
   Question,
   QuestionType,
+  QuestionGroup,
   QUESTION_TYPE_LABELS,
   ChoiceQuestion,
   RatingQuestion,
@@ -30,6 +31,7 @@ interface QuestionEditorProps {
   question: Question;
   index: number;
   totalQuestions: number;
+  groups: QuestionGroup[];
   onChange: (question: Question) => void;
   onDelete: () => void;
   onMove: (direction: "up" | "down") => void;
@@ -39,6 +41,7 @@ export function QuestionEditor({
   question,
   index,
   totalQuestions,
+  groups,
   onChange,
   onDelete,
   onMove,
@@ -79,6 +82,9 @@ export function QuestionEditor({
     onChange({ ...question, options } as ChoiceQuestion);
   }
 
+  // Get group name for display
+  const groupName = groups.find((g) => g.id === question.groupId)?.title;
+
   return (
     <Card className="overflow-hidden">
       {/* Header */}
@@ -87,6 +93,11 @@ export function QuestionEditor({
         <span className="text-xs font-medium text-text-secondary">
           {index + 1}. {QUESTION_TYPE_LABELS[question.type]}
         </span>
+        {groupName && (
+          <span className="text-xs text-accent bg-accent/10 px-1.5 py-0.5 rounded">
+            {groupName}
+          </span>
+        )}
         <div className="ml-auto flex items-center gap-1">
           <Button
             variant="ghost"
@@ -234,22 +245,43 @@ export function QuestionEditor({
           </div>
         )}
 
-        {/* Required toggle */}
-        <div className="flex items-center gap-2 pt-2 border-t border-border">
-          <Checkbox
-            id={`required-${question.id}`}
-            checked={question.required}
-            onChange={(e) => updateField("required", e.target.checked)}
-          />
-          <Label
-            htmlFor={`required-${question.id}`}
-            className="text-sm font-normal"
-          >
-            Required
-          </Label>
+        {/* Settings Row */}
+        <div className="flex items-center gap-4 pt-2 border-t border-border">
+          {/* Required toggle */}
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id={`required-${question.id}`}
+              checked={question.required}
+              onChange={(e) => updateField("required", e.target.checked)}
+            />
+            <Label
+              htmlFor={`required-${question.id}`}
+              className="text-sm font-normal"
+            >
+              Required
+            </Label>
+          </div>
+
+          {/* Group selector - only show if groups exist */}
+          {groups.length > 0 && (
+            <div className="flex items-center gap-2 ml-auto">
+              <Label className="text-xs text-text-secondary">Step:</Label>
+              <Select
+                value={question.groupId || ""}
+                onChange={(e) => updateField("groupId", e.target.value || undefined)}
+                className="h-8 text-sm w-auto min-w-[120px]"
+              >
+                <option value="">No step</option>
+                {groups.map((group) => (
+                  <option key={group.id} value={group.id}>
+                    {group.title}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          )}
         </div>
       </div>
     </Card>
   );
 }
-

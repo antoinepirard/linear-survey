@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect, FormEvent, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -12,11 +12,16 @@ import {
   RatingRenderer,
   EmailRenderer,
 } from "@/components/survey/QuestionRenderers";
-import { Check, FileText, Loader2 } from "lucide-react";
-import { Survey, Question, Answer } from "@/lib/types";
+import { Check, FileText, Loader2, ArrowLeft, ArrowRight } from "lucide-react";
+import { Survey, Question, Answer, QuestionGroup } from "@/lib/types";
 import { getSurvey, submitResponse } from "@/lib/supabase";
 
 type SurveyState = "loading" | "active" | "submitted" | "error";
+
+interface Step {
+  group: QuestionGroup | null; // null = ungrouped questions
+  questions: Question[];
+}
 
 export default function SurveyPage() {
   const params = useParams();
@@ -27,6 +32,55 @@ export default function SurveyPage() {
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  // Organize questions into steps
+  const steps = useMemo<Step[]>(() => {
+    if (!survey) return [];
+
+    const hasGroups = survey.groups.length > 0;
+    
+    if (!hasGroups) {
+      // Single step with all questions
+      return [{ group: null, questions: survey.questions }];
+    }
+
+    // Group questions by their groupId
+    const groupedQuestions = new Map<string, Question[]>();
+    const ungroupedQuestions: Question[] = [];
+
+    for (const question of survey.questions) {
+      if (question.groupId) {
+        const existing = groupedQuestions.get(question.groupId) || [];
+        existing.push(question);
+        groupedQuestions.set(question.groupId, existing);
+      } else {
+        ungroupedQuestions.push(question);
+      }
+    }
+
+    // Build steps in group order
+    const result: Step[] = [];
+    
+    for (const group of survey.groups) {
+      const questions = groupedQuestions.get(group.id) || [];
+      if (questions.length > 0) {
+        result.push({ group, questions });
+      }
+    }
+
+    // Add ungrouped questions at the end
+    if (ungroupedQuestions.length > 0) {
+      result.push({ group: null, questions: ungroupedQuestions });
+    }
+
+    return result;
+  }, [survey]);
+
+  const currentStep = steps[currentStepIndex];
+  const isFirstStep = currentStepIndex === 0;
+  const isLastStep = currentStepIndex === steps.length - 1;
+  const isMultiStep = steps.length > 1;
 
   useEffect(() => {
     loadSurvey();
@@ -59,12 +113,10 @@ export default function SurveyPage() {
     }
   }
 
-  function validate(): boolean {
-    if (!survey) return false;
-
+  function validateStep(stepQuestions: Question[]): boolean {
     const newErrors: Record<string, string> = {};
 
-    for (const question of survey.questions) {
+    for (const question of stepQuestions) {
       if (question.required) {
         const answer = answers[question.id];
 
@@ -87,14 +139,29 @@ export default function SurveyPage() {
       }
     }
 
-    setErrors(newErrors);
+    setErrors((prev) => ({ ...prev, ...newErrors }));
     return Object.keys(newErrors).length === 0;
+  }
+
+  function handleNext() {
+    if (!currentStep) return;
+    
+    if (validateStep(currentStep.questions)) {
+      setCurrentStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
+    }
+  }
+
+  function handleBack() {
+    setCurrentStepIndex((prev) => Math.max(prev - 1, 0));
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
-    if (!survey || !validate()) return;
+    if (!survey || !currentStep) return;
+    
+    // Validate current step
+    if (!validateStep(currentStep.questions)) return;
 
     setSubmitting(true);
     try {
@@ -110,7 +177,7 @@ export default function SurveyPage() {
     }
   }
 
-  function renderQuestion(question: Question, index: number) {
+  function renderQuestion(question: Question) {
     const value = answers[question.id];
     const error = errors[question.id];
     const commonProps = {
@@ -182,7 +249,7 @@ export default function SurveyPage() {
     );
   }
 
-  if (!survey) return null;
+  if (!survey || !currentStep) return null;
 
   return (
     <div className="min-h-screen bg-surface-secondary py-12 px-4">
@@ -197,36 +264,94 @@ export default function SurveyPage() {
           )}
         </div>
 
+        {/* Progress Indicator (for multi-step) */}
+        {isMultiStep && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-text-secondary">
+                Step {currentStepIndex + 1} of {steps.length}
+              </span>
+              {currentStep.group && (
+                <span className="text-sm text-text-primary">
+                  {currentStep.group.title}
+                </span>
+              )}
+            </div>
+            <div className="h-2 bg-border rounded-full overflow-hidden">
+              <div
+                className="h-full bg-accent transition-all duration-300"
+                style={{
+                  width: `${((currentStepIndex + 1) / steps.length) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Form */}
         <form onSubmit={handleSubmit}>
           <Card className="divide-y divide-border">
-            {survey.questions.length === 0 ? (
+            {currentStep.group?.description && (
+              <div className="p-6 bg-surface-secondary">
+                <p className="text-sm text-text-secondary">
+                  {currentStep.group.description}
+                </p>
+              </div>
+            )}
+            
+            {currentStep.questions.length === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-sm text-text-secondary">
-                  This survey has no questions yet.
+                  No questions in this step.
                 </p>
               </div>
             ) : (
-              survey.questions.map((question, index) => (
+              currentStep.questions.map((question) => (
                 <div key={question.id} className="p-6">
-                  {renderQuestion(question, index)}
+                  {renderQuestion(question)}
                 </div>
               ))
             )}
           </Card>
 
-          {survey.questions.length > 0 && (
-            <div className="mt-6 flex justify-end">
-              <Button type="submit" disabled={submitting} size="lg">
-                {submitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  "Submit"
+          {/* Navigation */}
+          {(survey.questions.length > 0 || isMultiStep) && (
+            <div className="mt-6 flex justify-between">
+              {/* Back Button */}
+              <div>
+                {isMultiStep && !isFirstStep && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="lg"
+                    onClick={handleBack}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back
+                  </Button>
                 )}
-              </Button>
+              </div>
+
+              {/* Next/Submit Button */}
+              <div>
+                {isLastStep ? (
+                  <Button type="submit" disabled={submitting} size="lg">
+                    {submitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      "Submit"
+                    )}
+                  </Button>
+                ) : (
+                  <Button type="button" size="lg" onClick={handleNext}>
+                    Next
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           )}
         </form>
@@ -247,4 +372,3 @@ export default function SurveyPage() {
     </div>
   );
 }
-

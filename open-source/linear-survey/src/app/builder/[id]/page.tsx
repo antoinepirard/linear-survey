@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { Label } from "@/components/ui/Label";
 import { QuestionEditor } from "@/components/builder/QuestionEditor";
 import { LinearConfigPanel } from "@/components/builder/LinearConfigPanel";
+import { GroupManager } from "@/components/builder/GroupManager";
 import {
   ArrowLeft,
   Plus,
@@ -18,7 +19,7 @@ import {
   Settings,
   Eye,
 } from "lucide-react";
-import { Survey, Question, QuestionType, createDefaultQuestion } from "@/lib/types";
+import { Survey, Question, QuestionType, QuestionGroup, createDefaultQuestion } from "@/lib/types";
 import { getSurvey, updateSurvey } from "@/lib/supabase";
 
 export default function BuilderPage() {
@@ -60,6 +61,7 @@ export default function BuilderPage() {
         title: survey.title,
         description: survey.description,
         questions: survey.questions,
+        groups: survey.groups,
         linear_config: survey.linear_config,
       });
       setHasChanges(false);
@@ -79,6 +81,12 @@ export default function BuilderPage() {
   function addQuestion(type: QuestionType) {
     if (!survey) return;
     const newQuestion = createDefaultQuestion(type);
+    
+    // If there are groups and questions, assign to the last group by default
+    if (survey.groups.length > 0) {
+      newQuestion.groupId = survey.groups[survey.groups.length - 1].id;
+    }
+    
     setSurvey({
       ...survey,
       questions: [...survey.questions, newQuestion],
@@ -112,6 +120,27 @@ export default function BuilderPage() {
     setHasChanges(true);
   }
 
+  function updateGroups(groups: QuestionGroup[]) {
+    if (!survey) return;
+    
+    // When groups are deleted, unassign questions from those groups
+    const validGroupIds = new Set(groups.map(g => g.id));
+    const updatedQuestions = survey.questions.map(q => {
+      if (q.groupId && !validGroupIds.has(q.groupId)) {
+        const { groupId, ...rest } = q;
+        return rest as Question;
+      }
+      return q;
+    });
+    
+    setSurvey({ 
+      ...survey, 
+      groups,
+      questions: updatedQuestions
+    });
+    setHasChanges(true);
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-surface-secondary">
@@ -121,6 +150,10 @@ export default function BuilderPage() {
   }
 
   if (!survey) return null;
+
+  // Calculate questions per group for stats
+  const questionsInGroups = survey.questions.filter(q => q.groupId).length;
+  const ungroupedQuestions = survey.questions.length - questionsInGroups;
 
   return (
     <div className="min-h-screen bg-surface-secondary">
@@ -193,6 +226,7 @@ export default function BuilderPage() {
                   question={question}
                   index={index}
                   totalQuestions={survey.questions.length}
+                  groups={survey.groups}
                   onChange={(q) => updateQuestion(index, q)}
                   onDelete={() => deleteQuestion(index)}
                   onMove={(dir) => moveQuestion(index, dir)}
@@ -234,7 +268,13 @@ export default function BuilderPage() {
           </div>
 
           {/* Config Panel */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-4">
+            {/* Group Manager */}
+            <GroupManager
+              groups={survey.groups}
+              onChange={updateGroups}
+            />
+            
             {showConfig && (
               <LinearConfigPanel
                 config={survey.linear_config}
@@ -243,7 +283,7 @@ export default function BuilderPage() {
             )}
 
             {/* Quick Stats */}
-            <Card className={`p-4 ${showConfig ? "mt-4" : ""}`}>
+            <Card className="p-4">
               <p className="mb-3 text-sm font-medium text-text-primary">
                 Survey Info
               </p>
@@ -260,10 +300,26 @@ export default function BuilderPage() {
                     {survey.questions.filter((q) => q.required).length}
                   </span>
                 </div>
+                {survey.groups.length > 0 && (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary">Steps</span>
+                      <span className="text-text-primary">
+                        {survey.groups.length}
+                      </span>
+                    </div>
+                    {ungroupedQuestions > 0 && (
+                      <div className="flex justify-between text-amber-600">
+                        <span>Ungrouped</span>
+                        <span>{ungroupedQuestions}</span>
+                      </div>
+                    )}
+                  </>
+                )}
                 <div className="flex justify-between">
                   <span className="text-text-secondary">Linear</span>
                   <span className="text-text-primary">
-                    {survey.linear_config ? "Connected" : "Not configured"}
+                    {survey.linear_config?.team_id ? "Connected" : "Not configured"}
                   </span>
                 </div>
               </div>
@@ -284,4 +340,3 @@ export default function BuilderPage() {
     </div>
   );
 }
-
