@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { cn } from "@/lib/utils";
 import {
   ShortTextRenderer,
   LongTextRenderer,
@@ -143,7 +144,8 @@ export default function SurveyPage() {
     return Object.keys(newErrors).length === 0;
   }
 
-  function handleNext() {
+  function handleNext(e: React.MouseEvent) {
+    e.preventDefault();
     if (!currentStep) return;
     
     if (validateStep(currentStep.questions)) {
@@ -151,7 +153,8 @@ export default function SurveyPage() {
     }
   }
 
-  function handleBack() {
+  function handleBack(e: React.MouseEvent) {
+    e.preventDefault();
     setCurrentStepIndex((prev) => Math.max(prev - 1, 0));
   }
 
@@ -264,27 +267,22 @@ export default function SurveyPage() {
           )}
         </div>
 
-        {/* Progress Indicator (for multi-step) */}
+        {/* Progress Dots (for multi-step) */}
         {isMultiStep && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-text-secondary">
-                Step {currentStepIndex + 1} of {steps.length}
-              </span>
-              {currentStep.group && (
-                <span className="text-sm text-text-primary">
-                  {currentStep.group.title}
-                </span>
-              )}
-            </div>
-            <div className="h-2 bg-border rounded-full overflow-hidden">
+          <div className="mb-8 flex items-center justify-center gap-2">
+            {steps.map((_, index) => (
               <div
-                className="h-full bg-accent transition-all duration-300"
-                style={{
-                  width: `${((currentStepIndex + 1) / steps.length) * 100}%`,
-                }}
+                key={index}
+                className={cn(
+                  "h-2 w-2 rounded-full transition-all duration-300",
+                  index === currentStepIndex
+                    ? "bg-accent scale-125"
+                    : index < currentStepIndex
+                    ? "bg-accent/50"
+                    : "bg-border"
+                )}
               />
-            </div>
+            ))}
           </div>
         )}
 
@@ -324,7 +322,7 @@ export default function SurveyPage() {
                     type="button"
                     variant="ghost"
                     size="lg"
-                    onClick={handleBack}
+                    onClick={(e) => handleBack(e)}
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back
@@ -346,7 +344,7 @@ export default function SurveyPage() {
                     )}
                   </Button>
                 ) : (
-                  <Button type="button" size="lg" onClick={handleNext}>
+                  <Button type="button" size="lg" onClick={(e) => handleNext(e)}>
                     Next
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
