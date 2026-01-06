@@ -27,6 +27,14 @@ const featuredProjects = [
 
 const openSourceProjects = [
   {
+    slug: "linear-survey",
+    title: "linear-survey",
+    description: "Survey builder that integrates with Linear.",
+    date: "2026",
+    href: "/open-source/linear-survey",
+    isExternal: false,
+  },
+  {
     slug: "morphing-toc",
     title: "morphing-toc",
     description: "Table of contents that morphs from lines to menu on hover.",
