@@ -5,6 +5,202 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { MorphingToc } from "../../../../open-source/morphing-toc/src";
 
+// ============================================================================
+// Types & Config
+// ============================================================================
+
+interface PlaygroundConfig {
+  lineThickness: number;
+  lineScale: number;
+  colorTheme: "slate" | "blue" | "purple" | "emerald" | "rose";
+}
+
+const colorThemes = {
+  slate: {
+    line: { h1: "#475569", h2: "#94a3b8", h3: "#cbd5e1", h4: "#cbd5e1" },
+    menu: {
+      background: "rgba(255, 255, 255, 0.95)",
+      border: "rgba(203, 213, 225, 0.3)",
+      text: "#475569",
+      textHover: "#0f172a",
+      itemHover: "#f8fafc",
+    },
+  },
+  blue: {
+    line: { h1: "#1e40af", h2: "#3b82f6", h3: "#93c5fd", h4: "#bfdbfe" },
+    menu: {
+      background: "rgba(239, 246, 255, 0.95)",
+      border: "rgba(59, 130, 246, 0.2)",
+      text: "#1e40af",
+      textHover: "#1e3a8a",
+      itemHover: "#dbeafe",
+    },
+  },
+  purple: {
+    line: { h1: "#6b21a8", h2: "#a855f7", h3: "#d8b4fe", h4: "#e9d5ff" },
+    menu: {
+      background: "rgba(250, 245, 255, 0.95)",
+      border: "rgba(168, 85, 247, 0.2)",
+      text: "#6b21a8",
+      textHover: "#581c87",
+      itemHover: "#f3e8ff",
+    },
+  },
+  emerald: {
+    line: { h1: "#065f46", h2: "#10b981", h3: "#6ee7b7", h4: "#a7f3d0" },
+    menu: {
+      background: "rgba(236, 253, 245, 0.95)",
+      border: "rgba(16, 185, 129, 0.2)",
+      text: "#065f46",
+      textHover: "#064e3b",
+      itemHover: "#d1fae5",
+    },
+  },
+  rose: {
+    line: { h1: "#9f1239", h2: "#f43f5e", h3: "#fda4af", h4: "#fecdd3" },
+    menu: {
+      background: "rgba(255, 241, 242, 0.95)",
+      border: "rgba(244, 63, 94, 0.2)",
+      text: "#9f1239",
+      textHover: "#881337",
+      itemHover: "#ffe4e6",
+    },
+  },
+};
+
+const defaultConfig: PlaygroundConfig = {
+  lineThickness: 1,
+  lineScale: 1,
+  colorTheme: "slate",
+};
+
+// ============================================================================
+// Playground Component
+// ============================================================================
+
+interface PlaygroundProps {
+  config: PlaygroundConfig;
+  setConfig: React.Dispatch<React.SetStateAction<PlaygroundConfig>>;
+}
+
+function Playground({ config, setConfig }: PlaygroundProps) {
+  const themeOptions: Array<{ id: PlaygroundConfig["colorTheme"]; label: string; colors: string[] }> = [
+    { id: "slate", label: "Slate", colors: ["#475569", "#94a3b8", "#cbd5e1"] },
+    { id: "blue", label: "Blue", colors: ["#1e40af", "#3b82f6", "#93c5fd"] },
+    { id: "purple", label: "Purple", colors: ["#6b21a8", "#a855f7", "#d8b4fe"] },
+    { id: "emerald", label: "Emerald", colors: ["#065f46", "#10b981", "#6ee7b7"] },
+    { id: "rose", label: "Rose", colors: ["#9f1239", "#f43f5e", "#fda4af"] },
+  ];
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.15 }}
+      className="mb-16"
+    >
+      <h2 className="text-xl font-medium text-slate-900 mb-2">
+        Interactive Playground
+      </h2>
+      <p className="text-sm text-slate-500 mb-5">
+        Try the component on the left. Adjust settings to see changes in real-time.
+      </p>
+
+      <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+        {/* Line Thickness */}
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+            Thickness
+          </span>
+          <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1.5">
+            <input
+              type="range"
+              min={1}
+              max={4}
+              step={0.5}
+              value={config.lineThickness}
+              onChange={(e) =>
+                setConfig((prev) => ({
+                  ...prev,
+                  lineThickness: Number(e.target.value),
+                }))
+              }
+              className="w-20 h-1 bg-slate-300 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-slate-700 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
+            />
+            <span className="text-xs font-mono text-slate-600 w-6 text-right">
+              {config.lineThickness}
+            </span>
+          </div>
+        </div>
+
+        {/* Line Length */}
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+            Length
+          </span>
+          <div className="flex items-center gap-2 bg-slate-100 rounded-full px-3 py-1.5">
+            <input
+              type="range"
+              min={0.5}
+              max={2}
+              step={0.1}
+              value={config.lineScale}
+              onChange={(e) =>
+                setConfig((prev) => ({
+                  ...prev,
+                  lineScale: Number(e.target.value),
+                }))
+              }
+              className="w-20 h-1 bg-slate-300 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-slate-700 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
+            />
+            <span className="text-xs font-mono text-slate-600 w-6 text-right">
+              {config.lineScale.toFixed(1)}
+            </span>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="hidden sm:block w-px h-6 bg-slate-200" />
+
+        {/* Color Theme */}
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+            Theme
+          </span>
+          <div className="flex gap-1.5">
+            {themeOptions.map((theme) => (
+              <button
+                key={theme.id}
+                onClick={() =>
+                  setConfig((prev) => ({ ...prev, colorTheme: theme.id }))
+                }
+                className={`relative w-6 h-6 rounded-md overflow-hidden transition-all ${
+                  config.colorTheme === theme.id
+                    ? "ring-2 ring-slate-900 ring-offset-1"
+                    : "hover:scale-110"
+                }`}
+                title={theme.label}
+              >
+                {/* Gradient preview of the theme colors */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${theme.colors[0]} 0%, ${theme.colors[1]} 50%, ${theme.colors[2]} 100%)`,
+                  }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+// ============================================================================
+// Other Components
+// ============================================================================
+
 function CodeBlock({ children }: { children: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -144,7 +340,23 @@ function PropsTable() {
   );
 }
 
+// ============================================================================
+// Main Page Component
+// ============================================================================
+
 export default function MorphingTocDemo() {
+  const [config, setConfig] = useState<PlaygroundConfig>(defaultConfig);
+
+  // Derive MorphingToc props from playground config
+  const theme = colorThemes[config.colorTheme];
+  const baseWidths = { h1: 1.5, h2: 1, h3: 0.75, h4: 0.5 };
+  const scaledWidths = {
+    h1: `${baseWidths.h1 * config.lineScale}rem`,
+    h2: `${baseWidths.h2 * config.lineScale}rem`,
+    h3: `${baseWidths.h3 * config.lineScale}rem`,
+    h4: `${baseWidths.h4 * config.lineScale}rem`,
+  };
+
   return (
     <div className="bg-white min-h-screen relative">
       {/* Animated glow behind the TOC */}
@@ -172,8 +384,18 @@ export default function MorphingTocDemo() {
         />
       </motion.div>
 
-      {/* The component itself - demonstrating it on this page */}
-      <MorphingToc scrollOffset={80} headingLevels={[2, 3]} />
+      {/* The component itself - controlled by playground */}
+      <MorphingToc
+        scrollOffset={80}
+        headingLevels={[2, 3]}
+        colors={theme}
+        sizes={{
+          lineWidth: scaledWidths,
+          lineHeight: `${config.lineThickness}px`,
+          lineGap: "0.5rem",
+          menuWidth: "16rem",
+        }}
+      />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
         {/* Back navigation */}
@@ -239,6 +461,9 @@ export default function MorphingTocDemo() {
             </a>
           </div>
         </motion.header>
+
+        {/* Interactive Playground */}
+        <Playground config={config} setConfig={setConfig} />
 
         {/* Content sections */}
         <motion.div
