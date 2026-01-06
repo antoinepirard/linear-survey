@@ -1,0 +1,34 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build output
+.next
+out
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files (build args should be used instead)
+.env
+.env.*
+
+# Vercel
+.vercel
+
+# Misc
+*.md
+!README.md
+LICENSE
+
