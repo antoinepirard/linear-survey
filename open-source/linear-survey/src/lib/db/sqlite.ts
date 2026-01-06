@@ -7,36 +7,45 @@ import {
 } from "../types";
 import { DatabaseAdapter, SurveyStatus } from "./types";
 
-type BetterSqlite3Database = import("better-sqlite3").Database;
-
 /**
  * SQLite adapter for simple self-hosting
- * Uses better-sqlite3 for synchronous, fast access
+ * 
+ * NOTE: Requires 'better-sqlite3' package to be installed: pnpm add better-sqlite3
  */
 export class SQLiteAdapter implements DatabaseAdapter {
   readonly name = "sqlite";
-  private db: BetterSqlite3Database | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private db: any = null;
   private initialized = false;
+  private initError: Error | null = null;
 
   get isConfigured(): boolean {
     return !!process.env.SQLITE_PATH;
   }
 
-  private getDb(): BetterSqlite3Database {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private getDb(): any {
+    if (this.initError) {
+      throw this.initError;
+    }
+    
     if (!this.initialized) {
       const path = process.env.SQLITE_PATH || "./data/survey.db";
-      // Dynamic import to avoid issues in browser
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const Database = require("better-sqlite3");
-      this.db = new Database(path);
-      this.initialized = true;
+      
+      try {
+        // Dynamic require using eval to prevent webpack from analyzing
+        const Database = (0, eval)('require("better-sqlite3")');
+        this.db = new Database(path);
+        this.initialized = true;
+      } catch {
+        this.initError = new Error(
+          "SQLite adapter requires 'better-sqlite3' package. Install with: pnpm add better-sqlite3"
+        );
+        throw this.initError;
+      }
     }
     return this.db!;
   }
-
-  // ============================================
-  // Survey operations
-  // ============================================
 
   async getSurveys(status: SurveyStatus = "active"): Promise<Survey[]> {
     const db = this.getDb();
@@ -59,12 +68,10 @@ export class SQLiteAdapter implements DatabaseAdapter {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
 
-    const stmt = db.prepare(`
+    db.prepare(`
       INSERT INTO surveys (id, title, description, questions, groups, linear_config, status, created_at)
       VALUES (?, ?, ?, ?, ?, ?, 'active', ?)
-    `);
-
-    stmt.run(
+    `).run(
       id,
       input.title,
       input.description,
@@ -89,8 +96,6 @@ export class SQLiteAdapter implements DatabaseAdapter {
   async updateSurvey(id: string, input: UpdateSurveyInput): Promise<Survey> {
     const db = this.getDb();
     const now = new Date().toISOString();
-
-    // Build dynamic update
     const updates: string[] = [];
     const values: unknown[] = [];
 
@@ -123,8 +128,7 @@ export class SQLiteAdapter implements DatabaseAdapter {
     values.push(now);
     values.push(id);
 
-    const stmt = db.prepare(`UPDATE surveys SET ${updates.join(", ")} WHERE id = ?`);
-    stmt.run(...values);
+    db.prepare(`UPDATE surveys SET ${updates.join(", ")} WHERE id = ?`).run(...values);
 
     const updated = await this.getSurvey(id);
     if (!updated) throw new Error("Survey not found");
@@ -143,10 +147,6 @@ export class SQLiteAdapter implements DatabaseAdapter {
   async restoreSurvey(id: string): Promise<Survey> {
     return this.updateSurvey(id, { status: "active" });
   }
-
-  // ============================================
-  // Response operations
-  // ============================================
 
   async getResponses(surveyId: string): Promise<SurveyResponse[]> {
     const db = this.getDb();
@@ -169,12 +169,10 @@ export class SQLiteAdapter implements DatabaseAdapter {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
 
-    const stmt = db.prepare(`
+    db.prepare(`
       INSERT INTO responses (id, survey_id, answers, created_at)
       VALUES (?, ?, ?, ?)
-    `);
-
-    stmt.run(id, input.survey_id, JSON.stringify(input.answers), now);
+    `).run(id, input.survey_id, JSON.stringify(input.answers), now);
 
     return {
       id,
@@ -185,15 +183,9 @@ export class SQLiteAdapter implements DatabaseAdapter {
     };
   }
 
-  async updateResponseLinearIssue(
-    responseId: string,
-    linearIssueId: string
-  ): Promise<void> {
+  async updateResponseLinearIssue(responseId: string, linearIssueId: string): Promise<void> {
     const db = this.getDb();
-    db.prepare(`UPDATE responses SET linear_issue_id = ? WHERE id = ?`).run(
-      linearIssueId,
-      responseId
-    );
+    db.prepare(`UPDATE responses SET linear_issue_id = ? WHERE id = ?`).run(linearIssueId, responseId);
   }
 
   async deleteResponse(id: string): Promise<void> {
@@ -201,14 +193,9 @@ export class SQLiteAdapter implements DatabaseAdapter {
     db.prepare(`DELETE FROM responses WHERE id = ?`).run(id);
   }
 
-  // ============================================
-  // Settings operations
-  // ============================================
-
   async getSetting<T = unknown>(key: string): Promise<T | null> {
     const db = this.getDb();
-    const stmt = db.prepare(`SELECT value FROM settings WHERE key = ?`);
-    const row = stmt.get(key) as { value: string } | undefined;
+    const row = db.prepare(`SELECT value FROM settings WHERE key = ?`).get(key) as { value: string } | undefined;
     return row ? JSON.parse(row.value) : null;
   }
 
@@ -226,10 +213,6 @@ export class SQLiteAdapter implements DatabaseAdapter {
     db.prepare(`DELETE FROM settings WHERE key = ?`).run(key);
   }
 
-  // ============================================
-  // Connection
-  // ============================================
-
   async testConnection(): Promise<boolean> {
     try {
       const db = this.getDb();
@@ -242,7 +225,6 @@ export class SQLiteAdapter implements DatabaseAdapter {
 
   async runMigrations(): Promise<void> {
     const db = this.getDb();
-
     db.exec(`
       CREATE TABLE IF NOT EXISTS surveys (
         id TEXT PRIMARY KEY,
@@ -255,7 +237,6 @@ export class SQLiteAdapter implements DatabaseAdapter {
         created_at TEXT NOT NULL,
         updated_at TEXT
       );
-
       CREATE TABLE IF NOT EXISTS responses (
         id TEXT PRIMARY KEY,
         survey_id TEXT NOT NULL REFERENCES surveys(id) ON DELETE CASCADE,
@@ -263,23 +244,17 @@ export class SQLiteAdapter implements DatabaseAdapter {
         linear_issue_id TEXT DEFAULT NULL,
         created_at TEXT NOT NULL
       );
-
       CREATE TABLE IF NOT EXISTS settings (
         key TEXT PRIMARY KEY,
         value TEXT NOT NULL,
         updated_at TEXT
       );
-
       CREATE INDEX IF NOT EXISTS idx_responses_survey_id ON responses(survey_id);
       CREATE INDEX IF NOT EXISTS idx_responses_created_at ON responses(created_at);
       CREATE INDEX IF NOT EXISTS idx_surveys_created_at ON surveys(created_at);
       CREATE INDEX IF NOT EXISTS idx_surveys_status ON surveys(status);
     `);
   }
-
-  // ============================================
-  // Helpers
-  // ============================================
 
   private parseSurveyRow(row: Record<string, unknown>): Survey {
     return {
@@ -307,4 +282,3 @@ export class SQLiteAdapter implements DatabaseAdapter {
 }
 
 export const sqliteAdapter = new SQLiteAdapter();
-

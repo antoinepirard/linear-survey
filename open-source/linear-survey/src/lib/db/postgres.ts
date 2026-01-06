@@ -10,33 +10,46 @@ import { DatabaseAdapter, SurveyStatus } from "./types";
 /**
  * PostgreSQL adapter using native pg client
  * For generic PostgreSQL databases (not Supabase)
+ * 
+ * NOTE: Requires 'pg' package to be installed: pnpm add pg
  */
 export class PostgresAdapter implements DatabaseAdapter {
   readonly name = "postgres";
-  private pool: import("pg").Pool | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private pool: any = null;
   private initialized = false;
+  private initError: Error | null = null;
 
   get isConfigured(): boolean {
     return !!process.env.DATABASE_URL;
   }
 
-  private async getPool(): Promise<import("pg").Pool> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async getPool(): Promise<any> {
+    if (this.initError) {
+      throw this.initError;
+    }
+    
     if (!this.initialized) {
       const url = process.env.DATABASE_URL;
       if (!url) {
         throw new Error("DATABASE_URL is not configured");
       }
-      // Dynamic import to avoid issues in browser
-      const { Pool } = await import("pg");
-      this.pool = new Pool({ connectionString: url });
-      this.initialized = true;
+      
+      try {
+        // Dynamic import using eval to prevent webpack from analyzing
+        const pg = await (0, eval)('import("pg")');
+        this.pool = new pg.Pool({ connectionString: url });
+        this.initialized = true;
+      } catch {
+        this.initError = new Error(
+          "PostgreSQL adapter requires 'pg' package. Install with: pnpm add pg"
+        );
+        throw this.initError;
+      }
     }
     return this.pool!;
   }
-
-  // ============================================
-  // Survey operations
-  // ============================================
 
   async getSurveys(status: SurveyStatus = "active"): Promise<Survey[]> {
     const pool = await this.getPool();
@@ -44,13 +57,13 @@ export class PostgresAdapter implements DatabaseAdapter {
       `SELECT * FROM surveys WHERE status = $1 ORDER BY created_at DESC`,
       [status]
     );
-    return result.rows;
+    return result.rows as Survey[];
   }
 
   async getSurvey(id: string): Promise<Survey | null> {
     const pool = await this.getPool();
     const result = await pool.query(`SELECT * FROM surveys WHERE id = $1`, [id]);
-    return result.rows[0] || null;
+    return (result.rows[0] as Survey) || null;
   }
 
   async createSurvey(input: CreateSurveyInput): Promise<Survey> {
@@ -67,13 +80,11 @@ export class PostgresAdapter implements DatabaseAdapter {
         input.linear_config ? JSON.stringify(input.linear_config) : null,
       ]
     );
-    return result.rows[0];
+    return result.rows[0] as Survey;
   }
 
   async updateSurvey(id: string, input: UpdateSurveyInput): Promise<Survey> {
     const pool = await this.getPool();
-    
-    // Build dynamic update query
     const updates: string[] = [];
     const values: unknown[] = [];
     let paramIndex = 1;
@@ -114,7 +125,7 @@ export class PostgresAdapter implements DatabaseAdapter {
     if (result.rows.length === 0) {
       throw new Error("Survey not found");
     }
-    return result.rows[0];
+    return result.rows[0] as Survey;
   }
 
   async deleteSurvey(id: string): Promise<void> {
@@ -130,23 +141,19 @@ export class PostgresAdapter implements DatabaseAdapter {
     return this.updateSurvey(id, { status: "active" });
   }
 
-  // ============================================
-  // Response operations
-  // ============================================
-
   async getResponses(surveyId: string): Promise<SurveyResponse[]> {
     const pool = await this.getPool();
     const result = await pool.query(
       `SELECT * FROM responses WHERE survey_id = $1 ORDER BY created_at DESC`,
       [surveyId]
     );
-    return result.rows;
+    return result.rows as SurveyResponse[];
   }
 
   async getResponse(id: string): Promise<SurveyResponse | null> {
     const pool = await this.getPool();
     const result = await pool.query(`SELECT * FROM responses WHERE id = $1`, [id]);
-    return result.rows[0] || null;
+    return (result.rows[0] as SurveyResponse) || null;
   }
 
   async submitResponse(input: SubmitResponseInput): Promise<SurveyResponse> {
@@ -157,13 +164,10 @@ export class PostgresAdapter implements DatabaseAdapter {
        RETURNING *`,
       [input.survey_id, JSON.stringify(input.answers)]
     );
-    return result.rows[0];
+    return result.rows[0] as SurveyResponse;
   }
 
-  async updateResponseLinearIssue(
-    responseId: string,
-    linearIssueId: string
-  ): Promise<void> {
+  async updateResponseLinearIssue(responseId: string, linearIssueId: string): Promise<void> {
     const pool = await this.getPool();
     await pool.query(
       `UPDATE responses SET linear_issue_id = $1 WHERE id = $2`,
@@ -176,17 +180,13 @@ export class PostgresAdapter implements DatabaseAdapter {
     await pool.query(`DELETE FROM responses WHERE id = $1`, [id]);
   }
 
-  // ============================================
-  // Settings operations
-  // ============================================
-
   async getSetting<T = unknown>(key: string): Promise<T | null> {
     const pool = await this.getPool();
     const result = await pool.query(
       `SELECT value FROM settings WHERE key = $1`,
       [key]
     );
-    return result.rows[0]?.value || null;
+    return (result.rows[0] as { value: T })?.value || null;
   }
 
   async setSetting<T = unknown>(key: string, value: T): Promise<void> {
@@ -204,10 +204,6 @@ export class PostgresAdapter implements DatabaseAdapter {
     await pool.query(`DELETE FROM settings WHERE key = $1`, [key]);
   }
 
-  // ============================================
-  // Connection
-  // ============================================
-
   async testConnection(): Promise<boolean> {
     try {
       const pool = await this.getPool();
@@ -220,11 +216,8 @@ export class PostgresAdapter implements DatabaseAdapter {
 
   async runMigrations(): Promise<void> {
     const pool = await this.getPool();
-    
-    // Run schema migrations
     await pool.query(`
       CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
       CREATE TABLE IF NOT EXISTS surveys (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         title TEXT NOT NULL DEFAULT '',
@@ -236,7 +229,6 @@ export class PostgresAdapter implements DatabaseAdapter {
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ
       );
-
       CREATE TABLE IF NOT EXISTS responses (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         survey_id UUID NOT NULL REFERENCES surveys(id) ON DELETE CASCADE,
@@ -244,13 +236,11 @@ export class PostgresAdapter implements DatabaseAdapter {
         linear_issue_id TEXT DEFAULT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
-
       CREATE TABLE IF NOT EXISTS settings (
         key TEXT PRIMARY KEY,
         value JSONB NOT NULL,
         updated_at TIMESTAMPTZ DEFAULT NOW()
       );
-
       CREATE INDEX IF NOT EXISTS idx_responses_survey_id ON responses(survey_id);
       CREATE INDEX IF NOT EXISTS idx_responses_created_at ON responses(created_at DESC);
       CREATE INDEX IF NOT EXISTS idx_surveys_created_at ON surveys(created_at DESC);
@@ -260,4 +250,3 @@ export class PostgresAdapter implements DatabaseAdapter {
 }
 
 export const postgresAdapter = new PostgresAdapter();
-

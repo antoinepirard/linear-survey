@@ -1,8 +1,6 @@
 import { DatabaseAdapter } from "./types";
 import { localStorageAdapter } from "./localStorage";
 import { supabaseAdapter } from "./supabase";
-import { postgresAdapter } from "./postgres";
-import { sqliteAdapter } from "./sqlite";
 
 export * from "./types";
 
@@ -38,6 +36,10 @@ export function getAdapterType(): AdapterType {
   return "local";
 }
 
+// Lazy-loaded adapters (only loaded when actually used)
+let postgresAdapter: DatabaseAdapter | null = null;
+let sqliteAdapter: DatabaseAdapter | null = null;
+
 /**
  * Get the database adapter instance based on configuration
  */
@@ -47,10 +49,25 @@ export function getAdapter(): DatabaseAdapter {
   switch (type) {
     case "supabase":
       return supabaseAdapter;
+      
     case "postgres":
-      return postgresAdapter;
+      // Lazy load postgres adapter only when needed
+      if (!postgresAdapter) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { PostgresAdapter } = require("./postgres");
+        postgresAdapter = new PostgresAdapter();
+      }
+      return postgresAdapter!;
+      
     case "sqlite":
-      return sqliteAdapter;
+      // Lazy load sqlite adapter only when needed
+      if (!sqliteAdapter) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { SQLiteAdapter } = require("./sqlite");
+        sqliteAdapter = new SQLiteAdapter();
+      }
+      return sqliteAdapter!;
+      
     case "local":
     default:
       return localStorageAdapter;
@@ -78,13 +95,13 @@ export function getAvailableAdapters(): Array<{
     {
       type: "postgres",
       name: "PostgreSQL",
-      isConfigured: postgresAdapter.isConfigured,
+      isConfigured: !!process.env.DATABASE_URL,
       isActive: activeType === "postgres",
     },
     {
       type: "sqlite",
       name: "SQLite",
-      isConfigured: sqliteAdapter.isConfigured,
+      isConfigured: !!process.env.SQLITE_PATH,
       isActive: activeType === "sqlite",
     },
     {
@@ -97,9 +114,8 @@ export function getAvailableAdapters(): Array<{
 }
 
 // Export individual adapters for direct access if needed
-export { localStorageAdapter, supabaseAdapter, postgresAdapter, sqliteAdapter };
+export { localStorageAdapter, supabaseAdapter };
 
 // Default export is the active adapter
 const db = getAdapter();
 export default db;
-

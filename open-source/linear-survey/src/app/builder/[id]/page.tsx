@@ -127,7 +127,8 @@ export default function BuilderPage() {
     const validGroupIds = new Set(groups.map(g => g.id));
     const updatedQuestions = survey.questions.map(q => {
       if (q.groupId && !validGroupIds.has(q.groupId)) {
-        const { groupId, ...rest } = q;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { groupId: _unused, ...rest } = q;
         return rest as Question;
       }
       return q;

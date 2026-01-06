@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -18,7 +17,6 @@ import {
 } from "lucide-react";
 import {
   Question,
-  QuestionType,
   QuestionGroup,
   QUESTION_TYPE_LABELS,
   ChoiceQuestion,
@@ -46,8 +44,6 @@ export function QuestionEditor({
   onDelete,
   onMove,
 }: QuestionEditorProps) {
-  const [expanded, setExpanded] = useState(true);
-
   function updateField<K extends keyof Question>(
     field: K,
     value: Question[K]

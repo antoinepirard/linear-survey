@@ -12,7 +12,6 @@ import {
   TableBody,
   TableRow,
   TableHead,
-  TableCell,
 } from "@/components/ui/Table";
 import { ResponseRow } from "@/components/responses/ResponseRow";
 import {
@@ -27,7 +26,7 @@ import {
 } from "lucide-react";
 import { Survey, SurveyResponse, Question, Answer } from "@/lib/types";
 import { getSurvey, getResponses, getSetting } from "@/lib/supabase";
-import { pushResponseToLinear, formatResponseAsMarkdown } from "@/lib/linear";
+import { pushResponseToLinear } from "@/lib/linear";
 
 interface LinearSettings {
   api_key: string;
@@ -145,7 +144,12 @@ export default function ResponsesPage() {
   function exportToCSV() {
     if (!survey || responses.length === 0) return;
 
-    const headers = ["ID", "Submitted At", "Linear Issue", ...survey.questions.map((q) => q.title)];
+    const headers = [
+      "ID",
+      "Submitted At",
+      "Linear Issue",
+      ...survey.questions.map((q) => q.title),
+    ];
 
     const rows = responses.map((response) => {
       const row = [
@@ -189,7 +193,10 @@ export default function ResponsesPage() {
     return value;
   }
 
-  function getAnswerDisplay(question: Question, answer: Answer | undefined): string {
+  function getAnswerDisplay(
+    question: Question,
+    answer: Answer | undefined
+  ): string {
     if (answer === undefined || answer === null || answer === "") return "—";
     if (Array.isArray(answer)) return answer.join(", ");
     if (question.type === "rating") return `${answer}/5`;
@@ -210,7 +217,7 @@ export default function ResponsesPage() {
   const selectedUnpushed = responses.filter(
     (r) => selectedIds.has(r.id) && !r.linear_issue_id
   ).length;
-  
+
   // Check if Linear integration is fully configured
   const isLinearReady = apiKey && survey.linear_config?.team_id;
 
@@ -365,7 +372,11 @@ export default function ResponsesPage() {
                     selected={selectedIds.has(response.id)}
                     pushing={pushing.has(response.id)}
                     onToggleSelect={() => toggleSelect(response.id)}
-                    onPushToLinear={isLinearReady ? () => handlePushToLinear(response.id) : undefined}
+                    onPushToLinear={
+                      isLinearReady
+                        ? () => handlePushToLinear(response.id)
+                        : undefined
+                    }
                     getAnswerDisplay={getAnswerDisplay}
                   />
                 ))}

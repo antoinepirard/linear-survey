@@ -3,8 +3,7 @@
 import { forwardRef, InputHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-export interface RadioProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {}
+export type RadioProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type">;
 
 const Radio = forwardRef<HTMLInputElement, RadioProps>(
   ({ className, ...props }, ref) => {

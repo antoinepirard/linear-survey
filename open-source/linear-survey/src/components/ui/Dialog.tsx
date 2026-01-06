@@ -70,7 +70,7 @@ interface ConfirmDialogProps {
   title: string;
   description: string;
   confirmLabel?: string;
-  confirmVariant?: "primary" | "danger";
+  confirmVariant?: "default" | "danger";
   loading?: boolean;
 }
 
@@ -81,7 +81,7 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel = "Confirm",
-  confirmVariant = "primary",
+  confirmVariant = "default",
   loading = false,
 }: ConfirmDialogProps) {
   return (
@@ -91,10 +91,9 @@ export function ConfirmDialog({
           Cancel
         </Button>
         <Button
-          variant={confirmVariant === "danger" ? "ghost" : "primary"}
+          variant={confirmVariant === "danger" ? "destructive" : "default"}
           onClick={onConfirm}
           disabled={loading}
-          className={confirmVariant === "danger" ? "text-red-600 hover:bg-red-50 hover:text-red-700" : ""}
         >
           {loading ? "..." : confirmLabel}
         </Button>

@@ -84,7 +84,7 @@ export default function SettingsPage() {
       
       setOriginalApiKey(apiKey);
       setVerified(true);
-    } catch (err) {
+    } catch {
       setError("Invalid API key. Please check and try again.");
       setVerified(false);
     } finally {

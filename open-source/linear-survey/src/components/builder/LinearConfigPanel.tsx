@@ -8,7 +8,7 @@ import { Select } from "@/components/ui/Select";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { Check, Loader2, AlertCircle, Settings, ExternalLink } from "lucide-react";
+import { Check, Loader2, AlertCircle, Settings } from "lucide-react";
 import { LinearConfig, LinearTeam, LinearProject } from "@/lib/types";
 import { getLinearTeams, getLinearProjects } from "@/lib/linear";
 import { getSetting } from "@/lib/supabase";
@@ -85,7 +85,7 @@ export function LinearConfigPanel({ config, onChange }: LinearConfigPanelProps) 
           title_template: "Survey Response",
         });
       }
-    } catch (err) {
+    } catch {
       setError("Failed to load teams");
     }
   }
@@ -97,8 +97,8 @@ export function LinearConfigPanel({ config, onChange }: LinearConfigPanelProps) 
     try {
       const teamProjects = await getLinearProjects(apiKey, teamId);
       setProjects(teamProjects);
-    } catch (err) {
-      console.error("Failed to load projects:", err);
+    } catch {
+      console.error("Failed to load projects");
     } finally {
       setLoadingProjects(false);
     }
