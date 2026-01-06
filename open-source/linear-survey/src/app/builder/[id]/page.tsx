@@ -19,7 +19,13 @@ import {
   Settings,
   Eye,
 } from "lucide-react";
-import { Survey, Question, QuestionType, QuestionGroup, createDefaultQuestion } from "@/lib/types";
+import {
+  Survey,
+  Question,
+  QuestionType,
+  QuestionGroup,
+  createDefaultQuestion,
+} from "@/lib/types";
 import { getSurvey, updateSurvey } from "@/lib/supabase";
 
 export default function BuilderPage() {
@@ -81,12 +87,12 @@ export default function BuilderPage() {
   function addQuestion(type: QuestionType) {
     if (!survey) return;
     const newQuestion = createDefaultQuestion(type);
-    
+
     // If there are groups and questions, assign to the last group by default
     if (survey.groups.length > 0) {
       newQuestion.groupId = survey.groups[survey.groups.length - 1].id;
     }
-    
+
     setSurvey({
       ...survey,
       questions: [...survey.questions, newQuestion],
@@ -122,10 +128,10 @@ export default function BuilderPage() {
 
   function updateGroups(groups: QuestionGroup[]) {
     if (!survey) return;
-    
+
     // When groups are deleted, unassign questions from those groups
-    const validGroupIds = new Set(groups.map(g => g.id));
-    const updatedQuestions = survey.questions.map(q => {
+    const validGroupIds = new Set(groups.map((g) => g.id));
+    const updatedQuestions = survey.questions.map((q) => {
       if (q.groupId && !validGroupIds.has(q.groupId)) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { groupId: _unused, ...rest } = q;
@@ -133,11 +139,11 @@ export default function BuilderPage() {
       }
       return q;
     });
-    
-    setSurvey({ 
-      ...survey, 
+
+    setSurvey({
+      ...survey,
       groups,
-      questions: updatedQuestions
+      questions: updatedQuestions,
     });
     setHasChanges(true);
   }
@@ -153,7 +159,7 @@ export default function BuilderPage() {
   if (!survey) return null;
 
   // Calculate questions per group for stats
-  const questionsInGroups = survey.questions.filter(q => q.groupId).length;
+  const questionsInGroups = survey.questions.filter((q) => q.groupId).length;
   const ungroupedQuestions = survey.questions.length - questionsInGroups;
 
   return (
@@ -271,11 +277,8 @@ export default function BuilderPage() {
           {/* Config Panel */}
           <div className="lg:col-span-1 space-y-4">
             {/* Group Manager */}
-            <GroupManager
-              groups={survey.groups}
-              onChange={updateGroups}
-            />
-            
+            <GroupManager groups={survey.groups} onChange={updateGroups} />
+
             {showConfig && (
               <LinearConfigPanel
                 config={survey.linear_config}
@@ -320,7 +323,9 @@ export default function BuilderPage() {
                 <div className="flex justify-between">
                   <span className="text-text-secondary">Linear</span>
                   <span className="text-text-primary">
-                    {survey.linear_config?.team_id ? "Connected" : "Not configured"}
+                    {survey.linear_config?.team_id
+                      ? "Connected"
+                      : "Not configured"}
                   </span>
                 </div>
               </div>
