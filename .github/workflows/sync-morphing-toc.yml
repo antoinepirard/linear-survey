@@ -1,0 +1,39 @@
+name: Sync morphing-toc to public repo
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'open-source/morphing-toc/**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Setup SSH for deploy key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.MORPHING_TOC_DEPLOY_KEY }}
+
+      - name: Split subtree and push to public repo
+        run: |
+          # Split the subtree into a temporary branch
+          git subtree split --prefix=open-source/morphing-toc -b subtree-split
+
+          # Add the public repo as a remote
+          git remote add public git@github.com:antoinepirard/morphing-toc.git
+
+          # Push the split branch to the public repo's main branch
+          git push public subtree-split:main --force
+
