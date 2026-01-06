@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
 import { Checkbox } from "@/components/ui/Checkbox";
 import {
-  ChevronUp,
-  ChevronDown,
   Trash2,
   GripVertical,
   Plus,
@@ -27,22 +25,17 @@ interface QuestionEditorProps {
   question: Question;
   index: number;
   totalQuestions: number;
-  canMoveUp?: boolean;
-  canMoveDown?: boolean;
   onChange: (question: Question) => void;
   onDelete: () => void;
-  onMove: (direction: "up" | "down") => void;
+  dragHandleProps?: React.HTMLAttributes<HTMLDivElement>;
 }
 
 export function QuestionEditor({
   question,
   index,
-  totalQuestions,
-  canMoveUp = true,
-  canMoveDown = true,
   onChange,
   onDelete,
-  onMove,
+  dragHandleProps,
 }: QuestionEditorProps) {
   function updateField<K extends keyof Question>(
     field: K,
@@ -82,29 +75,16 @@ export function QuestionEditor({
     <Card className="overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-border bg-surface-secondary px-4 py-2">
-        <GripVertical className="h-4 w-4 cursor-grab text-text-tertiary" />
+        <div
+          {...dragHandleProps}
+          className="cursor-grab active:cursor-grabbing touch-none"
+        >
+          <GripVertical className="h-4 w-4 text-text-tertiary" />
+        </div>
         <span className="text-xs font-medium text-text-secondary">
           {index + 1}. {QUESTION_TYPE_LABELS[question.type]}
         </span>
         <div className="ml-auto flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => onMove("up")}
-            disabled={!canMoveUp}
-          >
-            <ChevronUp className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => onMove("down")}
-            disabled={!canMoveDown}
-          >
-            <ChevronDown className="h-4 w-4" />
-          </Button>
           <Button
             variant="ghost"
             size="icon"

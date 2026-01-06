@@ -3,6 +3,23 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -28,6 +45,92 @@ import {
   createDefaultQuestion,
 } from "@/lib/types";
 import { getSurvey, updateSurvey } from "@/lib/supabase";
+
+// Draggable item types
+type DraggableItem =
+  | { type: "question"; id: string; question: Question; globalIndex: number }
+  | { type: "separator"; id: string; group: QuestionGroup };
+
+// Sortable wrapper for questions
+function SortableQuestionEditor({
+  item,
+  totalQuestions,
+  onChange,
+  onDelete,
+}: {
+  item: Extract<DraggableItem, { type: "question" }>;
+  totalQuestions: number;
+  onChange: (q: Question) => void;
+  onDelete: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <QuestionEditor
+        question={item.question}
+        index={item.globalIndex}
+        totalQuestions={totalQuestions}
+        onChange={onChange}
+        onDelete={onDelete}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
+    </div>
+  );
+}
+
+// Sortable wrapper for step separators
+function SortableStepSeparator({
+  item,
+  stepNumber,
+  onUpdate,
+  onDelete,
+}: {
+  item: Extract<DraggableItem, { type: "separator" }>;
+  stepNumber: number;
+  onUpdate: (updates: Partial<QuestionGroup>) => void;
+  onDelete: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <StepSeparator
+        group={item.group}
+        stepNumber={stepNumber}
+        onUpdate={onUpdate}
+        onDelete={onDelete}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
+    </div>
+  );
+}
 
 export default function BuilderPage() {
   const params = useParams();
@@ -85,44 +188,141 @@ export default function BuilderPage() {
     setHasChanges(true);
   }
 
-  // Organize questions into sections (steps) for display
-  const questionSections = useMemo(() => {
+  // Build a flat list of draggable items (questions + separators) for dnd-kit
+  const draggableItems = useMemo<DraggableItem[]>(() => {
     if (!survey) return [];
 
-    // Build ordered list of questions with their step positions
-    // Questions are stored flat but we display them grouped by step
-    const sections: Array<{
-      group: QuestionGroup | null;
-      questions: Array<{ question: Question; globalIndex: number }>;
-    }> = [];
+    const items: DraggableItem[] = [];
 
-    // First, collect all questions by group
-    const ungrouped: Array<{ question: Question; globalIndex: number }> = [];
-    const byGroup = new Map<string, Array<{ question: Question; globalIndex: number }>>();
+    // Collect questions by group
+    const ungrouped: Question[] = [];
+    const byGroup = new Map<string, Question[]>();
 
-    survey.questions.forEach((question, globalIndex) => {
+    survey.questions.forEach((question) => {
       if (question.groupId) {
         const existing = byGroup.get(question.groupId) || [];
-        existing.push({ question, globalIndex });
+        existing.push(question);
         byGroup.set(question.groupId, existing);
       } else {
-        ungrouped.push({ question, globalIndex });
+        ungrouped.push(question);
       }
     });
 
     // Add ungrouped questions first (before any step)
-    if (ungrouped.length > 0) {
-      sections.push({ group: null, questions: ungrouped });
-    }
+    ungrouped.forEach((question, idx) => {
+      items.push({
+        type: "question",
+        id: `question-${question.id}`,
+        question,
+        globalIndex: idx,
+      });
+    });
 
-    // Add questions for each group in order
+    // Add groups and their questions
+    let questionIndex = ungrouped.length;
     for (const group of survey.groups) {
-      const questions = byGroup.get(group.id) || [];
-      sections.push({ group, questions });
+      // Add the separator
+      items.push({
+        type: "separator",
+        id: `separator-${group.id}`,
+        group,
+      });
+
+      // Add questions in this group
+      const groupQuestions = byGroup.get(group.id) || [];
+      groupQuestions.forEach((question) => {
+        items.push({
+          type: "question",
+          id: `question-${question.id}`,
+          question,
+          globalIndex: questionIndex++,
+        });
+      });
     }
 
-    return sections;
+    return items;
   }, [survey]);
+
+  // Get just the IDs for SortableContext
+  const draggableItemIds = useMemo(
+    () => draggableItems.map((item) => item.id),
+    [draggableItems]
+  );
+
+  // Configure dnd-kit sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end - reorder items and update groupIds
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id || !survey) return;
+
+    const oldIndex = draggableItems.findIndex((item) => item.id === active.id);
+    const newIndex = draggableItems.findIndex((item) => item.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const movedItem = draggableItems[oldIndex];
+
+    if (movedItem.type === "question") {
+      // Moving a question
+      const newItems = arrayMove(draggableItems, oldIndex, newIndex);
+
+      // Build new questions array from the reordered items
+      // Recalculate groupId for each question based on its position relative to separators
+      const newQuestions: Question[] = [];
+      let currentGroupId: string | undefined = undefined;
+
+      for (const item of newItems) {
+        if (item.type === "separator") {
+          currentGroupId = item.group.id;
+        } else if (item.type === "question") {
+          newQuestions.push({
+            ...item.question,
+            groupId: currentGroupId,
+          } as Question);
+        }
+      }
+
+      setSurvey({ ...survey, questions: newQuestions });
+      setHasChanges(true);
+    } else if (movedItem.type === "separator") {
+      // Moving a separator - this reorders the groups
+      const newItems = arrayMove(draggableItems, oldIndex, newIndex);
+
+      // Extract new group order from the reordered items
+      const newGroups = newItems
+        .filter(
+          (item): item is Extract<DraggableItem, { type: "separator" }> =>
+            item.type === "separator"
+        )
+        .map((item) => item.group);
+
+      // Now we need to reassign questions based on new separator positions
+      const newQuestions: Question[] = [];
+      let currentGroupId: string | undefined = undefined;
+
+      for (const item of newItems) {
+        if (item.type === "separator") {
+          currentGroupId = item.group.id;
+        } else if (item.type === "question") {
+          newQuestions.push({
+            ...item.question,
+            groupId: currentGroupId,
+          } as Question);
+        }
+      }
+
+      setSurvey({ ...survey, groups: newGroups, questions: newQuestions });
+      setHasChanges(true);
+    }
+  }
 
   function addQuestion(type: QuestionType, groupId?: string) {
     if (!survey) return;
@@ -150,32 +350,9 @@ export default function BuilderPage() {
     setHasChanges(true);
   }
 
-  function deleteQuestion(index: number) {
+  function deleteQuestion(questionId: string) {
     if (!survey) return;
-    const updated = survey.questions.filter((_, i) => i !== index);
-    setSurvey({ ...survey, questions: updated });
-    setHasChanges(true);
-  }
-
-  function moveQuestion(index: number, direction: "up" | "down") {
-    if (!survey) return;
-    const newIndex = direction === "up" ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= survey.questions.length) return;
-
-    const updated = [...survey.questions];
-    const movingQuestion = updated[index];
-    const targetQuestion = updated[newIndex];
-
-    // When moving, inherit the groupId from the target position
-    // This makes questions automatically belong to the step they're moved into
-    const updatedMovingQuestion = {
-      ...movingQuestion,
-      groupId: targetQuestion.groupId,
-    } as Question;
-
-    updated[index] = targetQuestion;
-    updated[newIndex] = updatedMovingQuestion;
-
+    const updated = survey.questions.filter((q) => q.id !== questionId);
     setSurvey({ ...survey, questions: updated });
     setHasChanges(true);
   }
@@ -193,7 +370,10 @@ export default function BuilderPage() {
     setHasChanges(true);
   }
 
-  function updateStepSeparator(groupId: string, updates: Partial<QuestionGroup>) {
+  function updateStepSeparator(
+    groupId: string,
+    updates: Partial<QuestionGroup>
+  ) {
     if (!survey) return;
     const updatedGroups = survey.groups.map((g) =>
       g.id === groupId ? { ...g, ...updates } : g
@@ -321,72 +501,75 @@ export default function BuilderPage() {
               />
             </Card>
 
-            {/* Questions List with Step Separators */}
-            <div className="space-y-4">
-              {questionSections.map((section) => (
-                <div key={section.group?.id || "ungrouped"}>
-                  {/* Step separator (only show if there's a group) */}
-                  {section.group && (
-                    <StepSeparator
-                      group={section.group}
-                      stepNumber={survey.groups.indexOf(section.group) + 1}
-                      onUpdate={(updates) =>
-                        updateStepSeparator(section.group!.id, updates)
-                      }
-                      onDelete={() => deleteStepSeparator(section.group!.id)}
-                    />
-                  )}
-
-                  {/* Questions in this section */}
-                  <div className="space-y-4">
-                    {section.questions.map(({ question, globalIndex }) => {
-                      // Calculate if we can move up/down
-                      const canMoveUp = globalIndex > 0;
-                      const canMoveDown = globalIndex < survey.questions.length - 1;
-
+            {/* Questions List with Step Separators - Drag and Drop */}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={draggableItemIds}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-4">
+                  {draggableItems.map((item, idx) => {
+                    if (item.type === "separator") {
+                      const stepNumber = survey.groups.indexOf(item.group) + 1;
                       return (
-                        <QuestionEditor
-                          key={question.id}
-                          question={question}
-                          index={globalIndex}
-                          totalQuestions={survey.questions.length}
-                          canMoveUp={canMoveUp}
-                          canMoveDown={canMoveDown}
-                          onChange={(q) => updateQuestion(globalIndex, q)}
-                          onDelete={() => deleteQuestion(globalIndex)}
-                          onMove={(dir) => moveQuestion(globalIndex, dir)}
+                        <SortableStepSeparator
+                          key={item.id}
+                          item={item}
+                          stepNumber={stepNumber}
+                          onUpdate={(updates) =>
+                            updateStepSeparator(item.group.id, updates)
+                          }
+                          onDelete={() => deleteStepSeparator(item.group.id)}
                         />
                       );
-                    })}
-                  </div>
+                    } else {
+                      // Find the display index (1-based for users)
+                      const questionIndex = draggableItems
+                        .slice(0, idx)
+                        .filter((i) => i.type === "question").length;
 
-                  {/* Add question button for this section */}
-                  {section.questions.length === 0 && section.group && (
-                    <p className="text-center text-sm text-text-tertiary py-4">
-                      Move questions below this line to add them to {section.group.title}
-                    </p>
+                      return (
+                        <SortableQuestionEditor
+                          key={item.id}
+                          item={{ ...item, globalIndex: questionIndex }}
+                          totalQuestions={survey.questions.length}
+                          onChange={(q) => {
+                            const qIdx = survey.questions.findIndex(
+                              (sq) => sq.id === item.question.id
+                            );
+                            if (qIdx !== -1) updateQuestion(qIdx, q);
+                          }}
+                          onDelete={() => deleteQuestion(item.question.id)}
+                        />
+                      );
+                    }
+                  })}
+
+                  {/* Show message if no questions at all */}
+                  {survey.questions.length === 0 && (
+                    <div className="text-center py-8 text-text-secondary">
+                      <p className="text-sm">
+                        No questions yet. Add your first question below.
+                      </p>
+                    </div>
                   )}
                 </div>
-              ))}
-
-              {/* Show message if no questions at all */}
-              {survey.questions.length === 0 && (
-                <div className="text-center py-8 text-text-secondary">
-                  <p className="text-sm">No questions yet. Add your first question below.</p>
-                </div>
-              )}
-            </div>
+              </SortableContext>
+            </DndContext>
 
             {/* Add Step Separator */}
             {survey.groups.length > 0 && (
-              <div className="flex justify-center mt-4">
+              <div className="flex justify-center mt-6">
                 <Button
-                  variant="ghost"
+                  variant="secondary"
                   size="sm"
                   onClick={addStepSeparator}
-                  className="text-text-tertiary hover:text-text-secondary"
                 >
-                  <Plus className="mr-1 h-3 w-3" />
+                  <Plus className="mr-1.5 h-3 w-3" />
                   Add Step
                 </Button>
               </div>

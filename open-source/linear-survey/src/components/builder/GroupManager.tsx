@@ -45,7 +45,7 @@ export function GroupManager({ groups, onChange }: GroupManagerProps) {
       </p>
       <Button variant="secondary" size="sm" onClick={addFirstStep} className="w-full">
         <Plus className="mr-1.5 h-3 w-3" />
-        Add First Step
+        Enable Steps
       </Button>
     </Card>
   );

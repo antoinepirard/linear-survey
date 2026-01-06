@@ -11,6 +11,7 @@ interface StepSeparatorProps {
   stepNumber: number;
   onUpdate: (updates: Partial<QuestionGroup>) => void;
   onDelete: () => void;
+  dragHandleProps?: React.HTMLAttributes<HTMLDivElement>;
 }
 
 export function StepSeparator({
@@ -18,6 +19,7 @@ export function StepSeparator({
   stepNumber,
   onUpdate,
   onDelete,
+  dragHandleProps,
 }: StepSeparatorProps) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -28,7 +30,12 @@ export function StepSeparator({
 
       {/* Step label */}
       <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border shadow-sm">
-        <GripVertical className="h-3 w-3 text-text-tertiary cursor-grab" />
+        <div
+          {...dragHandleProps}
+          className="cursor-grab active:cursor-grabbing touch-none"
+        >
+          <GripVertical className="h-3 w-3 text-text-tertiary" />
+        </div>
         
         {isEditing ? (
           <Input
